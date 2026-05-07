@@ -4,6 +4,7 @@ Allows admin to manually run the pipeline.
 """
 
 import os
+import threading
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
@@ -38,30 +39,24 @@ async def trigger_pipeline(
     Manually trigger the news pipeline.
     Requires admin token in X-Admin-Token header.
     """
-    # Validate admin token
     if not ADMIN_SECRET_TOKEN:
         raise HTTPException(status_code=500, detail="Admin token not configured")
     
     if x_admin_token != ADMIN_SECRET_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid admin token")
     
-    try:
-        # Run pipeline with optional parameters
-        kwargs = {}
-        if request:
-            if request.supplementary_only:
-                kwargs['supplementary_only'] = True
-            if request.archive_only:
-                kwargs['archive_only'] = True
-        
-        # Run synchronously for API response
-        import asyncio
-        await asyncio.to_thread(run_pipeline, **kwargs)
-        
-        return TriggerResponse(
-            success=True,
-            message="Pipeline triggered successfully",
-            timestamp=datetime.utcnow().isoformat()
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Pipeline failed: {str(e)}")
+    kwargs = {}
+    if request:
+        if request.supplementary_only:
+            kwargs['supplementary_only'] = True
+        if request.archive_only:
+            kwargs['archive_only'] = True
+    
+    thread = threading.Thread(target=run_pipeline, kwargs=kwargs, daemon=True)
+    thread.start()
+    
+    return TriggerResponse(
+        success=True,
+        message="Pipeline triggered successfully",
+        timestamp=datetime.utcnow().isoformat()
+    )
