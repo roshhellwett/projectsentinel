@@ -1,0 +1,181 @@
+"""
+Deduplication logic - SHA256 URL hashing and database checks.
+Optimized: batch DB operations, upsert, minimal memory.
+"""
+
+import os
+import hashlib
+from typing import List, Dict, Set, Optional
+from datetime import datetime, timezone
+
+from supabase import create_client
+
+from logger.pipeline_logger import PipelineLogger
+
+
+class Deduplicator:
+    """Handles article deduplication using URL hashing."""
+
+    def __init__(self):
+        self.logger = PipelineLogger()
+        self.supabase = None
+        self._known_hashes: Optional[Set[str]] = None
+        self._init_supabase()
+
+    def _init_supabase(self):
+        """Initialize Supabase client."""
+        supabase_url = os.getenv("SUPABASE_URL", "")
+        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+
+        if supabase_url and supabase_key:
+            try:
+                self.supabase = create_client(supabase_url, supabase_key)
+            except Exception as e:
+                self.logger.log("DEDUP_ERROR", f"Failed to connect to Supabase: {str(e)}")
+
+    def _load_known_hashes(self) -> Set[str]:
+        """Load all known URL hashes from raw_articles (cached per pipeline run)."""
+        if self._known_hashes is not None:
+            return self._known_hashes
+
+        if not self.supabase:
+            self._known_hashes = set()
+            return self._known_hashes
+
+        try:
+            result = self.supabase.table("raw_articles").select("url_hash").execute()
+            self._known_hashes = {row["url_hash"] for row in (result.data or [])}
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
+            self._known_hashes = set()
+
+        return self._known_hashes
+
+    def is_new(self, article: Dict) -> bool:
+        """
+        Check if article is new using in-memory hash cache.
+        Batch-inserts new articles at end of pipeline via mark_group_processed.
+
+        Args:
+            article: Article dict with url_hash
+
+        Returns:
+            True if article is new, False if duplicate
+        """
+        if not self.supabase:
+            return True
+
+        url_hash = article.get("url_hash", "")
+        if not url_hash:
+            return False
+
+        known = self._load_known_hashes()
+        if url_hash in known:
+            return False
+
+        known.add(url_hash)
+        article["_is_new"] = True
+        return True
+
+    def batch_insert_new_articles(self, articles: List[Dict]) -> int:
+        """
+        Batch insert all new articles into raw_articles.
+        Call this once at end of fetch step for all new articles.
+
+        Args:
+            articles: List of article dicts that passed is_new()
+
+        Returns:
+            Number of articles inserted
+        """
+        if not self.supabase:
+            return 0
+
+        new_articles = [a for a in articles if a.get("_is_new")]
+        if not new_articles:
+            return 0
+
+        try:
+            insert_data = [
+                {
+                    "url_hash": a["url_hash"],
+                    "url": a["url"],
+                    "headline": a["headline"],
+                    "excerpt": a.get("excerpt", ""),
+                    "source_name": a["source_name"],
+                    "source_url": a.get("source_url", ""),
+                    "category_hint": a.get("category_hint", "general"),
+                    "processed": False,
+                    "fetched_at": datetime.now(timezone.utc).isoformat()
+                }
+                for a in new_articles
+            ]
+
+            self.supabase.table("raw_articles").insert(insert_data).execute()
+            self.logger.log("DEDUP", f"Batch inserted {len(insert_data)} new articles")
+            return len(insert_data)
+
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Batch insert failed: {str(e)}")
+            return 0
+
+    def log_discarded(self, article: Dict, reason: str, score: int = None):
+        """Log a discarded article to discarded_articles table."""
+        if not self.supabase:
+            return
+
+        try:
+            data = {
+                "url": article.get("url", ""),
+                "source_name": article.get("source_name", ""),
+                "headline": article.get("headline", ""),
+                "discard_reason": reason,
+                "credibility_score": score,
+                "discarded_at": datetime.now(timezone.utc).isoformat()
+            }
+
+            self.supabase.table("discarded_articles").insert(data).execute()
+
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Failed to log discarded: {str(e)}")
+
+    def log_discarded_group(self, group: List[Dict], reason: str, score: int = None):
+        """Batch log all articles in a group as discarded."""
+        if not self.supabase:
+            return
+
+        try:
+            data_list = [
+                {
+                    "url": a.get("url", ""),
+                    "source_name": a.get("source_name", ""),
+                    "headline": a.get("headline", ""),
+                    "discard_reason": reason,
+                    "credibility_score": score,
+                    "discarded_at": datetime.now(timezone.utc).isoformat()
+                }
+                for a in group
+            ]
+
+            self.supabase.table("discarded_articles").insert(data_list).execute()
+
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Failed to batch log discarded: {str(e)}")
+
+    def mark_group_processed(self, group: List[Dict]):
+        """Batch mark all articles in a group as processed."""
+        if not self.supabase:
+            return
+
+        url_hashes = [a.get("url_hash", "") for a in group if a.get("url_hash")]
+        if not url_hashes:
+            return
+
+        try:
+            self.supabase.table("raw_articles").update({"processed": True}).in_("url_hash", url_hashes).execute()
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Failed to mark processed: {str(e)}")
+
+    def compute_url_hash(self, url: str) -> str:
+        """Compute SHA256 hash of URL."""
+        return hashlib.sha256(url.encode()).hexdigest()
