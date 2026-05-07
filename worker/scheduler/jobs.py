@@ -72,7 +72,7 @@ def run_pipeline(
         all_articles.extend(rss_articles)
         logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
 
-        if supplementary_only:
+        if supplementary_only or len(rss_articles) == 0:
             with ThreadPoolExecutor(max_workers=2) as executor:
                 futures = {
                     executor.submit(GNewsFetcher().fetch): "GNews",
