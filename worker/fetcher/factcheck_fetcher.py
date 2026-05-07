@@ -3,7 +3,6 @@ Fact-check feed fetcher - updates known_false_claims table from AltNews and AFP.
 Optimized: batch insert instead of N+1 queries.
 """
 
-import hashlib
 import re
 from typing import List, Dict, Optional
 
@@ -74,7 +73,12 @@ class FactCheckFetcher:
 
         if new_claims:
             try:
-                supabase.table("known_false_claims").insert(new_claims).execute()
+                try:
+                    supabase.table("known_false_claims")\
+                        .upsert(new_claims, on_conflict="fact_check_url")\
+                        .execute()
+                except TypeError:
+                    supabase.table("known_false_claims").insert(new_claims).execute()
                 self.logger.log("FACTCHECK", f"Added {len(new_claims)} new fact checks")
             except Exception as e:
                 self.logger.log("FACTCHECK_ERROR", f"Batch insert failed: {str(e)}")
@@ -97,8 +101,7 @@ class FactCheckFetcher:
             "claim_summary": title,
             "source": source,
             "fact_check_url": url,
-            "keywords": keywords,
-            "added_at": None
+            "keywords": keywords
         }
 
     def _extract_keywords(self, title: str) -> List[str]:

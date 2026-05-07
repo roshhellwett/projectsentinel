@@ -50,11 +50,16 @@ STOP_WORDS: Set[str] = frozenset({
     'same', 'also', 'says', 'said', 'say', 'new', 'old', 'first', 'last',
     'high', 'low', 'big', 'yet', 'both', 'even', 'much', 'any', 'many',
     'may', 'might', 'must', 'shall', 'should', 'could', 'would',
+    'india', 'indian', 'news', 'live', 'updates', 'breaking', 'latest',
 })
 
 
 class CrossSourceChecker:
     """Checks if articles are confirmed by multiple trusted sources."""
+
+    MIN_SHARED_KEYWORDS = 2
+    MIN_SIMILARITY = 0.24
+    MAX_ARTICLES_TO_COMPARE = 80
 
     def __init__(self):
         self.logger = PipelineLogger()
@@ -113,7 +118,7 @@ class CrossSourceChecker:
             List of article groups (each group has 2+ different sources)
         """
         recent_articles = self._get_recent_raw_articles()
-        all_articles = articles + recent_articles
+        all_articles = self._unique_articles(articles + recent_articles)
 
         if len(all_articles) < 2:
             return []
@@ -124,7 +129,7 @@ class CrossSourceChecker:
         for group in groups:
             source_names = set(a.get("source_name", "") for a in group)
             if len(source_names) >= 2:
-                verified_groups.append(group)
+                verified_groups.append(group[:5])
 
         self.logger.log("CROSS_SOURCE", f"Found {len(verified_groups)} verified groups from {len(groups)} total groups")
         return verified_groups
@@ -139,6 +144,7 @@ class CrossSourceChecker:
         Returns:
             List of article groups
         """
+        articles = articles[:self.MAX_ARTICLES_TO_COMPARE]
         article_keywords = []
         for article in articles:
             headline = article.get("headline", "")
@@ -152,9 +158,19 @@ class CrossSourceChecker:
             for kw in keywords:
                 keyword_to_indices[kw].append(i)
 
-        for kw, indices in keyword_to_indices.items():
-            for i in range(1, len(indices)):
-                uf.union(indices[0], indices[i])
+        candidate_pairs: Set[Tuple[int, int]] = set()
+        for indices in keyword_to_indices.values():
+            if len(indices) > 12:
+                continue
+            for left_pos, left in enumerate(indices):
+                for right in indices[left_pos + 1:]:
+                    candidate_pairs.add((left, right))
+
+        for left, right in candidate_pairs:
+            if self._same_source(articles[left], articles[right]):
+                continue
+            if self._are_same_story(article_keywords[left], article_keywords[right]):
+                uf.union(left, right)
 
         group_map: Dict[int, List[int]] = defaultdict(list)
         for i in range(len(articles)):
@@ -169,6 +185,38 @@ class CrossSourceChecker:
             groups.append(group)
 
         return groups
+
+    def _are_same_story(self, left: Set[str], right: Set[str]) -> bool:
+        """Require more than one shared meaningful term before grouping."""
+        if not left or not right:
+            return False
+
+        shared = left & right
+        if len(shared) < self.MIN_SHARED_KEYWORDS:
+            return False
+
+        similarity = len(shared) / max(len(left | right), 1)
+        return similarity >= self.MIN_SIMILARITY
+
+    def _same_source(self, left: Dict, right: Dict) -> bool:
+        """Treat matching source names or domains as the same source."""
+        left_name = (left.get("source_name") or "").strip().lower()
+        right_name = (right.get("source_name") or "").strip().lower()
+        left_url = (left.get("source_url") or "").strip().lower()
+        right_url = (right.get("source_url") or "").strip().lower()
+        return bool((left_name and left_name == right_name) or (left_url and left_url == right_url))
+
+    def _unique_articles(self, articles: List[Dict]) -> List[Dict]:
+        """Deduplicate merged live and recent article lists by URL hash."""
+        unique = []
+        seen = set()
+        for article in articles:
+            key = article.get("url_hash") or article.get("url")
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            unique.append(article)
+        return unique
 
     def _extract_significant_words(self, headline: str) -> Set[str]:
         """

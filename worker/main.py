@@ -54,18 +54,18 @@ async def lifespan(app: FastAPI):
 
     try:
         scheduler.start()
-        print("✓ Scheduler started")
+        print("Scheduler started")
         print("  - Main pipeline: every 30 minutes")
         print("  - Supplementary APIs: every 4 hours")
         print("  - Archive job: 1st of month at 2 AM")
     except Exception as e:
-        print(f"✗ Scheduler failed to start: {e}")
+        print(f"Scheduler failed to start: {e}")
 
     yield
 
     try:
         scheduler.shutdown()
-        print("✓ Scheduler shut down")
+        print("Scheduler shut down")
     except Exception:
         pass
 

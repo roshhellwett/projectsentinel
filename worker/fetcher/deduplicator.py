@@ -4,13 +4,13 @@ Optimized: batch DB operations, upsert, minimal memory.
 """
 
 import os
-import hashlib
 from typing import List, Dict, Set, Optional
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from supabase import create_client
 
 from logger.pipeline_logger import PipelineLogger
+from fetcher.url_tools import compute_url_hash
 
 
 class Deduplicator:
@@ -43,7 +43,11 @@ class Deduplicator:
             return self._known_hashes
 
         try:
-            result = self.supabase.table("raw_articles").select("url_hash").execute()
+            cutoff = (datetime.now(timezone.utc) - timedelta(days=45)).isoformat()
+            result = self.supabase.table("raw_articles")\
+                .select("url_hash")\
+                .gte("fetched_at", cutoff)\
+                .execute()
             self._known_hashes = {row["url_hash"] for row in (result.data or [])}
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
@@ -111,7 +115,13 @@ class Deduplicator:
                 for a in new_articles
             ]
 
-            self.supabase.table("raw_articles").insert(insert_data).execute()
+            try:
+                self.supabase.table("raw_articles")\
+                    .upsert(insert_data, on_conflict="url_hash", ignore_duplicates=True)\
+                    .execute()
+            except TypeError:
+                self.supabase.table("raw_articles").insert(insert_data).execute()
+
             self.logger.log("DEDUP", f"Batch inserted {len(insert_data)} new articles")
             return len(insert_data)
 
@@ -178,4 +188,4 @@ class Deduplicator:
 
     def compute_url_hash(self, url: str) -> str:
         """Compute SHA256 hash of URL."""
-        return hashlib.sha256(url.encode()).hexdigest()
+        return compute_url_hash(url)

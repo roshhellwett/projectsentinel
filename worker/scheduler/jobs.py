@@ -40,6 +40,7 @@ def run_pipeline(
     logger.log("PIPELINE", "Starting pipeline run", {"mode": "supplementary" if supplementary_only else ("archive" if archive_only else "full")})
 
     start_time = datetime.now(timezone.utc)
+    max_ai_groups = int(os.getenv("MAX_AI_GROUPS_PER_RUN", "4"))
     stats = {
         "fetched": 0,
         "duplicates": 0,
@@ -47,7 +48,8 @@ def run_pipeline(
         "false_claims": 0,
         "single_source": 0,
         "low_score": 0,
-        "published": 0
+        "published": 0,
+        "ai_groups_skipped": 0
     }
 
     try:
@@ -130,7 +132,13 @@ def run_pipeline(
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
 
-        for group in verified_groups:
+        groups_to_process = verified_groups[:max_ai_groups]
+        stats["ai_groups_skipped"] = max(0, len(verified_groups) - len(groups_to_process))
+
+        if stats["ai_groups_skipped"]:
+            logger.log("AI_BUDGET", f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run")
+
+        for group in groups_to_process:
             try:
                 verification = groq_verifier.verify(group)
 
@@ -140,24 +148,29 @@ def run_pipeline(
                     stats["low_score"] += 1
                     continue
 
-                writing = groq_writer.write(
-                    key_facts=verification["key_facts"],
-                    category=verification["category"]
-                )
+                headline = verification.get("headline")
+                summary = verification.get("summary")
+
+                if not headline or not summary:
+                    writing = groq_writer.write(
+                        key_facts=verification["key_facts"],
+                        category=verification["category"]
+                    )
+                    headline = writing["headline"]
+                    summary = writing["summary"]
 
                 post = post_builder.build(
-                    headline=writing["headline"],
-                    summary=writing["summary"],
+                    headline=headline,
+                    summary=summary,
                     category=verification["category"],
                     credibility_score=score,
                     credibility_reason=verification["reason"],
                     source_articles=group
                 )
 
-                publisher.publish(post)
-                stats["published"] += 1
-
-                deduplicator.mark_group_processed(group)
+                if publisher.publish(post):
+                    stats["published"] += 1
+                    deduplicator.mark_group_processed(group)
 
             except Exception as e:
                 logger.log("ERROR", f"Failed to process article group: {str(e)}")

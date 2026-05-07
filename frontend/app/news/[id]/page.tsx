@@ -52,16 +52,16 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <nav aria-label="Breadcrumb" className="text-sm text-gray-400 mb-6">
+      <nav aria-label="Breadcrumb" className="text-sm text-slate-500 mb-6">
         <ol className="flex items-center gap-2">
           <li>
-            <Link href="/" className="hover:text-white transition-colors">
+            <Link href="/" className="hover:text-slate-950 transition-colors">
               Home
             </Link>
           </li>
-          <li className="text-gray-600">/</li>
+          <li className="text-slate-300">/</li>
           <li>
-            <Link href={`/category/${post.category}`} className="hover:text-white capitalize transition-colors">
+            <Link href={`/category/${post.category}`} className="hover:text-slate-950 capitalize transition-colors">
               {post.category}
             </Link>
           </li>
@@ -79,43 +79,43 @@ export default async function NewsPage({ params }: NewsPageProps) {
         <CategoryTag category={post.category} />
       </div>
 
-      <h1 className={`text-3xl md:text-4xl font-medium mb-6 leading-tight ${isRetracted ? 'line-through opacity-50' : ''}`}>
+      <h1 className={`text-3xl md:text-4xl font-semibold mb-6 leading-tight text-slate-950 ${isRetracted ? 'line-through opacity-50' : ''}`}>
         {post.headline}
       </h1>
 
-      <div className="flex flex-wrap items-center gap-4 mb-8 pb-8 border-b border-gray-800">
+      <div className="flex flex-wrap items-center gap-4 mb-8 pb-8 border-b border-slate-200">
         <CredibilityBadge score={post.credibility_score} showTooltip />
-        <span className="text-gray-400">{post.source_count} sources</span>
-        <span className="text-gray-400">{formatDate(post.published_at)}</span>
+        <span className="text-slate-500">{post.source_count} sources</span>
+        <span className="text-slate-500">{formatDate(post.published_at)}</span>
       </div>
 
       <div className={`mb-8 ${isRetracted ? 'opacity-50' : ''}`}>
-        <p className="text-lg text-gray-300 leading-relaxed">
+        <p className="text-lg text-slate-700 leading-relaxed">
           {post.summary}
         </p>
       </div>
 
-      <div className="bg-surface rounded-lg p-6 mb-8">
-        <h2 className="text-lg font-medium text-white mb-3">
+      <div className="bg-white rounded-lg p-6 mb-8 border border-slate-200 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-950 mb-3">
           Credibility Score: {post.credibility_score}/100
         </h2>
-        <p className="text-gray-400">
+        <p className="text-slate-600">
           {post.credibility_reason}
         </p>
       </div>
 
       <div className="mb-8">
-        <h2 className="text-lg font-medium text-white mb-4">
+        <h2 className="text-lg font-semibold text-slate-950 mb-4">
           Original Sources
         </h2>
         <SourceLinks sources={post.sources} />
       </div>
 
-      <div className="border-t border-gray-800 pt-8">
-        <h3 className="text-sm font-medium text-gray-400 mb-3">
+      <div className="border-t border-slate-200 pt-8">
+        <h3 className="text-sm font-semibold text-slate-600 mb-3">
           About this story
         </h3>
-        <ul className="space-y-2 text-sm text-gray-500 list-none">
+        <ul className="space-y-2 text-sm text-slate-500 list-none">
           <li className="flex items-start gap-2">
             <span className="text-success mt-0.5">&#10003;</span>
             Verified by cross-referencing {post.source_count} trusted sources

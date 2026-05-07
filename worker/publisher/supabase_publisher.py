@@ -3,6 +3,7 @@ Supabase publisher - inserts verified posts into the database.
 """
 
 import os
+import hashlib
 from typing import Dict
 
 from supabase import create_client
@@ -47,10 +48,24 @@ class SupabasePublisher:
             return False
         
         try:
-            # Remove updated_at (handled by trigger)
+            # Remove updated_at (handled by trigger) and add a stable story key when possible.
             post_data = {k: v for k, v in post.items() if k != "updated_at"}
+            source_urls = sorted(
+                source.get("url", "")
+                for source in post_data.get("sources", [])
+                if source.get("url")
+            )
+            if source_urls:
+                post_data["story_fingerprint"] = hashlib.sha256("|".join(source_urls).encode()).hexdigest()
             
-            result = self.supabase.table("posts").insert(post_data).execute()
+            try:
+                result = self.supabase.table("posts").insert(post_data).execute()
+            except Exception as e:
+                if "story_fingerprint" in post_data and "story_fingerprint" in str(e):
+                    post_data.pop("story_fingerprint", None)
+                    result = self.supabase.table("posts").insert(post_data).execute()
+                else:
+                    raise
             
             if result.data:
                 self.logger.log("PUBLISH", f"Published: {post.get('headline', '')[:50]}")

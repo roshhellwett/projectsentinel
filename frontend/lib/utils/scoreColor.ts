@@ -4,9 +4,9 @@
 
 export function getScoreColor(score: number): string {
   const clamped = Math.max(0, Math.min(100, score));
-  if (clamped >= 80) return 'text-success';
-  if (clamped >= 60) return 'text-warning';
-  return 'text-danger';
+  if (clamped >= 80) return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+  if (clamped >= 60) return 'bg-amber-50 text-amber-800 ring-amber-200';
+  return 'bg-red-50 text-red-700 ring-red-200';
 }
 
 export function getScoreBgColor(score: number): string {

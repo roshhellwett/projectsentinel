@@ -3,7 +3,6 @@ RSS feed fetcher - parallel fetching with session reuse.
 Optimized: concurrent feed fetching, session passed to feedparser.
 """
 
-import hashlib
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Optional
@@ -15,6 +14,7 @@ import requests
 
 from sources.rss_sources import get_rss_sources
 from logger.pipeline_logger import PipelineLogger
+from fetcher.url_tools import compute_url_hash, normalize_url
 
 
 class RSSFetcher:
@@ -95,7 +95,7 @@ class RSSFetcher:
         Returns:
             Article dict or None if invalid
         """
-        url = entry.get("link", "")
+        url = normalize_url(entry.get("link", ""))
         if not url:
             return None
 
@@ -107,7 +107,7 @@ class RSSFetcher:
 
         return {
             "url": url,
-            "url_hash": hashlib.sha256(url.encode()).hexdigest(),
+            "url_hash": compute_url_hash(url),
             "headline": headline,
             "excerpt": excerpt,
             "source_name": source["name"],

@@ -26,11 +26,11 @@ class GroqVerifier:
         "You are a news verification assistant. "
         "Return ONLY a valid JSON object with no extra text, no markdown, no explanation.\n\n"
         "JSON format:\n"
-        '{"score": <int 0-100>, "reason": "<one sentence>", "key_facts": ["<fact1>",...,"<fact5>"], "category": "<politics|business|sports|crime|science|health|tech|world>"}\n\n'
+        '{"score": <int 0-100>, "reason": "<one sentence>", "key_facts": ["<fact1>",...,"<fact5>"], "category": "<politics|business|sports|crime|science|health|tech|world>", "headline": "<short neutral headline>", "summary": "<3 neutral sentences under 80 words>"}\n\n'
         "Scoring (start at 50): +20 multi-source agree, +10 named officials/institutions, "
         "+10 specific dates/locations, +10 neutral language, "
         "-20 vague claims, -15 only anonymous sources, -10 outrage-provoking language.\n"
-        "Key facts: 3-5 verified info points only. Category: one of the 8 values."
+        "Key facts: 3-5 verified info points only. Headline and summary must use only those facts."
     )
 
     MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
@@ -69,7 +69,7 @@ class GroqVerifier:
                     {"role": "user", "content": user_content}
                 ],
                 "temperature": 0.1,
-                "max_tokens": 400,
+                "max_tokens": 520,
                 "response_format": {"type": "json_object"}
             }
 
@@ -134,18 +134,25 @@ class GroqVerifier:
 
     def _build_prompt(self, article_group: List[Dict]) -> str:
         """Build minimal token-efficient verification prompt."""
-        headline = article_group[0].get("headline", "")
+        headline = self._trim_words(article_group[0].get("headline", ""), 18)
 
         excerpts = []
         for article in article_group[:3]:
             source = article.get("source_name", "Unknown")
-            excerpt = article.get("excerpt", "")
+            excerpt = self._trim_words(article.get("excerpt", ""), 45)
             if excerpt:
                 excerpts.append(f"[{source}] {excerpt}")
 
         excerpts_text = "\n\n".join(excerpts)
 
         return f"Headline: {headline}\n\nSource excerpts:\n{excerpts_text}"
+
+    def _trim_words(self, text: str, limit: int) -> str:
+        """Trim prompt content by words to keep token use predictable."""
+        words = str(text or "").split()
+        if len(words) <= limit:
+            return " ".join(words)
+        return " ".join(words[:limit])
 
     def _parse_response(self, text: str) -> Optional[Dict]:
         """Parse Groq JSON response. Returns None on failure."""
@@ -179,5 +186,13 @@ class GroqVerifier:
         valid_categories = ["politics", "business", "sports", "crime", "science", "health", "tech", "world"]
         if result["category"] not in valid_categories:
             result["category"] = "politics"
+
+        if "headline" in result:
+            headline = str(result["headline"]).strip()
+            result["headline"] = self._trim_words(headline, 12)
+
+        if "summary" in result:
+            summary = " ".join(str(result["summary"]).split())
+            result["summary"] = summary[:420]
 
         return result

@@ -4,13 +4,13 @@ Limited to 6 calls per day to stay within free tier (100 req/day).
 """
 
 import os
-import hashlib
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 
 import requests
 
 from logger.pipeline_logger import PipelineLogger
+from fetcher.url_tools import compute_url_hash, normalize_url
 
 
 class GNewsFetcher:
@@ -78,7 +78,7 @@ class GNewsFetcher:
         Returns:
             Article dict or None if invalid
         """
-        url = item.get("url", "")
+        url = normalize_url(item.get("url", ""))
         if not url:
             return None
         
@@ -96,7 +96,7 @@ class GNewsFetcher:
         
         return {
             "url": url,
-            "url_hash": hashlib.sha256(url.encode()).hexdigest(),
+            "url_hash": compute_url_hash(url),
             "headline": headline,
             "excerpt": excerpt,
             "source_name": source_name,

@@ -44,7 +44,11 @@ class FactCheckMatcher:
             return
 
         try:
-            result = self.supabase.table("known_false_claims").select("*").execute()
+            result = self.supabase.table("known_false_claims")\
+                .select("claim_summary,keywords,fact_check_url")\
+                .order("added_at", desc=True)\
+                .limit(500)\
+                .execute()
             self.known_claims = result.data or []
             self._last_load = now
             self.logger.log("FACTCHECK_MATCHER", f"Loaded {len(self.known_claims)} known false claims")

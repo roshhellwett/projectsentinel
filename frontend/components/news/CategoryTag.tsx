@@ -9,21 +9,21 @@ interface CategoryTagProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  politics: 'bg-red-500/20 text-red-400',
-  business: 'bg-green-500/20 text-green-400',
-  sports: 'bg-blue-500/20 text-blue-400',
-  crime: 'bg-orange-500/20 text-orange-400',
-  science: 'bg-purple-500/20 text-purple-400',
-  health: 'bg-pink-500/20 text-pink-400',
-  tech: 'bg-cyan-500/20 text-cyan-400',
-  world: 'bg-yellow-500/20 text-yellow-400'
+  politics: 'bg-red-50 text-red-700 ring-red-200',
+  business: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  sports: 'bg-blue-50 text-blue-700 ring-blue-200',
+  crime: 'bg-orange-50 text-orange-700 ring-orange-200',
+  science: 'bg-violet-50 text-violet-700 ring-violet-200',
+  health: 'bg-rose-50 text-rose-700 ring-rose-200',
+  tech: 'bg-cyan-50 text-cyan-700 ring-cyan-200',
+  world: 'bg-amber-50 text-amber-700 ring-amber-200'
 };
 
 export function CategoryTag({ category }: CategoryTagProps) {
-  const colorClass = CATEGORY_COLORS[category] || 'bg-gray-500/20 text-gray-400';
+  const colorClass = CATEGORY_COLORS[category] || 'bg-slate-100 text-slate-700 ring-slate-200';
   
   return (
-    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${colorClass}`}>
+    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ring-1 ring-inset ${colorClass}`}>
       {category.charAt(0).toUpperCase() + category.slice(1)}
     </span>
   );

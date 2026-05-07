@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Search } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 
@@ -26,24 +27,31 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setIsLoading(true);
-      setError(null);
-      fetch('/api/posts?page=1&limit=50')
-        .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch');
-          return res.json();
-        })
-        .then(data => {
-          setAllPosts(data.posts || []);
-          setIsLoading(false);
-        })
-        .catch(() => {
-          setError('Failed to load articles');
-          setIsLoading(false);
-        });
+    if (!isOpen || allPosts.length > 0) {
+      return;
     }
-  }, [isOpen]);
+
+    const controller = new AbortController();
+    setIsLoading(true);
+    setError(null);
+
+    fetch('/api/posts?page=1&limit=50', { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(data => {
+        setAllPosts(data.posts || []);
+        setIsLoading(false);
+      })
+      .catch((fetchError) => {
+        if (fetchError.name === 'AbortError') return;
+        setError('Failed to load articles');
+        setIsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [allPosts.length, isOpen]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,12 +78,17 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
+      const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
+
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = previousOverflow;
+      };
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
 
@@ -84,60 +97,71 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     router.push(`/news/${post.id}`);
   }, [onClose, router]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-background/98 animate-fade-in">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-medium">Search</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-surface rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
-            aria-label="Close search"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Search articles"
+          className="fixed inset-0 z-[100] bg-background"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-semibold text-slate-950">Search</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
+                aria-label="Close search"
+              >
+                <X className="w-6 h-6 text-slate-700" />
+              </button>
+            </div>
 
-        <div className="relative max-w-2xl mx-auto mb-8">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-          <input
-            ref={inputRef}
-            id="search-input"
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search news..."
-            className="w-full pl-12 pr-4 py-4 bg-surface border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent transition-colors duration-200"
-            autoFocus
-          />
-        </div>
-
-        <div className="max-w-4xl mx-auto">
-          {isLoading && (
-            <p className="text-center text-gray-500 py-8 animate-pulse">Loading articles...</p>
-          )}
-          {error && (
-            <p className="text-center text-danger py-8">{error}</p>
-          )}
-          {query.trim() && !isLoading && (
-            <p className="text-sm text-gray-500 mb-4">
-              {results.length} results for &quot;{query}&quot;
-            </p>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {results.map((post) => (
-              <NewsCard
-                key={post.id}
-                post={post}
-                onClick={() => handleSelect(post)}
+            <div className="relative max-w-2xl mx-auto mb-8">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <input
+                ref={inputRef}
+                id="search-input"
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search news..."
+                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 rounded-xl text-slate-950 placeholder-slate-500 shadow-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 transition-colors duration-200"
+                autoFocus
               />
-            ))}
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              {isLoading && (
+                <p className="text-center text-slate-500 py-8 animate-pulse">Loading articles...</p>
+              )}
+              {error && (
+                <p className="text-center text-danger py-8">{error}</p>
+              )}
+              {query.trim() && !isLoading && (
+                <p className="text-sm text-slate-500 mb-4">
+                  {results.length} results for &quot;{query}&quot;
+                </p>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {results.map((post) => (
+                  <NewsCard
+                    key={post.id}
+                    post={post}
+                    onClick={() => handleSelect(post)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

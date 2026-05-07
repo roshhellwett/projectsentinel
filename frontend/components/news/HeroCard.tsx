@@ -18,15 +18,15 @@ export function HeroCard({ post }: HeroCardProps) {
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="mb-12 relative"
     >
-      <div className="absolute -inset-1 bg-gradient-to-r from-india-saffron/40 via-accent/30 to-india-green/40 rounded-[2rem] blur opacity-40 animate-pulse-accent"></div>
+      <div className="absolute -inset-1 bg-gradient-to-r from-india-saffron/30 via-accent/20 to-india-green/30 rounded-2xl blur opacity-30"></div>
       <Link
         href={`/news/${post.id}`}
-        className="block relative min-h-[350px] md:min-h-[400px] rounded-[2rem] overflow-hidden group shadow-xl bg-surface flex flex-col justify-end border border-slate-200"
+        className="block relative min-h-[300px] md:min-h-[340px] rounded-2xl overflow-hidden group shadow-xl bg-surface flex flex-col justify-center border border-slate-200"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-white to-slate-50 z-0" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMwZjE3MmEiIGZpbGwtb3BhY2l0eT0iMC4wMiIvPjwvc3ZnPg==')] z-0 opacity-50" />
 
-        <div className="relative p-6 md:p-10 flex flex-col justify-end h-full z-10">
+        <div className="relative p-6 md:p-10 flex flex-col justify-center z-10">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -39,7 +39,7 @@ export function HeroCard({ post }: HeroCardProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-india-saffron group-hover:to-accent transition-all duration-500 leading-tight tracking-tight mt-4 max-w-4xl"
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 group-hover:text-accent transition-colors duration-300 leading-tight tracking-tight mt-4 max-w-4xl"
           >
             {post.headline}
           </motion.h1>

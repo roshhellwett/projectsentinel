@@ -12,8 +12,17 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
 export function getSupabaseBrowserClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase browser environment variables are not configured');
+  }
+
   if (!browserClient) {
-    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    });
   }
   return browserClient;
 }
@@ -29,7 +38,8 @@ export function subscribeToPosts(callback: (post: Post) => void) {
       {
         event: 'INSERT',
         schema: 'public',
-        table: 'posts'
+        table: 'posts',
+        filter: 'status=eq.published'
       },
       (payload) => {
         callback(payload.new as Post);

@@ -51,7 +51,7 @@ export async function PATCH(
     const body = await request.json();
     const { status, correction_note } = body;
 
-    if (status && !VALID_STATUSES.includes(status)) {
+    if (!status || !VALID_STATUSES.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 

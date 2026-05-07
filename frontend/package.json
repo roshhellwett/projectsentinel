@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit --incremental false"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.0",

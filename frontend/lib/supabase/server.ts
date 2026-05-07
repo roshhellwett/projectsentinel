@@ -6,6 +6,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types';
 
+const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world']);
+const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
+
 // Lazy-initialized server client to handle missing env vars during build
 let supabaseServerInstance: ReturnType<typeof createClient> | null = null;
 
@@ -28,8 +31,6 @@ function getSupabaseServer() {
     
     const mockResponse = Promise.resolve({ data: null, error: null });
     const mockArrayResponse = Promise.resolve({ data: [] as never[], count: 0, error: null });
-    const mockPostsResponse = Promise.resolve({ data: [] as Post[], error: null });
-    
     const createMockQuery = (): MockQueryBuilder => {
       const self: MockQueryBuilder = {
         eq: () => ({ ...self, single: () => mockResponse, range: () => mockArrayResponse, limit: () => ({ single: () => mockResponse }), order: () => self }),
@@ -51,7 +52,12 @@ function getSupabaseServer() {
     return mockClient as unknown as ReturnType<typeof createClient>;
   }
   
-  supabaseServerInstance = createClient(supabaseUrl, supabaseServiceKey);
+  supabaseServerInstance = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
   return supabaseServerInstance;
 }
 
@@ -68,19 +74,23 @@ export async function fetchPosts(
     return { posts: [], count: 0 };
   }
   
-  const start = (page - 1) * limit;
-  const end = start + limit - 1;
+  const safePage = Math.max(1, Math.floor(page || 1));
+  const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
+  const start = (safePage - 1) * safeLimit;
+  const end = start + safeLimit - 1;
   
   let query = getSupabaseServer()
     .from('posts')
     .select('*', { count: 'exact' })
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-    .range(start, end);
+    .eq('status', 'published');
   
-  if (category && category !== 'all') {
+  if (category && category !== 'all' && VALID_CATEGORIES.has(category)) {
     query = query.eq('category', category);
   }
+
+  query = query
+    .order('published_at', { ascending: false })
+    .range(start, end);
   
   const { data, error, count } = await query;
   
@@ -98,6 +108,10 @@ export async function fetchPostById(id: string): Promise<Post | null> {
     return null;
   }
   
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return null;
+  }
+
   const { data, error } = await getSupabaseServer()
     .from('posts')
     .select('*')
@@ -166,10 +180,14 @@ export async function fetchLatestPost(): Promise<Post | null> {
 export async function updatePostStatus(
   id: string,
   status: string,
-  correctionNote?: string
+  correctionNote?: string | null
 ): Promise<void> {
-  const update: { status: string; correction_note?: string } = { status };
-  if (correctionNote) {
+  if (!VALID_STATUSES.has(status)) {
+    throw new Error('Invalid post status');
+  }
+
+  const update: { status: string; correction_note?: string | null } = { status };
+  if (correctionNote !== undefined) {
     update.correction_note = correctionNote;
   }
   
