@@ -20,6 +20,7 @@ from sources.blocked_domains import is_blocked_domain
 from verifier.cross_source_checker import CrossSourceChecker
 from verifier.factcheck_matcher import FactCheckMatcher
 from verifier.groq_verifier import GroqVerifier
+from verifier.score_evaluator import ScoreEvaluator
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
 
@@ -40,7 +41,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
     )
 
     start_time = datetime.now(UTC)
-    max_ai_groups = int(os.getenv("MAX_AI_GROUPS_PER_RUN", "4"))
+    max_ai_groups = int(os.getenv("MAX_AI_GROUPS_PER_RUN", "12"))
     stats = {
         "fetched": 0,
         "duplicates": 0,
@@ -64,15 +65,18 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         if archive_only:
             archiver = OldPostArchiver()
             deleted_count = archiver.archive_old_posts()
-            logger.log("ARCHIVE", f"Archived {deleted_count} old posts")
+            cleanup_counts = archiver.cleanup_pipeline_tables()
+            logger.log("ARCHIVE", f"Archived {deleted_count} old posts", cleanup_counts)
             return
 
         all_articles = []
 
-        rss_fetcher = RSSFetcher()
-        rss_articles = rss_fetcher.fetch_all()
-        all_articles.extend(rss_articles)
-        logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
+        rss_articles = []
+        if not supplementary_only:
+            rss_fetcher = RSSFetcher()
+            rss_articles = rss_fetcher.fetch_all()
+            all_articles.extend(rss_articles)
+            logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
 
         if supplementary_only or len(rss_articles) == 0:
             with ThreadPoolExecutor(max_workers=2) as executor:
@@ -110,6 +114,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         for article in new_articles:
             if is_blocked_domain(article.get("source_url", "")):
                 deduplicator.log_discarded(article, "blocked_domain")
+                deduplicator.mark_group_processed([article])
                 stats["blocked"] += 1
             else:
                 unblocked_articles.append(article)
@@ -120,6 +125,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         for article in unblocked_articles:
             if factcheck_matcher.is_false_claim(article.get("headline", "")):
                 deduplicator.log_discarded(article, "known_false_claim")
+                deduplicator.mark_group_processed([article])
                 stats["false_claims"] += 1
             else:
                 clean_articles.append(article)
@@ -142,9 +148,15 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             try:
                 verification = groq_verifier.verify(group)
 
-                score = verification.get("score", 0)
+                score_result = ScoreEvaluator.evaluate(
+                    groq_score=verification.get("score", 0),
+                    source_articles=group,
+                    fact_check_flags=[],
+                )
+                score = score_result["final_score"]
                 if score < 65:
                     deduplicator.log_discarded_group(group, "low_credibility_score", score)
+                    deduplicator.mark_group_processed(group)
                     stats["low_score"] += 1
                     continue
 

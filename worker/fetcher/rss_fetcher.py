@@ -60,7 +60,7 @@ class RSSFetcher:
         articles = []
 
         session = requests.Session()
-        session.headers.update({"User-Agent": "ProjectSentinel Bot/1.0 (+https://projectsentinel.in/bot)"})
+        session.headers.update({"User-Agent": "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"})
 
         try:
             feed = feedparser.parse(source["url"], request_session=session)

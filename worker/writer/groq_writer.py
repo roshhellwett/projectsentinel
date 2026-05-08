@@ -11,6 +11,7 @@ import time
 import requests
 
 from logger.pipeline_logger import PipelineLogger
+from rate_limiter.limiter import RateLimiter
 
 
 class GroqWriter:
@@ -24,7 +25,8 @@ class GroqWriter:
     SYSTEM_PROMPT = (
         "You are a neutral news writer. "
         "Return ONLY a valid JSON object with no extra text, no markdown, no explanation.\n\n"
-        'JSON format: {"headline": "<short neutral factual headline under 12 words>", "summary": "<exactly 3 sentences, under 80 words>"}\n\n'
+        'JSON format: {"headline": "<short neutral factual headline under 12 words>", '
+        '"summary": "<exactly 3 sentences, under 80 words>"}\n\n'
         "Rules: Do not invent info. Headline < 12 words. Summary = exactly 3 sentences, < 80 words. "
         "Plain English, no jargon, no opinion, no bias, no sensationalism, active voice."
     )
@@ -32,8 +34,8 @@ class GroqWriter:
     def __init__(self):
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY", "")
-        self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama3-70b-8192")
-        self._last_call_time = 0.0
+        self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama-3.3-70b-versatile")
+        self.rate_limiter = RateLimiter.get_global("groq", self.MIN_DELAY_SECONDS)
 
     def write(self, key_facts: list[str], category: str) -> dict:
         """
@@ -65,7 +67,7 @@ class GroqWriter:
         }
 
         for attempt in range(self.MAX_RETRIES):
-            self._apply_rate_limit()
+            self.rate_limiter.wait_if_needed()
 
             try:
                 response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
@@ -102,17 +104,6 @@ class GroqWriter:
         if match:
             return int(float(match.group(1))) + 2
         return self.RETRY_DELAY
-
-    def _apply_rate_limit(self):
-        """Enforce rate limiting between API calls."""
-        current_time = time.time()
-        time_since_last = current_time - self._last_call_time
-
-        if time_since_last < self.MIN_DELAY_SECONDS:
-            sleep_time = self.MIN_DELAY_SECONDS - time_since_last
-            time.sleep(sleep_time)
-
-        self._last_call_time = time.time()
 
     def _build_prompt(self, key_facts: list[str], category: str) -> str:
         """Build token-efficient writing prompt."""

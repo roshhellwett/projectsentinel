@@ -1,4 +1,4 @@
--- Initial schema for ProjectSentinel
+-- Initial schema for India Verified
 -- Run this in Supabase SQL Editor
 
 -- Enable UUID extension

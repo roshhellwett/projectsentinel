@@ -177,13 +177,13 @@ class CrossSourceChecker:
             return []
 
         try:
-            two_hours_ago = (now - timedelta(hours=2)).isoformat()
+            eight_hours_ago = (now - timedelta(hours=8)).isoformat()
 
             result = (
                 self.supabase.table("raw_articles")
                 .select("*")
                 .eq("processed", False)
-                .gte("fetched_at", two_hours_ago)
+                .gte("fetched_at", eight_hours_ago)
                 .execute()
             )
 

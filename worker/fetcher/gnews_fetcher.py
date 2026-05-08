@@ -4,7 +4,7 @@ Limited to 6 calls per day to stay within free tier (100 req/day).
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import requests
 
@@ -94,7 +94,7 @@ class GNewsFetcher:
             "source_name": source_name,
             "source_url": self._get_base_url(url),
             "category_hint": "general",
-            "fetched_at": None,
+            "fetched_at": datetime.now(UTC).isoformat(),
         }
 
     def _get_base_url(self, url: str) -> str:

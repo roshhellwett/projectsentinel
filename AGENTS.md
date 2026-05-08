@@ -1,4 +1,4 @@
-# ProjectSentinel - Agent Instructions
+# India Verified - Agent Instructions
 
 ## Project Overview
 AI-powered, fully automated Indian news aggregator. Fetches news every 30 minutes, verifies with Groq AI, and publishes verified stories with credibility scores.
@@ -35,8 +35,7 @@ AI-powered, fully automated Indian news aggregator. Fetches news every 30 minute
 ## Environment Variables
 Required vars (see `.env.example` files):
 - SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
-- GEMINI_API_KEY
-- GROQ_API_KEY_VERIFY, GROQ_VERIFY_MODEL (default: llama3-8b-8192)
-- GROQ_API_KEY, GROQ_WRITE_MODEL (default: llama3-70b-8192)
+- GROQ_API_KEY_VERIFY, GROQ_VERIFY_MODEL (default: llama-3.3-70b-versatile)
+- GROQ_API_KEY, GROQ_WRITE_MODEL (default: llama-3.3-70b-versatile)
 - GNEWS_API_KEY, NEWSAPI_KEY
 - ADMIN_PASSWORD, ADMIN_SECRET_TOKEN

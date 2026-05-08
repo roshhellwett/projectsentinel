@@ -11,6 +11,7 @@ import time
 import requests
 
 from logger.pipeline_logger import PipelineLogger
+from rate_limiter.limiter import RateLimiter
 
 
 class GroqVerifier:
@@ -25,20 +26,24 @@ class GroqVerifier:
         "You are a news verification assistant. "
         "Return ONLY a valid JSON object with no extra text, no markdown, no explanation.\n\n"
         "JSON format:\n"
-        '{"score": <int 0-100>, "reason": "<one sentence>", "key_facts": ["<fact1>",...,"<fact5>"], "category": "<politics|business|sports|crime|science|health|tech|world>", "headline": "<short neutral headline>", "summary": "<3 neutral sentences under 80 words>"}\n\n'
+        '{"score": <int 0-100>, "reason": "<one sentence>", '
+        '"key_facts": ["<fact1>",...,"<fact5>"], '
+        '"category": "<politics|business|sports|crime|science|health|tech|world>", '
+        '"headline": "<short neutral headline>", '
+        '"summary": "<3 neutral sentences under 80 words>"}\n\n'
         "Scoring (start at 50): +20 multi-source agree, +10 named officials/institutions, "
         "+10 specific dates/locations, +10 neutral language, "
         "-20 vague claims, -15 only anonymous sources, -10 outrage-provoking language.\n"
         "Key facts: 3-5 verified info points only. Headline and summary must use only those facts."
     )
 
-    FALLBACK_MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+    FALLBACK_MODELS = ["llama3-8b-8192", "llama-3.1-8b-instant"]
 
     def __init__(self):
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY_VERIFY", "")
-        self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama3-8b-8192")
-        self._last_call_time = 0.0
+        self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
+        self.rate_limiter = RateLimiter.get_global("groq", self.MIN_DELAY_SECONDS)
 
     def verify(self, article_group: list[dict]) -> dict:
         """
@@ -60,7 +65,7 @@ class GroqVerifier:
             model = (
                 self.verify_model
                 if attempt == 0
-                else (self.FALLBACK_MODELS[1] if len(self.FALLBACK_MODELS) > 1 else self.verify_model)
+                else self.FALLBACK_MODELS[min(attempt - 1, len(self.FALLBACK_MODELS) - 1)]
             )
 
             data = {
@@ -75,10 +80,7 @@ class GroqVerifier:
             }
 
             try:
-                if attempt > 0:
-                    self._apply_rate_limit()
-                else:
-                    self._apply_rate_limit()
+                self.rate_limiter.wait_if_needed()
 
                 response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
                 response.raise_for_status()
@@ -118,17 +120,6 @@ class GroqVerifier:
         if "503" in error_str:
             return 15 * (attempt + 1)
         return self.RETRY_DELAY * (attempt + 1)
-
-    def _apply_rate_limit(self):
-        """Enforce rate limiting between API calls."""
-        current_time = time.time()
-        time_since_last = current_time - self._last_call_time
-
-        if time_since_last < self.MIN_DELAY_SECONDS:
-            sleep_time = self.MIN_DELAY_SECONDS - time_since_last
-            time.sleep(sleep_time)
-
-        self._last_call_time = time.time()
 
     def _build_prompt(self, article_group: list[dict]) -> str:
         """Build minimal token-efficient verification prompt."""

@@ -43,8 +43,10 @@ class Deduplicator:
 
         try:
             cutoff = (datetime.now(UTC) - timedelta(days=45)).isoformat()
-            result = self.supabase.table("raw_articles").select("url_hash").gte("fetched_at", cutoff).execute()
-            self._known_hashes = {row["url_hash"] for row in (result.data or [])}
+            recent_result = self.supabase.table("raw_articles").select("url_hash").gte("fetched_at", cutoff).execute()
+            null_result = self.supabase.table("raw_articles").select("url_hash").is_("fetched_at", "null").execute()
+            rows = (recent_result.data or []) + (null_result.data or [])
+            self._known_hashes = {row["url_hash"] for row in rows if row.get("url_hash")}
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
             self._known_hashes = set()
@@ -74,7 +76,6 @@ class Deduplicator:
             return False
 
         known.add(url_hash)
-        article["_is_new"] = True
         return True
 
     def batch_insert_new_articles(self, articles: list[dict]) -> int:
@@ -91,8 +92,7 @@ class Deduplicator:
         if not self.supabase:
             return 0
 
-        new_articles = [a for a in articles if a.get("_is_new")]
-        if not new_articles:
+        if not articles:
             return 0
 
         try:
@@ -108,7 +108,7 @@ class Deduplicator:
                     "processed": False,
                     "fetched_at": datetime.now(UTC).isoformat(),
                 }
-                for a in new_articles
+                for a in articles
             ]
 
             try:

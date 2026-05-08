@@ -15,8 +15,6 @@ interface NewsGridProps {
   posts: Post[];
 }
 
-const MemoizedNewsCard = NewsCard;
-
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -64,7 +62,7 @@ export function NewsGrid({ posts }: NewsGridProps) {
               variants={item}
               layout
             >
-              <MemoizedNewsCard
+              <NewsCard
                 post={post}
                 onClick={() => handleSelect(post)}
               />

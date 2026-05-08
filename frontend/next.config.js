@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'xkztysfrnvqjnjyowlcw.supabase.co',
+        hostname: 'ngygecxnwhdjdjhwmnzq.supabase.co',
       },
     ],
   },
@@ -21,6 +21,7 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Link', value: `<https://www.googletagmanager.com>; rel=preconnect, <https://www.googletagmanager.com>; rel=preconnect; crossorigin` },
         ],
       },
       {

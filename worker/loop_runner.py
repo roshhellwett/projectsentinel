@@ -9,12 +9,11 @@ import time
 from datetime import UTC, datetime
 
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from supabase import create_client
 
 from scheduler.jobs import run_pipeline
+
+load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
@@ -30,7 +29,7 @@ def get_post_count():
 
 def main():
     print("=" * 60)
-    print("ProjectSentinel - Continuous Pipeline Runner")
+    print("India Verified - Continuous Pipeline Runner")
     print("=" * 60)
     print(f"Started at: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S UTC')}")
     print()

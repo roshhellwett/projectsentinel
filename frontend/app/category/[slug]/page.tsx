@@ -1,8 +1,3 @@
-/**
- * Category page - filtered news by category
- * Optimized: title-case function, static params
- */
-
 import { Suspense } from 'react';
 import { fetchPosts } from '@/lib/supabase/server';
 import { NewsGrid } from '@/components/news/NewsGrid';
@@ -27,8 +22,19 @@ export async function generateMetadata({ params }: CategoryPageProps) {
   const { slug } = await params;
   const category = titleCase(slug);
   return {
-    title: `${category} News - Sentinel News`,
-    description: `AI-verified ${slug} news from multiple trusted Indian sources.`
+    title: `${category} News - India Verified`,
+    description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
+    openGraph: {
+      title: `${category} News - India Verified`,
+      description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
+      images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${category} News - India Verified`,
+      description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
+      images: ['/og-image.svg'],
+    },
   };
 }
 
@@ -43,8 +49,24 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryName = titleCase(slug);
   const isValidCategory = VALID_CATEGORIES.includes(slug as typeof VALID_CATEGORIES[number]);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: `${categoryName} News`,
+            description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
+            url: `${siteUrl}/category/${slug}`,
+            publisher: { '@type': 'Organization', name: 'India Verified' },
+          }),
+        }}
+      />
+
       <CategoryBar />
 
       <h1 className="text-3xl font-semibold mb-2 text-slate-950">{categoryName} News</h1>

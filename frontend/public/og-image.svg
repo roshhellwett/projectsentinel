@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a"/>
+      <stop offset="100%" style="stop-color:#ff9933"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <rect width="1200" height="420" fill="url(#bg)" opacity="0.95"/>
+  <text x="600" y="200" font-family="system-ui, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">India Verified</text>
+  <text x="600" y="280" font-family="system-ui, sans-serif" font-size="36" fill="rgba(255,255,255,0.9)" text-anchor="middle">AI-Verified Indian News</text>
+  <text x="600" y="520" font-family="system-ui, sans-serif" font-size="24" fill="#475569" text-anchor="middle">Every story verified through cross-referencing</text>
+  <text x="600" y="560" font-family="system-ui, sans-serif" font-size="24" fill="#475569" text-anchor="middle">multiple trusted Indian news sources</text>
+</svg>

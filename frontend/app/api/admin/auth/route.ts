@@ -18,6 +18,13 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+
+    if (!ADMIN_SECRET) {
+      return NextResponse.json(
+        { success: false, error: 'Admin secret not configured' },
+        { status: 500 }
+      );
+    }
     
     // Create JWT token
     const token = await new SignJWT({ role: 'admin' })

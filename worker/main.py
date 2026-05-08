@@ -1,22 +1,21 @@
 """
-Main entry point for ProjectSentinel worker.
+Main entry point for India Verified worker.
 Starts FastAPI server and APScheduler for the news pipeline.
 """
 
 import os
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from apscheduler.schedulers.background import BackgroundScheduler
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.health import router as health_router
 from api.trigger import router as trigger_router
 from scheduler.jobs import run_pipeline
+
+load_dotenv()
 
 scheduler = BackgroundScheduler()
 
@@ -66,13 +65,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="ProjectSentinel Worker",
+    title="India Verified Worker",
     description="AI-powered news verification and publishing pipeline",
     version="1.1.0",
     lifespan=lifespan,
 )
 
-allowed_origins = os.getenv("CORS_ORIGINS", "https://sentinelnews.vercel.app").split(",")
+allowed_origins = os.getenv("CORS_ORIGINS", "https://indiaverified.vercel.app").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

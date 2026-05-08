@@ -9,7 +9,7 @@ def test_verifier_init_defaults():
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY": "test_key"}, clear=True):
         v = GroqVerifier()
         assert v.api_key == "test_key"
-        assert v.verify_model == "llama3-8b-8192"
+        assert v.verify_model == "llama-3.3-70b-versatile"
 
 
 def test_verifier_init_custom_model():

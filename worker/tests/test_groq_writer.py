@@ -9,7 +9,7 @@ def test_writer_init_defaults():
     with patch.dict(os.environ, {"GROQ_API_KEY": "test_key"}, clear=True):
         w = GroqWriter()
         assert w.api_key == "test_key"
-        assert w.write_model == "llama3-70b-8192"
+        assert w.write_model == "llama-3.3-70b-versatile"
 
 
 def test_writer_init_custom_model():

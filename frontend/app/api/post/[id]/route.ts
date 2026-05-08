@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
 import { fetchPostById, updatePostStatus } from '@/lib/supabase/server';
 
 const VALID_STATUSES = ['published', 'corrected', 'retracted'] as const;
@@ -42,7 +43,13 @@ export async function PATCH(
   const token = authHeader?.replace('Bearer ', '');
 
   const secretToken = process.env.ADMIN_SECRET_TOKEN;
-  if (!secretToken || token !== secretToken) {
+  if (!secretToken || !token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    await jwtVerify(token, new TextEncoder().encode(secretToken));
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

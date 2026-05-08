@@ -1,4 +1,4 @@
--- Database hardening for ProjectSentinel
+-- Database hardening for India Verified
 -- Safe to run after the initial schema.
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

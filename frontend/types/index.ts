@@ -1,5 +1,5 @@
 /**
- * TypeScript types for ProjectSentinel frontend
+ * TypeScript types for India Verified frontend
  */
 
 export interface Source {

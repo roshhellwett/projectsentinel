@@ -23,9 +23,17 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
     setLoading(true);
     
     try {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('admin_token='))
+        ?.split('=')[1];
+
       const response = await fetch(`/api/post/${post.id}/`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           status: type,
           correction_note: note

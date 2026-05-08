@@ -4,14 +4,70 @@
 
 @layer base {
   body {
-    @apply leading-normal bg-background text-slate-900;
+    @apply leading-normal bg-background text-slate-900 dark:bg-slate-950 dark:text-slate-100;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply leading-tight text-slate-900;
+    @apply leading-tight text-slate-900 dark:text-white;
   }
   p, span, li, a {
     @apply leading-relaxed;
   }
+}
+
+.dark body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+.dark .bg-surface {
+  @apply bg-slate-900;
+}
+
+.dark .bg-background {
+  @apply bg-slate-950;
+}
+
+.dark .border-slate-200 {
+  @apply border-slate-700;
+}
+
+.dark .border-slate-100 {
+  @apply border-slate-800;
+}
+
+.dark .text-slate-900 {
+  @apply text-white;
+}
+
+.dark .text-slate-950 {
+  @apply text-white;
+}
+
+.dark .text-slate-600 {
+  @apply text-slate-400;
+}
+
+.dark .text-slate-500 {
+  @apply text-slate-400;
+}
+
+.dark .bg-white {
+  @apply bg-slate-900;
+}
+
+.dark .shadow-sm {
+  @apply shadow-none;
+}
+
+.dark .shadow-xl {
+  @apply shadow-none;
+}
+
+.dark .shadow-md {
+  @apply shadow-none;
+}
+
+.dark .bg-gradient-to-b.from-white {
+  @apply from-slate-950;
 }
 
 /* Custom CSS Variables */
@@ -20,17 +76,18 @@
   --font-geist-mono: 'Geist Mono', monospace;
 }
 
-/* Light mode is default */
 html {
   color-scheme: light;
 }
 
-/* Smooth scrolling */
+html.dark {
+  color-scheme: dark;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -40,34 +97,51 @@ html {
   background: #f8fafc;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Selection color */
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 ::selection {
   background: rgba(15, 23, 42, 0.1);
   color: #0f172a;
 }
 
-/* Focus styles */
+.dark ::selection {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
 *:focus-visible {
   outline: 2px solid #0f172a;
   outline-offset: 2px;
 }
 
-/* Prevent layout shift */
+.dark *:focus-visible {
+  outline-color: #94a3b8;
+}
+
 img, video {
   max-width: 100%;
   height: auto;
 }
 
-/* Animation utilities */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -88,7 +162,15 @@ img, video {
   animation: shimmer 1.5s infinite;
 }
 
-/* Flash animation for new posts */
+.dark .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1e293b 25%,
+    #334155 50%,
+    #1e293b 75%
+  );
+}
+
 @keyframes flashBorder {
   0%, 100% {
     border-color: rgba(15, 23, 42, 0);
@@ -98,12 +180,21 @@ img, video {
   }
 }
 
-.flash-new-post {
+.dark .flash-new-post {
   animation: flashBorder 1s ease-in-out 3;
+  border: 2px solid rgba(255, 255, 255, 0);
+}
+
+@keyframes flashBorderDark {
+  0%, 100% { border-color: rgba(255, 255, 255, 0); }
+  50% { border-color: rgba(255, 255, 255, 0.5); }
+}
+
+.dark .flash-new-post {
+  animation: flashBorderDark 1s ease-in-out 3;
   border: 2px solid transparent;
 }
 
-/* Animation Delays */
 .animation-delay-2000 {
   animation-delay: 2s;
 }

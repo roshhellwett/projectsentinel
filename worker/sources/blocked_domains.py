@@ -53,7 +53,7 @@ def is_blocked_domain(url: str) -> bool:
 
     try:
         parsed = urlparse(url)
-        domain = parsed.netloc.lower().lstrip("www.")
+        domain = parsed.netloc.lower().removeprefix("www.")
 
         if domain in BLOCKED_DOMAINS:
             return True
@@ -65,9 +65,8 @@ def is_blocked_domain(url: str) -> bool:
                 return True
             blocked_parts = blocked.split(".")
             domain_parts = domain.split(".")
-            if len(domain_parts) >= len(blocked_parts):
-                if domain_parts[-len(blocked_parts) :] == blocked_parts:
-                    return True
+            if len(domain_parts) >= len(blocked_parts) and domain_parts[-len(blocked_parts) :] == blocked_parts:
+                return True
 
         return False
     except Exception:

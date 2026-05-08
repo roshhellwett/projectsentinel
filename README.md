@@ -1,11 +1,11 @@
-# ProjectSentinel
+# India Verified
 
 An AI-powered, fully automated Indian news aggregator that verifies stories through cross-referencing before publishing. Zero human intervention required.
 
 ## What It Does
 
 - **Fetches** news from trusted Indian sources every 30 minutes
-- **Verifies** stories by cross-referencing multiple sources using Gemini AI
+- **Verifies** stories by cross-referencing multiple sources using Groq AI (Llama 3.3 70B)
 - **Writes** neutral summaries using Groq AI (Llama 3.3 70B)
 - **Publishes** only verified stories with credibility scores and source links
 - **Operates** 24/7 without any human editors
@@ -17,7 +17,7 @@ An AI-powered, fully automated Indian news aggregator that verifies stories thro
 | Frontend | Next.js 14 + TypeScript + Tailwind CSS |
 | Backend | Python 3.11 + FastAPI |
 | Database | Supabase (PostgreSQL) |
-| AI Verification | Google Gemini 1.5 Flash |
+| AI Verification | Groq API (Llama 3.3 70B) |
 | AI Writing | Groq API (Llama 3.3 70B) |
 | Hosting | Vercel (frontend), Railway (backend) |
 
@@ -83,7 +83,7 @@ npm run dev
 Copy `.env.example` to `.env` and fill in all values:
 
 - **Supabase**: URL, anon key, service role key
-- **AI**: Gemini API key, Groq API key
+- **AI**: Groq API keys for verification and writing
 - **News APIs**: GNews API key, NewsAPI key
 - **Admin**: Password, secret token
 - **App**: Site URL, Supabase public config
@@ -113,7 +113,7 @@ Copy `.env.example` to `.env` and fill in all values:
 3. **Block check**: Skip blocked/satire domains
 4. **False claim match**: Check against known false claims
 5. **Cross-source check**: Require 2+ sources
-6. **Gemini verification**: Score 0-100, extract key facts
+6. **Groq verification**: Score 0-100, extract key facts, headline, and summary
 7. **Groq writing**: Write neutral headline + summary
 8. **Publish**: Insert to `posts` table
 9. **Log**: Structured logging to stdout

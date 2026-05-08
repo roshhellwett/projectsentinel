@@ -1,6 +1,4 @@
-"""
-Archives old posts - deletes posts older than 6 months (runs monthly).
-"""
+"""Archives old worker data on the monthly maintenance run."""
 
 import os
 from datetime import UTC, datetime, timedelta
@@ -11,7 +9,7 @@ from logger.pipeline_logger import PipelineLogger
 
 
 class OldPostArchiver:
-    """Archives posts older than 6 months."""
+    """Archives posts and cleans up old pipeline tables."""
 
     def __init__(self):
         self.logger = PipelineLogger()
@@ -41,10 +39,7 @@ class OldPostArchiver:
             return 0
 
         try:
-            # Calculate cutoff date (6 months ago)
             cutoff_date = (datetime.now(UTC) - timedelta(days=180)).isoformat()
-
-            # Get count of old posts
             count_result = (
                 self.supabase.table("posts").select("id", count="exact").lt("published_at", cutoff_date).execute()
             )
@@ -55,14 +50,41 @@ class OldPostArchiver:
                 self.logger.log("ARCHIVER", "No old posts to archive")
                 return 0
 
-            # Delete old posts
             delete_result = self.supabase.table("posts").delete().lt("published_at", cutoff_date).execute()
-
             deleted = len(delete_result.data) if delete_result.data else 0
             self.logger.log("ARCHIVER", f"Archived {deleted} posts older than 6 months")
-
             return deleted
 
         except Exception as e:
             self.logger.log("ARCHIVER_ERROR", f"Failed to archive: {str(e)}")
+            return 0
+
+    def cleanup_discarded_articles(self, days: int = 30) -> int:
+        """Delete discarded article logs older than the retention window."""
+        return self._delete_old_rows("discarded_articles", "discarded_at", days)
+
+    def cleanup_raw_articles(self, days: int = 60) -> int:
+        """Delete raw article rows older than the retention window."""
+        return self._delete_old_rows("raw_articles", "fetched_at", days)
+
+    def cleanup_pipeline_tables(self) -> dict[str, int]:
+        """Run all monthly pipeline table cleanup jobs."""
+        return {
+            "discarded_articles": self.cleanup_discarded_articles(),
+            "raw_articles": self.cleanup_raw_articles(),
+        }
+
+    def _delete_old_rows(self, table: str, date_column: str, days: int) -> int:
+        if not self.supabase:
+            self.logger.log("ARCHIVER_ERROR", "Supabase not initialized")
+            return 0
+
+        try:
+            cutoff_date = (datetime.now(UTC) - timedelta(days=days)).isoformat()
+            delete_result = self.supabase.table(table).delete().lt(date_column, cutoff_date).execute()
+            deleted = len(delete_result.data) if delete_result.data else 0
+            self.logger.log("ARCHIVER", f"Deleted {deleted} {table} rows older than {days} days")
+            return deleted
+        except Exception as e:
+            self.logger.log("ARCHIVER_ERROR", f"Failed to clean {table}: {str(e)}")
             return 0

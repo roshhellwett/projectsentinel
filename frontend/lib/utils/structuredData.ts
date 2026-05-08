@@ -1,0 +1,87 @@
+import { Post } from '@/types';
+
+export function newsArticleJsonLd(post: Post): object {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: post.headline,
+    description: post.summary,
+    datePublished: post.published_at,
+    dateModified: post.updated_at || post.published_at,
+    author: {
+      '@type': 'Organization',
+      name: 'India Verified',
+      url: siteUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'India Verified',
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/favicon.svg`,
+      },
+    },
+    articleSection: post.category,
+    url: `${siteUrl}/news/${post.id}`,
+    credibilityScore: post.credibility_score,
+    sourceCount: post.source_count,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/news/${post.id}`,
+    },
+  };
+}
+
+export function websiteJsonLd(): object {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'India Verified',
+    url: siteUrl,
+    description: 'AI-powered Indian news aggregator that verifies every story through cross-referencing multiple trusted sources.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+}
+
+export function organizationJsonLd(): object {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'India Verified',
+    url: siteUrl,
+    logo: `${siteUrl}/favicon.svg`,
+    description: 'AI-powered, fully automated Indian news aggregator.',
+    foundingDate: '2025',
+  };
+}
+
+export function breadcrumbJsonLd(items: { name: string; url: string }[]): object {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+export function jsonLdToString(data: object): string {
+  return JSON.stringify(data);
+}

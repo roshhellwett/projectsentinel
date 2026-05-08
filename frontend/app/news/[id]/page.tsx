@@ -1,17 +1,18 @@
-/**
- * Individual news post page
- * Optimized: Link components, proper breadcrumb semantics, smooth animations
- */
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { fetchPostById } from '@/lib/supabase/server';
+import { fetchPostById, fetchPosts } from '@/lib/supabase/server';
 import { CategoryTag } from '@/components/news/CategoryTag';
 import { CredibilityBadge } from '@/components/news/CredibilityBadge';
 import { SourceLinks } from '@/components/news/SourceLinks';
 import { CorrectionsNotice } from '@/components/news/CorrectionsNotice';
+import { ShareButtons } from '@/components/news/ShareButtons';
+import { RelatedStories } from '@/components/news/RelatedStories';
+import { ReadingTime } from '@/components/news/ReadingTime';
 import { formatDate } from '@/lib/utils/formatDate';
+import { newsArticleJsonLd, breadcrumbJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
@@ -23,19 +24,30 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
 
   if (!post) {
     return {
-      title: 'Not Found - Sentinel News'
+      title: 'Not Found - India Verified'
     };
   }
 
   return {
-    title: `${post.headline} - Sentinel News`,
+    title: post.headline,
     description: post.summary,
     openGraph: {
       title: post.headline,
       description: post.summary,
       type: 'article',
-      publishedTime: post.published_at
-    }
+      publishedTime: post.published_at,
+      url: `${siteUrl}/news/${post.id}`,
+      images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.headline,
+      description: post.summary,
+      images: ['/og-image.svg'],
+    },
+    alternates: {
+      canonical: `${siteUrl}/news/${post.id}`,
+    },
   };
 }
 
@@ -47,11 +59,31 @@ export default async function NewsPage({ params }: NewsPageProps) {
     notFound();
   }
 
+  const [relatedPosts] = await Promise.all([
+    fetchPosts(1, 4, post.category),
+  ]);
+
   const isCorrected = post.status === 'corrected';
   const isRetracted = post.status === 'retracted';
 
+  const jsonLd = [
+    newsArticleJsonLd(post),
+    breadcrumbJsonLd([
+      { name: 'Home', url: siteUrl },
+      { name: post.category.charAt(0).toUpperCase() + post.category.slice(1), url: `${siteUrl}/category/${post.category}` },
+      { name: post.headline, url: `${siteUrl}/news/${post.id}` },
+    ]),
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdToString(jsonLd),
+        }}
+      />
+
       <nav aria-label="Breadcrumb" className="text-sm text-slate-500 mb-6">
         <ol className="flex items-center gap-2">
           <li>
@@ -87,6 +119,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
         <CredibilityBadge score={post.credibility_score} showTooltip />
         <span className="text-slate-500">{post.source_count} sources</span>
         <span className="text-slate-500">{formatDate(post.published_at)}</span>
+        <ReadingTime text={post.summary} />
+        <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}`} />
       </div>
 
       <div className={`mb-8 ${isRetracted ? 'opacity-50' : ''}`}>
@@ -134,6 +168,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </li>
         </ul>
       </div>
+
+      <RelatedStories posts={relatedPosts.posts} currentPostId={post.id} />
     </div>
   );
 }

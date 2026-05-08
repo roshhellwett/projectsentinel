@@ -1,31 +1,35 @@
-"""
-Final score evaluation - combines Gemini score with cross-source results.
-"""
+"""Final score evaluation - combines AI score with cross-source results."""
 
 
 class ScoreEvaluator:
     """Evaluates final credibility score based on multiple factors."""
 
     @staticmethod
-    def evaluate(gemini_score: int, source_articles: list[dict], fact_check_flags: list[str] = None) -> dict:
+    def evaluate(
+        groq_score: int | None = None,
+        source_articles: list[dict] | None = None,
+        fact_check_flags: list[str] | None = None,
+    ) -> dict:
         """
         Calculate final credibility score and metadata.
 
         Args:
-            gemini_score: Base score from Gemini (0-100)
+            groq_score: Base score from Groq verifier (0-100)
             source_articles: List of confirming source articles
             fact_check_flags: Any fact-check warnings
 
         Returns:
             Dict with final_score, source_count, flags
         """
+        base_score = groq_score if groq_score is not None else 0
+        if source_articles is None:
+            source_articles = []
         if fact_check_flags is None:
             fact_check_flags = []
 
         source_count = len(source_articles)
 
-        # Start with Gemini score
-        final_score = gemini_score
+        final_score = int(base_score)
 
         # Bonus for more sources (up to +10 for 4+ sources)
         if source_count >= 4:

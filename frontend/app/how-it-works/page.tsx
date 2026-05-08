@@ -1,7 +1,3 @@
-/**
- * How it works page - transparency and explanation
- */
-
 import { Metadata } from 'next';
 import { 
   Newspaper, 
@@ -15,8 +11,19 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'How It Works - Sentinel News',
-  description: 'Learn how Sentinel News uses AI to verify news stories from multiple trusted sources.'
+  title: 'How It Works - India Verified',
+  description: 'Learn how India Verified uses AI to verify news stories from multiple trusted sources.',
+  openGraph: {
+    title: 'How It Works - India Verified',
+    description: 'Learn how India Verified uses AI to verify news stories from multiple trusted sources.',
+    images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How It Works - India Verified',
+    description: 'Learn how India Verified uses AI to verify news stories from multiple trusted sources.',
+    images: ['/og-image.svg'],
+  },
 };
 
 const TRUSTED_SOURCES = [
@@ -26,17 +33,53 @@ const TRUSTED_SOURCES = [
 ];
 
 export default function HowItWorksPage() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      {/* Header */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'How does India Verified fetch news?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Our system continuously monitors RSS feeds from 20+ trusted Indian news sources. We fetch headlines and the first 150 words of each article for efficiency every 30 minutes.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'How does India Verified verify news?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Stories must be confirmed by 2+ different trusted sources. Single-source stories are discarded. Groq Llama 3.3 AI then analyzes headlines and excerpts, returning a credibility score (0-100), key facts, category, headline, and summary.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Is India Verified open source?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Yes, the entire codebase is open source under MIT license. Anyone can audit how we work, suggest improvements, or run their own instance.',
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-medium mb-4">How Sentinel News Works</h1>
-        <p className="text-xl text-gray-400">
+        <h1 className="text-4xl font-medium mb-4">How India Verified Works</h1>
+        <p className="text-xl text-slate-600">
           Fully automated, AI-powered news verification
         </p>
       </div>
       
-      {/* Pipeline steps */}
       <div className="space-y-8 mb-16">
         <Step
           icon={<Clock className="w-6 h-6" />}
@@ -69,8 +112,8 @@ export default function HowItWorksPage() {
         <Step
           icon={<CheckCircle className="w-6 h-6" />}
           number="5"
-          title="AI Verification (Gemini)"
-          description="Google Gemini 1.5 Flash analyzes headlines and excerpts from confirming sources. It returns: credibility score (0-100), key facts, and category."
+          title="AI Verification (Groq Llama 3.3)"
+          description="Groq Llama 3.3 analyzes headlines and excerpts from confirming sources. It returns: credibility score (0-100), key facts, category, headline, and summary."
         />
         
         <Step
@@ -88,17 +131,16 @@ export default function HowItWorksPage() {
         />
       </div>
       
-      {/* Trusted sources */}
       <div className="bg-surface rounded-xl p-8 mb-12">
         <h2 className="text-2xl font-medium mb-6">Trusted Sources</h2>
-        <p className="text-gray-400 mb-6">
+        <p className="text-slate-600 mb-6">
           We only pull from established Indian news organizations with editorial standards.
         </p>
         <div className="flex flex-wrap gap-3">
           {TRUSTED_SOURCES.map(source => (
             <span 
               key={source}
-              className="px-3 py-1 bg-background rounded-full text-sm text-gray-300"
+              className="px-3 py-1 bg-background rounded-full text-sm text-slate-600"
             >
               {source}
             </span>
@@ -106,7 +148,6 @@ export default function HowItWorksPage() {
         </div>
       </div>
       
-      {/* Scoring system */}
       <div className="mb-12">
         <h2 className="text-2xl font-medium mb-6">Credibility Scoring</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -131,11 +172,10 @@ export default function HowItWorksPage() {
         </div>
       </div>
       
-      {/* Open source */}
       <div className="text-center bg-surface rounded-xl p-8">
         <Github className="w-12 h-12 text-accent mx-auto mb-4" />
         <h2 className="text-2xl font-medium mb-4">Open Source</h2>
-        <p className="text-gray-400 mb-6">
+        <p className="text-slate-600 mb-6">
           The entire codebase is public. Anyone can audit how we work, suggest improvements, or run their own instance.
         </p>
         <a
@@ -171,9 +211,9 @@ function Step({
       <div>
         <div className="flex items-center gap-3 mb-1">
           <span className="text-sm font-medium text-accent">Step {number}</span>
-          <h3 className="text-lg font-medium text-white">{title}</h3>
+          <h3 className="text-lg font-medium text-slate-900">{title}</h3>
         </div>
-        <p className="text-gray-400">{description}</p>
+        <p className="text-slate-600">{description}</p>
       </div>
     </div>
   );
@@ -195,8 +235,8 @@ function ScoreCard({
       <div className={`inline-block px-3 py-1 ${color} text-white text-sm font-medium rounded-full mb-3`}>
         {range}
       </div>
-      <h3 className="font-medium text-white mb-2">{label}</h3>
-      <p className="text-sm text-gray-400">{description}</p>
+      <h3 className="font-medium text-slate-900 mb-2">{label}</h3>
+      <p className="text-sm text-slate-600">{description}</p>
     </div>
   );
 }
