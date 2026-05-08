@@ -3,7 +3,7 @@ Archives old posts - deletes posts older than 6 months (runs monthly).
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from supabase import create_client
 
@@ -42,7 +42,7 @@ class OldPostArchiver:
 
         try:
             # Calculate cutoff date (6 months ago)
-            cutoff_date = (datetime.utcnow() - timedelta(days=180)).isoformat()
+            cutoff_date = (datetime.now(UTC) - timedelta(days=180)).isoformat()
 
             # Get count of old posts
             count_result = (
