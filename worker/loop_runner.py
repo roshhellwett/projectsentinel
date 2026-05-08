@@ -2,15 +2,18 @@
 Loop runner - runs the pipeline continuously until news is published.
 Optimized: reuses Supabase client, handles errors gracefully.
 """
+
 import os
-import time
 import sys
-from datetime import datetime, timezone
+import time
+from datetime import UTC, datetime
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from supabase import create_client
+
 from scheduler.jobs import run_pipeline
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
@@ -29,7 +32,7 @@ def main():
     print("=" * 60)
     print("ProjectSentinel - Continuous Pipeline Runner")
     print("=" * 60)
-    print(f"Started at: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}")
+    print(f"Started at: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S UTC')}")
     print()
 
     initial_count = get_post_count()
@@ -42,7 +45,7 @@ def main():
     while True:
         run_number += 1
         print(f"\n{'=' * 60}")
-        print(f"[{datetime.now(timezone.utc).strftime('%H:%M:%S')}] Pipeline Run #{run_number}")
+        print(f"[{datetime.now(UTC).strftime('%H:%M:%S')}] Pipeline Run #{run_number}")
         print(f"{'=' * 60}")
 
         try:
@@ -58,8 +61,8 @@ def main():
                 print(f"{'#' * 60}")
                 break
             else:
-                print(f"\nNo new posts published yet.")
-                print(f"Waiting 60 seconds before next run...")
+                print("\nNo new posts published yet.")
+                print("Waiting 60 seconds before next run...")
                 time.sleep(60)
 
         except KeyboardInterrupt:
@@ -67,6 +70,7 @@ def main():
             sys.exit(0)
         except Exception as e:
             import traceback
+
             print(f"\nError during pipeline run: {e}")
             print(traceback.format_exc())
             print("Retrying in 60 seconds...")

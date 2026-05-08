@@ -23,6 +23,10 @@ env/
 .env.development
 .env.production
 .env.*.local
+.env.example
+!.env.example
+frontend/.env
+worker/.env
 
 # Next.js
 .next/

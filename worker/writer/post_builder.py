@@ -3,8 +3,7 @@ Post builder - assembles final post object before database insertion.
 Fixed: single timestamp capture, validation.
 """
 
-from typing import List, Dict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 class PostBuilder:
@@ -17,8 +16,8 @@ class PostBuilder:
         category: str,
         credibility_score: int,
         credibility_reason: str,
-        source_articles: List[Dict]
-    ) -> Dict:
+        source_articles: list[dict],
+    ) -> dict:
         """
         Assemble final post object.
 
@@ -39,15 +38,12 @@ class PostBuilder:
             raise ValueError("Summary cannot be empty")
 
         sources = [
-            {
-                "name": article.get("source_name", "Unknown"),
-                "url": article.get("url", "")
-            }
+            {"name": article.get("source_name", "Unknown"), "url": article.get("url", "")}
             for article in source_articles
             if article.get("url")
         ]
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
 
         return {
             "headline": headline.strip(),
@@ -61,5 +57,5 @@ class PostBuilder:
             "status": "published",
             "correction_note": None,
             "published_at": now,
-            "updated_at": now
+            "updated_at": now,
         }

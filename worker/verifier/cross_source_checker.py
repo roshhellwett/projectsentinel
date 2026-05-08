@@ -5,9 +5,8 @@ Requires 2+ independent sources for verification.
 
 import os
 import re
-from typing import List, Dict, Set, Tuple
-from datetime import datetime, timedelta, timezone
 from collections import defaultdict
+from datetime import UTC, datetime, timedelta
 
 from supabase import create_client
 
@@ -38,20 +37,109 @@ class UnionFind:
         return True
 
 
-STOP_WORDS: Set[str] = frozenset({
-    'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had',
-    'her', 'was', 'one', 'our', 'out', 'has', 'have', 'been', 'being',
-    'from', 'with', 'this', 'that', 'they', 'will', 'each', 'does', 'did',
-    'more', 'most', 'some', 'such', 'than', 'very', 'just', 'because',
-    'while', 'after', 'over', 'under', 'again', 'further', 'then', 'once',
-    'here', 'there', 'when', 'where', 'why', 'how', 'what', 'which',
-    'who', 'whom', 'whose', 'these', 'those', 'their', 'about', 'into',
-    'through', 'during', 'before', 'between', 'other', 'only', 'own',
-    'same', 'also', 'says', 'said', 'say', 'new', 'old', 'first', 'last',
-    'high', 'low', 'big', 'yet', 'both', 'even', 'much', 'any', 'many',
-    'may', 'might', 'must', 'shall', 'should', 'could', 'would',
-    'india', 'indian', 'news', 'live', 'updates', 'breaking', 'latest',
-})
+STOP_WORDS: set[str] = frozenset(
+    {
+        "the",
+        "and",
+        "for",
+        "are",
+        "but",
+        "not",
+        "you",
+        "all",
+        "can",
+        "had",
+        "her",
+        "was",
+        "one",
+        "our",
+        "out",
+        "has",
+        "have",
+        "been",
+        "being",
+        "from",
+        "with",
+        "this",
+        "that",
+        "they",
+        "will",
+        "each",
+        "does",
+        "did",
+        "more",
+        "most",
+        "some",
+        "such",
+        "than",
+        "very",
+        "just",
+        "because",
+        "while",
+        "after",
+        "over",
+        "under",
+        "again",
+        "further",
+        "then",
+        "once",
+        "here",
+        "there",
+        "when",
+        "where",
+        "why",
+        "how",
+        "what",
+        "which",
+        "who",
+        "whom",
+        "whose",
+        "these",
+        "those",
+        "their",
+        "about",
+        "into",
+        "through",
+        "during",
+        "before",
+        "between",
+        "other",
+        "only",
+        "own",
+        "same",
+        "also",
+        "says",
+        "said",
+        "say",
+        "new",
+        "old",
+        "first",
+        "last",
+        "high",
+        "low",
+        "big",
+        "yet",
+        "both",
+        "even",
+        "much",
+        "any",
+        "many",
+        "may",
+        "might",
+        "must",
+        "shall",
+        "should",
+        "could",
+        "would",
+        "india",
+        "indian",
+        "news",
+        "live",
+        "updates",
+        "breaking",
+        "latest",
+    }
+)
 
 
 class CrossSourceChecker:
@@ -64,8 +152,8 @@ class CrossSourceChecker:
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
-        self._recent_cache: List[Dict] = []
-        self._cache_time: datetime = datetime.min.replace(tzinfo=timezone.utc)
+        self._recent_cache: list[dict] = []
+        self._cache_time: datetime = datetime.min.replace(tzinfo=UTC)
         self._init_supabase()
 
     def _init_supabase(self):
@@ -79,9 +167,9 @@ class CrossSourceChecker:
             except Exception as e:
                 self.logger.log("CROSS_SOURCE_ERROR", f"Failed to connect: {str(e)}")
 
-    def _get_recent_raw_articles(self) -> List[Dict]:
+    def _get_recent_raw_articles(self) -> list[dict]:
         """Get recent unprocessed articles with 30-minute cache."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if (now - self._cache_time).total_seconds() < 1800:
             return self._recent_cache
 
@@ -91,11 +179,13 @@ class CrossSourceChecker:
         try:
             two_hours_ago = (now - timedelta(hours=2)).isoformat()
 
-            result = self.supabase.table("raw_articles")\
-                .select("*")\
-                .eq("processed", False)\
-                .gte("fetched_at", two_hours_ago)\
+            result = (
+                self.supabase.table("raw_articles")
+                .select("*")
+                .eq("processed", False)
+                .gte("fetched_at", two_hours_ago)
                 .execute()
+            )
 
             self._recent_cache = result.data or []
             self._cache_time = now
@@ -104,7 +194,7 @@ class CrossSourceChecker:
             self.logger.log("CROSS_SOURCE_ERROR", f"Failed to get recent articles: {str(e)}")
             return []
 
-    def get_verified_groups(self, articles: List[Dict]) -> List[List[Dict]]:
+    def get_verified_groups(self, articles: list[dict]) -> list[list[dict]]:
         """
         Group articles by topic using Union-Find and return only groups with 2+ sources.
 
@@ -134,7 +224,7 @@ class CrossSourceChecker:
         self.logger.log("CROSS_SOURCE", f"Found {len(verified_groups)} verified groups from {len(groups)} total groups")
         return verified_groups
 
-    def _group_by_topic(self, articles: List[Dict]) -> List[List[Dict]]:
+    def _group_by_topic(self, articles: list[dict]) -> list[list[dict]]:
         """
         Group articles by similar topics using Union-Find for O(n log n) grouping.
 
@@ -144,7 +234,7 @@ class CrossSourceChecker:
         Returns:
             List of article groups
         """
-        articles = articles[:self.MAX_ARTICLES_TO_COMPARE]
+        articles = articles[: self.MAX_ARTICLES_TO_COMPARE]
         article_keywords = []
         for article in articles:
             headline = article.get("headline", "")
@@ -153,17 +243,17 @@ class CrossSourceChecker:
 
         uf = UnionFind(len(articles))
 
-        keyword_to_indices: Dict[str, List[int]] = defaultdict(list)
+        keyword_to_indices: dict[str, list[int]] = defaultdict(list)
         for i, keywords in enumerate(article_keywords):
             for kw in keywords:
                 keyword_to_indices[kw].append(i)
 
-        candidate_pairs: Set[Tuple[int, int]] = set()
+        candidate_pairs: set[tuple[int, int]] = set()
         for indices in keyword_to_indices.values():
             if len(indices) > 12:
                 continue
             for left_pos, left in enumerate(indices):
-                for right in indices[left_pos + 1:]:
+                for right in indices[left_pos + 1 :]:
                     candidate_pairs.add((left, right))
 
         for left, right in candidate_pairs:
@@ -172,7 +262,7 @@ class CrossSourceChecker:
             if self._are_same_story(article_keywords[left], article_keywords[right]):
                 uf.union(left, right)
 
-        group_map: Dict[int, List[int]] = defaultdict(list)
+        group_map: dict[int, list[int]] = defaultdict(list)
         for i in range(len(articles)):
             group_map[uf.find(i)].append(i)
 
@@ -186,7 +276,7 @@ class CrossSourceChecker:
 
         return groups
 
-    def _are_same_story(self, left: Set[str], right: Set[str]) -> bool:
+    def _are_same_story(self, left: set[str], right: set[str]) -> bool:
         """Require more than one shared meaningful term before grouping."""
         if not left or not right:
             return False
@@ -198,7 +288,7 @@ class CrossSourceChecker:
         similarity = len(shared) / max(len(left | right), 1)
         return similarity >= self.MIN_SIMILARITY
 
-    def _same_source(self, left: Dict, right: Dict) -> bool:
+    def _same_source(self, left: dict, right: dict) -> bool:
         """Treat matching source names or domains as the same source."""
         left_name = (left.get("source_name") or "").strip().lower()
         right_name = (right.get("source_name") or "").strip().lower()
@@ -206,7 +296,7 @@ class CrossSourceChecker:
         right_url = (right.get("source_url") or "").strip().lower()
         return bool((left_name and left_name == right_name) or (left_url and left_url == right_url))
 
-    def _unique_articles(self, articles: List[Dict]) -> List[Dict]:
+    def _unique_articles(self, articles: list[dict]) -> list[dict]:
         """Deduplicate merged live and recent article lists by URL hash."""
         unique = []
         seen = set()
@@ -218,7 +308,7 @@ class CrossSourceChecker:
             unique.append(article)
         return unique
 
-    def _extract_significant_words(self, headline: str) -> Set[str]:
+    def _extract_significant_words(self, headline: str) -> set[str]:
         """
         Extract significant words from headline for matching.
 
@@ -232,7 +322,7 @@ class CrossSourceChecker:
             return set()
 
         headline = headline.lower()
-        headline = re.sub(r'[^\w\s]', ' ', headline)
+        headline = re.sub(r"[^\w\s]", " ", headline)
 
         words = headline.split()
         significant = {w for w in words if len(w) > 3 and w not in STOP_WORDS}

@@ -3,11 +3,10 @@ Groq AI verification - uses Llama 3.3 70B for news verification.
 Token-optimized: system+user split, minimal prompt, model fallback.
 """
 
+import json
 import os
 import re
-import json
 import time
-from typing import List, Dict, Optional
 
 import requests
 
@@ -33,14 +32,15 @@ class GroqVerifier:
         "Key facts: 3-5 verified info points only. Headline and summary must use only those facts."
     )
 
-    MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+    FALLBACK_MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 
     def __init__(self):
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY_VERIFY", "")
+        self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama3-8b-8192")
         self._last_call_time = 0.0
 
-    def verify(self, article_group: List[Dict]) -> Dict:
+    def verify(self, article_group: list[dict]) -> dict:
         """
         Verify an article group using Groq.
 
@@ -54,23 +54,24 @@ class GroqVerifier:
             raise Exception("Groq verification API key not configured")
 
         user_content = self._build_prompt(article_group)
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
 
         for attempt in range(self.MAX_RETRIES):
-            model = self.MODELS[0] if attempt == 0 else self.MODELS[1]
+            model = (
+                self.verify_model
+                if attempt == 0
+                else (self.FALLBACK_MODELS[1] if len(self.FALLBACK_MODELS) > 1 else self.verify_model)
+            )
 
             data = {
                 "model": model,
                 "messages": [
                     {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {"role": "user", "content": user_content}
+                    {"role": "user", "content": user_content},
                 ],
                 "temperature": 0.1,
                 "max_tokens": 520,
-                "response_format": {"type": "json_object"}
+                "response_format": {"type": "json_object"},
             }
 
             try:
@@ -79,12 +80,7 @@ class GroqVerifier:
                 else:
                     self._apply_rate_limit()
 
-                response = requests.post(
-                    self.API_URL,
-                    headers=headers,
-                    json=data,
-                    timeout=30
-                )
+                response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
                 response.raise_for_status()
 
                 result = response.json()
@@ -98,7 +94,9 @@ class GroqVerifier:
             except requests.exceptions.RequestException as e:
                 error_str = str(e)
                 wait = self._extract_retry_delay(error_str, attempt)
-                self.logger.log("GROQ_VERIFY", f"Request failed ({model}), attempt {attempt+1}/{self.MAX_RETRIES}: {str(e)[:80]}")
+                self.logger.log(
+                    "GROQ_VERIFY", f"Request failed ({model}), attempt {attempt + 1}/{self.MAX_RETRIES}: {str(e)[:80]}"
+                )
                 if wait > 0:
                     self.logger.log("GROQ_VERIFY", f"Waiting {wait}s before retry")
                     time.sleep(wait)
@@ -114,7 +112,7 @@ class GroqVerifier:
     def _extract_retry_delay(self, error_str: str, attempt: int) -> int:
         """Extract retry delay from error message or compute exponential backoff."""
         if "429" in error_str:
-            match = re.search(r'retry in (\d+(?:\.\d+)?)s', error_str, re.IGNORECASE)
+            match = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.IGNORECASE)
             if match:
                 return int(float(match.group(1))) + 2
         if "503" in error_str:
@@ -132,7 +130,7 @@ class GroqVerifier:
 
         self._last_call_time = time.time()
 
-    def _build_prompt(self, article_group: List[Dict]) -> str:
+    def _build_prompt(self, article_group: list[dict]) -> str:
         """Build minimal token-efficient verification prompt."""
         headline = self._trim_words(article_group[0].get("headline", ""), 18)
 
@@ -154,10 +152,10 @@ class GroqVerifier:
             return " ".join(words)
         return " ".join(words[:limit])
 
-    def _parse_response(self, text: str) -> Optional[Dict]:
+    def _parse_response(self, text: str) -> dict | None:
         """Parse Groq JSON response. Returns None on failure."""
         text = text.strip()
-        text = re.sub(r'^```(?:json)?\s*|\s*```$', '', text).strip()
+        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text).strip()
 
         try:
             result = json.loads(text)

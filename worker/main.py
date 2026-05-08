@@ -5,12 +5,14 @@ Starts FastAPI server and APScheduler for the news pipeline.
 
 import os
 from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import FastAPI
 from apscheduler.schedulers.background import BackgroundScheduler
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.health import router as health_router
 from api.trigger import router as trigger_router
@@ -22,34 +24,27 @@ scheduler = BackgroundScheduler()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage scheduler lifecycle."""
-    scheduler.add_job(
-        run_pipeline,
-        'interval',
-        minutes=30,
-        id='news_pipeline',
-        replace_existing=True,
-        max_instances=1
-    )
+    scheduler.add_job(run_pipeline, "interval", minutes=30, id="news_pipeline", replace_existing=True, max_instances=1)
 
     scheduler.add_job(
         run_pipeline,
-        'interval',
+        "interval",
         hours=4,
-        id='supplementary_fetch',
+        id="supplementary_fetch",
         replace_existing=True,
         max_instances=1,
-        kwargs={'supplementary_only': True}
+        kwargs={"supplementary_only": True},
     )
 
     scheduler.add_job(
         run_pipeline,
-        'cron',
+        "cron",
         day=1,
         hour=2,
-        id='archive_old_posts',
+        id="archive_old_posts",
         replace_existing=True,
         max_instances=1,
-        kwargs={'archive_only': True}
+        kwargs={"archive_only": True},
     )
 
     try:
@@ -73,8 +68,17 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="ProjectSentinel Worker",
     description="AI-powered news verification and publishing pipeline",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.1.0",
+    lifespan=lifespan,
+)
+
+allowed_origins = os.getenv("CORS_ORIGINS", "https://sentinelnews.vercel.app").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+    max_age=600,
 )
 
 app.include_router(health_router, tags=["health"])

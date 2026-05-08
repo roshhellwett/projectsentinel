@@ -3,18 +3,17 @@ RSS feed fetcher - parallel fetching with session reuse.
 Optimized: concurrent feed fetching, session passed to feedparser.
 """
 
-import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Dict, Optional
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from urllib.parse import urlparse
-from bs4 import BeautifulSoup
+
 import feedparser
 import requests
+from bs4 import BeautifulSoup
 
-from sources.rss_sources import get_rss_sources
-from logger.pipeline_logger import PipelineLogger
 from fetcher.url_tools import compute_url_hash, normalize_url
+from logger.pipeline_logger import PipelineLogger
+from sources.rss_sources import get_rss_sources
 
 
 class RSSFetcher:
@@ -24,7 +23,7 @@ class RSSFetcher:
         self.logger = PipelineLogger()
         self.max_workers = max_workers
 
-    def fetch_all(self) -> List[Dict]:
+    def fetch_all(self) -> list[dict]:
         """
         Fetch all RSS feeds concurrently and return list of raw articles.
 
@@ -35,10 +34,7 @@ class RSSFetcher:
         sources = get_rss_sources()
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_source = {
-                executor.submit(self._fetch_feed, source): source
-                for source in sources
-            }
+            future_to_source = {executor.submit(self._fetch_feed, source): source for source in sources}
 
             for future in as_completed(future_to_source):
                 source = future_to_source[future]
@@ -51,7 +47,7 @@ class RSSFetcher:
 
         return articles
 
-    def _fetch_feed(self, source: Dict) -> List[Dict]:
+    def _fetch_feed(self, source: dict) -> list[dict]:
         """
         Fetch and parse a single RSS feed.
 
@@ -64,9 +60,7 @@ class RSSFetcher:
         articles = []
 
         session = requests.Session()
-        session.headers.update({
-            "User-Agent": "ProjectSentinel Bot/1.0 (+https://projectsentinel.in/bot)"
-        })
+        session.headers.update({"User-Agent": "ProjectSentinel Bot/1.0 (+https://projectsentinel.in/bot)"})
 
         try:
             feed = feedparser.parse(source["url"], request_session=session)
@@ -84,7 +78,7 @@ class RSSFetcher:
 
         return articles
 
-    def _parse_entry(self, entry, source: Dict) -> Optional[Dict]:
+    def _parse_entry(self, entry, source: dict) -> dict | None:
         """
         Parse a single RSS entry into article format.
 
@@ -113,7 +107,7 @@ class RSSFetcher:
             "source_name": source["name"],
             "source_url": self._get_base_url(url),
             "category_hint": source.get("category_hint", "general"),
-            "fetched_at": datetime.now(timezone.utc).isoformat()
+            "fetched_at": datetime.now(UTC).isoformat(),
         }
 
     def _extract_excerpt(self, entry) -> str:

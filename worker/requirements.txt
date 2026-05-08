@@ -11,3 +11,8 @@ pydantic>=2.10.0
 python-jose[cryptography]>=3.3.0
 beautifulsoup4>=4.12.3
 lxml>=5.3.1
+
+# Testing & linting
+pytest>=8.0.0
+pytest-asyncio>=0.24.0
+ruff>=0.7.0

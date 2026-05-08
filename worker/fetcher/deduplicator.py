@@ -4,13 +4,12 @@ Optimized: batch DB operations, upsert, minimal memory.
 """
 
 import os
-from typing import List, Dict, Set, Optional
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from supabase import create_client
 
-from logger.pipeline_logger import PipelineLogger
 from fetcher.url_tools import compute_url_hash
+from logger.pipeline_logger import PipelineLogger
 
 
 class Deduplicator:
@@ -19,7 +18,7 @@ class Deduplicator:
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
-        self._known_hashes: Optional[Set[str]] = None
+        self._known_hashes: set[str] | None = None
         self._init_supabase()
 
     def _init_supabase(self):
@@ -33,7 +32,7 @@ class Deduplicator:
             except Exception as e:
                 self.logger.log("DEDUP_ERROR", f"Failed to connect to Supabase: {str(e)}")
 
-    def _load_known_hashes(self) -> Set[str]:
+    def _load_known_hashes(self) -> set[str]:
         """Load all known URL hashes from raw_articles (cached per pipeline run)."""
         if self._known_hashes is not None:
             return self._known_hashes
@@ -43,11 +42,8 @@ class Deduplicator:
             return self._known_hashes
 
         try:
-            cutoff = (datetime.now(timezone.utc) - timedelta(days=45)).isoformat()
-            result = self.supabase.table("raw_articles")\
-                .select("url_hash")\
-                .gte("fetched_at", cutoff)\
-                .execute()
+            cutoff = (datetime.now(UTC) - timedelta(days=45)).isoformat()
+            result = self.supabase.table("raw_articles").select("url_hash").gte("fetched_at", cutoff).execute()
             self._known_hashes = {row["url_hash"] for row in (result.data or [])}
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
@@ -55,7 +51,7 @@ class Deduplicator:
 
         return self._known_hashes
 
-    def is_new(self, article: Dict) -> bool:
+    def is_new(self, article: dict) -> bool:
         """
         Check if article is new using in-memory hash cache.
         Batch-inserts new articles at end of pipeline via mark_group_processed.
@@ -81,7 +77,7 @@ class Deduplicator:
         article["_is_new"] = True
         return True
 
-    def batch_insert_new_articles(self, articles: List[Dict]) -> int:
+    def batch_insert_new_articles(self, articles: list[dict]) -> int:
         """
         Batch insert all new articles into raw_articles.
         Call this once at end of fetch step for all new articles.
@@ -110,15 +106,15 @@ class Deduplicator:
                     "source_url": a.get("source_url", ""),
                     "category_hint": a.get("category_hint", "general"),
                     "processed": False,
-                    "fetched_at": datetime.now(timezone.utc).isoformat()
+                    "fetched_at": datetime.now(UTC).isoformat(),
                 }
                 for a in new_articles
             ]
 
             try:
-                self.supabase.table("raw_articles")\
-                    .upsert(insert_data, on_conflict="url_hash", ignore_duplicates=True)\
-                    .execute()
+                self.supabase.table("raw_articles").upsert(
+                    insert_data, on_conflict="url_hash", ignore_duplicates=True
+                ).execute()
             except TypeError:
                 self.supabase.table("raw_articles").insert(insert_data).execute()
 
@@ -129,7 +125,7 @@ class Deduplicator:
             self.logger.log("DEDUP_ERROR", f"Batch insert failed: {str(e)}")
             return 0
 
-    def log_discarded(self, article: Dict, reason: str, score: int = None):
+    def log_discarded(self, article: dict, reason: str, score: int = None):
         """Log a discarded article to discarded_articles table."""
         if not self.supabase:
             return
@@ -141,7 +137,7 @@ class Deduplicator:
                 "headline": article.get("headline", ""),
                 "discard_reason": reason,
                 "credibility_score": score,
-                "discarded_at": datetime.now(timezone.utc).isoformat()
+                "discarded_at": datetime.now(UTC).isoformat(),
             }
 
             self.supabase.table("discarded_articles").insert(data).execute()
@@ -149,7 +145,7 @@ class Deduplicator:
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to log discarded: {str(e)}")
 
-    def log_discarded_group(self, group: List[Dict], reason: str, score: int = None):
+    def log_discarded_group(self, group: list[dict], reason: str, score: int = None):
         """Batch log all articles in a group as discarded."""
         if not self.supabase:
             return
@@ -162,7 +158,7 @@ class Deduplicator:
                     "headline": a.get("headline", ""),
                     "discard_reason": reason,
                     "credibility_score": score,
-                    "discarded_at": datetime.now(timezone.utc).isoformat()
+                    "discarded_at": datetime.now(UTC).isoformat(),
                 }
                 for a in group
             ]
@@ -172,7 +168,7 @@ class Deduplicator:
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to batch log discarded: {str(e)}")
 
-    def mark_group_processed(self, group: List[Dict]):
+    def mark_group_processed(self, group: list[dict]):
         """Batch mark all articles in a group as processed."""
         if not self.supabase:
             return

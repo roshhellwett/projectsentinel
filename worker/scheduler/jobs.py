@@ -5,30 +5,26 @@ Optimized: batch operations, parallel fetching, singletons, proper timezone.
 
 import os
 import traceback
-from datetime import datetime, timezone, timedelta
-from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import UTC, datetime
 
-from fetcher.rss_fetcher import RSSFetcher
+from archiver.old_post_archiver import OldPostArchiver
+from fetcher.deduplicator import Deduplicator
+from fetcher.factcheck_fetcher import FactCheckFetcher
 from fetcher.gnews_fetcher import GNewsFetcher
 from fetcher.newsapi_fetcher import NewsAPIFetcher
-from fetcher.factcheck_fetcher import FactCheckFetcher
-from fetcher.deduplicator import Deduplicator
+from fetcher.rss_fetcher import RSSFetcher
+from logger.pipeline_logger import PipelineLogger
+from publisher.supabase_publisher import SupabasePublisher
 from sources.blocked_domains import is_blocked_domain
-from verifier.factcheck_matcher import FactCheckMatcher
 from verifier.cross_source_checker import CrossSourceChecker
+from verifier.factcheck_matcher import FactCheckMatcher
 from verifier.groq_verifier import GroqVerifier
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
-from publisher.supabase_publisher import SupabasePublisher
-from archiver.old_post_archiver import OldPostArchiver
-from logger.pipeline_logger import PipelineLogger
 
 
-def run_pipeline(
-    supplementary_only: bool = False,
-    archive_only: bool = False
-) -> None:
+def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -> None:
     """
     Main pipeline function that orchestrates all steps.
 
@@ -37,9 +33,13 @@ def run_pipeline(
         archive_only: Only run archive job (monthly)
     """
     logger = PipelineLogger()
-    logger.log("PIPELINE", "Starting pipeline run", {"mode": "supplementary" if supplementary_only else ("archive" if archive_only else "full")})
+    logger.log(
+        "PIPELINE",
+        "Starting pipeline run",
+        {"mode": "supplementary" if supplementary_only else ("archive" if archive_only else "full")},
+    )
 
-    start_time = datetime.now(timezone.utc)
+    start_time = datetime.now(UTC)
     max_ai_groups = int(os.getenv("MAX_AI_GROUPS_PER_RUN", "4"))
     stats = {
         "fetched": 0,
@@ -49,7 +49,7 @@ def run_pipeline(
         "single_source": 0,
         "low_score": 0,
         "published": 0,
-        "ai_groups_skipped": 0
+        "ai_groups_skipped": 0,
     }
 
     try:
@@ -78,7 +78,7 @@ def run_pipeline(
             with ThreadPoolExecutor(max_workers=2) as executor:
                 futures = {
                     executor.submit(GNewsFetcher().fetch): "GNews",
-                    executor.submit(NewsAPIFetcher().fetch): "NewsAPI"
+                    executor.submit(NewsAPIFetcher().fetch): "NewsAPI",
                 }
                 for future in as_completed(futures):
                     name = futures[future]
@@ -152,10 +152,7 @@ def run_pipeline(
                 summary = verification.get("summary")
 
                 if not headline or not summary:
-                    writing = groq_writer.write(
-                        key_facts=verification["key_facts"],
-                        category=verification["category"]
-                    )
+                    writing = groq_writer.write(key_facts=verification["key_facts"], category=verification["category"])
                     headline = writing["headline"]
                     summary = writing["summary"]
 
@@ -165,7 +162,7 @@ def run_pipeline(
                     category=verification["category"],
                     credibility_score=score,
                     credibility_reason=verification["reason"],
-                    source_articles=group
+                    source_articles=group,
                 )
 
                 if publisher.publish(post):
@@ -177,7 +174,7 @@ def run_pipeline(
                 logger.log("ERROR", traceback.format_exc())
                 continue
 
-        duration = (datetime.now(timezone.utc) - start_time).total_seconds()
+        duration = (datetime.now(UTC) - start_time).total_seconds()
         logger.log("COMPLETE", f"Pipeline completed in {duration:.1f}s", stats)
 
     except Exception as e:

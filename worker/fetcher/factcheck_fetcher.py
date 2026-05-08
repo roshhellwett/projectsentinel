@@ -4,7 +4,6 @@ Optimized: batch insert instead of N+1 queries.
 """
 
 import re
-from typing import List, Dict, Optional
 
 import feedparser
 
@@ -31,6 +30,7 @@ class FactCheckFetcher:
             Number of new fact-checks added
         """
         import os
+
         from supabase import create_client
 
         supabase_url = os.getenv("SUPABASE_URL", "")
@@ -74,9 +74,7 @@ class FactCheckFetcher:
         if new_claims:
             try:
                 try:
-                    supabase.table("known_false_claims")\
-                        .upsert(new_claims, on_conflict="fact_check_url")\
-                        .execute()
+                    supabase.table("known_false_claims").upsert(new_claims, on_conflict="fact_check_url").execute()
                 except TypeError:
                     supabase.table("known_false_claims").insert(new_claims).execute()
                 self.logger.log("FACTCHECK", f"Added {len(new_claims)} new fact checks")
@@ -85,7 +83,7 @@ class FactCheckFetcher:
 
         return len(new_claims)
 
-    def _parse_factcheck(self, entry, source: str) -> Optional[Dict]:
+    def _parse_factcheck(self, entry, source: str) -> dict | None:
         """Parse a fact-check entry into claim format."""
         url = entry.get("link", "")
         if not url:
@@ -97,33 +95,119 @@ class FactCheckFetcher:
 
         keywords = self._extract_keywords(title)
 
-        return {
-            "claim_summary": title,
-            "source": source,
-            "fact_check_url": url,
-            "keywords": keywords
-        }
+        return {"claim_summary": title, "source": source, "fact_check_url": url, "keywords": keywords}
 
-    def _extract_keywords(self, title: str) -> List[str]:
+    def _extract_keywords(self, title: str) -> list[str]:
         """Extract relevant keywords from a fact-check title."""
-        stop_words = frozenset({
-            "the", "a", "an", "is", "are", "was", "were", "be", "been",
-            "being", "have", "has", "had", "do", "does", "did", "will",
-            "would", "could", "should", "may", "might", "must", "shall",
-            "can", "need", "to", "of", "in", "for", "on", "with", "at",
-            "by", "from", "as", "into", "through", "during", "before",
-            "after", "above", "below", "between", "under", "again",
-            "further", "then", "once", "here", "there", "when", "where",
-            "why", "how", "all", "each", "few", "more", "most", "other",
-            "some", "such", "no", "nor", "not", "only", "own", "same",
-            "so", "than", "too", "very", "just", "and", "but", "if", "or",
-            "because", "until", "while", "this", "that", "these", "those",
-            "am", "s", "t", "don", "doesn", "didn", "wasn", "weren",
-            "haven", "hasn", "hadn", "won", "wouldn", "shouldn", "mightn",
-            "mustn", "isn", "aren"
-        })
+        stop_words = frozenset(
+            {
+                "the",
+                "a",
+                "an",
+                "is",
+                "are",
+                "was",
+                "were",
+                "be",
+                "been",
+                "being",
+                "have",
+                "has",
+                "had",
+                "do",
+                "does",
+                "did",
+                "will",
+                "would",
+                "could",
+                "should",
+                "may",
+                "might",
+                "must",
+                "shall",
+                "can",
+                "need",
+                "to",
+                "of",
+                "in",
+                "for",
+                "on",
+                "with",
+                "at",
+                "by",
+                "from",
+                "as",
+                "into",
+                "through",
+                "during",
+                "before",
+                "after",
+                "above",
+                "below",
+                "between",
+                "under",
+                "again",
+                "further",
+                "then",
+                "once",
+                "here",
+                "there",
+                "when",
+                "where",
+                "why",
+                "how",
+                "all",
+                "each",
+                "few",
+                "more",
+                "most",
+                "other",
+                "some",
+                "such",
+                "no",
+                "nor",
+                "not",
+                "only",
+                "own",
+                "same",
+                "so",
+                "than",
+                "too",
+                "very",
+                "just",
+                "and",
+                "but",
+                "if",
+                "or",
+                "because",
+                "until",
+                "while",
+                "this",
+                "that",
+                "these",
+                "those",
+                "am",
+                "s",
+                "t",
+                "don",
+                "doesn",
+                "didn",
+                "wasn",
+                "weren",
+                "haven",
+                "hasn",
+                "hadn",
+                "won",
+                "wouldn",
+                "shouldn",
+                "mightn",
+                "mustn",
+                "isn",
+                "aren",
+            }
+        )
 
-        words = re.findall(r'\b\w+\b', title.lower())
+        words = re.findall(r"\b\w+\b", title.lower())
         keywords = [w for w in words if len(w) > 3 and w not in stop_words]
 
         return list(dict.fromkeys(keywords))[:10]

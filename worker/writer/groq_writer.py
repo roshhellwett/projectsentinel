@@ -3,11 +3,10 @@ Groq AI writer - writes neutral headlines and summaries from verified facts.
 Token-optimized: system+user split, minimal prompt, rate limiting.
 """
 
+import json
 import os
 import re
-import json
 import time
-from typing import List, Dict, Optional
 
 import requests
 
@@ -33,9 +32,10 @@ class GroqWriter:
     def __init__(self):
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY", "")
+        self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama3-70b-8192")
         self._last_call_time = 0.0
 
-    def write(self, key_facts: List[str], category: str) -> Dict:
+    def write(self, key_facts: list[str], category: str) -> dict:
         """
         Write neutral headline and summary from verified facts.
 
@@ -54,32 +54,21 @@ class GroqWriter:
 
         user_content = self._build_prompt(key_facts, category)
 
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
 
         data = {
-            "model": "llama-3.3-70b-versatile",
-            "messages": [
-                {"role": "system", "content": self.SYSTEM_PROMPT},
-                {"role": "user", "content": user_content}
-            ],
+            "model": self.write_model,
+            "messages": [{"role": "system", "content": self.SYSTEM_PROMPT}, {"role": "user", "content": user_content}],
             "temperature": 0.3,
             "max_tokens": 200,
-            "response_format": {"type": "json_object"}
+            "response_format": {"type": "json_object"},
         }
 
         for attempt in range(self.MAX_RETRIES):
             self._apply_rate_limit()
 
             try:
-                response = requests.post(
-                    self.API_URL,
-                    headers=headers,
-                    json=data,
-                    timeout=30
-                )
+                response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
                 response.raise_for_status()
 
                 result = response.json()
@@ -93,10 +82,10 @@ class GroqWriter:
                 error_str = str(e)
                 if "429" in error_str:
                     wait = self._extract_retry_delay(error_str)
-                    self.logger.log("GROQ", f"Rate limited, waiting {wait}s (attempt {attempt+1}/{self.MAX_RETRIES})")
+                    self.logger.log("GROQ", f"Rate limited, waiting {wait}s (attempt {attempt + 1}/{self.MAX_RETRIES})")
                     time.sleep(wait)
                     continue
-                self.logger.log("GROQ_ERROR", f"API request failed (attempt {attempt+1}): {str(e)[:80]}")
+                self.logger.log("GROQ_ERROR", f"API request failed (attempt {attempt + 1}): {str(e)[:80]}")
                 if attempt < self.MAX_RETRIES - 1:
                     time.sleep(self.RETRY_DELAY)
                 else:
@@ -109,7 +98,7 @@ class GroqWriter:
 
     def _extract_retry_delay(self, error_str: str) -> int:
         """Extract retry delay from error message."""
-        match = re.search(r'retry in (\d+(?:\.\d+)?)s', error_str, re.IGNORECASE)
+        match = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.IGNORECASE)
         if match:
             return int(float(match.group(1))) + 2
         return self.RETRY_DELAY
@@ -125,15 +114,15 @@ class GroqWriter:
 
         self._last_call_time = time.time()
 
-    def _build_prompt(self, key_facts: List[str], category: str) -> str:
+    def _build_prompt(self, key_facts: list[str], category: str) -> str:
         """Build token-efficient writing prompt."""
-        facts_text = "\n".join(f"{i+1}. {fact}" for i, fact in enumerate(key_facts))
+        facts_text = "\n".join(f"{i + 1}. {fact}" for i, fact in enumerate(key_facts))
         return f"Category: {category}\n\nVerified facts:\n{facts_text}"
 
-    def _parse_response(self, text: str) -> Dict:
+    def _parse_response(self, text: str) -> dict:
         """Parse Groq JSON response."""
         text = text.strip()
-        text = re.sub(r'^```(?:json)?\s*|\s*```$', '', text).strip()
+        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text).strip()
 
         try:
             result = json.loads(text)
@@ -150,7 +139,4 @@ class GroqWriter:
 
         summary = str(result["summary"]).strip()
 
-        return {
-            "headline": headline,
-            "summary": summary[:300]
-        }
+        return {"headline": headline, "summary": summary[:300]}

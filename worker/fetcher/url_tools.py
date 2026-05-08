@@ -6,7 +6,6 @@ Keeps duplicate tracking stable across common tracking parameters.
 import hashlib
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-
 TRACKING_PREFIXES = ("utm_",)
 TRACKING_PARAMS = {
     "fbclid",
