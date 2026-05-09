@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { fetchPosts } from '@/lib/supabase/server';
-import { LoadMoreGrid } from '@/components/news/LoadMoreGrid';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { CategoryBar } from '@/components/layout/CategoryBar';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
@@ -43,7 +42,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 async function CategoryGrid({ slug }: { slug: string }) {
   const { posts, count } = await fetchPosts(1, 20, slug);
 
-  return <LoadMoreGrid initialPosts={posts} initialCount={count} category={slug} />;
+  return <InfiniteFeed initialPosts={posts} initialCount={count} category={slug} />;
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
@@ -54,7 +53,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 lg:px-6 pt-10 pb-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -69,25 +68,30 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         }}
       />
 
-      <CategoryBar />
+      <div className="mb-10">
+        <CategoryBar />
+      </div>
 
-      <h1 className="text-3xl font-semibold mb-2 text-slate-950">{categoryName} News</h1>
-      <p className="text-slate-500 mb-8">
-        AI-verified {slug} stories from multiple trusted sources
-      </p>
+      <header className="mb-10">
+        <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-2">Category</p>
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-white mb-3">{categoryName}</h1>
+        <p className="text-sm text-zinc-400 max-w-xl">
+          AI-verified {slug} stories cross-referenced across multiple trusted sources.
+        </p>
+      </header>
 
       {isValidCategory ? (
         <Suspense fallback={
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 9 }).map((_, i) => (
-              <Skeleton key={i} className="h-[200px] rounded-lg animate-pulse bg-white border border-slate-200" />
+              <div key={i} className="h-[200px] rounded-2xl border border-white/[0.06] bg-white/[0.02] animate-shimmer" />
             ))}
           </div>
         }>
           <CategoryGrid slug={slug} />
         </Suspense>
       ) : (
-        <p className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">
+        <p className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 text-zinc-400">
           This category does not exist yet.
         </p>
       )}

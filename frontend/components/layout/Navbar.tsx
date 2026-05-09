@@ -1,215 +1,231 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Menu, X, Moon, Sun, ChevronDown } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Search, Github, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/components/ui/ThemeProvider';
-import { CATEGORIES } from '@/lib/constants/categories';
 
-const PRIMARY_NAV = CATEGORIES.slice(0, 5).map((c) => ({ href: `/category/${c.slug}`, label: c.label }));
-const MORE_NAV = CATEGORIES.slice(5).map((c) => ({ href: `/category/${c.slug}`, label: c.label }));
-const ALL_MOBILE_NAV = [...CATEGORIES.map((c) => ({ href: `/category/${c.slug}`, label: c.label })), { href: '/how-it-works', label: 'How It Works' }];
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/category/politics', label: 'Politics' },
+  { href: '/category/business', label: 'Business' },
+  { href: '/category/sports', label: 'Sports' },
+  { href: '/category/tech', label: 'Tech' },
+  { href: '/how-it-works', label: 'How It Works' },
+] as const;
+
+const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
 
 export function Navbar() {
+  const pathname = usePathname();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { theme, toggleTheme } = useTheme();
-  const moreRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 12));
 
+  // Lock body scroll when mobile drawer open
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-        setIsMoreOpen(false);
-      }
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
 
-  useMotionValueEvent(scrollY, 'change', (latest) => {
-    setScrolled(latest > 20);
-  });
+  // Close drawer on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
 
-  const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(prev => !prev);
-  }, []);
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
 
-  const openSearch = useCallback(() => {
-    setIsSearchOpen(true);
-  }, []);
-
-  const closeSearch = useCallback(() => {
-    setIsSearchOpen(false);
-  }, []);
+  const openSearch = useCallback(() => setIsSearchOpen(true), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
 
   return (
-    <motion.header 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring" as const, stiffness: 300, damping: 30 }}
-      className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'py-2' : 'py-3'}`}
-    >
-      <div className="container mx-auto px-4">
-        <div className={`relative flex items-center justify-between transition-all duration-500 rounded-2xl border ${
-          scrolled 
-            ? 'bg-white/70 backdrop-blur-xl border-slate-200/60 dark:bg-slate-900/70 dark:border-slate-700/60 shadow-lg shadow-black/[0.03] px-5 h-14' 
-            : 'bg-white/40 backdrop-blur-sm border-transparent px-3 h-16'
-        }`}>
-          {/* Saffron accent line on top when scrolled */}
-          {scrolled && (
-            <div className="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-india-saffron/60 to-transparent rounded-full" />
-          )}
-
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity z-10 group">
-            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-india-saffron via-orange-500 to-saffron-dark flex items-center justify-center shadow-saffron group-hover:shadow-saffron-lg transition-shadow duration-300">
-              <span className="text-white font-extrabold text-base leading-none tracking-tight">IV</span>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
-                India <span className="text-india-saffron">Verified</span>
-              </span>
-              <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 tracking-widest uppercase leading-none hidden sm:block">
-                AI-Verified News
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-0.5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            {PRIMARY_NAV.map((link) => (
+    <>
+      <motion.header
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+        className="fixed top-0 inset-x-0 z-50"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <div
+          className={`w-full transition-all duration-300 ${
+            scrolled
+              ? 'bg-[rgba(10,10,10,0.78)] backdrop-blur-xl border-b border-white/[0.06]'
+              : 'bg-[rgba(10,10,10,0.5)] backdrop-blur-md border-b border-transparent'
+          }`}
+        >
+          <div className="container mx-auto px-4 lg:px-6">
+            <div className="flex items-center justify-between h-16 lg:h-[68px]">
+              {/* Logo */}
               <Link
-                key={link.href}
-                href={link.href}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10 transition-all duration-200"
+                href="/"
+                aria-label="India Verified — home"
+                className="flex items-center gap-2.5 group focus:outline-none"
               >
-                {link.label}
+                <div className="relative w-9 h-9 rounded-xl bg-white/[0.06] border border-white/[0.10] flex items-center justify-center shadow-inner shadow-white/5 group-hover:border-accent/50 group-hover:shadow-glow-accent transition-all duration-300">
+                  <span className="text-[13px] font-black text-white tracking-tight leading-none">IV</span>
+                </div>
+                <span className="text-[15px] font-semibold tracking-tight text-white leading-none hidden sm:block">
+                  India Verified
+                </span>
               </Link>
-            ))}
-            {MORE_NAV.length > 0 && (
-              <div ref={moreRef} className="relative">
-                <button
-                  onClick={() => setIsMoreOpen((v) => !v)}
-                  className="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10 transition-all duration-200"
-                >
-                  More <ChevronDown className="w-3.5 h-3.5" />
-                </button>
-                {isMoreOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
-                    {MORE_NAV.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setIsMoreOpen(false)}
-                        className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron hover:bg-india-saffron/5 transition-all"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                    <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+
+              {/* Desktop Nav */}
+              <nav
+                aria-label="Main navigation"
+                className="hidden lg:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2"
+              >
+                {NAV_LINKS.map((link) => {
+                  const active = isActive(link.href);
+                  return (
                     <Link
-                      href="/how-it-works"
-                      onClick={() => setIsMoreOpen(false)}
-                      className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron hover:bg-india-saffron/5 transition-all"
+                      key={link.href}
+                      href={link.href}
+                      className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                        active ? 'text-white' : 'text-zinc-400 hover:text-white'
+                      }`}
                     >
-                      How It Works
+                      {link.label}
+                      {active && (
+                        <motion.span
+                          layoutId="navbar-active-dot"
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent shadow-[0_0_8px_rgba(37,99,235,0.8)]"
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                        />
+                      )}
                     </Link>
-                  </div>
-                )}
+                  );
+                })}
+              </nav>
+
+              {/* Right actions */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={openSearch}
+                  aria-label="Search articles"
+                  className="p-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors duration-200"
+                >
+                  <Search className="w-[18px] h-[18px]" strokeWidth={2} />
+                </button>
+
+                <a
+                  href={REPO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] hover:border-white/[0.18] text-[13px] font-medium text-white transition-all duration-200"
+                >
+                  <Github className="w-3.5 h-3.5" />
+                  GitHub
+                </a>
+
+                {/* Mobile hamburger */}
+                <button
+                  onClick={() => setIsMobileOpen((v) => !v)}
+                  aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
+                  aria-expanded={isMobileOpen}
+                  className="lg:hidden p-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors duration-200"
+                >
+                  {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
+                </button>
               </div>
-            )}
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center gap-1.5 z-10">
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10 transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-india-saffron/50"
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {theme === 'dark' ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
-            </button>
-
-            <button
-              onClick={openSearch}
-              className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10 transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-india-saffron/50"
-              aria-label="Search articles"
-            >
-              <Search className="w-[18px] h-[18px]" />
-            </button>
-
-            <button
-              onClick={toggleMobileMenu}
-              className="md:hidden p-2.5 text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10 transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-india-saffron/50"
-              aria-label="Toggle menu"
-              aria-expanded={isMobileMenuOpen}
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-[18px] h-[18px]" />
-              ) : (
-                <Menu className="w-[18px] h-[18px]" />
-              )}
-            </button>
+            </div>
           </div>
         </div>
+      </motion.header>
 
-        {/* Mobile Menu with Backdrop */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                onClick={() => setIsMobileMenuOpen(false)}
-              />
-              {/* Menu */}
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                className="md:hidden absolute top-full left-4 right-4 mt-2 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 shadow-2xl z-50 overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-india-saffron via-accent to-india-green" />
-                <nav className="flex flex-col p-3 pt-4">
-                  {ALL_MOBILE_NAV.map((link, index) => (
+      {/* Spacer to offset fixed navbar */}
+      <div className="h-16 lg:h-[68px] flex-shrink-0" aria-hidden="true" />
+
+      {/* Mobile sliding drawer */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <>
+            <motion.div
+              key="nav-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
+              onClick={() => setIsMobileOpen(false)}
+            />
+            <motion.aside
+              key="nav-drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 340, damping: 34 }}
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[78%] max-w-sm bg-[#0a0a0a] border-l border-white/[0.08] shadow-2xl flex flex-col"
+              style={{
+                paddingTop: 'env(safe-area-inset-top, 0px)',
+                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+              }}
+            >
+              <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06]">
+                <span className="text-sm font-semibold text-white">Menu</span>
+                <button
+                  onClick={() => setIsMobileOpen(false)}
+                  aria-label="Close menu"
+                  className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.06]"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
+                {NAV_LINKS.map((link, i) => {
+                  const active = isActive(link.href);
+                  return (
                     <motion.div
                       key={link.href}
-                      initial={{ opacity: 0, x: -20 }}
+                      initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.03 }}
+                      transition={{ delay: 0.05 + i * 0.04 }}
                     >
                       <Link
                         href={link.href}
-                        className="block py-3 px-4 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 rounded-xl transition-all"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`block px-4 py-3 rounded-xl text-[15px] font-medium transition-colors ${
+                          active
+                            ? 'bg-accent/15 text-white border border-accent/30'
+                            : 'text-zinc-300 hover:bg-white/[0.05] border border-transparent'
+                        }`}
                       >
                         {link.label}
                       </Link>
                     </motion.div>
-                  ))}
-                </nav>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
+                  );
+                })}
+              </nav>
+              <div className="p-5 border-t border-white/[0.06]">
+                <a
+                  href={REPO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-sm font-medium text-white transition-all"
+                >
+                  <Github className="w-4 h-4" />
+                  View on GitHub
+                </a>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
-      <SearchBar
-        isOpen={isSearchOpen}
-        onClose={closeSearch}
-      />
-    </motion.header>
+      <SearchBar isOpen={isSearchOpen} onClose={closeSearch} />
+    </>
   );
 }

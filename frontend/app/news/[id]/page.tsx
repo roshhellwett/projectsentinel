@@ -77,7 +77,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
   ];
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden pb-12">
+    <div className="relative min-h-screen overflow-hidden pb-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -85,17 +85,15 @@ export default async function NewsPage({ params }: NewsPageProps) {
         }}
       />
 
-      {/* Decorative Background */}
-      <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-saffron-light/40 via-background to-background pointer-events-none dark:from-india-saffron/[0.04] dark:via-slate-950 dark:to-slate-950 -z-10" />
-      <div className="absolute top-40 right-20 w-80 h-80 bg-india-saffron/[0.06] rounded-full blur-3xl pointer-events-none dark:bg-india-saffron/[0.03] -z-10" />
-      <div className="absolute top-80 -left-20 w-96 h-96 bg-accent/[0.04] rounded-full blur-3xl pointer-events-none dark:bg-accent/[0.02] -z-10" />
+      {/* Decorative accent glow */}
+      <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.10),transparent_60%)] pointer-events-none -z-10" />
 
       <div className="container mx-auto px-4 pt-10 max-w-4xl">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-india-saffron dark:text-slate-400 dark:hover:text-india-saffron mb-8 transition-colors group"
+          className="inline-flex items-center gap-2 text-sm font-medium text-zinc-400 hover:text-white mb-8 transition-colors group"
         >
-          <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-india-saffron/10 transition-colors">
+          <div className="p-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </div>
           Back to all news
@@ -113,33 +111,33 @@ export default async function NewsPage({ params }: NewsPageProps) {
         )}
 
         {/* Article Header Card */}
-        <article className={`bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none overflow-hidden mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-india-saffron via-orange-400 to-accent" />
+        <article className={`relative bg-white/[0.04] backdrop-blur-md rounded-3xl border border-white/[0.08] overflow-hidden mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
           
           <div className="p-8 md:p-12">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
               <CategoryTag category={post.category} />
-              <span className="flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full">
-                <Calendar className="w-4 h-4" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 bg-white/[0.04] border border-white/[0.06] px-3 py-1.5 rounded-full">
+                <Calendar className="w-3.5 h-3.5" />
                 {formatDate(post.published_at)}
               </span>
-              <span className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full">
-                <Clock className="w-4 h-4" />
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 bg-white/[0.04] border border-white/[0.06] px-3 py-1.5 rounded-full">
+                <Clock className="w-3.5 h-3.5" />
                 <ReadingTime text={post.summary} />
               </span>
             </div>
 
-            <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white leading-[1.15] mb-8 tracking-tight ${isRetracted ? 'line-through text-slate-500 dark:text-slate-400' : ''}`}>
+            <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tighter leading-[1.15] mb-8 ${isRetracted ? 'line-through text-zinc-500' : ''}`}>
               {post.headline}
             </h1>
 
             {/* Score Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 py-6 border-y border-slate-100 dark:border-slate-800 mb-8 bg-slate-50/50 dark:bg-slate-800/20 -mx-8 px-8">
+            <div className="flex flex-wrap items-center justify-between gap-4 py-6 border-y border-white/[0.06] mb-8 bg-white/[0.02] -mx-8 px-8">
               <div className="flex flex-wrap items-center gap-4">
                 <CredibilityBadge score={post.credibility_score} showTooltip />
-                <div className="hidden sm:block w-px h-6 bg-slate-200 dark:bg-slate-700" />
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300">
-                  <Database className="w-4 h-4 text-india-saffron" />
+                <div className="hidden sm:block w-px h-6 bg-white/10" />
+                <div className="flex items-center gap-2 text-xs font-medium text-zinc-300">
+                  <Database className="w-3.5 h-3.5 text-accent" />
                   {post.source_count} Sources Verified
                 </div>
               </div>
@@ -147,8 +145,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
 
             {/* Summary / Body */}
-            <div className="prose prose-lg dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-              <p className="text-xl md:text-2xl leading-relaxed text-slate-800 dark:text-slate-200 font-serif">
+            <div className="max-w-none">
+              <p className="text-lg md:text-xl leading-relaxed text-zinc-200 font-normal">
                 {post.summary}
               </p>
             </div>
@@ -157,28 +155,28 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {/* Reason Card */}
-          <div className="md:col-span-2 bg-saffron-light/30 dark:bg-india-saffron/5 rounded-3xl p-8 border border-india-saffron/20 dark:border-india-saffron/10 shadow-sm relative overflow-hidden">
-            <div className="absolute -right-4 -top-4 text-india-saffron/10">
+          <div className="md:col-span-2 relative overflow-hidden bg-accent/[0.06] rounded-3xl p-8 border border-accent/[0.18]">
+            <div className="absolute -right-4 -top-4 text-accent/10">
               <ShieldCheck className="w-32 h-32" />
             </div>
             <div className="relative z-10">
-              <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white mb-4">
-                <div className="w-2.5 h-2.5 rounded-full bg-india-saffron" />
+              <h2 className="flex items-center gap-2 text-xl font-bold text-white mb-4">
+                <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(37,99,235,0.8)]" />
                 AI Credibility Analysis
               </h2>
-              <div className="inline-flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-200 mb-4 shadow-sm border border-slate-100 dark:border-slate-700">
+              <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.10] px-3 py-1 rounded-lg text-sm font-bold text-white mb-4">
                 Score: {post.credibility_score}/100
               </div>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base">
+              <p className="text-zinc-300 leading-relaxed text-base">
                 {post.credibility_reason}
               </p>
             </div>
           </div>
 
           {/* Sources Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
-              <Database className="w-5 h-5 text-accent" />
+          <div className="bg-white/[0.04] backdrop-blur-md rounded-3xl p-8 border border-white/[0.08]">
+            <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+              <Database className="w-4 h-4 text-accent" />
               Original Sources
             </h2>
             <SourceLinks sources={post.sources} />
@@ -186,43 +184,32 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </div>
 
         {/* Transparency Banner */}
-        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 mb-12">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 uppercase tracking-wider text-center">
+        <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/[0.06] mb-12">
+          <h3 className="text-[11px] font-bold text-zinc-400 mb-5 uppercase tracking-[0.18em] text-center">
             How This Story Was Built
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex flex-col items-center text-center p-3">
-              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mb-2">
-                <ShieldCheck className="w-5 h-5" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'Cross-Referenced', icon: <ShieldCheck className="w-4 h-4" /> },
+              { label: `${post.source_count} Sources`, icon: <Database className="w-4 h-4" /> },
+              { label: 'Unbiased AI', icon: <span className="font-bold text-[11px] leading-none">AI</span> },
+              { label: 'Auto-Published', icon: <span className="text-base">⚡</span> },
+            ].map((item) => (
+              <div key={item.label} className="flex flex-col items-center text-center p-2">
+                <div className="w-9 h-9 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent mb-2.5">
+                  {item.icon}
+                </div>
+                <span className="text-[11px] font-semibold text-zinc-400">{item.label}</span>
               </div>
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Cross-Referenced</span>
-            </div>
-            <div className="flex flex-col items-center text-center p-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-2">
-                <Database className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{post.source_count} Sources</span>
-            </div>
-            <div className="flex flex-col items-center text-center p-3">
-              <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-2">
-                <span className="font-bold text-sm leading-none tracking-tighter">AI</span>
-              </div>
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Unbiased Analysis</span>
-            </div>
-            <div className="flex flex-col items-center text-center p-3">
-              <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-2">
-                <span className="text-lg">⚡</span>
-              </div>
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Auto-Published</span>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* Related Stories */}
-        <div className="mt-16 border-t border-slate-200 dark:border-slate-800 pt-16">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-india-saffron to-accent" />
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+        <div className="mt-16 border-t border-white/[0.06] pt-12">
+          <div className="flex items-center gap-3 mb-7">
+            <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+            <h2 className="text-xl font-semibold text-white tracking-tight">
               Related News
             </h2>
           </div>

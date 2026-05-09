@@ -1,17 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
 
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
   display: 'swap',
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
 });
 
 const geistMono = Geist_Mono({
@@ -25,14 +27,22 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.verc
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'India Verified - AI-Verified Indian News',
-    template: '%s - India Verified',
+    default: 'India Verified — AI-Verified Indian News',
+    template: '%s — India Verified',
   },
-  description: 'Fully automated, AI-powered Indian news aggregator. Every story verified through cross-referencing multiple trusted sources.',
-  keywords: ['Indian news', 'AI verified news', 'fact-check', 'news aggregator', 'India news', 'trusted news'],
+  description:
+    'AI-powered Indian news aggregator. Every story cross-referenced across multiple trusted sources. No ads. No bias. Open source.',
+  keywords: [
+    'Indian news',
+    'AI verified news',
+    'fact-check',
+    'news aggregator',
+    'India news',
+    'trusted news',
+  ],
   openGraph: {
-    title: 'India Verified - AI-Verified Indian News',
-    description: 'Fully automated, AI-powered Indian news aggregator',
+    title: 'India Verified — AI-Verified Indian News',
+    description: 'AI-Verified Indian News. No Ads. No Bias.',
     type: 'website',
     locale: 'en_IN',
     siteName: 'India Verified',
@@ -40,43 +50,44 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'India Verified - AI-Verified Indian News',
-    description: 'Fully automated, AI-powered Indian news aggregator',
+    title: 'India Verified — AI-Verified Indian News',
+    description: 'AI-Verified Indian News. No Ads. No Bias.',
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   alternates: {
-    types: {
-      'application/rss+xml': `${siteUrl}/rss.xml`,
-    },
+    types: { 'application/rss+xml': `${siteUrl}/rss.xml` },
   },
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    apple: '/apple-touch-icon.svg',
   },
   manifest: '/manifest',
 };
 
 export const viewport: Viewport = {
-  themeColor: '#1e3a8a',
+  themeColor: '#0a0a0a',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  colorScheme: 'dark',
 };
 
-export default function RootLayout({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         {gtmId && (
           <Script id="gtm-script" strategy="afterInteractive">
@@ -89,21 +100,10 @@ export default function RootLayout({
             `}
           </Script>
         )}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (_) {}
-            `,
-          }}
-        />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans bg-background text-slate-900 min-h-screen flex flex-col antialiased selection:bg-slate-200 selection:text-slate-900`}>
+      <body
+        className={`${inter.variable} ${geistMono.variable} font-sans bg-background text-white min-h-screen flex flex-col antialiased`}
+      >
         {gtmId && (
           <noscript>
             <iframe
@@ -115,14 +115,20 @@ export default function RootLayout({
           </noscript>
         )}
         <ThemeProvider>
-          <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded">
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-lg"
+          >
             Skip to content
           </a>
           <Navbar />
           <main id="main" className="flex-1 w-full">
             {children}
           </main>
+          {/* Spacer so footer clears the fixed mobile bottom nav */}
+          <div className="h-20 md:hidden" aria-hidden="true" />
           <Footer />
+          <MobileBottomNav />
           <ScrollToTop />
         </ThemeProvider>
       </body>

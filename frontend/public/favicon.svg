@@ -1,19 +1,13 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="128" fill="#1E3A8A"/>
-  <rect x="4" y="4" width="504" height="504" rx="124" stroke="#FFFFFF" stroke-width="8" stroke-opacity="0.1"/>
-  
-  <path d="M 512 128 C 512 57.3 454.7 0 384 0 L 256 0 C 412 100 512 256 512 256 L 512 128 Z" fill="#FF9933" opacity="0.95"/>
-  <path d="M 0 384 C 0 454.7 57.3 512 128 512 L 256 512 C 100 412 0 256 0 256 L 0 384 Z" fill="#138808" opacity="0.95"/>
-
-  <!-- Left fold of document -->
-  <path d="M140 180C140 162.3 154.3 148 172 148H256V370L140 270V180Z" fill="#FFFFFF"/>
-  <!-- Right fold of document -->
-  <path d="M256 148H340C357.7 148 372 162.3 372 180V300C372 338.6 340.7 370 302 370H256V148Z" fill="#F8FAFC"/>
-  <!-- Inner shadow line -->
-  <line x1="256" y1="148" x2="256" y2="370" stroke="#E2E8F0" stroke-width="4"/>
-
-  <!-- Checkmark -->
-  <path d="M190 250L240 300" stroke="#1E3A8A" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M240 300L320 180" stroke="#FF9933" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="320" cy="180" r="18" fill="#138808"/>
+  <rect width="512" height="512" rx="120" fill="#0a0a0a"/>
+  <rect x="8" y="8" width="496" height="496" rx="112" stroke="#2563eb" stroke-width="12" stroke-opacity="0.25"/>
+  <rect x="20" y="20" width="472" height="472" rx="100" stroke="#2563eb" stroke-width="4" stroke-opacity="0.10"/>
+  <text x="256" y="296" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="248" letter-spacing="-16" fill="#2563eb" text-anchor="middle" dominant-baseline="central">IV</text>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="url(#glow)"/>
 </svg>
