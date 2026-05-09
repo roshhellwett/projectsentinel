@@ -75,7 +75,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                 <p className="text-[11px] text-zinc-500 mt-1 capitalize">{post.category}</p>
               </div>
 
-              <div className="hidden sm:block flex-shrink-0">
+              <div className="flex-shrink-0">
                 <CredibilityBadge score={post.credibility_score} compact />
               </div>
 

@@ -33,15 +33,12 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
   };
 
   return (
-    <motion.article
+    <motion.div
       layoutId={`card-${post.id}`}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 380, damping: 28 }}
@@ -103,7 +100,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
           </div>
         </div>
       </div>
-    </motion.article>
+    </motion.div>
   );
 };
 

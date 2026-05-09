@@ -7,7 +7,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
-import { ThemeProvider } from '@/components/ui/ThemeProvider';
+
 
 const inter = Inter({
   variable: '--font-inter',
@@ -114,29 +114,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </noscript>
         )}
-        <ThemeProvider>
-          {/* Fixed viewport-centered watermark — always behind content */}
-          <div className="watermark-fixed" aria-hidden="true">
-            <span>Verified News</span>
-          </div>
-          <div className="watermark-spotlight" aria-hidden="true" />
+        {/* Fixed viewport-centered watermark — always behind content */}
+        <div className="watermark-fixed" aria-hidden="true">
+          <span>Verified News</span>
+        </div>
+        <div className="watermark-spotlight" aria-hidden="true" />
 
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-lg"
-          >
-            Skip to content
-          </a>
-          <Navbar />
-          <main id="main" className="flex-1 w-full relative z-10 page-enter">
-            {children}
-          </main>
-          {/* Spacer so footer clears the fixed mobile bottom nav */}
-          <div className="h-20 md:hidden" aria-hidden="true" />
-          <Footer />
-          <MobileBottomNav />
-          <ScrollToTop />
-        </ThemeProvider>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-lg"
+        >
+          Skip to content
+        </a>
+        <Navbar />
+        <main id="main" className="flex-1 w-full relative z-10 page-enter">
+          {children}
+        </main>
+        {/* Spacer so footer clears the fixed mobile bottom nav */}
+        <div className="h-20 md:hidden" aria-hidden="true" />
+        <Footer />
+        <MobileBottomNav />
+        <ScrollToTop />
       </body>
     </html>
   );

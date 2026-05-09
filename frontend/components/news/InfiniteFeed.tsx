@@ -66,6 +66,8 @@ export function InfiniteFeed({
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const postsRef = useRef(posts);
+  postsRef.current = posts;
 
   // ── Infinite scroll: load next page when sentinel intersects ──
   const loadMore = useCallback(async () => {
@@ -129,28 +131,26 @@ export function InfiniteFeed({
         const data: { posts: Post[] } = await res.json();
         if (cancelled) return;
 
-        setPosts((prev) => {
-          const existing = new Set(prev.map((p) => p.id));
-          const fresh = data.posts.filter((p) => !existing.has(p.id));
-          if (fresh.length === 0) return prev;
+        const existing = new Set(postsRef.current.map((p) => p.id));
+        const fresh = data.posts.filter((p) => !existing.has(p.id));
+        if (fresh.length === 0) return;
 
-          // Mark as fresh for flash animation
+        // Mark as fresh for flash animation
+        setFreshIds((curr) => {
+          const next = new Set(curr);
+          for (const f of fresh) next.add(f.id);
+          return next;
+        });
+        // Clear flash after 3s
+        window.setTimeout(() => {
           setFreshIds((curr) => {
             const next = new Set(curr);
-            for (const f of fresh) next.add(f.id);
+            for (const f of fresh) next.delete(f.id);
             return next;
           });
-          // Clear flash after 3s
-          window.setTimeout(() => {
-            setFreshIds((curr) => {
-              const next = new Set(curr);
-              for (const f of fresh) next.delete(f.id);
-              return next;
-            });
-          }, 3200);
+        }, 3200);
 
-          return [...fresh, ...prev];
-        });
+        setPosts((prev) => [...fresh, ...prev]);
       } catch {
         /* silent */
       }
