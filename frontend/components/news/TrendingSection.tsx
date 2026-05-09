@@ -14,7 +14,6 @@ interface TrendingSectionProps {
 export function TrendingSection({ posts }: TrendingSectionProps) {
   const trending = useMemo(() => {
     if (!posts || posts.length === 0) return [];
-    // Deduplicate by id then rank
     const seen = new Set<string>();
     const unique = posts.filter((p) => {
       if (seen.has(p.id)) return false;
@@ -38,17 +37,17 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   return (
     <section aria-label="Trending stories" className="mb-12">
       <div className="flex items-center gap-3 mb-6">
-        <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-accent/15 border border-accent/30">
+        <div className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-accent/15 border border-accent/30">
           <Flame className="w-4 h-4 text-accent" />
-        </span>
+        </div>
         <div>
           <h2 className="text-base font-semibold text-white tracking-tight">Trending Now</h2>
-          <p className="text-[11px] text-zinc-500">Top 5 by credibility &amp; freshness</p>
+          <p className="text-[11px] text-zinc-500">Top stories by credibility</p>
         </div>
         <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent ml-3" />
       </div>
 
-      <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md overflow-hidden">
+      <div className="rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] overflow-hidden">
         {trending.map((post, index) => (
           <motion.div
             key={post.id}
@@ -61,7 +60,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
               href={`/news/${post.id}`}
               className="group flex items-center gap-4 px-4 sm:px-5 py-4 border-b border-white/[0.05] last:border-b-0 hover:bg-white/[0.04] transition-colors duration-200"
             >
-              {/* Large rank number */}
+              {/* Rank number */}
               <span
                 className="text-[28px] sm:text-[34px] font-black tracking-tighter text-zinc-700 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
                 aria-hidden="true"

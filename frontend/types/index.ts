@@ -28,17 +28,4 @@ export interface Post {
   updated_at: string;
 }
 
-export interface AdminSession {
-  token: string;
-  expiresAt: number;
-}
 
-export interface PipelineStats {
-  fetched: number;
-  duplicates: number;
-  blocked: number;
-  false_claims: number;
-  single_source: number;
-  low_score: number;
-  published: number;
-}

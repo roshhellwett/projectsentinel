@@ -112,18 +112,18 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
         >
           <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-semibold text-slate-950">Search</h2>
+              <h2 className="text-2xl font-semibold text-white tracking-tight">Search</h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
+                className="p-2 hover:bg-white/[0.06] rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
                 aria-label="Close search"
               >
-                <X className="w-6 h-6 text-slate-700" />
+                <X className="w-6 h-6 text-zinc-400" />
               </button>
             </div>
 
             <div className="relative max-w-2xl mx-auto mb-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
               <input
                 ref={inputRef}
                 id="search-input"
@@ -131,20 +131,20 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search news..."
-                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 rounded-xl text-slate-950 placeholder-slate-500 shadow-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 transition-colors duration-200"
+                className="w-full pl-12 pr-4 py-4 bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all duration-200"
                 autoFocus
               />
             </div>
 
             <div className="max-w-4xl mx-auto">
               {isLoading && (
-                <p className="text-center text-slate-500 py-8 animate-pulse">Loading articles...</p>
+                <p className="text-center text-zinc-500 py-8 animate-pulse">Loading articles...</p>
               )}
               {error && (
-                <p className="text-center text-danger py-8">{error}</p>
+                <p className="text-center text-cred-low py-8">{error}</p>
               )}
               {query.trim() && !isLoading && (
-                <p className="text-sm text-slate-500 mb-4">
+                <p className="text-sm text-zinc-500 mb-4">
                   {results.length} results for &quot;{query}&quot;
                 </p>
               )}

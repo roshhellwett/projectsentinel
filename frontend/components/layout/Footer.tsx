@@ -21,7 +21,8 @@ const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
 
 export function Footer() {
   return (
-    <footer className="relative mt-auto bg-[#080808] border-t border-white/[0.08]">
+    <footer className="relative mt-auto bg-[#080808] border-t border-white/[0.06]">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
       <div className="container mx-auto px-4 lg:px-6 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 mb-12">
           {/* Column 1 — Brand */}

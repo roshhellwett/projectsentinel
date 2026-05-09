@@ -36,30 +36,30 @@ export function CategoryBar() {
             return (
               <Link
                 key={cat.slug}
-                href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
+                href={cat.slug === 'all' ? '/' : `/category/${cat.slug}/`}
                 ref={isActive ? activeRef : undefined}
                 role="tab"
                 aria-selected={isActive}
-                className="relative isolate"
+                className="relative isolate group"
               >
                 <span
                   className={`relative z-10 inline-flex items-center px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors duration-200 ${
                     isActive
                       ? 'text-white'
-                      : 'text-zinc-400 hover:text-white'
+                      : 'text-zinc-400 group-hover:text-white'
                   }`}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="activeCategoryPill"
-                      className="absolute inset-0 -z-10 rounded-full bg-accent shadow-glow-accent"
+                      className="absolute inset-0 -z-10 rounded-full bg-accent shadow-[0_0_0_1px_rgba(37,99,235,0.3),0_8px_24px_-6px_rgba(37,99,235,0.4)]"
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}
                   {!isActive && (
                     <span
                       aria-hidden="true"
-                      className="absolute inset-0 -z-10 rounded-full bg-white/[0.04] border border-white/[0.08]"
+                      className="absolute inset-0 -z-10 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/[0.08] group-hover:bg-white/[0.06] group-hover:border-white/[0.14] transition-colors duration-200"
                     />
                   )}
                   {cat.label}

@@ -100,40 +100,71 @@ html {
 }
 
 /* ═══════════════════════════════════════════════
-   HERO WATERMARK — "Verified News" massive bg text
+   FIXED WATERMARK — "Verified News" viewport-centered bg
 ═══════════════════════════════════════════════ */
-.hero-watermark {
-  position: absolute;
+.watermark-fixed {
+  position: fixed;
   inset: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   pointer-events: none;
   user-select: none;
   overflow: hidden;
+  z-index: 0;
 }
-.hero-watermark > span {
+.watermark-fixed > span {
   font-family: var(--font-sans);
   font-weight: 900;
-  font-size: clamp(80px, 18vw, 220px);
+  font-size: clamp(60px, 22vw, 220px);
   line-height: 0.85;
   letter-spacing: -0.04em;
-  color: rgba(255, 255, 255, 0.035);
-  margin-top: -0.08em;
-  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.03);
   text-align: center;
+  transform: translateY(-4vh);
+  /* Responsive: wrap on very small screens to prevent clipping */
+  white-space: nowrap;
+  padding: 0 4vw;
 }
-.hero-spotlight {
-  position: absolute;
-  top: 30%;
+@media (max-width: 480px) {
+  .watermark-fixed > span {
+    font-size: clamp(48px, 20vw, 80px);
+    letter-spacing: -0.02em;
+    white-space: normal;
+    line-height: 0.9;
+    max-width: 90vw;
+  }
+}
+.watermark-spotlight {
+  position: fixed;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(90vw, 800px);
-  height: min(90vw, 800px);
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.10) 0%, rgba(37, 99, 235, 0.04) 30%, transparent 60%);
-  filter: blur(40px);
+  width: min(90vw, 900px);
+  height: min(90vw, 900px);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.03) 30%, transparent 60%);
+  filter: blur(60px);
   pointer-events: none;
   z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   SUBTLE BACKGROUND TEXTURE
+═══════════════════════════════════════════════ */
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE ENTRY ANIMATION
+═══════════════════════════════════════════════ */
+@keyframes pageEnter {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.page-enter {
+  animation: pageEnter 0.4s ease-out;
 }
 
 /* ═══════════════════════════════════════════════
@@ -178,11 +209,12 @@ html {
 }
 
 @keyframes flashBorder {
-  0%, 100% { border-color: rgba(37, 99, 235, 0); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-  50%      { border-color: rgba(37, 99, 235, 0.7); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+  0%   { border-color: rgba(37, 99, 235, 0); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+  30%  { border-color: rgba(37, 99, 235, 0.5); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+  100% { border-color: rgba(37, 99, 235, 0); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
 }
 .flash-new-post {
-  animation: flashBorder 1s ease-in-out 3;
+  animation: flashBorder 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1;
 }
 
 @keyframes float {

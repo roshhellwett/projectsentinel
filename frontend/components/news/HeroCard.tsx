@@ -24,20 +24,23 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
     >
       <Link
         href={`/news/${post.id}`}
-        className="block relative overflow-hidden rounded-3xl bg-white/[0.04] backdrop-blur-md border border-white/[0.08] hover:border-accent/35 transition-[border-color,box-shadow] duration-300 hover:shadow-glow-accent-lg focus:outline-none focus:ring-2 focus:ring-accent/60"
+        className="block relative overflow-hidden rounded-3xl bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] hover:border-accent/30 transition-all duration-500 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.15),0_24px_80px_-16px_rgba(37,99,235,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[340px] lg:min-h-[400px]">
+        {/* Gradient accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[320px] lg:min-h-[380px]">
           {/* Visual side */}
           <div className="relative lg:col-span-2 min-h-[180px] lg:min-h-full overflow-hidden">
             <CategoryPlaceholder category={post.category} />
             {/* Edge fade for desktop seam */}
             <div
-              className="hidden lg:block absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-[#0a0a0a]/80 pointer-events-none"
+              className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[#0a0a0a] pointer-events-none"
               aria-hidden="true"
             />
             {/* Badge */}
             {badge && (
-              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/[0.10] text-[10px] font-bold uppercase tracking-wider text-white">
+              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/[0.10] text-[10px] font-bold uppercase tracking-wider text-white">
                 <Flame className="w-3 h-3 text-accent" />
                 {badge === 'breaking' ? 'Breaking' : 'Trending'}
               </div>
@@ -63,7 +66,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/[0.08]">
                 <CredibilityBadge score={post.credibility_score} compact />
                 <div className="h-3.5 w-px bg-white/10" />
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
@@ -72,9 +75,9 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
                 </span>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-2.5 transition-all">
+              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-2.5 transition-all duration-300">
                 Read full story
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </span>
             </div>
           </div>

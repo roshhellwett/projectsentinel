@@ -62,10 +62,10 @@ export function Navbar() {
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div
-          className={`w-full transition-all duration-300 ${
+          className={`w-full transition-all duration-500 ${
             scrolled
-              ? 'bg-[rgba(10,10,10,0.78)] backdrop-blur-xl border-b border-white/[0.06]'
-              : 'bg-[rgba(10,10,10,0.5)] backdrop-blur-md border-b border-transparent'
+              ? 'bg-[rgba(10,10,10,0.75)] backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
+              : 'bg-[rgba(10,10,10,0.4)] backdrop-blur-md border-b border-transparent'
           }`}
         >
           <div className="container mx-auto px-4 lg:px-6">

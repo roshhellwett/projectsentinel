@@ -16,20 +16,6 @@ export function getScoreTier(score: number): 'high' | 'mid' | 'low' {
   return 'low';
 }
 
-export function getScoreColor(score: number): string {
-  const tier = getScoreTier(score);
-  if (tier === 'high') return 'bg-cred-high/12 text-cred-high border-cred-high/30';
-  if (tier === 'mid') return 'bg-cred-mid/12 text-cred-mid border-cred-mid/30';
-  return 'bg-cred-low/12 text-cred-low border-cred-low/30';
-}
-
-export function getScoreBgColor(score: number): string {
-  const tier = getScoreTier(score);
-  if (tier === 'high') return 'bg-cred-high text-black';
-  if (tier === 'mid') return 'bg-cred-mid text-black';
-  return 'bg-cred-low text-white';
-}
-
 export function getScoreLabel(score: number): string {
   const tier = getScoreTier(score);
   if (tier === 'high') return 'High credibility';

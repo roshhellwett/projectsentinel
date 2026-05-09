@@ -32,9 +32,8 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
       className="relative group inline-flex items-center gap-2 max-w-full"
       aria-label={`Credibility score: ${score}/100 — ${label}`}
       role="img"
-      style={{ ['--ring-color' as string]: hex }}
     >
-      <div className="relative w-9 h-9 flex-shrink-0 flex items-center justify-center" aria-hidden="true">
+      <div className="relative w-9 h-9 flex-shrink-0 flex items-center justify-center">
         <svg className="w-9 h-9 -rotate-90" viewBox="0 0 40 40">
           <circle
             className={`${ringBg} stroke-current`}
@@ -61,9 +60,9 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
             }
           />
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white">
-          {score}
-        </span>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-[10px] font-bold text-white tabular-nums">{score}</span>
+        </div>
       </div>
 
       {!compact && (

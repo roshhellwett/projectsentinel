@@ -1,5 +1,4 @@
 import { fetchLatestPost, fetchPosts } from '@/lib/supabase/server';
-import { Hero } from '@/components/layout/Hero';
 import { CategoryBar } from '@/components/layout/CategoryBar';
 import { HeroCard } from '@/components/news/HeroCard';
 import { TrendingSection } from '@/components/news/TrendingSection';
@@ -20,7 +19,7 @@ export default async function HomePage() {
     : postsResult.posts;
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -28,16 +27,13 @@ export default async function HomePage() {
         }}
       />
 
-      {/* Brand hero with massive "Verified News" watermark */}
-      <Hero />
-
-      <div className="container mx-auto px-4 lg:px-6">
+      <div className="container mx-auto px-4 lg:px-6 pt-6 lg:pt-8">
         {/* Category filter bar */}
-        <div className="mb-10">
+        <div className="mb-8">
           <CategoryBar />
         </div>
 
-        {/* Featured story */}
+        {/* Featured story — always first */}
         {heroPost && (
           <div id="latest" className="mb-12 scroll-mt-24">
             <HeroCard post={heroPost} />
@@ -49,8 +45,9 @@ export default async function HomePage() {
 
         {/* Latest verified news — auto-loading infinite feed */}
         <section aria-label="Latest verified news">
-          <div className="flex items-center gap-3 mb-7">
-            <h2 className="text-base font-semibold text-white tracking-tight">Latest Verified News</h2>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+            <h2 className="text-base font-semibold text-white tracking-tight">Latest News</h2>
             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
           </div>
           <InfiniteFeed initialPosts={posts} initialCount={postsResult.count} />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Share2, Twitter, Link as LinkIcon, Check } from 'lucide-react';
+import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 
 interface ShareButtonsProps {
   headline: string;
@@ -12,27 +12,22 @@ const SHARE_PLATFORMS = [
   {
     name: 'WhatsApp',
     getUrl: (url: string, text: string) => `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
-    color: 'hover:bg-[#25D366] hover:text-white',
   },
   {
     name: 'Twitter / X',
     getUrl: (url: string, text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-    color: 'hover:bg-[#000] hover:text-white',
   },
   {
     name: 'LinkedIn',
     getUrl: (url: string, text: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-    color: 'hover:bg-[#0A66C2] hover:text-white',
   },
   {
     name: 'Facebook',
     getUrl: (url: string, text: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    color: 'hover:bg-[#1877F2] hover:text-white',
   },
   {
     name: 'Telegram',
     getUrl: (url: string, text: string) => `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-    color: 'hover:bg-[#0088cc] hover:text-white',
   },
 ];
 
@@ -61,7 +56,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
     <div className="relative">
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-sm font-medium"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.04] backdrop-blur-md border border-white/[0.08] text-zinc-400 hover:text-white hover:bg-white/[0.08] hover:border-accent/30 transition-all text-sm font-medium"
         aria-label="Share this article"
       >
         <Share2 className="w-4 h-4" />
@@ -71,8 +66,8 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
       {showMenu && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-          <div className="absolute right-0 top-full mt-2 z-50 bg-white rounded-xl border border-slate-200 shadow-xl p-2 min-w-[200px] animate-fade-in">
-            <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-slate-100">
+          <div className="absolute right-0 top-full mt-2 z-50 bg-[#0f0f0f] backdrop-blur-xl rounded-xl border border-white/[0.08] shadow-2xl p-2 min-w-[200px] animate-fade-in">
+            <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-white/[0.06]">
               {SHARE_PLATFORMS.map((platform) => (
                 <a
                   key={platform.name}
@@ -80,7 +75,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowMenu(false)}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-lg text-slate-500 transition-all ${platform.color}`}
+                  className="flex flex-col items-center gap-1 p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all"
                   title={platform.name}
                 >
                   {platform.name === 'WhatsApp' ? (
@@ -99,7 +94,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
 
             <button
               onClick={copyLink}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-all"
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all"
             >
               {copied ? (
                 <Check className="w-4 h-4 text-success" />

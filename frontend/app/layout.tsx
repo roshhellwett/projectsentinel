@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body
-        className={`${inter.variable} ${geistMono.variable} font-sans bg-background text-white min-h-screen flex flex-col antialiased`}
+        className={`${inter.variable} ${geistMono.variable} font-sans bg-background text-white min-h-screen flex flex-col antialiased bg-dot-grid`}
       >
         {gtmId && (
           <noscript>
@@ -115,6 +115,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </noscript>
         )}
         <ThemeProvider>
+          {/* Fixed viewport-centered watermark — always behind content */}
+          <div className="watermark-fixed" aria-hidden="true">
+            <span>Verified News</span>
+          </div>
+          <div className="watermark-spotlight" aria-hidden="true" />
+
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-lg"
@@ -122,7 +128,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Skip to content
           </a>
           <Navbar />
-          <main id="main" className="flex-1 w-full">
+          <main id="main" className="flex-1 w-full relative z-10 page-enter">
             {children}
           </main>
           {/* Spacer so footer clears the fixed mobile bottom nav */}

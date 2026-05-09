@@ -30,6 +30,11 @@ interface InfiniteFeedProps {
 
 const POLL_INTERVAL_MS = 60_000;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
+};
+
 const itemVariants = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 26 } },
@@ -191,6 +196,9 @@ export function InfiniteFeed({
     <>
       <motion.div
         layout
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch"
       >
         <AnimatePresence initial={false}>
