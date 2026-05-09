@@ -23,11 +23,12 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const [results, setResults] = useState<Post[]>([]);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!isOpen || allPosts.length > 0) {
+    if (!isOpen || hasFetched) {
       return;
     }
 
@@ -42,6 +43,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       })
       .then(data => {
         setAllPosts(data.posts || []);
+        setHasFetched(true);
         setIsLoading(false);
       })
       .catch((fetchError) => {
@@ -51,7 +53,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       });
 
     return () => controller.abort();
-  }, [allPosts.length, isOpen]);
+  }, [hasFetched, isOpen]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

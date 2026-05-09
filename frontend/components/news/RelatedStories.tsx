@@ -9,6 +9,8 @@ interface RelatedStoriesProps {
 }
 
 export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
+  if (!posts || posts.length === 0) return null;
+
   const related = posts
     .filter((p) => p.id !== currentPostId)
     .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())

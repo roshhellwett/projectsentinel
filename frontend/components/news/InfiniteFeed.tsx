@@ -26,6 +26,8 @@ interface InfiniteFeedProps {
   initialCount: number;
   category?: string;
   pageSize?: number;
+  /** IDs to always exclude (e.g. hero + trending on homepage) */
+  excludeIds?: Set<string>;
 }
 
 const POLL_INTERVAL_MS = 60_000;
@@ -40,21 +42,38 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 26 } },
 };
 
+/**
+ * Dedupe an array of posts by `id` in place. In dev, logs removed titles.
+ */
+function dedupeById(posts: Post[]): Post[] {
+  const seen = new Set<string>();
+  const dupes: string[] = [];
+  const result = posts.filter((p) => {
+    if (seen.has(p.id)) {
+      dupes.push(p.headline);
+      return false;
+    }
+    seen.add(p.id);
+    return true;
+  });
+  if (dupes.length > 0 && process.env.NODE_ENV === 'development') {
+    console.warn(
+      `[InfiniteFeed dedupe] Removed ${dupes.length} duplicate(s):`,
+      dupes,
+    );
+  }
+  return result;
+}
+
 export function InfiniteFeed({
   initialPosts,
   initialCount,
   category,
   pageSize = 20,
+  excludeIds,
 }: InfiniteFeedProps) {
   // Dedupe initial just in case
-  const dedupedInitial = (() => {
-    const seen = new Set<string>();
-    return initialPosts.filter((p) => {
-      if (seen.has(p.id)) return false;
-      seen.add(p.id);
-      return true;
-    });
-  })();
+  const dedupedInitial = dedupeById(initialPosts);
 
   const [posts, setPosts] = useState<Post[]>(dedupedInitial);
   const [page, setPage] = useState(1);
@@ -68,6 +87,10 @@ export function InfiniteFeed({
   const loadingRef = useRef(false);
   const postsRef = useRef(posts);
   postsRef.current = posts;
+
+  // Keep a stable reference to excludeIds for callbacks
+  const excludeIdsRef = useRef(excludeIds);
+  excludeIdsRef.current = excludeIds;
 
   // ── Infinite scroll: load next page when sentinel intersects ──
   const loadMore = useCallback(async () => {
@@ -84,8 +107,11 @@ export function InfiniteFeed({
 
       setPosts((prev) => {
         const existing = new Set(prev.map((p) => p.id));
-        const incoming = data.posts.filter((p) => !existing.has(p.id));
-        const merged = [...prev, ...incoming];
+        const excluded = excludeIdsRef.current;
+        const incoming = data.posts.filter(
+          (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
+        );
+        const merged = dedupeById([...prev, ...incoming]);
         if (merged.length >= data.count || incoming.length === 0) {
           setExhausted(true);
         }
@@ -132,7 +158,10 @@ export function InfiniteFeed({
         if (cancelled) return;
 
         const existing = new Set(postsRef.current.map((p) => p.id));
-        const fresh = data.posts.filter((p) => !existing.has(p.id));
+        const excluded = excludeIdsRef.current;
+        const fresh = data.posts.filter(
+          (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
+        );
         if (fresh.length === 0) return;
 
         // Mark as fresh for flash animation
@@ -150,7 +179,7 @@ export function InfiniteFeed({
           });
         }, 3200);
 
-        setPosts((prev) => [...fresh, ...prev]);
+        setPosts((prev) => dedupeById([...fresh, ...prev]));
       } catch {
         /* silent */
       }

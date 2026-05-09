@@ -4,6 +4,7 @@ import { HeroCard } from '@/components/news/HeroCard';
 import { TrendingSection } from '@/components/news/TrendingSection';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
+import { dedupe } from '@/lib/utils/dedupe';
 
 export const revalidate = 30;
 
@@ -13,10 +14,30 @@ export default async function HomePage() {
     fetchPosts(1, 20),
   ]);
 
-  // Dedupe: hero post should not appear in the grid
-  const posts = heroPost
-    ? postsResult.posts.filter((post) => post.id !== heroPost.id)
-    : postsResult.posts;
+  // Dedupe at ingestion — remove hero post and any DB-level dupes
+  const allPosts = dedupe(
+    heroPost
+      ? postsResult.posts.filter((post) => post.id !== heroPost.id)
+      : postsResult.posts,
+  );
+
+  // Trending: top 5 by credibility × freshness — these IDs will be
+  // excluded from the Latest News feed to prevent the same card
+  // appearing in both sections.
+  const trendingIds = new Set(
+    [...allPosts]
+      .map((post) => {
+        const ageHours = (Date.now() - new Date(post.published_at).getTime()) / 3_600_000;
+        const freshness = Math.max(0, 1 - ageHours / 12);
+        return { id: post.id, score: post.credibility_score * 0.6 + freshness * 40 };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map(({ id }) => id),
+  );
+
+  // Feed posts: everything EXCEPT hero and trending
+  const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
 
   return (
     <div className="relative min-h-screen">
@@ -41,7 +62,7 @@ export default async function HomePage() {
         )}
 
         {/* Trending */}
-        {posts.length > 0 && <TrendingSection posts={posts} />}
+        {allPosts.length > 0 && <TrendingSection posts={allPosts} />}
 
         {/* Latest verified news — auto-loading infinite feed */}
         <section aria-label="Latest verified news">
@@ -50,7 +71,10 @@ export default async function HomePage() {
             <h2 className="text-base font-semibold text-white tracking-tight">Latest News</h2>
             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
           </div>
-          <InfiniteFeed initialPosts={posts} initialCount={postsResult.count} />
+          <InfiniteFeed
+            initialPosts={feedPosts}
+            initialCount={Math.max(0, postsResult.count - trendingIds.size - (heroPost ? 1 : 0))}
+          />
         </section>
       </div>
     </div>

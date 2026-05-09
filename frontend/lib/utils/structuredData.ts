@@ -1,7 +1,7 @@
 import { Post } from '@/types';
 
 export function newsArticleJsonLd(post: Post): object {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return {
     '@context': 'https://schema.org',
@@ -36,7 +36,7 @@ export function newsArticleJsonLd(post: Post): object {
 }
 
 export function websiteJsonLd(): object {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return {
     '@context': 'https://schema.org',
@@ -57,7 +57,7 @@ export function websiteJsonLd(): object {
 }
 
 export function organizationJsonLd(): object {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return {
     '@context': 'https://schema.org',

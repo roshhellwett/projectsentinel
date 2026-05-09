@@ -52,12 +52,12 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-surface rounded-xl p-6 w-full max-w-lg">
+      <div className="bg-[#0f0f0f] border border-white/[0.08] rounded-xl p-6 w-full max-w-lg">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-medium">
             {type === 'corrected' ? 'Add Correction' : 'Retract Article'}
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-surface-hover rounded">
+          <button onClick={onClose} className="p-1 hover:bg-white/[0.06] rounded">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -85,7 +85,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 bg-surface-hover hover:bg-gray-800 text-white rounded-lg transition-colors"
+              className="flex-1 py-3 bg-white/[0.06] hover:bg-white/[0.10] text-white rounded-lg transition-colors"
             >
               Cancel
             </button>
@@ -94,8 +94,8 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
               disabled={loading}
               className={`flex-1 py-3 text-white rounded-lg transition-colors disabled:opacity-50 ${
                 type === 'corrected' 
-                  ? 'bg-warning hover:bg-warning/80' 
-                  : 'bg-danger hover:bg-danger/80'
+                  ? 'bg-cred-mid hover:bg-cred-mid/80' 
+                  : 'bg-cred-low hover:bg-cred-low/80'
               }`}
             >
               {loading ? 'Saving...' : (type === 'corrected' ? 'Add Correction' : 'Retract')}

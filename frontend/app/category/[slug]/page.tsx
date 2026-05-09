@@ -50,7 +50,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryName = titleCase(slug);
   const isValidCategory = (VALID_CATEGORIES as readonly string[]).includes(slug);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return (
     <div className="container mx-auto px-4 lg:px-6 pt-10 pb-12">

@@ -25,9 +25,8 @@ function lockBody() {
 }
 
 function unlockBody() {
-  overflowCount--;
-  if (overflowCount <= 0) {
-    overflowCount = 0;
+  overflowCount = Math.max(0, overflowCount - 1);
+  if (overflowCount === 0) {
     document.body.style.overflow = '';
   }
 }

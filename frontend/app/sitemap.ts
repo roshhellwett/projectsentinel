@@ -1,23 +1,13 @@
 import type { MetadataRoute } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { fetchPosts } from '@/lib/supabase/server';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
 export const revalidate = 3600;
 
 async function fetchArticleUrls(): Promise<{ id: string; published_at: string }[]> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return [];
-
   try {
-    const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-    const { data } = await sb
-      .from('posts')
-      .select('id, published_at')
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
-      .limit(1000);
-    return (data || []) as { id: string; published_at: string }[];
+    const { posts } = await fetchPosts(1, 50);
+    return posts.map((p) => ({ id: p.id, published_at: p.published_at }));
   } catch {
     return [];
   }

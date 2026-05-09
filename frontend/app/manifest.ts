@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Fully automated, AI-powered Indian news aggregator. Every story verified through cross-referencing multiple trusted sources.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#f8fafc',
-    theme_color: '#1e3a8a',
+    background_color: '#0a0a0a',
+    theme_color: '#2563eb',
     orientation: 'portrait',
     icons: [
       {

@@ -52,9 +52,9 @@ export function PostTable({ posts }: PostTableProps) {
                 </td>
                 <td className="py-3 px-4">
                   <span className={`text-sm ${
-                    post.status === 'published' ? 'text-success' :
-                    post.status === 'corrected' ? 'text-warning' :
-                    'text-danger'
+                    post.status === 'published' ? 'text-cred-high' :
+                    post.status === 'corrected' ? 'text-cred-mid' :
+                    'text-cred-low'
                   }`}>
                     {post.status}
                   </span>
@@ -69,7 +69,7 @@ export function PostTable({ posts }: PostTableProps) {
                         setSelectedPost(post);
                         setCorrectionType('corrected');
                       }}
-                      className="text-xs px-3 py-1 bg-warning/20 text-warning rounded hover:bg-warning/30 transition-colors"
+                      className="text-xs px-3 py-1 bg-cred-mid/20 text-cred-mid rounded hover:bg-cred-mid/30 transition-colors"
                     >
                       Correct
                     </button>
@@ -78,7 +78,7 @@ export function PostTable({ posts }: PostTableProps) {
                         setSelectedPost(post);
                         setCorrectionType('retracted');
                       }}
-                      className="text-xs px-3 py-1 bg-danger/20 text-danger rounded hover:bg-danger/30 transition-colors"
+                      className="text-xs px-3 py-1 bg-cred-low/20 text-cred-low rounded hover:bg-cred-low/30 transition-colors"
                     >
                       Retract
                     </button>

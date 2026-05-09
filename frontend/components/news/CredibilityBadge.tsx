@@ -1,6 +1,6 @@
 'use client';
 
-import { getScoreLabel, getScoreTier, getScoreHex } from '@/lib/utils/scoreColor';
+import { getScoreLabel, getScoreTier } from '@/lib/utils/scoreColor';
 
 interface CredibilityBadgeProps {
   score: number;
@@ -11,7 +11,6 @@ interface CredibilityBadgeProps {
 export function CredibilityBadge({ score, showTooltip = false, compact = false }: CredibilityBadgeProps) {
   const tier = getScoreTier(score);
   const label = getScoreLabel(score);
-  const hex = getScoreHex(score);
 
   const radius = 16;
   const circumference = 2 * Math.PI * radius;

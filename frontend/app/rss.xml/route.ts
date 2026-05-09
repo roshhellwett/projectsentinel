@@ -1,7 +1,7 @@
 import { fetchPosts } from '@/lib/supabase/server';
 
 export async function GET() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
   const { posts } = await fetchPosts(1, 50);
 
   const items = posts.map((post) => `
