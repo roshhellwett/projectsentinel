@@ -20,7 +20,7 @@ class GroqVerifier:
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
     RETRY_DELAY = 10
-    MIN_DELAY_SECONDS = 6
+    MIN_DELAY_SECONDS = 8
 
     SYSTEM_PROMPT = (
         "You are a news verification assistant. "
@@ -43,7 +43,7 @@ class GroqVerifier:
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY_VERIFY", "")
         self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
-        self.rate_limiter = RateLimiter.get_global("groq", self.MIN_DELAY_SECONDS)
+        self.rate_limiter = RateLimiter.get_global("groq", self.MIN_DELAY_SECONDS, max_calls_per_day=400)
 
     def verify(self, article_group: list[dict]) -> dict:
         """

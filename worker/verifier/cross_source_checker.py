@@ -3,13 +3,11 @@ Cross-source verification - groups articles by topic using Union-Find for O(n lo
 Requires 2+ independent sources for verification.
 """
 
-import os
 import re
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
-from supabase import create_client
-
+from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 
@@ -158,14 +156,7 @@ class CrossSourceChecker:
 
     def _init_supabase(self):
         """Initialize Supabase client."""
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
-
-        if supabase_url and supabase_key:
-            try:
-                self.supabase = create_client(supabase_url, supabase_key)
-            except Exception as e:
-                self.logger.log("CROSS_SOURCE_ERROR", f"Failed to connect: {str(e)}")
+        self.supabase = get_supabase()
 
     def _get_recent_raw_articles(self) -> list[dict]:
         """Get recent unprocessed articles with 30-minute cache."""

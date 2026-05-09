@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
   display: 'swap',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -37,13 +37,13 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     siteName: 'India Verified',
     url: siteUrl,
-    images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'India Verified - AI-Verified Indian News',
     description: 'Fully automated, AI-powered Indian news aggregator',
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
@@ -87,6 +87,19 @@ export default function RootLayout({
             `}
           </Script>
         )}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans bg-background text-slate-900 min-h-screen flex flex-col antialiased selection:bg-slate-200 selection:text-slate-900`}>
         {gtmId && (

@@ -1,10 +1,8 @@
 """Archives old worker data on the monthly maintenance run."""
 
-import os
 from datetime import UTC, datetime, timedelta
 
-from supabase import create_client
-
+from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 
@@ -18,14 +16,7 @@ class OldPostArchiver:
 
     def _init_supabase(self):
         """Initialize Supabase client."""
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
-
-        if supabase_url and supabase_key:
-            try:
-                self.supabase = create_client(supabase_url, supabase_key)
-            except Exception as e:
-                self.logger.log("ARCHIVER_ERROR", f"Failed to connect: {str(e)}")
+        self.supabase = get_supabase()
 
     def archive_old_posts(self) -> int:
         """

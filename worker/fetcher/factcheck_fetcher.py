@@ -29,21 +29,11 @@ class FactCheckFetcher:
         Returns:
             Number of new fact-checks added
         """
-        import os
+        from database.client import get_supabase
 
-        from supabase import create_client
-
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
-
-        if not supabase_url or not supabase_key:
-            self.logger.log("FACTCHECK", "Supabase not configured, skipping update")
-            return 0
-
-        try:
-            supabase = create_client(supabase_url, supabase_key)
-        except Exception as e:
-            self.logger.log("FACTCHECK_ERROR", f"Database connection failed: {str(e)}")
+        supabase = get_supabase()
+        if not supabase:
+            self.logger.log("FACTCHECK_ERROR", "Database connection failed or not configured")
             return 0
 
         new_claims = []

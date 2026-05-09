@@ -37,7 +37,7 @@ class GNewsFetcher:
         articles = []
 
         # Search for India news from last 24 hours
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday = (datetime.now(UTC) - timedelta(days=1)).strftime("%Y-%m-%d")
 
         params = {"q": "India", "lang": "en", "country": "in", "max": 20, "from": yesterday, "apikey": self.api_key}
 

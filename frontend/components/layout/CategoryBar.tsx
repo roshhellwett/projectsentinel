@@ -1,8 +1,3 @@
-/**
- * Horizontal scrollable category pill tabs
- * Optimized: transition-colors only, Link components, proper tab semantics
- */
-
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -11,15 +6,15 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 
 const CATEGORIES = [
-  { slug: 'all', label: 'All' },
-  { slug: 'politics', label: 'Politics' },
-  { slug: 'business', label: 'Business' },
-  { slug: 'sports', label: 'Sports' },
-  { slug: 'crime', label: 'Crime' },
-  { slug: 'science', label: 'Science' },
-  { slug: 'health', label: 'Health' },
-  { slug: 'tech', label: 'Tech' },
-  { slug: 'world', label: 'World' }
+  { slug: 'all', label: 'All', emoji: '📰' },
+  { slug: 'politics', label: 'Politics', emoji: '🏛️' },
+  { slug: 'business', label: 'Business', emoji: '📈' },
+  { slug: 'sports', label: 'Sports', emoji: '🏏' },
+  { slug: 'crime', label: 'Crime', emoji: '🔍' },
+  { slug: 'science', label: 'Science', emoji: '🔬' },
+  { slug: 'health', label: 'Health', emoji: '🏥' },
+  { slug: 'tech', label: 'Tech', emoji: '💻' },
+  { slug: 'world', label: 'World', emoji: '🌏' }
 ];
 
 export function CategoryBar() {
@@ -29,33 +24,42 @@ export function CategoryBar() {
     : 'all';
 
   return (
-    <div className="mb-8 -mx-4 px-4 overflow-x-auto scrollbar-hide py-2" role="tablist" aria-label="News categories">
-      <div className="flex gap-2 min-w-max p-1 bg-white rounded-full border border-slate-200 shadow-sm w-fit">
-        {CATEGORIES.map((cat) => {
-          const isActive = currentCategory === cat.slug;
+    <div className="relative mb-8 -mx-4 px-4" role="tablist" aria-label="News categories">
+      {/* Fade indicators */}
+      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      
+      <div className="overflow-x-auto scrollbar-hide py-2">
+        <div className="flex gap-2 min-w-max p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm w-fit">
+          {CATEGORIES.map((cat) => {
+            const isActive = currentCategory === cat.slug;
 
-          return (
-            <Link
-              key={cat.slug}
-              href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
-              role="tab"
-              aria-selected={isActive}
-              className={cn(
-                "relative px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors duration-300",
-                isActive ? "text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              )}
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="activeCategory"
-                  className="absolute inset-0 bg-slate-900 rounded-full shadow-md"
-                  transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
-                />
-              )}
-              <span className="relative z-10">{cat.label}</span>
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={cat.slug}
+                href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
+                role="tab"
+                aria-selected={isActive}
+                className={cn(
+                  "relative px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-1.5",
+                  isActive 
+                    ? "text-white" 
+                    : "text-slate-600 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10"
+                )}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeCategory"
+                    className="absolute inset-0 bg-gradient-to-r from-india-saffron to-saffron-dark rounded-xl shadow-saffron"
+                    transition={{ type: "spring" as const, stiffness: 350, damping: 28 }}
+                  />
+                )}
+                <span className="relative z-10 text-xs">{cat.emoji}</span>
+                <span className="relative z-10">{cat.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

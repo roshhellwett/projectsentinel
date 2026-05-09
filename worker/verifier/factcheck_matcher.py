@@ -3,12 +3,10 @@ Matches article headlines against known false claims database.
 Fixed: word boundary matching, adaptive thresholds.
 """
 
-import os
 import re
 from datetime import UTC, datetime
 
-from supabase import create_client
-
+from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 
@@ -24,14 +22,7 @@ class FactCheckMatcher:
 
     def _init_supabase(self):
         """Initialize Supabase client."""
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
-
-        if supabase_url and supabase_key:
-            try:
-                self.supabase = create_client(supabase_url, supabase_key)
-            except Exception as e:
-                self.logger.log("FACTCHECK_MATCHER_ERROR", f"Failed to connect: {str(e)}")
+        self.supabase = get_supabase()
 
     def _load_known_claims(self):
         """Lazy-load known false claims with 1-hour cache."""

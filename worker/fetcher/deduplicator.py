@@ -3,11 +3,9 @@ Deduplication logic - SHA256 URL hashing and database checks.
 Optimized: batch DB operations, upsert, minimal memory.
 """
 
-import os
 from datetime import UTC, datetime, timedelta
 
-from supabase import create_client
-
+from database.client import get_supabase
 from fetcher.url_tools import compute_url_hash
 from logger.pipeline_logger import PipelineLogger
 
@@ -23,14 +21,7 @@ class Deduplicator:
 
     def _init_supabase(self):
         """Initialize Supabase client."""
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
-
-        if supabase_url and supabase_key:
-            try:
-                self.supabase = create_client(supabase_url, supabase_key)
-            except Exception as e:
-                self.logger.log("DEDUP_ERROR", f"Failed to connect to Supabase: {str(e)}")
+        self.supabase = get_supabase()
 
     def _load_known_hashes(self) -> set[str]:
         """Load all known URL hashes from raw_articles (cached per pipeline run)."""

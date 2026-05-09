@@ -27,13 +27,13 @@ export async function generateMetadata({ params }: CategoryPageProps) {
     openGraph: {
       title: `${category} News - India Verified`,
       description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
-      images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
+      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${category} News - India Verified`,
-      description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
-      images: ['/og-image.svg'],
+      description: `Latest verified ${category} news from India. Every story verified across multiple sources.`,
+      images: ['/og-image.png'],
     },
   };
 }

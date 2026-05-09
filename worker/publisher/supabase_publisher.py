@@ -3,10 +3,8 @@ Supabase publisher - inserts verified posts into the database.
 """
 
 import hashlib
-import os
 
-from supabase import create_client
-
+from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 
@@ -20,17 +18,7 @@ class SupabasePublisher:
 
     def _init_supabase(self):
         """Initialize Supabase client."""
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
-
-        if supabase_url and supabase_key:
-            try:
-                self.supabase = create_client(supabase_url, supabase_key)
-                self.logger.log("PUBLISHER", "Supabase client initialized")
-            except Exception as e:
-                self.logger.log("PUBLISHER_ERROR", f"Failed to connect: {str(e)}")
-        else:
-            self.logger.log("PUBLISHER_ERROR", "Supabase credentials not configured")
+        self.supabase = get_supabase()
 
     def publish(self, post: dict) -> bool:
         """
@@ -52,6 +40,24 @@ class SupabasePublisher:
             source_urls = sorted(source.get("url", "") for source in post_data.get("sources", []) if source.get("url"))
             if source_urls:
                 post_data["story_fingerprint"] = hashlib.sha256("|".join(source_urls).encode()).hexdigest()
+
+            # Prevent duplicate headlines
+            headline = post_data.get("headline", "")
+            if headline:
+                import re
+
+                def normalize(text):
+                    return re.sub(r"[^\w\s]", "", text.lower()).replace(" ", "")
+
+                norm_headline = normalize(headline)
+
+                recent = (
+                    self.supabase.table("posts").select("headline").order("published_at", desc=True).limit(50).execute()
+                )
+                for row in recent.data or []:
+                    if normalize(row.get("headline", "")) == norm_headline:
+                        self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
+                        return False
 
             try:
                 result = self.supabase.table("posts").insert(post_data).execute()
