@@ -95,7 +95,8 @@ export async function fetchPosts(
   const { data, error, count } = await query;
   
   if (error) {
-    throw new Error(`Failed to fetch posts: ${error.message}`);
+    console.error(`fetchPosts error: ${error.message}`);
+    return { posts: [], count: 0 };
   }
   
   return { posts: data as Post[], count: count || 0 };
@@ -119,10 +120,7 @@ export async function fetchPostById(id: string): Promise<Post | null> {
     .single();
   
   if (error) {
-    if (error.code === 'PGRST116') {
-      return null; // Not found
-    }
-    throw new Error(`Failed to fetch post: ${error.message}`);
+    return null;
   }
   
   return data as Post;
@@ -197,7 +195,7 @@ export async function updatePostStatus(
     .eq('id', id);
   
   if (error) {
-    throw new Error(`Failed to update post: ${error.message}`);
+    console.error(`updatePostStatus error: ${error.message}`);
   }
 }
 
@@ -253,7 +251,8 @@ export async function fetchAllPosts(): Promise<Post[]> {
     .order('published_at', { ascending: false });
   
   if (error) {
-    throw new Error(`Failed to fetch posts: ${error.message}`);
+    console.error(`fetchAllPosts error: ${error.message}`);
+    return [];
   }
   
   return (data || []) as Post[];
