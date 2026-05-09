@@ -35,7 +35,7 @@ class UnionFind:
         return True
 
 
-STOP_WORDS: set[str] = frozenset(
+STOP_WORDS: frozenset[str] = frozenset(
     {
         "the",
         "and",

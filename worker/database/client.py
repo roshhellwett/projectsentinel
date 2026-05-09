@@ -23,8 +23,8 @@ def get_supabase() -> Client | None:
         if _client_instance is not None:
             return _client_instance
 
-        supabase_url = os.getenv("SUPABASE_URL", "")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+        supabase_url = os.getenv("SUPABASE_URL", "").strip()
+        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
 
         if supabase_url and supabase_key:
             try:
@@ -37,3 +37,11 @@ def get_supabase() -> Client | None:
             PipelineLogger().log("SUPABASE_ERROR", "Credentials not configured")
 
         return None
+
+
+def reset_client() -> None:
+    """Reset the singleton so the next get_supabase() creates a fresh client.
+    Useful for tests or recovery after connection failures."""
+    global _client_instance
+    with _client_lock:
+        _client_instance = None

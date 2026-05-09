@@ -3,9 +3,17 @@ Supabase publisher - inserts verified posts into the database.
 """
 
 import hashlib
+import re
 
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
+
+_NORMALIZE_RE = re.compile(r"[^\w\s]")
+
+
+def _normalize_headline(text: str) -> str:
+    """Normalize headline for duplicate comparison."""
+    return _NORMALIZE_RE.sub("", text.lower()).replace(" ", "")
 
 
 class SupabasePublisher:
@@ -44,20 +52,22 @@ class SupabasePublisher:
             # Prevent duplicate headlines
             headline = post_data.get("headline", "")
             if headline:
-                import re
+                norm_headline = _normalize_headline(headline)
 
-                def normalize(text):
-                    return re.sub(r"[^\w\s]", "", text.lower()).replace(" ", "")
-
-                norm_headline = normalize(headline)
-
-                recent = (
-                    self.supabase.table("posts").select("headline").order("published_at", desc=True).limit(50).execute()
-                )
-                for row in recent.data or []:
-                    if normalize(row.get("headline", "")) == norm_headline:
-                        self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
-                        return False
+                try:
+                    recent = (
+                        self.supabase.table("posts")
+                        .select("headline")
+                        .order("published_at", desc=True)
+                        .limit(50)
+                        .execute()
+                    )
+                    for row in recent.data or []:
+                        if _normalize_headline(row.get("headline", "")) == norm_headline:
+                            self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
+                            return False
+                except Exception as e:
+                    self.logger.log("PUBLISHER_WARN", f"Headline dedup check failed (proceeding): {str(e)[:80]}")
 
             try:
                 result = self.supabase.table("posts").insert(post_data).execute()

@@ -5,6 +5,7 @@ Limited to 6 calls per day to stay within free tier (100 req/day).
 
 import os
 from datetime import UTC, datetime, timedelta
+from urllib.parse import urlparse
 
 import requests
 
@@ -78,8 +79,7 @@ class GNewsFetcher:
         if not headline or len(headline) < 10:
             return None
 
-        # Get description as excerpt
-        excerpt = item.get("description", "")
+        excerpt = item.get("description", "") or ""
         words = excerpt.split()
         if len(words) > 150:
             excerpt = " ".join(words[:150]) + "..."
@@ -100,8 +100,6 @@ class GNewsFetcher:
     def _get_base_url(self, url: str) -> str:
         """Extract base URL from full URL."""
         try:
-            from urllib.parse import urlparse
-
             parsed = urlparse(url)
             return f"{parsed.scheme}://{parsed.netloc}"
         except Exception:

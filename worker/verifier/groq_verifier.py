@@ -11,7 +11,7 @@ import time
 import requests
 
 from logger.pipeline_logger import PipelineLogger
-from rate_limiter.limiter import RateLimiter
+from rate_limiter.limiter import RateLimiter, RateLimitExceededError
 
 
 class GroqVerifier:
@@ -106,6 +106,8 @@ class GroqVerifier:
                     self.logger.log("GROQ_VERIFY", f"Verified article: score={parsed.get('score', 0)}, model={model}")
                     return parsed
 
+            except RateLimitExceededError:
+                raise
             except requests.exceptions.RequestException as e:
                 error_str = str(e)
                 wait = self._extract_retry_delay(error_str, attempt)
@@ -186,8 +188,15 @@ class GroqVerifier:
             result["key_facts"] = [str(result["key_facts"])]
 
         valid_categories = [
-            "politics", "business", "sports", "crime", "science",
-            "health", "tech", "world", "entertainment",
+            "politics",
+            "business",
+            "sports",
+            "crime",
+            "science",
+            "health",
+            "tech",
+            "world",
+            "entertainment",
         ]
         if result["category"] not in valid_categories:
             self.logger.log("GROQ_VERIFY", f"Invalid category '{result['category']}' — defaulting to 'world'")

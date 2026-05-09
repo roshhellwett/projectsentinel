@@ -5,6 +5,7 @@ Limited to 6 calls per day to stay within free tier (100 req/day).
 
 import os
 from datetime import UTC, datetime, timedelta
+from urllib.parse import urlparse
 
 import requests
 
@@ -111,8 +112,6 @@ class NewsAPIFetcher:
     def _get_base_url(self, url: str) -> str:
         """Extract base URL from full URL."""
         try:
-            from urllib.parse import urlparse
-
             parsed = urlparse(url)
             return f"{parsed.scheme}://{parsed.netloc}"
         except Exception:

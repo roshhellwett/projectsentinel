@@ -17,7 +17,9 @@ from scheduler.jobs import run_pipeline
 
 load_dotenv()
 
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(
+    job_defaults={"coalesce": True, "misfire_grace_time": 300},
+)
 
 
 @asynccontextmanager
@@ -58,7 +60,7 @@ async def lifespan(app: FastAPI):
     yield
 
     try:
-        scheduler.shutdown()
+        scheduler.shutdown(wait=False)
         print("Scheduler shut down")
     except Exception:
         pass
@@ -76,7 +78,7 @@ allowed_origins = os.getenv("CORS_ORIGINS", "https://verifiedindian.vercel.app,h
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=[o.strip() for o in allowed_origins if o.strip()],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
     max_age=600,

@@ -11,7 +11,7 @@ import time
 import requests
 
 from logger.pipeline_logger import PipelineLogger
-from rate_limiter.limiter import RateLimiter
+from rate_limiter.limiter import RateLimiter, RateLimitExceededError
 
 
 class GroqWriter:
@@ -80,6 +80,8 @@ class GroqWriter:
                 self.logger.log("GROQ", f"Wrote article: {parsed.get('headline', '')[:50]}")
                 return parsed
 
+            except RateLimitExceededError:
+                raise
             except requests.exceptions.RequestException as e:
                 error_str = str(e)
                 if "429" in error_str:

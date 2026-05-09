@@ -1,30 +1,30 @@
 """
 Loop runner - runs the pipeline continuously until news is published.
-Optimized: reuses Supabase client, handles errors gracefully.
+Optimized: reuses Supabase singleton, handles errors gracefully.
 """
 
-import os
 import sys
 import time
 from datetime import UTC, datetime
 
 from dotenv import load_dotenv
-from supabase import create_client
 
+from database.client import get_supabase
 from scheduler.jobs import run_pipeline
 
 load_dotenv()
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-
-def get_post_count():
+def get_post_count() -> int:
     """Get current number of published posts."""
-    result = supabase.table("posts").select("id", count="exact").execute()
-    return result.count if result.count is not None else 0
+    supabase = get_supabase()
+    if not supabase:
+        return 0
+    try:
+        result = supabase.table("posts").select("id", count="exact").execute()
+        return result.count if result.count is not None else 0
+    except Exception:
+        return 0
 
 
 def main():

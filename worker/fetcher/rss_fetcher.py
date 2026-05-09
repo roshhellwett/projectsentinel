@@ -63,7 +63,9 @@ class RSSFetcher:
         session.headers.update({"User-Agent": "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"})
 
         try:
-            feed = feedparser.parse(source["url"], request_session=session)
+            resp = session.get(source["url"], timeout=20)
+            resp.raise_for_status()
+            feed = feedparser.parse(resp.content)
         except Exception:
             return []
 

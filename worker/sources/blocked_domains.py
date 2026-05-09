@@ -55,17 +55,18 @@ def is_blocked_domain(url: str) -> bool:
         parsed = urlparse(url)
         domain = parsed.netloc.lower().removeprefix("www.")
 
+        if not domain:
+            return False
+
+        # Exact match first (fast path)
         if domain in BLOCKED_DOMAINS:
             return True
 
+        # Suffix match: e.g. "sub.reddit.com" should match "reddit.com"
+        domain_parts = domain.split(".")
         for blocked in BLOCKED_DOMAINS:
-            if blocked.startswith("www."):
-                blocked = blocked[4:]
-            if domain == blocked:
-                return True
             blocked_parts = blocked.split(".")
-            domain_parts = domain.split(".")
-            if len(domain_parts) >= len(blocked_parts) and domain_parts[-len(blocked_parts) :] == blocked_parts:
+            if len(domain_parts) > len(blocked_parts) and domain_parts[-len(blocked_parts) :] == blocked_parts:
                 return True
 
         return False

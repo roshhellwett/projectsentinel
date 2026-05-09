@@ -4,6 +4,10 @@ import time
 from threading import Lock
 
 
+class RateLimitExceededError(Exception):
+    """Raised when a rate limiter's daily call budget is exhausted."""
+
+
 class RateLimiter:
     """Manages process-wide rate limiting for API calls."""
 
@@ -45,7 +49,7 @@ class RateLimiter:
                 self.day_start = current_time
 
             if self.max_calls_per_day and self.calls_today >= self.max_calls_per_day:
-                raise Exception(f"Daily limit reached: {self.max_calls_per_day} calls")
+                raise RateLimitExceededError(f"Daily limit reached: {self.max_calls_per_day} calls")
 
             time_since_last = current_time - self.last_call_time
             if time_since_last < self.min_delay:

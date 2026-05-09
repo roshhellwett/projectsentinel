@@ -56,15 +56,8 @@ class Deduplicator:
 
         try:
             cutoff = (datetime.now(UTC) - timedelta(hours=6)).isoformat()
-            result = (
-                self.supabase.table("posts")
-                .select("headline")
-                .gte("published_at", cutoff)
-                .execute()
-            )
-            self._recent_post_headlines = [
-                row["headline"] for row in (result.data or []) if row.get("headline")
-            ]
+            result = self.supabase.table("posts").select("headline").gte("published_at", cutoff).execute()
+            self._recent_post_headlines = [row["headline"] for row in (result.data or []) if row.get("headline")]
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load recent headlines: {str(e)}")
             self._recent_post_headlines = []
@@ -148,7 +141,7 @@ class Deduplicator:
             self.logger.log("DEDUP_ERROR", f"Batch insert failed: {str(e)}")
             return 0
 
-    def log_discarded(self, article: dict, reason: str, score: int = None):
+    def log_discarded(self, article: dict, reason: str, score: int | None = None):
         """Log a discarded article to discarded_articles table."""
         if not self.supabase:
             return
@@ -168,7 +161,7 @@ class Deduplicator:
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to log discarded: {str(e)}")
 
-    def log_discarded_group(self, group: list[dict], reason: str, score: int = None):
+    def log_discarded_group(self, group: list[dict], reason: str, score: int | None = None):
         """Batch log all articles in a group as discarded."""
         if not self.supabase:
             return
