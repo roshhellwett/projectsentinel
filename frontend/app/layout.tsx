@@ -37,13 +37,11 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     siteName: 'India Verified',
     url: siteUrl,
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'India Verified - AI-Verified Indian News',
     description: 'Fully automated, AI-powered Indian news aggregator',
-    images: ['/og-image.png'],
   },
   robots: {
     index: true,
@@ -58,12 +56,16 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   manifest: '/manifest',
 };
 
 export const viewport: Viewport = {
   themeColor: '#1e3a8a',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({

@@ -127,8 +127,8 @@ class RSSFetcher:
             text = soup.get_text(separator=" ", strip=True)
 
         words = text.split()
-        if len(words) > 150:
-            text = " ".join(words[:150]) + "..."
+        if len(words) > 60:
+            text = " ".join(words[:60]) + "..."
 
         return text
 

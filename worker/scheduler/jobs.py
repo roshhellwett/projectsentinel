@@ -34,14 +34,22 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         archive_only: Only run archive job (monthly)
     """
     logger = PipelineLogger()
-    logger.log(
-        "PIPELINE",
-        "Starting pipeline run",
-        {"mode": "supplementary" if supplementary_only else ("archive" if archive_only else "full")},
-    )
+    mode = "supplementary" if supplementary_only else ("archive" if archive_only else "full")
+    logger.log("PIPELINE", "Starting pipeline run", {"mode": mode})
 
     start_time = datetime.now(UTC)
-    max_ai_groups = int(os.getenv("MAX_AI_GROUPS_PER_RUN", "12"))
+    run_id: str | None = None
+
+    try:
+        from database.client import get_supabase as _get_sb
+        _sb = _get_sb()
+        if _sb:
+            _res = _sb.table("pipeline_runs").insert({"started_at": start_time.isoformat(), "mode": mode}).execute()
+            if _res.data:
+                run_id = _res.data[0].get("id")
+    except Exception as _e:
+        logger.log("PIPELINE", f"Could not record pipeline run start: {_e}")
+    max_ai_groups = int(os.getenv("MAX_AI_GROUPS_PER_RUN", "8"))
     stats = {
         "fetched": 0,
         "duplicates": 0,
@@ -108,7 +116,28 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         deduplicator.batch_insert_new_articles(new_articles)
 
-        logger.log("DEDUPLICATE", f"{len(new_articles)} new articles after deduplication")
+        logger.log("DEDUPLICATE", f"{len(new_articles)} new articles after URL deduplication")
+
+        if supplementary_only:
+            logger.log("PIPELINE", f"Supplementary fetch complete: stored {len(new_articles)} articles for next main run")
+            return
+
+        title_deduped = []
+        title_dup_count = 0
+        for article in new_articles:
+            if deduplicator.is_duplicate_by_title(article.get("headline", "")):
+                deduplicator.log_discarded(article, "duplicate_title")
+                deduplicator.mark_group_processed([article])
+                title_dup_count += 1
+            else:
+                title_deduped.append(article)
+        new_articles = title_deduped
+        stats["duplicates"] += title_dup_count
+
+        logger.log(
+            "DEDUPLICATE",
+            f"{len(new_articles)} articles after title dedup ({title_dup_count} title-dups removed)",
+        )
 
         unblocked_articles = []
         for article in new_articles:
@@ -145,8 +174,20 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             logger.log("AI_BUDGET", f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run")
 
         for group in groups_to_process:
+            representative_url = group[0].get("url", "unknown") if group else "unknown"
+            representative_headline = group[0].get("headline", "unknown") if group else "unknown"
             try:
-                verification = groq_verifier.verify(group)
+                try:
+                    verification = groq_verifier.verify(group)
+                except Exception as groq_err:
+                    logger.log(
+                        "ERROR",
+                        "Groq verification failed — skipping story",
+                        {"url": representative_url, "headline": representative_headline[:80], "error": str(groq_err)},
+                    )
+                    deduplicator.log_discarded_group(group, f"groq_error: {str(groq_err)[:120]}")
+                    deduplicator.mark_group_processed(group)
+                    continue
 
                 score_result = ScoreEvaluator.evaluate(
                     groq_score=verification.get("score", 0),
@@ -164,9 +205,22 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 summary = verification.get("summary")
 
                 if not headline or not summary:
-                    writing = groq_writer.write(key_facts=verification["key_facts"], category=verification["category"])
-                    headline = writing["headline"]
-                    summary = writing["summary"]
+                    try:
+                        writing = groq_writer.write(
+                            key_facts=verification["key_facts"],
+                            category=verification["category"],
+                        )
+                        headline = writing["headline"]
+                        summary = writing["summary"]
+                    except Exception as write_err:
+                        logger.log(
+                            "ERROR",
+                            "Groq writer failed — skipping story",
+                            {"url": representative_url, "error": str(write_err)},
+                        )
+                        deduplicator.log_discarded_group(group, f"groq_write_error: {str(write_err)[:120]}")
+                        deduplicator.mark_group_processed(group)
+                        continue
 
                 post = post_builder.build(
                     headline=headline,
@@ -182,12 +236,28 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     deduplicator.mark_group_processed(group)
 
             except Exception as e:
-                logger.log("ERROR", f"Failed to process article group: {str(e)}")
+                logger.log(
+                    "ERROR",
+                    "Unexpected error processing group — skipping",
+                    {"url": representative_url, "error": str(e)},
+                )
                 logger.log("ERROR", traceback.format_exc())
                 continue
 
         duration = (datetime.now(UTC) - start_time).total_seconds()
         logger.log("COMPLETE", f"Pipeline completed in {duration:.1f}s", stats)
+
+        try:
+            from database.client import get_supabase as _get_sb
+            _sb = _get_sb()
+            if _sb and run_id:
+                _sb.table("pipeline_runs").update({
+                    "completed_at": datetime.now(UTC).isoformat(),
+                    "duration_seconds": round(duration, 1),
+                    "stats": stats,
+                }).eq("id", run_id).execute()
+        except Exception as _e:
+            logger.log("PIPELINE", f"Could not record pipeline run completion: {_e}")
 
     except Exception as e:
         logger.log("ERROR", f"Pipeline failed: {str(e)}")

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { X, ExternalLink } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Post } from '@/types';
@@ -34,6 +35,7 @@ function unlockBody() {
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
 export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
+  const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -187,12 +189,12 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
 
             {/* Footer CTA */}
             <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-              <a
-                href={`/news/${post.id}`}
+              <button
+                onClick={() => { onClose(); router.push(`/news/${post.id}`); }}
                 className="block w-full text-center py-3 px-4 bg-gradient-to-r from-india-saffron to-saffron-dark hover:from-saffron-dark hover:to-india-saffron text-white font-semibold rounded-xl transition-all duration-300 shadow-saffron hover:shadow-saffron-lg text-sm"
               >
                 Read Full Article →
-              </a>
+              </button>
             </div>
           </motion.div>
         </>

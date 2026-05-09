@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types';
 
-const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world']);
+const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment']);
 const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
 
 // Lazy-initialized server client to handle missing env vars during build
@@ -199,6 +199,45 @@ export async function updatePostStatus(
   if (error) {
     throw new Error(`Failed to update post: ${error.message}`);
   }
+}
+
+// Full-text search posts by query
+export async function searchPosts(
+  query: string,
+  limit: number = 20
+): Promise<{ posts: Post[]; count: number }> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { posts: [], count: 0 };
+  }
+
+  const safeQuery = query.trim().slice(0, 200);
+  if (!safeQuery) return { posts: [], count: 0 };
+
+  const safeLimit = Math.min(50, Math.max(1, limit));
+
+  const { data, error, count } = await getSupabaseServer()
+    .from('posts')
+    .select('*', { count: 'exact' })
+    .eq('status', 'published')
+    .textSearch('headline', safeQuery, { type: 'plain', config: 'english' })
+    .order('published_at', { ascending: false })
+    .limit(safeLimit);
+
+  if (error) {
+    // Fallback to ilike if textSearch fails (e.g. FTS index not yet created)
+    const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
+      .from('posts')
+      .select('*', { count: 'exact' })
+      .eq('status', 'published')
+      .ilike('headline', `%${safeQuery}%`)
+      .order('published_at', { ascending: false })
+      .limit(safeLimit);
+
+    if (fallbackErr) return { posts: [], count: 0 };
+    return { posts: (fallback || []) as Post[], count: fallbackCount || 0 };
+  }
+
+  return { posts: (data || []) as Post[], count: count || 0 };
 }
 
 // Get all posts for admin (including non-published)

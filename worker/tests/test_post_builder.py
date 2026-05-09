@@ -59,4 +59,5 @@ def test_build_no_url_sources():
         [{"source_name": "NoURL"}, {"source_name": "S2", "url": "https://valid.com"}],
     )
     assert len(post["sources"]) == 1
-    assert post["sources"][0]["name"] == "S2"
+    assert "title" in post["sources"][0]
+    assert post["sources"][0]["url"] == "https://valid.com"

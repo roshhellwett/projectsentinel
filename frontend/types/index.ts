@@ -3,11 +3,12 @@
  */
 
 export interface Source {
-  name: string;
+  title?: string;
+  name?: string;
   url: string;
 }
 
-export type Category = 'politics' | 'business' | 'sports' | 'crime' | 'science' | 'health' | 'tech' | 'world';
+export type Category = 'politics' | 'business' | 'sports' | 'crime' | 'science' | 'health' | 'tech' | 'world' | 'entertainment';
 
 export type PostStatus = 'published' | 'corrected' | 'retracted';
 

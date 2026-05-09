@@ -32,8 +32,12 @@ export function CredibilityBadge({ score, showTooltip = false }: CredibilityBadg
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="relative group inline-flex items-center gap-2">
-      <div className="relative w-10 h-10 flex items-center justify-center">
+    <div
+      className="relative group inline-flex items-center gap-2"
+      aria-label={`Credibility score: ${score}/100 — ${label}`}
+      role="img"
+    >
+      <div className="relative w-10 h-10 flex items-center justify-center" aria-hidden="true">
         <svg className="w-10 h-10 -rotate-90 transform" viewBox="0 0 40 40">
           <circle
             className={`${bgColor} stroke-current transition-colors duration-300`}
@@ -53,9 +57,9 @@ export function CredibilityBadge({ score, showTooltip = false }: CredibilityBadg
             cy="20"
             style={{
               strokeDasharray: circumference,
-              strokeDashoffset: circumference, // starting position for animation
+              strokeDashoffset: circumference,
               '--score-offset': strokeDashoffset
-            } as any}
+            } as React.CSSProperties & { '--score-offset': number }}
           />
         </svg>
         <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-slate-700 dark:text-slate-200">
@@ -63,7 +67,7 @@ export function CredibilityBadge({ score, showTooltip = false }: CredibilityBadg
         </span>
       </div>
       
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center" aria-hidden="true">
         <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider leading-none mb-0.5">
           {label}
         </span>

@@ -73,7 +73,7 @@ def test_parse_response_invalid_category_defaults():
     result = v._parse_response(
         json.dumps({"score": 50, "reason": "test", "key_facts": ["fact"], "category": "invalid_category"})
     )
-    assert result["category"] == "politics"
+    assert result["category"] == "world"
 
 
 def test_build_prompt_truncation():

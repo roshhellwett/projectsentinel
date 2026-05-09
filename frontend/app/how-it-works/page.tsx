@@ -14,17 +14,15 @@ import {
 
 export const metadata: Metadata = {
   title: 'How It Works - India Verified',
-  description: 'Learn how India Verified uses AI to verify news stories from multiple trusted sources.',
+  description: 'Learn how our AI cross-references and scores news from multiple trusted sources to fight misinformation.',
   openGraph: {
     title: 'How It Works - India Verified',
-    description: 'Learn how India Verified uses AI to verify news stories from multiple trusted sources.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    description: 'Learn how our AI verifies Indian news.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'How It Works - India Verified',
-    description: 'Learn how India Verified uses AI to verify news stories from multiple trusted sources.',
-    images: ['/og-image.png'],
+    description: 'Learn how our AI verifies Indian news.',
   },
 };
 

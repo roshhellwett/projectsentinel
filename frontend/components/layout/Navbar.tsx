@@ -1,27 +1,36 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Menu, X, Moon, Sun } from 'lucide-react';
+import { Search, Menu, X, Moon, Sun, ChevronDown } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/components/ui/ThemeProvider';
+import { CATEGORIES } from '@/lib/constants/categories';
 
-const NAV_LINKS = [
-  { href: '/category/politics', label: 'Politics' },
-  { href: '/category/business', label: 'Business' },
-  { href: '/category/sports', label: 'Sports' },
-  { href: '/category/tech', label: 'Tech' },
-  { href: '/how-it-works', label: 'How It Works' }
-];
+const PRIMARY_NAV = CATEGORIES.slice(0, 5).map((c) => ({ href: `/category/${c.slug}`, label: c.label }));
+const MORE_NAV = CATEGORIES.slice(5).map((c) => ({ href: `/category/${c.slug}`, label: c.label }));
+const ALL_MOBILE_NAV = [...CATEGORIES.map((c) => ({ href: `/category/${c.slug}`, label: c.label })), { href: '/how-it-works', label: 'How It Works' }];
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const moreRef = useRef<HTMLDivElement>(null);
   
   const { scrollY } = useScroll();
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setIsMoreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setScrolled(latest > 20);
@@ -75,7 +84,7 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <nav aria-label="Main navigation" className="hidden md:flex items-center gap-0.5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            {NAV_LINKS.map((link) => (
+            {PRIMARY_NAV.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -84,6 +93,38 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {MORE_NAV.length > 0 && (
+              <div ref={moreRef} className="relative">
+                <button
+                  onClick={() => setIsMoreOpen((v) => !v)}
+                  className="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron dark:hover:text-india-saffron hover:bg-india-saffron/5 dark:hover:bg-india-saffron/10 transition-all duration-200"
+                >
+                  More <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+                {isMoreOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
+                    {MORE_NAV.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsMoreOpen(false)}
+                        className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron hover:bg-india-saffron/5 transition-all"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                    <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                    <Link
+                      href="/how-it-works"
+                      onClick={() => setIsMoreOpen(false)}
+                      className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-india-saffron hover:bg-india-saffron/5 transition-all"
+                    >
+                      How It Works
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Actions */}
@@ -142,12 +183,12 @@ export function Navbar() {
               >
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-india-saffron via-accent to-india-green" />
                 <nav className="flex flex-col p-3 pt-4">
-                  {NAV_LINKS.map((link, index) => (
+                  {ALL_MOBILE_NAV.map((link, index) => (
                     <motion.div
                       key={link.href}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: index * 0.03 }}
                     >
                       <Link
                         href={link.href}

@@ -1,22 +1,54 @@
-name: Keep Backend Alive
+name: Keep Backend Alive & Health Check
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Every 10 minutes
+    - cron: '*/30 * * * *'  # Every 30 minutes
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
-    
+    permissions:
+      issues: write
+
     steps:
       - name: Ping Health Endpoint
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.BACKEND_URL }}/health || echo "000")
           if [ "$response" = "200" ]; then
             echo "✓ Backend is healthy"
-            exit 0
           else
             echo "✗ Backend returned status $response"
             exit 1
           fi
+
+      - name: Check Pipeline Status
+        id: status
+        run: |
+          STATUS=$(curl -s "${{ secrets.BACKEND_URL }}/status" || echo '{"pipeline_healthy":false}')
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          HEALTHY=$(echo "$STATUS" | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(d.get('pipeline_healthy','false')).lower())")
+          echo "healthy=$HEALTHY" >> $GITHUB_OUTPUT
+          echo "Pipeline status: $STATUS"
+
+      - name: Create Issue if Unhealthy
+        if: steps.status.outputs.healthy == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = ${{ toJson(steps.status.outputs.status) }};
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'pipeline-unhealthy',
+              state: 'open',
+            });
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '⚠️ Pipeline Unhealthy — last run >45 minutes ago',
+                body: `The India Verified worker pipeline has not run in over 45 minutes.\n\nStatus response:\n\`\`\`json\n${status}\n\`\`\`\n\nCheck Railway logs at your deployment dashboard.`,
+                labels: ['pipeline-unhealthy'],
+              });
+            }

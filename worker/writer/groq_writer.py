@@ -35,7 +35,7 @@ class GroqWriter:
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY", "")
         self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama-3.3-70b-versatile")
-        self.rate_limiter = RateLimiter.get_global("groq", self.MIN_DELAY_SECONDS)
+        self.rate_limiter = RateLimiter.get_global("groq_write", self.MIN_DELAY_SECONDS)
 
     def write(self, key_facts: list[str], category: str) -> dict:
         """

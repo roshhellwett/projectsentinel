@@ -1,0 +1,70 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0" y1="0" x2="800" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E3A8A" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#FF9933" stop-opacity="0.05"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#1E3A8A" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#gradient1)"/>
+
+  <!-- Back Card (Unverified Source 1) -->
+  <g transform="translate(100, 80) rotate(-4) scale(0.9)" opacity="0.6">
+    <rect width="400" height="480" rx="24" fill="#FFFFFF" filter="url(#shadow)"/>
+    <rect x="40" y="50" width="120" height="16" rx="8" fill="#CBD5E1"/>
+    <rect x="40" y="100" width="320" height="12" rx="6" fill="#E2E8F0"/>
+    <rect x="40" y="130" width="280" height="12" rx="6" fill="#E2E8F0"/>
+    <rect x="40" y="160" width="300" height="12" rx="6" fill="#E2E8F0"/>
+  </g>
+
+  <!-- Middle Card (Unverified Source 2) -->
+  <g transform="translate(150, 100) rotate(2) scale(0.95)" opacity="0.8">
+    <rect width="400" height="480" rx="24" fill="#FFFFFF" filter="url(#shadow)"/>
+    <rect x="40" y="50" width="140" height="16" rx="8" fill="#94A3B8"/>
+    <rect x="40" y="100" width="320" height="12" rx="6" fill="#CBD5E1"/>
+    <rect x="40" y="130" width="300" height="12" rx="6" fill="#CBD5E1"/>
+    <rect x="40" y="160" width="260" height="12" rx="6" fill="#CBD5E1"/>
+  </g>
+
+  <!-- Front Card (Verified Master Article) -->
+  <g transform="translate(200, 140)">
+    <rect width="460" height="380" rx="24" fill="#FFFFFF" filter="url(#shadow)" stroke="#FF9933" stroke-width="2"/>
+    
+    <!-- AI Scan Line Overlay -->
+    <rect x="0" y="180" width="460" height="4" fill="#138808" fill-opacity="0.8"/>
+    <rect x="0" y="184" width="460" height="60" fill="url(#gradient1)" fill-opacity="0.5"/>
+
+    <!-- Content -->
+    <rect x="40" y="50" width="80" height="24" rx="12" fill="#FF9933" fill-opacity="0.2"/>
+    <rect x="50" y="56" width="60" height="12" rx="6" fill="#FF9933"/>
+
+    <rect x="40" y="100" width="360" height="20" rx="10" fill="#1E3A8A"/>
+    <rect x="40" y="135" width="280" height="20" rx="10" fill="#1E3A8A"/>
+
+    <rect x="40" y="200" width="380" height="12" rx="6" fill="#94A3B8"/>
+    <rect x="40" y="230" width="360" height="12" rx="6" fill="#94A3B8"/>
+    <rect x="40" y="260" width="320" height="12" rx="6" fill="#94A3B8"/>
+
+    <!-- Verification Badge Box -->
+    <rect x="40" y="300" width="380" height="50" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+    <circle cx="70" cy="325" r="16" fill="#138808" fill-opacity="0.1"/>
+    <path d="M62 325L68 331L78 319" stroke="#138808" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="100" y="318" width="140" height="14" rx="7" fill="#138808" fill-opacity="0.8"/>
+  </g>
+  
+  <!-- Floating Elements -->
+  <!-- Shield -->
+  <g transform="translate(620, 80)">
+    <path d="M40 0L80 15V45C80 70 65 90 40 100C15 90 0 70 0 45V15L40 0Z" fill="#1E3A8A"/>
+    <path d="M25 45L35 55L55 35" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Network Nodes -->
+  <circle cx="120" cy="460" r="12" fill="#FF9933"/>
+  <circle cx="180" cy="520" r="8" fill="#1E3A8A"/>
+  <circle cx="80" cy="500" r="6" fill="#138808"/>
+  <path d="M120 460L180 520 M120 460L80 500" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"/>
+</svg>

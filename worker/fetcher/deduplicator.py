@@ -6,7 +6,7 @@ Optimized: batch DB operations, upsert, minimal memory.
 from datetime import UTC, datetime, timedelta
 
 from database.client import get_supabase
-from fetcher.url_tools import compute_url_hash
+from fetcher.url_tools import compute_url_hash, is_duplicate_title
 from logger.pipeline_logger import PipelineLogger
 
 
@@ -17,6 +17,7 @@ class Deduplicator:
         self.logger = PipelineLogger()
         self.supabase = None
         self._known_hashes: set[str] | None = None
+        self._recent_post_headlines: list[str] | None = None
         self._init_supabase()
 
     def _init_supabase(self):
@@ -43,6 +44,37 @@ class Deduplicator:
             self._known_hashes = set()
 
         return self._known_hashes
+
+    def _load_recent_post_headlines(self) -> list[str]:
+        """Load headlines from posts published in the last 6 hours (cached per run)."""
+        if self._recent_post_headlines is not None:
+            return self._recent_post_headlines
+
+        if not self.supabase:
+            self._recent_post_headlines = []
+            return self._recent_post_headlines
+
+        try:
+            cutoff = (datetime.now(UTC) - timedelta(hours=6)).isoformat()
+            result = (
+                self.supabase.table("posts")
+                .select("headline")
+                .gte("published_at", cutoff)
+                .execute()
+            )
+            self._recent_post_headlines = [
+                row["headline"] for row in (result.data or []) if row.get("headline")
+            ]
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Failed to load recent headlines: {str(e)}")
+            self._recent_post_headlines = []
+
+        return self._recent_post_headlines
+
+    def is_duplicate_by_title(self, headline: str) -> bool:
+        """Return True if headline is >80% similar to a post published in the last 6 hours."""
+        recent = self._load_recent_post_headlines()
+        return is_duplicate_title(headline, recent, threshold=0.80)
 
     def is_new(self, article: dict) -> bool:
         """

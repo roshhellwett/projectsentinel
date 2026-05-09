@@ -1,17 +1,21 @@
 /**
- * Date formatting utilities
- * Fixed: Invalid date handling
+ * Date formatting utilities — all output in IST (Asia/Kolkata, UTC+5:30).
+ * Supabase timestamps are stored as UTC; JS Date parses them correctly.
  */
+
+const IST: Intl.DateTimeFormatOptions = { timeZone: 'Asia/Kolkata' };
 
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return 'Unknown date';
   return date.toLocaleDateString('en-IN', {
+    ...IST,
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: true,
   });
 }
 
@@ -41,7 +45,8 @@ export function formatTimeAgo(dateString: string): string {
   }
 
   return date.toLocaleDateString('en-IN', {
+    ...IST,
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   });
 }

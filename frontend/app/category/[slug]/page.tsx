@@ -1,10 +1,14 @@
 import { Suspense } from 'react';
 import { fetchPosts } from '@/lib/supabase/server';
-import { NewsGrid } from '@/components/news/NewsGrid';
+import { LoadMoreGrid } from '@/components/news/LoadMoreGrid';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { CategoryBar } from '@/components/layout/CategoryBar';
+import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
-const VALID_CATEGORIES = ['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world'] as const;
+export const revalidate = 30;
+export const dynamicParams = true;
+
+const VALID_CATEGORIES = CATEGORY_SLUGS;
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -27,27 +31,25 @@ export async function generateMetadata({ params }: CategoryPageProps) {
     openGraph: {
       title: `${category} News - India Verified`,
       description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
-      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${category} News - India Verified`,
       description: `Latest verified ${category} news from India. Every story verified across multiple sources.`,
-      images: ['/og-image.png'],
     },
   };
 }
 
 async function CategoryGrid({ slug }: { slug: string }) {
-  const { posts } = await fetchPosts(1, 20, slug);
+  const { posts, count } = await fetchPosts(1, 20, slug);
 
-  return <NewsGrid posts={posts} />;
+  return <LoadMoreGrid initialPosts={posts} initialCount={count} category={slug} />;
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
   const categoryName = titleCase(slug);
-  const isValidCategory = VALID_CATEGORIES.includes(slug as typeof VALID_CATEGORIES[number]);
+  const isValidCategory = (VALID_CATEGORIES as readonly string[]).includes(slug);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://indiaverified.vercel.app';
 

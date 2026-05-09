@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS posts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     headline TEXT NOT NULL,
     summary TEXT NOT NULL,
-    category TEXT NOT NULL CHECK (category IN ('politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world')),
+    category TEXT NOT NULL CHECK (category IN ('politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment')),
     credibility_score INTEGER NOT NULL CHECK (credibility_score >= 0 AND credibility_score <= 100),
     credibility_reason TEXT,
     source_count INTEGER NOT NULL DEFAULT 1,
@@ -80,11 +80,29 @@ CREATE TABLE IF NOT EXISTS known_false_claims (
 
 CREATE INDEX IF NOT EXISTS idx_known_false_keywords ON known_false_claims USING GIN(keywords);
 
+-- Table: pipeline_runs
+-- Monitoring log for each pipeline execution
+CREATE TABLE IF NOT EXISTS pipeline_runs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ,
+    mode TEXT NOT NULL DEFAULT 'full',
+    fetched INTEGER DEFAULT 0,
+    duplicates INTEGER DEFAULT 0,
+    published INTEGER DEFAULT 0,
+    low_score INTEGER DEFAULT 0,
+    single_source INTEGER DEFAULT 0,
+    error TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_pipeline_runs_started_at ON pipeline_runs(started_at DESC);
+
 -- Enable Row Level Security on all tables
 ALTER TABLE raw_articles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE discarded_articles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE known_false_claims ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pipeline_runs ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for posts table (public read)
 DO $$

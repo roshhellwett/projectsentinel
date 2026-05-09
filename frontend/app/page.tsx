@@ -1,12 +1,13 @@
 import { fetchLatestPost, fetchPosts } from '@/lib/supabase/server';
-import { NewsGrid } from '@/components/news/NewsGrid';
+import { LoadMoreGrid } from '@/components/news/LoadMoreGrid';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { CategoryBar } from '@/components/layout/CategoryBar';
 import { HeroCard } from '@/components/news/HeroCard';
 import { TrendingSection } from '@/components/news/TrendingSection';
+import { LiveRefreshBanner } from '@/components/news/LiveRefreshBanner';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export default async function HomePage() {
   const [heroPost, postsResult] = await Promise.all([
@@ -19,6 +20,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative min-h-screen bg-background overflow-hidden">
+      {heroPost && <LiveRefreshBanner latestPublishedAt={heroPost.published_at} />}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -56,7 +58,7 @@ export default async function HomePage() {
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-700 to-transparent ml-6" />
           </div>
-          <NewsGrid posts={posts} />
+          <LoadMoreGrid initialPosts={posts} initialCount={postsResult.count} />
         </section>
       </div>
     </div>

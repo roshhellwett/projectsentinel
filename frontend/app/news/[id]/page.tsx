@@ -13,6 +13,8 @@ import { formatDate } from '@/lib/utils/formatDate';
 import { newsArticleJsonLd, breadcrumbJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { ArrowLeft, Clock, ShieldCheck, Database, Calendar } from 'lucide-react';
 
+export const revalidate = 300;
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
 interface NewsPageProps {
@@ -38,13 +40,11 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       type: 'article',
       publishedTime: post.published_at,
       url: `${siteUrl}/news/${post.id}`,
-      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.headline,
       description: post.summary,
-      images: ['/og-image.png'],
     },
     alternates: {
       canonical: `${siteUrl}/news/${post.id}`,

@@ -9,13 +9,15 @@ interface RelatedStoriesProps {
 }
 
 export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
-  const related = posts.filter((p) => p.id !== currentPostId).slice(0, 3);
+  const related = posts
+    .filter((p) => p.id !== currentPostId)
+    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+    .slice(0, 3);
 
   if (related.length === 0) return null;
 
   return (
-    <section className="mt-12 pt-8 border-t border-slate-200">
-      <h2 className="text-2xl font-semibold text-slate-900 mb-6">Related Stories</h2>
+    <section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {related.map((post) => (
           <Link
@@ -42,3 +44,4 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
     </section>
   );
 }
+

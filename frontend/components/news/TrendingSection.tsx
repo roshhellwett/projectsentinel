@@ -13,7 +13,16 @@ interface TrendingSectionProps {
 export function TrendingSection({ posts }: TrendingSectionProps) {
   if (!posts || posts.length === 0) return null;
 
-  const trending = [...posts].sort((a, b) => b.credibility_score - a.credibility_score).slice(0, 5);
+  const now = Date.now();
+  const trending = [...posts]
+    .map((post) => {
+      const ageHours = (now - new Date(post.published_at).getTime()) / 3_600_000;
+      const freshness = Math.max(0, 1 - ageHours / 12);
+      return { post, trendScore: post.credibility_score * 0.6 + freshness * 40 };
+    })
+    .sort((a, b) => b.trendScore - a.trendScore)
+    .slice(0, 5)
+    .map(({ post }) => post);
 
   return (
     <section className="mb-16">

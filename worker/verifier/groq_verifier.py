@@ -26,14 +26,27 @@ class GroqVerifier:
         "You are a news verification assistant. "
         "Return ONLY a valid JSON object with no extra text, no markdown, no explanation.\n\n"
         "JSON format:\n"
-        '{"score": <int 0-100>, "reason": "<one sentence>", '
+        '{"score": <int 0-100>, "reason": "<one sentence explicitly justifying the score>", '
         '"key_facts": ["<fact1>",...,"<fact5>"], '
-        '"category": "<politics|business|sports|crime|science|health|tech|world>", '
+        '"category": "<politics|business|sports|crime|science|health|tech|world|entertainment>", '
         '"headline": "<short neutral headline>", '
         '"summary": "<3 neutral sentences under 80 words>"}\n\n'
-        "Scoring (start at 50): +20 multi-source agree, +10 named officials/institutions, "
-        "+10 specific dates/locations, +10 neutral language, "
-        "-20 vague claims, -15 only anonymous sources, -10 outrage-provoking language.\n"
+        "CATEGORY DEFINITIONS — choose exactly one:\n"
+        "  politics: government, elections, policy, parliament, ministers, political parties\n"
+        "  business: economy, markets, companies, finance, trade, industry, startups\n"
+        "  sports: cricket, football, Olympics, athletes, tournaments, match results\n"
+        "  crime: arrests, murders, scams, fraud, court verdicts, police investigations\n"
+        "  science: research, space, discoveries, environment, climate, academic findings\n"
+        "  health: medicine, diseases, hospitals, public health, fitness, nutrition\n"
+        "  tech: technology, AI, software, gadgets, internet, cybersecurity, apps\n"
+        "  world: international news, foreign policy, global events outside India\n"
+        "  entertainment: films, music, celebrities, TV, OTT, awards, pop culture\n\n"
+        "SCORING BANDS — assign a score that reflects the actual evidence quality:\n"
+        "  90-100: 3+ authoritative named sources, specific data/dates/locations, official statements\n"
+        "  70-89:  2 sources, some named officials, mostly factual with minor gaps\n"
+        "  50-69:  vague claims, unnamed sources, speculative or unverified details\n"
+        "  0-49:   single source only, emotionally loaded language, or unverifiable claims\n"
+        "The 'reason' field MUST explicitly name which band applies and why.\n"
         "Key facts: 3-5 verified info points only. Headline and summary must use only those facts."
     )
 
@@ -43,7 +56,7 @@ class GroqVerifier:
         self.logger = PipelineLogger()
         self.api_key = os.getenv("GROQ_API_KEY_VERIFY", "")
         self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
-        self.rate_limiter = RateLimiter.get_global("groq", self.MIN_DELAY_SECONDS, max_calls_per_day=400)
+        self.rate_limiter = RateLimiter.get_global("groq_verify", self.MIN_DELAY_SECONDS, max_calls_per_day=400)
 
     def verify(self, article_group: list[dict]) -> dict:
         """
@@ -172,9 +185,13 @@ class GroqVerifier:
         if not isinstance(result["key_facts"], list):
             result["key_facts"] = [str(result["key_facts"])]
 
-        valid_categories = ["politics", "business", "sports", "crime", "science", "health", "tech", "world"]
+        valid_categories = [
+            "politics", "business", "sports", "crime", "science",
+            "health", "tech", "world", "entertainment",
+        ]
         if result["category"] not in valid_categories:
-            result["category"] = "politics"
+            self.logger.log("GROQ_VERIFY", f"Invalid category '{result['category']}' — defaulting to 'world'")
+            result["category"] = "world"
 
         if "headline" in result:
             headline = str(result["headline"]).strip()

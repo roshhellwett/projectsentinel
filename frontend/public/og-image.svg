@@ -1,14 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1e3a8a"/>
-      <stop offset="100%" style="stop-color:#ff9933"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F1D45"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
     </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#FFFFFF" fill-opacity="0.07"/>
+    </pattern>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="24" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
   </defs>
-  <rect width="1200" height="630" fill="#f8fafc"/>
-  <rect width="1200" height="420" fill="url(#bg)" opacity="0.95"/>
-  <text x="600" y="200" font-family="system-ui, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">India Verified</text>
-  <text x="600" y="280" font-family="system-ui, sans-serif" font-size="36" fill="rgba(255,255,255,0.9)" text-anchor="middle">AI-Verified Indian News</text>
-  <text x="600" y="520" font-family="system-ui, sans-serif" font-size="24" fill="#475569" text-anchor="middle">Every story verified through cross-referencing</text>
-  <text x="600" y="560" font-family="system-ui, sans-serif" font-size="24" fill="#475569" text-anchor="middle">multiple trusted Indian news sources</text>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Top Tricolor Accent -->
+  <rect x="0" y="0" width="1200" height="8" fill="#FF9933"/>
+  <rect x="0" y="8" width="1200" height="8" fill="#FFFFFF"/>
+  <rect x="0" y="16" width="1200" height="8" fill="#138808"/>
+
+  <!-- Left Side Text Content -->
+  <g transform="translate(100, 220)">
+    <text font-family="system-ui, -apple-system, sans-serif" font-size="84" font-weight="800" fill="#FFFFFF" letter-spacing="-0.02em">
+      India Verified
+    </text>
+    <text y="70" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="600" fill="#FF9933">
+      Trust, but verify.
+    </text>
+    <text y="150" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#94A3B8">
+      AI-powered news aggregator that cross-references
+    </text>
+    <text y="195" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#94A3B8">
+      and scores credibility of Indian news in real-time.
+    </text>
+  </g>
+
+  <!-- Right Side Illustration (Abstract Document Verification) -->
+  <g transform="translate(720, 100)">
+    <!-- Base Card -->
+    <rect x="0" y="0" width="400" height="480" rx="32" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="2"/>
+    
+    <!-- Code / Lines -->
+    <rect x="50" y="60" width="160" height="20" rx="10" fill="#FF9933" fill-opacity="0.9"/>
+    <rect x="50" y="110" width="300" height="14" rx="7" fill="#FFFFFF" fill-opacity="0.4"/>
+    <rect x="50" y="140" width="260" height="14" rx="7" fill="#FFFFFF" fill-opacity="0.4"/>
+    <rect x="50" y="170" width="280" height="14" rx="7" fill="#FFFFFF" fill-opacity="0.4"/>
+
+    <!-- Verification Badge Highlight -->
+    <rect x="50" y="240" width="300" height="140" rx="24" fill="#1E3A8A" stroke="#FF9933" stroke-width="3" filter="url(#glow)"/>
+    
+    <!-- Big Checkmark -->
+    <path d="M100 310L140 350L220 230" stroke="#138808" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Badge UI details -->
+    <rect x="230" y="280" width="80" height="16" rx="8" fill="#FFFFFF" fill-opacity="0.9"/>
+    <rect x="230" y="310" width="60" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.5"/>
+    <circle cx="160" cy="290" r="40" fill="none" stroke="#FF9933" stroke-opacity="0.2" stroke-width="8"/>
+  </g>
 </svg>

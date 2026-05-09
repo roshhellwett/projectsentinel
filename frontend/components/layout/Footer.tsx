@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Github, Shield, Eye, Code2, Zap } from 'lucide-react';
+import { CATEGORIES } from '@/lib/constants/categories';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -35,21 +36,13 @@ export function Footer() {
                   Home
                 </Link>
               </li>
-              <li>
-                <Link href="/category/politics" className="text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron transition-colors duration-200">
-                  Politics
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/business" className="text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron transition-colors duration-200">
-                  Business
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/sports" className="text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron transition-colors duration-200">
-                  Sports
-                </Link>
-              </li>
+              {CATEGORIES.map((cat) => (
+                <li key={cat.slug}>
+                  <Link href={`/category/${cat.slug}`} className="text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron transition-colors duration-200">
+                    {cat.label}
+                  </Link>
+                </li>
+              ))}
               <li>
                 <Link href="/how-it-works" className="text-slate-500 dark:text-slate-400 hover:text-india-saffron dark:hover:text-india-saffron transition-colors duration-200">
                   How It Works

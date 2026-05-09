@@ -43,7 +43,8 @@ export function websiteJsonLd(): object {
     '@type': 'WebSite',
     name: 'India Verified',
     url: siteUrl,
-    description: 'AI-powered Indian news aggregator that verifies every story through cross-referencing multiple trusted sources.',
+    description: 'Fully automated, AI-powered Indian news aggregator.',
+    image: `${siteUrl}/og-image.png`,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -64,6 +65,7 @@ export function organizationJsonLd(): object {
     name: 'India Verified',
     url: siteUrl,
     logo: `${siteUrl}/favicon.svg`,
+    image: `${siteUrl}/og-image.png`,
     description: 'AI-powered, fully automated Indian news aggregator.',
     foundingDate: '2025',
   };
