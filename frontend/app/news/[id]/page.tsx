@@ -67,21 +67,6 @@ export default async function NewsPage({ params }: NewsPageProps) {
   const isCorrected = post.status === 'corrected';
   const isRetracted = post.status === 'retracted';
 
-  function getSafeCredibilityReason(): string {
-    const p = post!;
-    if (!p.credibility_reason) {
-      return `This article has a credibility score of ${p.credibility_score}/100 based on the number and quality of verified sources.`;
-    }
-    const numbers = p.credibility_reason.match(/\b(\d{1,3})\b/g);
-    if (numbers) {
-      const hasMismatch = numbers.some((n) => parseInt(n) !== p.credibility_score);
-      if (hasMismatch) {
-        return `This article has a credibility score of ${p.credibility_score}/100 based on the number and quality of verified sources.`;
-      }
-    }
-    return p.credibility_reason;
-  }
-
   const jsonLd = [
     newsArticleJsonLd(post),
     breadcrumbJsonLd([
@@ -103,7 +88,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
       {/* Decorative accent glow */}
       <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(10,132,255,0.14),transparent_60%)] pointer-events-none -z-10" />
 
-      <div className="container mx-auto px-4 pt-24 lg:pt-28 max-w-5xl">
+      <div className="container mx-auto px-4 pt-10 max-w-5xl">
         <Link 
           href="/" 
           className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 mb-8 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
@@ -183,7 +168,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                 Score: {post.credibility_score}/100
               </div>
               <p className="text-slate-600 leading-relaxed text-base">
-                {getSafeCredibilityReason()}
+                {post.credibility_reason}
               </p>
             </div>
           </div>

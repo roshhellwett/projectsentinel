@@ -19,6 +19,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from './NewsCard';
+import { NewsDrawer } from './NewsDrawer';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface InfiniteFeedProps {
@@ -81,10 +82,10 @@ export function InfiniteFeed({
   const [exhausted, setExhausted] = useState(initialPosts.length >= initialCount);
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
 
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
-  const pageRef = useRef(page);
-  pageRef.current = page;
   const postsRef = useRef(posts);
   postsRef.current = posts;
 
@@ -98,7 +99,7 @@ export function InfiniteFeed({
     loadingRef.current = true;
     setLoading(true);
     try {
-      const next = pageRef.current + 1;
+      const next = page + 1;
       const params = new URLSearchParams({ page: String(next), limit: String(pageSize) });
       if (category) params.set('category', category);
       const res = await fetch(`/api/posts?${params.toString()}`);
@@ -112,7 +113,7 @@ export function InfiniteFeed({
           (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
         );
         const merged = dedupeById([...prev, ...incoming]);
-        if ((data.count > 0 && merged.length >= data.count) || incoming.length === 0) {
+        if (merged.length >= data.count || incoming.length === 0) {
           setExhausted(true);
         }
         return merged;
@@ -124,7 +125,7 @@ export function InfiniteFeed({
       setLoading(false);
       loadingRef.current = false;
     }
-  }, [pageSize, category, exhausted]);
+  }, [page, pageSize, category, exhausted]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -218,6 +219,13 @@ export function InfiniteFeed({
     };
   }, [category]);
 
+  // Close drawer if the post no longer exists in current list
+  useEffect(() => {
+    if (selectedPost && !posts.find((p) => p.id === selectedPost.id)) {
+      setSelectedPost(null);
+    }
+  }, [posts, selectedPost]);
+
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
@@ -262,6 +270,7 @@ export function InfiniteFeed({
             >
               <NewsCard
                 post={post}
+                onClick={() => setSelectedPost(post)}
                 isNew={freshIds.has(post.id)}
               />
             </motion.div>
@@ -291,6 +300,8 @@ export function InfiniteFeed({
           You&apos;ve reached the end — {posts.length} verified stories.
         </p>
       )}
+
+      <NewsDrawer post={selectedPost} onClose={() => setSelectedPost(null)} />
     </>
   );
 }

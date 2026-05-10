@@ -20,33 +20,14 @@ function getSourceLabel(source: Source): string {
   }
 }
 
-const CATEGORY_NAMES = new Set([
-  'politics', 'business', 'sports', 'crime', 'science', 'health', 'tech',
-  'world', 'entertainment', 'education',
-]);
-
-function isValidSource(source: Source): boolean {
-  const label = getSourceLabel(source).toLowerCase().trim();
-  return !CATEGORY_NAMES.has(label);
-}
-
 export function SourceLinks({ sources }: SourceLinksProps) {
-  const validSources = sources.filter(isValidSource);
-  const seen = new Set<string>();
-  const uniqueSources = validSources.filter((source) => {
-    const label = getSourceLabel(source).toLowerCase().trim();
-    if (seen.has(label)) return false;
-    seen.add(label);
-    return true;
-  });
-
-  if (uniqueSources.length === 0) {
+  if (!sources || sources.length === 0) {
     return <p className="text-sm text-slate-500">No sources available.</p>;
   }
 
   return (
     <ul className="space-y-2" role="list">
-      {uniqueSources.map((source, index) => {
+      {sources.map((source, index) => {
         const label = getSourceLabel(source);
         return (
           <li key={source.url || index}>

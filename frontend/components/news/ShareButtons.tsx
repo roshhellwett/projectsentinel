@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Share2, Link as LinkIcon, Check, X } from 'lucide-react';
+import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface ShareButtonsProps {
@@ -86,16 +86,6 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
             exit={{ opacity: 0, y: -4, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 420, damping: 30 }}
           >
-            <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-slate-950/[0.08]">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Share</span>
-              <button
-                onClick={() => setShowMenu(false)}
-                className="touch-polish p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-950/[0.05] active:scale-90 transition-all"
-                aria-label="Close share menu"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
             <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-slate-950/[0.08]">
               {SHARE_PLATFORMS.map((platform) => (
                 <a

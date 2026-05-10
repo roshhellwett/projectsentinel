@@ -1,7 +1,11 @@
+/**
+ * Floating scroll-to-top button
+ * Optimized: throttled scroll listener, smooth appearance transition
+ */
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 
 export function ScrollToTop() {
@@ -24,28 +28,28 @@ export function ScrollToTop() {
   }, [handleScroll]);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: 20 }}
-          whileHover={{ scale: 1.1, y: -4 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-40 p-4 rounded-full bg-slate-900 text-white shadow-[0_8px_32px_-6px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_40px_-6px_rgba(0,0,0,0.4)] backdrop-blur-xl border border-white/10 transition-shadow"
-          aria-label="Scroll to top"
-        >
-          <ArrowUp className="w-5 h-5 relative z-10" strokeWidth={2.5} />
-
-          {/* Glow effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 blur-xl pointer-events-none" />
-        </motion.button>
-      )}
-    </AnimatePresence>
+    <button
+      onClick={scrollToTop}
+      className={`
+        fixed right-4 p-3
+        bottom-24 md:bottom-8
+        bg-accent hover:bg-accent-hover text-white rounded-full
+        shadow-glow-accent hover:shadow-glow-accent-lg
+        touch-polish transition-all duration-300 z-[58]
+        active:scale-90 hover:-translate-y-0.5
+        focus:outline-none focus:ring-2 focus:ring-accent/60 focus:ring-offset-2 focus:ring-offset-background
+        ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-90 pointer-events-none'}
+      `}
+      aria-label="Scroll to top"
+    >
+      <ArrowUp className="w-5 h-5" />
+    </button>
   );
 }

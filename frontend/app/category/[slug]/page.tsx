@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { fetchPosts } from '@/lib/supabase/server';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { CategoryBar } from '@/components/layout/CategoryBar';
@@ -44,20 +43,6 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 async function CategoryGrid({ slug }: { slug: string }) {
   const { posts, count } = await fetchPosts(1, 20, slug);
 
-  if (count < 3) {
-    const categoryName = slug.charAt(0).toUpperCase() + slug.slice(1);
-    return (
-      <div className="text-center py-16 premium-card rounded-3xl">
-        <p className="text-lg text-gray-500 mb-4">
-          More {categoryName} stories coming soon. Check back later or browse another category.
-        </p>
-        <Link href="/" className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium">
-          Browse all news &rarr;
-        </Link>
-      </div>
-    );
-  }
-
   return <InfiniteFeed initialPosts={posts} initialCount={count} category={slug} />;
 }
 
@@ -69,7 +54,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return (
-    <div className="container mx-auto px-4 lg:px-6 pt-24 lg:pt-28 pb-14">
+    <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

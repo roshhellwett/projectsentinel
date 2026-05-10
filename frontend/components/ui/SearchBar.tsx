@@ -28,15 +28,6 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Reset fetch flag when overlay closes so data refreshes on reopen
-  useEffect(() => {
-    if (!isOpen) {
-      setHasFetched(false);
-      setResults([]);
-      setQuery('');
-    }
-  }, [isOpen]);
-
   useEffect(() => {
     if (!isOpen || hasFetched) {
       return;
@@ -165,60 +156,31 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             </div>
 
             <div className="max-w-4xl mx-auto">
-              {error && (
-                <p className="text-center text-cred-low py-8">{error}</p>
-              )}
-
-              {!query.trim() && !error && (
-                <div className="flex flex-col items-center text-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mb-5">
-                    <Search className="w-7 h-7 text-slate-400" />
-                  </div>
-                  <p className="text-lg font-semibold text-slate-700 mb-4">Search for verified Indian news</p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {['IPL', 'Budget 2026', 'Modi', 'Tamil Nadu', 'Elections', 'Startups'].map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => setQuery(tag)}
-                        className="touch-polish px-4 py-2 rounded-full bg-white/70 border border-slate-950/[0.10] text-sm font-medium text-slate-600 hover:bg-white hover:border-accent/30 hover:text-accent active:scale-95 transition-all"
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {query.trim() && isLoading && (
+              {isLoading && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Skeleton key={i} className="h-[190px] rounded-[1.65rem]" />
                   ))}
                 </div>
               )}
-
-              {query.trim() && !isLoading && results.length > 0 && (
-                <>
-                  <p className="text-sm text-slate-500 mb-4">
-                    {results.length} results for &quot;{query}&quot;
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {results.map((post) => (
-                      <NewsCard
-                        key={post.id}
-                        post={post}
-                        onClick={() => handleSelect(post)}
-                      />
-                    ))}
-                  </div>
-                </>
+              {error && (
+                <p className="text-center text-cred-low py-8">{error}</p>
               )}
-
-              {query.trim() && !isLoading && results.length === 0 && (
-                <p className="text-center text-slate-500 py-12">
-                  No results found for &quot;{query}&quot;
+              {query.trim() && !isLoading && (
+                <p className="text-sm text-slate-500 mb-4">
+                  {results.length} results for &quot;{query}&quot;
                 </p>
               )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {results.map((post) => (
+                  <NewsCard
+                    key={post.id}
+                    post={post}
+                    onClick={() => handleSelect(post)}
+                  />
+                ))}
+              </div>
             </div>
           </motion.div>
         </motion.div>
