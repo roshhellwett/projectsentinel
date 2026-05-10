@@ -1,7 +1,6 @@
 ![Repo Size](https://img.shields.io/github/repo-size/roshhellwett/projectsentinel?style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/roshhellwett/projectsentinel?style=for-the-badge)
 ![Forks](https://img.shields.io/github/forks/roshhellwett/projectsentinel?style=for-the-badge)
-![Issues](https://img.shields.io/github/issues/roshhellwett/projectsentinel?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Groq](https://img.shields.io/badge/Groq-Llama%203.3-0a84ff?style=for-the-badge)
