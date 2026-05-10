@@ -8,6 +8,19 @@ import { Post } from '@/types';
 import { CredibilityBadge } from './CredibilityBadge';
 import { CategoryTag } from './CategoryTag';
 
+const CATEGORY_COLOR: Record<string, string> = {
+  politics: '#f43f5e',
+  business: '#10b981',
+  sports: '#0ea5e9',
+  crime: '#f97316',
+  science: '#8b5cf6',
+  health: '#ec4899',
+  tech: '#06b6d4',
+  world: '#f59e0b',
+  entertainment: '#d946ef',
+  education: '#a78bfa',
+};
+
 interface TrendingSectionProps {
   posts: Post[];
 }
@@ -59,28 +72,36 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           >
             <Link
               href={`/news/${post.id}`}
-              className="group flex items-center gap-4 px-4 sm:px-5 py-4 border-b border-white/[0.05] last:border-b-0 hover:bg-white/[0.04] transition-colors duration-200"
+              className="group flex items-center border-b border-white/[0.05] last:border-b-0 hover:bg-white/[0.04] transition-colors duration-200 overflow-hidden"
             >
-              {/* Rank number */}
-              <span
-                className="text-[28px] sm:text-[34px] font-black tracking-tighter text-zinc-700 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
+              {/* Category colour left bar */}
+              <div
+                className="w-[3px] self-stretch flex-shrink-0 opacity-60"
+                style={{ backgroundColor: CATEGORY_COLOR[post.category] ?? '#2563eb' }}
                 aria-hidden="true"
-              >
-                {String(index + 1).padStart(2, '0')}
-              </span>
+              />
+              <div className="flex items-center gap-4 flex-1 min-w-0 px-4 sm:px-5 py-4">
+                {/* Rank number */}
+                <span
+                  className="text-[28px] sm:text-[32px] font-black tracking-tighter text-zinc-700 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
+                  aria-hidden="true"
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </span>
 
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-medium text-white line-clamp-2 leading-snug group-hover:text-accent transition-colors duration-200">
-                  {post.headline}
-                </p>
-                <div className="mt-1.5"><CategoryTag category={post.category} /></div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-white line-clamp-2 leading-snug group-hover:text-accent transition-colors duration-200">
+                    {post.headline}
+                  </p>
+                  <div className="mt-1.5"><CategoryTag category={post.category} /></div>
+                </div>
+
+                <div className="flex-shrink-0">
+                  <CredibilityBadge score={post.credibility_score} compact />
+                </div>
+
+                <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" />
               </div>
-
-              <div className="flex-shrink-0">
-                <CredibilityBadge score={post.credibility_score} compact />
-              </div>
-
-              <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" />
             </Link>
           </motion.div>
         ))}
