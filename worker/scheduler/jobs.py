@@ -304,6 +304,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         duration = (datetime.now(UTC) - start_time).total_seconds()
         logger.log("COMPLETE", f"Pipeline completed in {duration:.1f}s", stats)
+        groq_verifier.save_pool_stats()
         _record_run_end(logger, run_id, duration, stats)
 
     except Exception as e:

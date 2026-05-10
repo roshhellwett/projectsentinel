@@ -74,6 +74,14 @@ CREATE TABLE IF NOT EXISTS known_false_claims (
     added_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Groq API key daily usage — one row per calendar date, upserted after every run.
+-- Allows the worker to survive Railway redeploys without losing daily call counts.
+CREATE TABLE IF NOT EXISTS groq_usage (
+    usage_date  DATE        PRIMARY KEY,
+    key_stats   JSONB       NOT NULL DEFAULT '[]'::jsonb,
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Pipeline monitoring: one row per pipeline execution.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -243,6 +251,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON posts             TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON discarded_articles TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON known_false_claims TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON pipeline_runs     TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON groq_usage        TO service_role;
 
 -- anon key: public read on posts only (mirrors RLS policy).
 GRANT SELECT ON posts TO anon, authenticated;

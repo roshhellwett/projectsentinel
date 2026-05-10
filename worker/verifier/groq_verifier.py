@@ -97,6 +97,29 @@ class _KeyPool:
                 for i, s in enumerate(self._slots)
             ]
 
+    def get_persist_stats(self) -> list[dict]:
+        """Return stats formatted for Supabase persistence (0-based index + day)."""
+        with self._lock:
+            return [
+                {"index": i, "calls_today": s["calls_today"], "day": s["day"]}
+                for i, s in enumerate(self._slots)
+            ]
+
+    def restore_stats(self, persisted: list[dict]) -> None:
+        """Restore daily counters from Supabase. Only applies entries from today."""
+        today = str(date.today())
+        with self._lock:
+            for entry in persisted:
+                idx = entry.get("index")
+                if not isinstance(idx, int) or not (0 <= idx < len(self._slots)):
+                    continue
+                if entry.get("day") != today:
+                    continue
+                self._slots[idx]["calls_today"] = max(
+                    self._slots[idx]["calls_today"],
+                    int(entry.get("calls_today", 0)),
+                )
+
 
 class GroqVerifier:
     """Verifies news articles using Groq API (Llama 3.3 70B)."""
@@ -159,7 +182,27 @@ class GroqVerifier:
                 keys = cls._load_verify_keys()
                 if keys:
                     cls._key_pool = _KeyPool(keys)
+                    try:
+                        from persistence.groq_usage import load_key_stats
+                        persisted = load_key_stats()
+                        if persisted:
+                            cls._key_pool.restore_stats(persisted)
+                    except Exception:
+                        pass  # Non-fatal: fresh counters are safe
             return cls._key_pool
+
+    @classmethod
+    def save_pool_stats(cls) -> None:
+        """Persist current key counters to Supabase. Called at end of each pipeline run."""
+        with cls._key_pool_lock:
+            pool = cls._key_pool
+        if pool is None:
+            return
+        try:
+            from persistence.groq_usage import save_key_stats
+            save_key_stats(pool.get_persist_stats())
+        except Exception:
+            pass  # Non-fatal
 
     @classmethod
     def _reset_pool(cls) -> None:
