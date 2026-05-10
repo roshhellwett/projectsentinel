@@ -217,4 +217,176 @@ def get_rss_sources() -> list[dict[str, str]]:
             "url": "https://news.google.com/rss/topics/CAAqJQgKIh9DQkFTRVFvSUwyMHZNRFp0Y1RjU0FtVnVHZ0pWVXlnQVAB?hl=en-IN&gl=IN&ceid=IN:en",
             "category_hint": "science",
         },
+        # ===== NEW SOURCES ADDED (Premium & Trusted Indian Publications) =====
+        # Financial Chronicle (leading business news)
+        {
+            "name": "Financial Chronicle",
+            "url": "https://www.financialchronicle.com/feed/",
+            "category_hint": "business",
+        },
+        # Outlook India (established weekly)
+        {
+            "name": "Outlook India",
+            "url": "https://www.outlookindia.com/feed",
+            "category_hint": "general",
+        },
+        # Rediff (veteran news portal)
+        {
+            "name": "Rediff India",
+            "url": "https://www.rediff.com/rss/indiachannel.xml",
+            "category_hint": "politics",
+        },
+        {
+            "name": "Rediff Business",
+            "url": "https://www.rediff.com/rss/business.xml",
+            "category_hint": "business",
+        },
+        # Thehindubusinessline (business focus from The Hindu group)
+        {
+            "name": "Hindu Business Line",
+            "url": "https://www.thehindubusinessline.com/feed/",
+            "category_hint": "business",
+        },
+        # Indian Business Journal (emerging business media)
+        {
+            "name": "Indian Business Journal",
+            "url": "https://www.ibjournal.com/feed/",
+            "category_hint": "business",
+        },
+        # Frontline (news magazine from The Hindu group)
+        {
+            "name": "Frontline India",
+            "url": "https://frontline.thehindu.com/feed/",
+            "category_hint": "politics",
+        },
+        # Swarajya (news and opinion)
+        {
+            "name": "Swarajya",
+            "url": "https://swarajyamag.com/feed",
+            "category_hint": "politics",
+        },
+        # Quint (digital news platform)
+        {
+            "name": "The Quint India",
+            "url": "https://www.thequint.com/feed",
+            "category_hint": "general",
+        },
+        # DNA India (newspaper)
+        {
+            "name": "DNA India",
+            "url": "https://www.dnaindia.com/feeds/india.xml",
+            "category_hint": "politics",
+        },
+        {
+            "name": "DNA Business",
+            "url": "https://www.dnaindia.com/feeds/business.xml",
+            "category_hint": "business",
+        },
+        # Webdunia (regional & national news)
+        {
+            "name": "Webdunia Hindi",
+            "url": "https://hindi.webdunia.com/feed/latest-news.xml",
+            "category_hint": "general",
+        },
+        # Greaterkashmir (Jammu & Kashmir focus)
+        {
+            "name": "Greater Kashmir",
+            "url": "https://www.greaterkashmir.com/feed",
+            "category_hint": "politics",
+        },
+        # Bhaskar (Hindi media)
+        {
+            "name": "Dainik Bhaskar",
+            "url": "https://www.bhaskar.com/rss-feed/national.xml",
+            "category_hint": "politics",
+        },
+        # Jansatta (Hindi newspaper)
+        {
+            "name": "Jansatta",
+            "url": "https://www.jansatta.com/feed/",
+            "category_hint": "politics",
+        },
+        # Tribune (independent newspaper from Punjab)
+        {
+            "name": "Tribune India",
+            "url": "https://www.tribuneindia.com/feed/",
+            "category_hint": "politics",
+        },
+        # Shiv Telegram (sports & entertainment aggregator)
+        {
+            "name": "Shiv Telegram Sports",
+            "url": "https://www.shivtelegram.com/feed/sports.xml",
+            "category_hint": "sports",
+        },
+        # Outlook Sports
+        {
+            "name": "Outlook Sports",
+            "url": "https://www.outlookindia.com/sports/feed",
+            "category_hint": "sports",
+        },
+        # India Science Wire (science & technology news)
+        {
+            "name": "India Science Wire",
+            "url": "https://sciencewire.org/feed/",
+            "category_hint": "science",
+        },
+        # Vigil Online (independent news)
+        {
+            "name": "Vigil Online",
+            "url": "https://vigilonline.com/feed/",
+            "category_hint": "politics",
+        },
+        # Observer Research Foundation (think tank content)
+        {
+            "name": "ORF Observer",
+            "url": "https://www.orfonline.org/feed/",
+            "category_hint": "politics",
+        },
+        # Careers 360 (education & career news)
+        {
+            "name": "Careers 360",
+            "url": "https://www.careers360.com/feed",
+            "category_hint": "education",
+        },
+        # India Budget Analysis (financial news)
+        {
+            "name": "India Budget",
+            "url": "https://www.ibhfl.com/feed/",
+            "category_hint": "business",
+        },
+        # Times Network (entertainment & general)
+        {
+            "name": "Times Now",
+            "url": "https://www.timesnownews.com/rss/homepage.xml",
+            "category_hint": "general",
+        },
+        # Zee News
+        {
+            "name": "Zee News",
+            "url": "https://zeenews.india.com/rss/india.xml",
+            "category_hint": "politics",
+        },
+        {
+            "name": "Zee Business",
+            "url": "https://zeebiz.indiatimes.com/rss/home.xml",
+            "category_hint": "business",
+        },
+        # TV9 Network
+        {
+            "name": "TV9 Kannada",
+            "url": "https://www.tv9.com/feed/latest",
+            "category_hint": "general",
+        },
+        # Republic Media (English news channel)
+        {
+            "name": "Republic World",
+            "url": "https://www.republicworld.com/feed/",
+            "category_hint": "general",
+        },
+        # News X
+        {
+            "name": "NewsX India",
+            "url": "https://www.newsx.com/feed/",
+            "category_hint": "politics",
+        },
     ]
