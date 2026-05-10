@@ -59,7 +59,7 @@ class SupabasePublisher:
                         self.supabase.table("posts")
                         .select("headline")
                         .order("published_at", desc=True)
-                        .limit(50)
+                        .limit(200)
                         .execute()
                     )
                     for row in recent.data or []:

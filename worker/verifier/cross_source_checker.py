@@ -159,7 +159,7 @@ class CrossSourceChecker:
         self.supabase = get_supabase()
 
     def _get_recent_raw_articles(self) -> list[dict]:
-        """Get recent unprocessed articles with 30-minute cache."""
+        """Get recent unprocessed articles with 5-minute cache."""
         now = datetime.now(UTC)
         if (now - self._cache_time).total_seconds() < 300:
             return self._recent_cache

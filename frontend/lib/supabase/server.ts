@@ -83,9 +83,11 @@ export async function fetchPosts(
   });
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 // Fetch single post by ID
 export async function fetchPostById(id: string): Promise<Post | null> {
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+  if (!UUID_RE.test(id)) {
     return null;
   }
 
@@ -104,40 +106,38 @@ export async function fetchPostById(id: string): Promise<Post | null> {
 
 // Fetch trending post (highest score in last 24h)
 export async function fetchTrendingPost(): Promise<Post | null> {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  
-  const { data, error } = await getSupabaseServer()
-    .from('posts')
-    .select('*')
-    .eq('status', 'published')
-    .gte('published_at', yesterday.toISOString())
-    .order('credibility_score', { ascending: false })
-    .limit(1)
-    .single();
-  
-  if (error) {
-    return null;
-  }
-  
-  return data as Post;
+  return withRetry(async () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const { data, error } = await getSupabaseServer()
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
+      .gte('published_at', yesterday.toISOString())
+      .order('credibility_score', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) return null;
+    return data as Post;
+  }).catch(() => null);
 }
 
 // Fetch latest post
 export async function fetchLatestPost(): Promise<Post | null> {
-  const { data, error } = await getSupabaseServer()
-    .from('posts')
-    .select('*')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-    .limit(1)
-    .single();
-  
-  if (error) {
-    return null;
-  }
-  
-  return data as Post;
+  return withRetry(async () => {
+    const { data, error } = await getSupabaseServer()
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) return null;
+    return data as Post;
+  }).catch(() => null);
 }
 
 // Update post status (admin only)
@@ -146,22 +146,25 @@ export async function updatePostStatus(
   status: string,
   correctionNote?: string | null
 ): Promise<void> {
+  if (!UUID_RE.test(id)) {
+    throw new Error('Invalid post ID');
+  }
   if (!VALID_STATUSES.has(status)) {
     throw new Error('Invalid post status');
   }
 
-  const update: { status: string; correction_note?: string | null } = { status };
+  const payload: Record<string, unknown> = { status };
   if (correctionNote !== undefined) {
-    update.correction_note = correctionNote;
+    payload.correction_note = correctionNote;
   }
-  
+
   const { error } = await getSupabaseServer()
     .from('posts')
-    .update(update as unknown as never)
+    .update(payload as unknown as never)
     .eq('id', id);
-  
+
   if (error) {
-    console.error(`updatePostStatus error: ${error.message}`);
+    throw new Error(`updatePostStatus error: ${error.message}`);
   }
 }
 
@@ -184,12 +187,14 @@ export async function searchPosts(
     .limit(safeLimit);
 
   if (error) {
-    // Fallback to ilike if textSearch fails (e.g. FTS index not yet created)
+    // Fallback to ilike if textSearch fails (e.g. FTS index not yet created).
+    // Escape SQL LIKE metacharacters so user input is treated as a literal string.
+    const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
     const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
       .from('posts')
       .select('*', { count: 'exact' })
       .eq('status', 'published')
-      .ilike('headline', `%${safeQuery}%`)
+      .ilike('headline', `%${escapedForIlike}%`)
       .order('published_at', { ascending: false })
       .limit(safeLimit);
 
@@ -200,12 +205,13 @@ export async function searchPosts(
   return { posts: (data || []) as Post[], count: count || 0 };
 }
 
-// Get all posts for admin (including non-published)
+// Get all posts for admin (including non-published) — capped at 500 rows.
 export async function fetchAllPosts(): Promise<Post[]> {
   const { data, error } = await getSupabaseServer()
     .from('posts')
     .select('*')
-    .order('published_at', { ascending: false });
+    .order('published_at', { ascending: false })
+    .limit(500);
   
   if (error) {
     console.error(`fetchAllPosts error: ${error.message}`);
