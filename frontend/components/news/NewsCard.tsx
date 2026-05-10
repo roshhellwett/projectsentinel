@@ -11,6 +11,8 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 import { ArrowRight } from 'lucide-react';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+
 interface NewsCardProps {
   post: Post;
   onClick?: () => void;
@@ -95,7 +97,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
               {post.source_count} source{post.source_count === 1 ? '' : 's'}
             </span>
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — https://verifiedindian.vercel.app/news/${post.id}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
