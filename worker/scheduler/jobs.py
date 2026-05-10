@@ -20,7 +20,7 @@ from rate_limiter.limiter import RateLimitExceededError
 from sources.blocked_domains import is_blocked_domain
 from verifier.cross_source_checker import CrossSourceChecker
 from verifier.factcheck_matcher import FactCheckMatcher
-from verifier.groq_verifier import GroqVerifier
+from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
 from verifier.score_evaluator import ScoreEvaluator
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
@@ -77,9 +77,9 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
     run_id = _record_run_start(logger, start_time, mode)
 
     try:
-        max_ai_groups = max(1, int(os.getenv("MAX_AI_GROUPS_PER_RUN", "8")))
+        max_ai_groups = max(1, int(os.getenv("MAX_AI_GROUPS_PER_RUN", "12")))
     except (ValueError, TypeError):
-        max_ai_groups = 8
+        max_ai_groups = 12
 
     stats: dict = {
         "fetched": 0,
@@ -216,8 +216,8 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             try:
                 try:
                     verification = groq_verifier.verify(group)
-                except RateLimitExceededError:
-                    logger.log("AI_BUDGET", "Daily Groq verification limit reached — stopping AI processing")
+                except (RateLimitExceededError, AllKeysExhaustedError) as budget_err:
+                    logger.log("AI_BUDGET", f"Groq budget exhausted — stopping AI processing: {budget_err}")
                     break
                 except Exception as groq_err:
                     logger.log(

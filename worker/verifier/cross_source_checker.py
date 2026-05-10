@@ -145,7 +145,7 @@ class CrossSourceChecker:
 
     MIN_SHARED_KEYWORDS = 2
     MIN_SIMILARITY = 0.24
-    MAX_ARTICLES_TO_COMPARE = 80
+    MAX_ARTICLES_TO_COMPARE = 200
 
     def __init__(self):
         self.logger = PipelineLogger()
@@ -161,20 +161,20 @@ class CrossSourceChecker:
     def _get_recent_raw_articles(self) -> list[dict]:
         """Get recent unprocessed articles with 30-minute cache."""
         now = datetime.now(UTC)
-        if (now - self._cache_time).total_seconds() < 1800:
+        if (now - self._cache_time).total_seconds() < 300:
             return self._recent_cache
 
         if not self.supabase:
             return []
 
         try:
-            eight_hours_ago = (now - timedelta(hours=8)).isoformat()
+            twelve_hours_ago = (now - timedelta(hours=12)).isoformat()
 
             result = (
                 self.supabase.table("raw_articles")
                 .select("*")
                 .eq("processed", False)
-                .gte("fetched_at", eight_hours_ago)
+                .gte("fetched_at", twelve_hours_ago)
                 .execute()
             )
 

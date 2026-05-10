@@ -25,12 +25,12 @@ scheduler = BackgroundScheduler(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage scheduler lifecycle."""
-    scheduler.add_job(run_pipeline, "interval", minutes=15, id="news_pipeline", replace_existing=True, max_instances=1)
+    scheduler.add_job(run_pipeline, "interval", minutes=10, id="news_pipeline", replace_existing=True, max_instances=1)
 
     scheduler.add_job(
         run_pipeline,
         "interval",
-        hours=4,
+        hours=2,
         id="supplementary_fetch",
         replace_existing=True,
         max_instances=1,
@@ -51,8 +51,8 @@ async def lifespan(app: FastAPI):
     try:
         scheduler.start()
         print("Scheduler started")
-        print("  - Main pipeline: every 15 minutes")
-        print("  - Supplementary APIs: every 4 hours")
+        print("  - Main pipeline: every 10 minutes")
+        print("  - Supplementary APIs: every 2 hours")
         print("  - Archive job: 1st of month at 2 AM")
     except Exception as e:
         print(f"Scheduler failed to start: {e}")

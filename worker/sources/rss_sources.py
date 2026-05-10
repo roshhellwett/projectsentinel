@@ -125,6 +125,72 @@ def get_rss_sources() -> list[dict[str, str]]:
         },
         # ANI News
         {"name": "ANI News", "url": "https://aninews.in/rss/feed.xml", "category_hint": "general"},
+        # Economic Times (India's #1 financial paper)
+        {
+            "name": "Economic Times Top",
+            "url": "https://economictimes.indiatimes.com/rssfeedstopstories.cms",
+            "category_hint": "business",
+        },
+        {
+            "name": "Economic Times Markets",
+            "url": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
+            "category_hint": "business",
+        },
+        {
+            "name": "Economic Times Tech",
+            "url": "https://economictimes.indiatimes.com/news/tech/rssfeeds/13357270.cms",
+            "category_hint": "tech",
+        },
+        {
+            "name": "Economic Times Politics",
+            "url": "https://economictimes.indiatimes.com/news/politics-and-nation/rssfeeds/1052732854.cms",
+            "category_hint": "politics",
+        },
+        # Business Standard
+        {
+            "name": "Business Standard",
+            "url": "https://www.business-standard.com/rss/home_page_top_stories.rss",
+            "category_hint": "business",
+        },
+        # Moneycontrol
+        {
+            "name": "Moneycontrol Latest",
+            "url": "https://www.moneycontrol.com/rss/latestnews.xml",
+            "category_hint": "business",
+        },
+        # India Today
+        {"name": "India Today", "url": "https://www.indiatoday.in/rss/home", "category_hint": "general"},
+        # News18
+        {"name": "News18 India", "url": "https://www.news18.com/rss/india.xml", "category_hint": "politics"},
+        {"name": "News18 Business", "url": "https://www.news18.com/rss/business.xml", "category_hint": "business"},
+        # The Print
+        {"name": "The Print", "url": "https://theprint.in/feed/", "category_hint": "politics"},
+        # Firstpost
+        {"name": "Firstpost India", "url": "https://www.firstpost.com/rss/india.xml", "category_hint": "politics"},
+        # WION (international news from Indian perspective)
+        {"name": "WION", "url": "https://www.wionews.com/feed", "category_hint": "world"},
+        # Entertainment / Bollywood (high demand from Indian audience)
+        {
+            "name": "NDTV Entertainment",
+            "url": "https://feeds.feedburner.com/ndtvnews-entertainment-news",
+            "category_hint": "entertainment",
+        },
+        {
+            "name": "TOI Entertainment",
+            "url": "https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms",
+            "category_hint": "entertainment",
+        },
+        {
+            "name": "HT Entertainment",
+            "url": "https://www.hindustantimes.com/rss/entertainment/rssfeed.xml",
+            "category_hint": "entertainment",
+        },
+        # Cricket (ESPNCricinfo — most trusted cricket source globally)
+        {
+            "name": "ESPNCricinfo",
+            "url": "https://www.espncricinfo.com/rss/content/story/feeds/0.xml",
+            "category_hint": "sports",
+        },
         # Google News (India topics)
         {
             "name": "GNews India",
