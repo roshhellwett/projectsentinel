@@ -60,16 +60,16 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[10px] font-bold text-white tabular-nums">{score}</span>
+          <span className="text-[10px] font-bold text-slate-950 tabular-nums">{score}</span>
         </div>
       </div>
 
       {!compact && (
         <div className="flex flex-col justify-center min-w-0 max-w-[120px]" aria-hidden="true">
-          <span className="text-[10px] font-bold text-white uppercase tracking-wider leading-none mb-0.5 truncate">
+          <span className="text-[10px] font-bold text-slate-950 uppercase tracking-wider leading-none mb-0.5 truncate">
             {label}
           </span>
-          <span className="text-[9px] text-zinc-500 font-medium leading-none truncate">
+          <span className="text-[9px] text-slate-500 font-medium leading-none truncate">
             Credibility
           </span>
         </div>
@@ -77,11 +77,11 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
 
       {showTooltip && (
         <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-[#0f0f0f] border border-white/[0.08] text-xs text-white font-medium rounded-lg shadow-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-white border border-slate-950/[0.10] text-xs text-slate-950 font-medium rounded-lg shadow-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
           role="tooltip"
         >
           {label} · score {score}/100
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#0f0f0f]" />
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
         </div>
       )}
     </div>

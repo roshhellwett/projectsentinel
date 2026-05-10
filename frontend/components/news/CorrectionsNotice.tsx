@@ -25,7 +25,7 @@ export function CorrectionsNotice({ type, note }: CorrectionsNoticeProps) {
             {isRetracted ? 'Article Retracted' : 'Correction Notice'}
           </h4>
           {note && (
-            <p className="text-sm text-zinc-400 mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               {note}
             </p>
           )}

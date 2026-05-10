@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Geist_Mono } from 'next/font/google';
+import { Inter, Newsreader, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
 
 import './globals.css';
@@ -14,6 +14,13 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   weight: ['300', '400', '500', '600', '700', '800', '900'],
+});
+
+const newsreader = Newsreader({
+  variable: '--font-newsreader',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 const geistMono = Geist_Mono({
@@ -76,18 +83,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a0a',
+  themeColor: '#fbfbfd',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  colorScheme: 'dark',
+  colorScheme: 'light',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {gtmId && (
           <Script id="gtm-script" strategy="afterInteractive">
@@ -102,7 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body
-        className={`${inter.variable} ${geistMono.variable} font-sans bg-background text-white min-h-screen flex flex-col antialiased bg-dot-grid`}
+        className={`${inter.variable} ${newsreader.variable} ${geistMono.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased bg-dot-grid`}
       >
         {gtmId && (
           <noscript>

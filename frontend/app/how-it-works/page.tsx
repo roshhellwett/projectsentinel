@@ -93,7 +93,7 @@ const PIPELINE_STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
+    <div className="container mx-auto px-4 py-12 max-w-5xl">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -131,7 +131,7 @@ export default function HowItWorksPage() {
       />
 
       {/* Hero */}
-      <div className="text-center mb-16 relative">
+      <div className="premium-card text-center mb-16 relative rounded-[2rem] px-6 py-12 md:px-10 md:py-16">
         <div className="absolute inset-0 -z-10 flex justify-center">
           <div className="w-72 h-72 bg-accent/[0.04] rounded-full blur-3xl" />
         </div>
@@ -139,10 +139,10 @@ export default function HowItWorksPage() {
           <Zap className="w-4 h-4" />
           Fully Automated
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold mb-5 text-white leading-tight tracking-tight">
+        <h1 className="text-4xl md:text-6xl font-bold mb-5 text-slate-950 leading-tight tracking-tighter">
           How India <span className="text-accent">Verified</span> Works
         </h1>
-        <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
           Every story goes through a rigorous 7-step AI verification pipeline before reaching you.
         </p>
       </div>
@@ -151,24 +151,24 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="group flex gap-5 p-6 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.08] hover:bg-white/[0.05] hover:border-accent/20 transition-all duration-300">
-              <div className={`flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-white/[0.04] border border-white/[0.10] group-hover:border-accent/30 transition-colors`}>
+            <div className="premium-card group flex gap-5 p-6 rounded-2xl transition-all duration-300">
+              <div className={`relative z-10 flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-white/70 border border-slate-950/[0.10] group-hover:border-accent/30 transition-colors`}>
                 <step.icon className="w-6 h-6 text-accent" />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="relative z-10 flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1.5">
                   <span className="text-[10px] font-bold text-accent uppercase tracking-[0.18em]">
                     Step {step.number}
                   </span>
-                  <span className="text-[11px] text-zinc-500 font-medium">{step.subtitle}</span>
+                  <span className="text-[11px] text-slate-500 font-medium">{step.subtitle}</span>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-1">{step.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{step.description}</p>
+                <h3 className="text-lg font-bold text-slate-950 mb-1">{step.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{step.description}</p>
               </div>
             </div>
             {i < PIPELINE_STEPS.length - 1 && (
               <div className="flex justify-center py-2">
-                <ArrowDown className="w-4 h-4 text-zinc-600" />
+                <ArrowDown className="w-4 h-4 text-slate-400" />
               </div>
             )}
           </div>
@@ -176,16 +176,16 @@ export default function HowItWorksPage() {
       </div>
 
       {/* Trusted Sources */}
-      <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl p-8 md:p-10 mb-12 border border-white/[0.08]">
-        <h2 className="text-2xl font-bold mb-3 text-white">Trusted Sources</h2>
-        <p className="text-zinc-400 mb-6">
+      <div className="premium-card rounded-3xl p-8 md:p-10 mb-12">
+        <h2 className="text-2xl font-bold mb-3 text-slate-950">Trusted Sources</h2>
+        <p className="text-slate-600 mb-6">
           We only pull from established Indian news organizations with editorial standards.
         </p>
         <div className="flex flex-wrap gap-2.5">
           {TRUSTED_SOURCES.map(source => (
             <span
               key={source}
-              className="px-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm font-medium text-zinc-300 hover:bg-white/[0.06] hover:border-accent/20 transition-all"
+              className="px-4 py-2 bg-white/70 border border-slate-950/[0.08] rounded-xl text-sm font-medium text-slate-700 hover:bg-white hover:border-accent/20 transition-all"
             >
               {source}
             </span>
@@ -195,7 +195,7 @@ export default function HowItWorksPage() {
 
       {/* Credibility Scoring */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6 text-white">Credibility Scoring</h2>
+        <h2 className="text-2xl font-bold mb-6 text-slate-950">Credibility Scoring</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ScoreCard
             range="90-100"
@@ -222,12 +222,12 @@ export default function HowItWorksPage() {
       </div>
 
       {/* Open Source CTA */}
-      <div className="text-center bg-white/[0.03] backdrop-blur-xl rounded-3xl p-10 border border-white/[0.08]">
-        <div className="w-16 h-16 rounded-2xl bg-white/[0.06] border border-white/[0.10] flex items-center justify-center mx-auto mb-5">
-          <Github className="w-8 h-8 text-white" />
+      <div className="premium-card text-center rounded-3xl p-10">
+        <div className="w-16 h-16 rounded-2xl bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mx-auto mb-5">
+          <Github className="w-8 h-8 text-slate-950" />
         </div>
-        <h2 className="text-2xl font-bold mb-3 text-white">Open Source</h2>
-        <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+        <h2 className="text-2xl font-bold mb-3 text-slate-950">Open Source</h2>
+        <p className="text-slate-600 mb-6 max-w-md mx-auto">
           The entire codebase is public. Anyone can audit how we work, suggest improvements, or run their own instance.
         </p>
         <a
@@ -258,12 +258,12 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 border ${ringColor} shadow-sm`}>
-      <div className={`inline-block px-3.5 py-1.5 bg-white/[0.06] border border-white/[0.10] ${color} text-sm font-bold rounded-xl mb-3`}>
+    <div className={`premium-card rounded-2xl p-6 border ${ringColor}`}>
+      <div className={`relative z-10 inline-block px-3.5 py-1.5 bg-white/70 border border-slate-950/[0.10] ${color} text-sm font-bold rounded-xl mb-3`}>
         {range}
       </div>
-      <h3 className="font-bold text-white mb-2">{label}</h3>
-      <p className="text-sm text-zinc-400">{description}</p>
+      <h3 className="relative z-10 font-bold text-slate-950 mb-2">{label}</h3>
+      <p className="relative z-10 text-sm text-slate-600">{description}</p>
     </div>
   );
 }

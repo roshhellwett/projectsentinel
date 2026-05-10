@@ -11,19 +11,20 @@ module.exports = {
     extend: {
       colors: {
         // Page surfaces
-        background: '#0a0a0a',
-        'background-2': '#080808',
-        surface: 'rgba(255, 255, 255, 0.04)',
-        'surface-hover': 'rgba(255, 255, 255, 0.06)',
+        background: '#fbfbfd',
+        'background-2': '#f2f4f8',
+        foreground: '#111827',
+        surface: 'rgba(255, 255, 255, 0.78)',
+        'surface-hover': 'rgba(255, 255, 255, 0.94)',
 
         // Text
-        muted: '#a1a1aa',
-        subtle: '#71717a',
+        muted: '#4b5563',
+        subtle: '#7a8494',
 
         // Accent — Electric Blue
-        accent: '#2563eb',
-        'accent-hover': '#3b82f6',
-        'accent-soft': 'rgba(37, 99, 235, 0.12)',
+        accent: '#0a84ff',
+        'accent-hover': '#5ac8fa',
+        'accent-soft': 'rgba(10, 132, 255, 0.14)',
 
         // Credibility
         'cred-high': '#22c55e',
@@ -36,7 +37,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['var(--font-newsreader)', 'Newsreader', 'Georgia', 'serif'],
         mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
       },
       letterSpacing: {
@@ -44,8 +45,8 @@ module.exports = {
         tight: '-0.02em',
       },
       boxShadow: {
-        'glow-accent': '0 0 0 1px rgba(37, 99, 235, 0.18), 0 12px 40px -12px rgba(37, 99, 235, 0.35)',
-        'glow-accent-lg': '0 0 0 1px rgba(37, 99, 235, 0.25), 0 24px 60px -10px rgba(37, 99, 235, 0.45)',
+        'glow-accent': '0 0 0 1px rgba(10, 132, 255, 0.2), 0 18px 54px -18px rgba(10, 132, 255, 0.52)',
+        'glow-accent-lg': '0 0 0 1px rgba(90, 200, 250, 0.28), 0 30px 76px -18px rgba(10, 132, 255, 0.6)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

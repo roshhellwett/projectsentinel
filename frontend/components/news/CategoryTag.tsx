@@ -1,5 +1,5 @@
 /**
- * Category tag pill — dark glass style with accent-tinted variants.
+ * Category tag pill with accent-tinted variants.
  * Constrained width (max-w) prevents overflow inside cards.
  */
 
@@ -11,20 +11,20 @@ interface CategoryTagProps {
 }
 
 const CATEGORY_TINT: Record<string, string> = {
-  politics: 'bg-rose-500/12 text-rose-300 border-rose-500/25',
-  business: 'bg-emerald-500/12 text-emerald-300 border-emerald-500/25',
-  sports: 'bg-sky-500/12 text-sky-300 border-sky-500/25',
-  crime: 'bg-orange-500/12 text-orange-300 border-orange-500/25',
-  science: 'bg-violet-500/12 text-violet-300 border-violet-500/25',
-  health: 'bg-pink-500/12 text-pink-300 border-pink-500/25',
-  tech: 'bg-cyan-500/12 text-cyan-300 border-cyan-500/25',
-  world: 'bg-amber-500/12 text-amber-300 border-amber-500/25',
-  entertainment: 'bg-fuchsia-500/12 text-fuchsia-300 border-fuchsia-500/25',
+  politics: 'bg-rose-500/10 text-rose-700 border-rose-500/20',
+  business: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
+  sports: 'bg-sky-500/10 text-sky-700 border-sky-500/20',
+  crime: 'bg-orange-500/10 text-orange-700 border-orange-500/20',
+  science: 'bg-violet-500/10 text-violet-700 border-violet-500/20',
+  health: 'bg-pink-500/10 text-pink-700 border-pink-500/20',
+  tech: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20',
+  world: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+  entertainment: 'bg-fuchsia-500/10 text-fuchsia-700 border-fuchsia-500/20',
 };
 
 export function CategoryTag({ category, className = '' }: CategoryTagProps) {
   const colorClass =
-    CATEGORY_TINT[category] || 'bg-white/[0.06] text-zinc-300 border-white/[0.10]';
+    CATEGORY_TINT[category] || 'bg-slate-950/[0.05] text-slate-700 border-slate-950/[0.10]';
   const display = category.charAt(0).toUpperCase() + category.slice(1);
 
   return (

@@ -53,7 +53,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return (
-    <div className="container mx-auto px-4 lg:px-6 pt-10 pb-12">
+    <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -72,26 +72,28 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <CategoryBar />
       </div>
 
-      <header className="mb-10">
-        <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-2">Category</p>
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-white mb-3">{categoryName}</h1>
-        <p className="text-sm text-zinc-400 max-w-xl">
-          AI-verified {slug} stories cross-referenced across multiple trusted sources.
-        </p>
+      <header className="premium-card mb-10 rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
+        <div className="relative z-10">
+          <p className="editorial-kicker mb-3">Category</p>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-slate-950 mb-4">{categoryName}</h1>
+          <p className="text-sm md:text-base leading-7 text-slate-600 max-w-xl">
+            AI-verified {slug} stories cross-referenced across multiple trusted sources.
+          </p>
+        </div>
       </header>
 
       {isValidCategory ? (
         <Suspense fallback={
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="h-[200px] rounded-2xl border border-white/[0.06] bg-white/[0.02] animate-shimmer" />
+              <div key={i} className="h-[200px] rounded-2xl border border-slate-950/[0.08] bg-white/60 animate-shimmer" />
             ))}
           </div>
         }>
           <CategoryGrid slug={slug} />
         </Suspense>
       ) : (
-        <p className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 text-zinc-400">
+        <p className="rounded-2xl border border-slate-950/[0.08] bg-white/70 p-6 text-slate-600">
           This category does not exist yet.
         </p>
       )}

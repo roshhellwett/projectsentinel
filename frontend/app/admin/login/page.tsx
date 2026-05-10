@@ -40,15 +40,15 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white/[0.04] backdrop-blur-xl rounded-2xl border border-white/[0.08] p-8">
+        <div className="premium-card rounded-2xl p-8">
           <div className="flex items-center justify-center mb-6">
             <div className="w-12 h-12 bg-accent/15 border border-accent/30 rounded-xl flex items-center justify-center">
               <Lock className="w-6 h-6 text-accent" />
             </div>
           </div>
 
-          <h1 className="text-2xl font-semibold text-center text-white mb-2">Admin Login</h1>
-          <p className="text-zinc-400 text-center mb-6 text-sm">
+          <h1 className="text-2xl font-semibold text-center text-slate-950 mb-2">Admin Login</h1>
+          <p className="text-slate-600 text-center mb-6 text-sm">
             Enter your password to access the admin panel
           </p>
 
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 mb-4 transition-all"
+              className="w-full px-4 py-3 bg-white/70 border border-slate-950/[0.10] rounded-xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 mb-4 transition-all"
               required
             />
 

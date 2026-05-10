@@ -24,22 +24,22 @@ export function PostTable({ posts }: PostTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800">
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Headline</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Category</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Score</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Status</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Published</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Actions</th>
+            <tr className="border-b border-slate-950/[0.10]">
+              <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Headline</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Category</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Score</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Status</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Published</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Actions</th>
             </tr>
           </thead>
           <tbody>
             {posts.map((post) => (
-              <tr key={post.id} className="border-b border-gray-800/50">
+              <tr key={post.id} className="border-b border-slate-950/[0.08]">
                 <td className="py-3 px-4">
                   <a 
                     href={`/news/${post.id}/`}
-                    className="text-white hover:text-accent transition-colors line-clamp-1"
+                    className="text-slate-950 hover:text-accent transition-colors line-clamp-1"
                   >
                     {post.headline}
                   </a>
@@ -59,7 +59,7 @@ export function PostTable({ posts }: PostTableProps) {
                     {post.status}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-sm text-gray-400">
+                <td className="py-3 px-4 text-sm text-slate-500">
                   {formatDate(post.published_at)}
                 </td>
                 <td className="py-3 px-4">

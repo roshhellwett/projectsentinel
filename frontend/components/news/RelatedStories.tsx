@@ -25,20 +25,20 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
           <Link
             key={post.id}
             href={`/news/${post.id}`}
-            className="group flex flex-col h-full bg-white/[0.04] backdrop-blur-md rounded-2xl border border-white/[0.08] p-5 hover:bg-white/[0.06] hover:border-accent/30 hover:shadow-glow-accent transition-[background-color,border-color,box-shadow] duration-300"
+            className="premium-card premium-card-hover group flex flex-col h-full rounded-2xl p-5"
           >
-            <div className="flex items-center gap-2 mb-3">
+            <div className="relative z-10 flex items-center gap-2 mb-3">
               <CategoryTag category={post.category} />
             </div>
-            <h3 className="text-[14px] font-semibold text-white tracking-tight line-clamp-2 group-hover:text-accent transition-colors mb-3 leading-snug">
+            <h3 className="relative z-10 text-[14px] font-semibold text-slate-950 tracking-tight line-clamp-2 group-hover:text-accent transition-colors mb-3 leading-snug">
               {post.headline}
             </h3>
-            <p className="text-xs text-zinc-400 line-clamp-2 mb-4 mt-auto">
+            <p className="relative z-10 text-xs text-slate-600 line-clamp-2 mb-4 mt-auto">
               {post.summary}
             </p>
-            <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+            <div className="relative z-10 flex items-center justify-between pt-3 border-t border-slate-950/[0.08]">
               <CredibilityBadge score={post.credibility_score} compact />
-              <span className="text-[10px] text-zinc-500">{post.source_count} sources</span>
+              <span className="text-[10px] text-slate-500">{post.source_count} sources</span>
             </div>
           </Link>
         ))}

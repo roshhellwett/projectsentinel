@@ -98,7 +98,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-slate-950/22 backdrop-blur-md z-40"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -129,7 +129,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 y.set(0);
               }
             }}
-            className="fixed z-50 bg-[#0a0a0a] border-l border-white/[0.08] shadow-2xl lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[520px] bottom-0 left-0 right-0 h-[92vh] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
+            className="fixed z-50 bg-white/95 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-[0_30px_120px_-52px_rgba(15,23,42,0.46)] lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[540px] bottom-0 left-0 right-0 h-[92vh] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
@@ -143,11 +143,11 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
               className="lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none"
               onPointerDown={(e) => dragControls.start(e)}
             >
-              <div className="w-10 h-1 rounded-full bg-white/20" />
+              <div className="w-10 h-1 rounded-full bg-slate-950/20" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-white/[0.06] flex-shrink-0">
+            <div className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-950/[0.08] flex-shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <CategoryTag category={post.category} />
                 <span className="text-xs text-zinc-500 truncate">{formatDate(post.published_at)}</span>
@@ -155,10 +155,10 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
               <motion.button
                 whileTap={{ scale: 0.88 }}
                 onClick={onClose}
-                className="p-2 hover:bg-white/[0.06] rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent/60 flex-shrink-0"
+                className="p-2 hover:bg-slate-950/[0.06] rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent/60 flex-shrink-0"
                 aria-label="Close article"
               >
-                <X className="w-5 h-5 text-zinc-400" />
+                <X className="w-5 h-5 text-slate-500" />
               </motion.button>
             </div>
 
@@ -171,7 +171,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 <CorrectionsNotice type="retracted" note={post.correction_note} />
               )}
 
-              <h2 className="text-2xl font-bold text-white tracking-tight mb-5 leading-snug">
+              <h2 className="text-3xl font-bold text-slate-950 tracking-tighter mb-5 leading-tight">
                 {post.headline}
               </h2>
 
@@ -184,25 +184,25 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
 
               {/* Summary */}
               <div className="mb-8">
-                <p className="text-zinc-300 leading-relaxed text-base">
+                <p className="text-slate-600 leading-relaxed text-base">
                   {post.summary}
                 </p>
               </div>
 
               {/* Credibility Reasoning */}
-              <div className="bg-accent/[0.06] rounded-2xl p-5 mb-6 border border-accent/[0.18]">
-                <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+              <div className="premium-card rounded-2xl p-5 mb-6">
+                <h3 className="text-sm font-bold text-slate-950 mb-2 flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent" />
                   Why this score?
                 </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {post.credibility_reason}
                 </p>
               </div>
 
               {/* Sources */}
               <div>
-                <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-bold text-slate-950 mb-3 flex items-center gap-2">
                   <ExternalLink className="w-4 h-4 text-accent" />
                   Original Sources
                 </h3>
@@ -211,7 +211,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             </div>
 
             {/* Footer CTA */}
-            <div className="flex-shrink-0 p-4 border-t border-white/[0.06] bg-white/[0.02] flex gap-3"
+            <div className="flex-shrink-0 p-4 border-t border-slate-950/[0.08] bg-white/75 backdrop-blur-2xl flex gap-3"
               style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
             >
               <motion.a

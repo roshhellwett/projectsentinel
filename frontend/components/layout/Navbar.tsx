@@ -64,8 +64,8 @@ export function Navbar() {
         <div
           className={`w-full transition-all duration-500 ${
             scrolled
-              ? 'bg-[rgba(10,10,10,0.75)] backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
-              : 'bg-[rgba(10,10,10,0.4)] backdrop-blur-md border-b border-transparent'
+              ? 'bg-white/78 backdrop-blur-2xl border-b border-slate-950/[0.08] shadow-[0_18px_55px_-42px_rgba(15,23,42,0.28)]'
+              : 'bg-white/58 backdrop-blur-xl border-b border-slate-950/[0.04]'
           }`}
         >
           <div className="container mx-auto px-4 lg:px-6">
@@ -74,13 +74,13 @@ export function Navbar() {
               <Link
                 href="/"
                 aria-label="India Verified — home"
-                className="flex items-center gap-2.5 group focus:outline-none"
+                className="flex items-center gap-3 group focus:outline-none"
               >
-                <div className="relative w-9 h-9 rounded-xl bg-white/[0.06] border border-white/[0.10] flex items-center justify-center shadow-inner shadow-white/5 group-hover:border-accent/50 group-hover:shadow-glow-accent transition-all duration-300">
-                  <span className="text-[13px] font-black text-white tracking-tight leading-none">IV</span>
+                <div className="relative w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_16px_42px_-22px_rgba(10,132,255,0.65)] group-hover:scale-105 transition-all duration-300">
+                  <span className="text-[13px] font-black text-white tracking-tight leading-none drop-shadow">IV</span>
                 </div>
-                <span className="text-[15px] font-semibold tracking-tight text-white leading-none hidden sm:block">
-                  India Verified
+                <span className="hidden sm:flex flex-col leading-none">
+                  <span className="text-[15px] font-semibold tracking-tight text-slate-950">India Verified</span>
                 </span>
               </Link>
 
@@ -95,15 +95,15 @@ export function Navbar() {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                        active ? 'text-white' : 'text-zinc-400 hover:text-white'
+                      className={`relative px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
+                        active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950'
                       }`}
                     >
                       {link.label}
                       {active && (
                         <motion.span
                           layoutId="navbar-active-dot"
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent shadow-[0_0_8px_rgba(37,99,235,0.8)]"
+                          className="absolute inset-0 -z-10 rounded-full bg-white/80 border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_30px_-20px_rgba(10,132,255,0.55)]"
                           transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
                       )}
@@ -117,7 +117,7 @@ export function Navbar() {
                 <button
                   onClick={openSearch}
                   aria-label="Search articles"
-                  className="p-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors duration-200"
+                  className="p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-colors duration-200"
                 >
                   <Search className="w-[18px] h-[18px]" strokeWidth={2} />
                 </button>
@@ -126,7 +126,7 @@ export function Navbar() {
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] hover:border-white/[0.18] text-[13px] font-medium text-white transition-all duration-200"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
                 >
                   <Github className="w-3.5 h-3.5" />
                   GitHub
@@ -137,7 +137,7 @@ export function Navbar() {
                   onClick={() => setIsMobileOpen((v) => !v)}
                   aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={isMobileOpen}
-                  className="lg:hidden p-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors duration-200"
+                  className="lg:hidden p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-colors duration-200"
                 >
                   {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
                 </button>
@@ -160,7 +160,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 z-[60] bg-slate-950/20 backdrop-blur-sm"
               onClick={() => setIsMobileOpen(false)}
             />
             <motion.aside
@@ -169,18 +169,18 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[78%] max-w-sm bg-[#0a0a0a] border-l border-white/[0.08] shadow-2xl flex flex-col"
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[78%] max-w-sm bg-white/92 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-2xl flex flex-col"
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               }}
             >
-              <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06]">
-                <span className="text-sm font-semibold text-white">Menu</span>
+              <div className="flex items-center justify-between h-16 px-5 border-b border-slate-950/[0.08]">
+                <span className="text-sm font-semibold text-slate-950">Menu</span>
                 <button
                   onClick={() => setIsMobileOpen(false)}
                   aria-label="Close menu"
-                  className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.06]"
+                  className="p-2 text-slate-500 hover:text-slate-950 rounded-lg hover:bg-slate-950/[0.06]"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -199,8 +199,8 @@ export function Navbar() {
                         href={link.href}
                         className={`block px-4 py-3 rounded-xl text-[15px] font-medium transition-colors ${
                           active
-                            ? 'bg-accent/15 text-white border border-accent/30'
-                            : 'text-zinc-300 hover:bg-white/[0.05] border border-transparent'
+                            ? 'bg-slate-950/[0.055] text-slate-950 border border-slate-950/[0.10]'
+                            : 'text-slate-600 hover:bg-slate-950/[0.04] border border-transparent'
                         }`}
                       >
                         {link.label}
@@ -209,12 +209,12 @@ export function Navbar() {
                   );
                 })}
               </nav>
-              <div className="p-5 border-t border-white/[0.06]">
+              <div className="p-5 border-t border-slate-950/[0.08]">
                 <a
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-sm font-medium text-white transition-all"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-slate-950/[0.055] hover:bg-slate-950/[0.08] border border-slate-950/[0.10] text-sm font-medium text-slate-800 transition-all"
                 >
                   <Github className="w-4 h-4" />
                   View on GitHub

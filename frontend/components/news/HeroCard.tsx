@@ -20,27 +20,27 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      className="relative group"
+      className="relative group [perspective:1200px]"
     >
       <Link
         href={`/news/${post.id}`}
-        className="block relative overflow-hidden rounded-3xl bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] hover:border-accent/30 transition-all duration-500 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.15),0_24px_80px_-16px_rgba(37,99,235,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="premium-card premium-card-hover block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       >
         {/* Gradient accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[320px] lg:min-h-[380px]">
+        <div className="relative grid grid-cols-1 lg:grid-cols-5 min-h-[340px] lg:min-h-[420px]">
           {/* Visual side */}
           <div className="relative lg:col-span-2 min-h-[180px] lg:min-h-full overflow-hidden">
             <CategoryPlaceholder category={post.category} />
             {/* Edge fade for desktop seam */}
             <div
-              className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[#0a0a0a] pointer-events-none"
+              className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-white/80 pointer-events-none"
               aria-hidden="true"
             />
             {/* Badge */}
             {badge && (
-              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/[0.10] text-[10px] font-bold uppercase tracking-wider text-white">
+              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/75 backdrop-blur-xl border border-slate-950/[0.10] text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)]">
                 <Flame className="w-3 h-3 text-accent" />
                 {badge === 'breaking' ? 'Breaking' : 'Trending'}
               </div>
@@ -57,19 +57,19 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
               </span>
             </div>
 
-            <h2 className="text-[26px] md:text-[32px] lg:text-[36px] font-bold text-white tracking-tight leading-[1.15] mb-5">
+            <h2 className="text-[28px] md:text-[38px] lg:text-[46px] font-bold text-slate-950 tracking-tighter leading-[1.06] mb-5">
               {post.headline}
             </h2>
 
-            <p className="text-base text-zinc-400 leading-relaxed line-clamp-3 max-w-2xl mb-7">
+            <p className="text-base md:text-lg text-slate-600 leading-8 line-clamp-3 max-w-2xl mb-7">
               {post.summary}
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/[0.08]">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.88)]">
                 <CredibilityBadge score={post.credibility_score} compact />
-                <div className="h-3.5 w-px bg-white/10" />
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
+                <div className="h-3.5 w-px bg-slate-950/10" />
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
                   <Database className="w-3 h-3" />
                   {post.source_count} sources
                 </span>

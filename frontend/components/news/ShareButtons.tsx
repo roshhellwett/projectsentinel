@@ -56,7 +56,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
     <div className="relative">
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.04] backdrop-blur-md border border-white/[0.08] text-zinc-400 hover:text-white hover:bg-white/[0.08] hover:border-accent/30 transition-all text-sm font-medium"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30 transition-all text-sm font-medium"
         aria-label="Share this article"
       >
         <Share2 className="w-4 h-4" />
@@ -66,8 +66,8 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
       {showMenu && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-          <div className="absolute right-0 top-full mt-2 z-50 bg-[#0f0f0f] backdrop-blur-xl rounded-xl border border-white/[0.08] shadow-2xl p-2 min-w-[200px] animate-fade-in">
-            <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-white/[0.06]">
+          <div className="absolute right-0 top-full mt-2 z-50 bg-white/95 backdrop-blur-2xl rounded-2xl border border-slate-950/[0.10] shadow-2xl p-2 min-w-[200px] animate-fade-in">
+            <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-slate-950/[0.08]">
               {SHARE_PLATFORMS.map((platform) => (
                 <a
                   key={platform.name}
@@ -75,7 +75,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowMenu(false)}
-                  className="flex flex-col items-center gap-1 p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all"
+                  className="flex flex-col items-center gap-1 p-2 rounded-lg text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.05] transition-all"
                   title={platform.name}
                 >
                   {platform.name === 'WhatsApp' ? (
@@ -96,10 +96,10 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
 
             <button
               onClick={copyLink}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all"
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] transition-all"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-success" />
+                <Check className="w-4 h-4 text-cred-high" />
               ) : (
                 <LinkIcon className="w-4 h-4" />
               )}

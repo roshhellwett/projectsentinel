@@ -55,13 +55,13 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           <Flame className="w-4 h-4 text-accent" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-white tracking-tight">Trending Now</h2>
-          <p className="text-[11px] text-zinc-500">Top stories by credibility</p>
+          <h2 className="text-base font-semibold text-slate-950 tracking-tight">Trending Now</h2>
+          <p className="text-[11px] text-slate-500">Top stories by credibility</p>
         </div>
-        <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent ml-3" />
+        <div className="h-px flex-1 bg-gradient-to-r from-slate-950/10 to-transparent ml-3" />
       </div>
 
-      <div className="rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] overflow-hidden">
+      <div className="premium-card rounded-[1.6rem] overflow-hidden">
         {trending.map((post, index) => (
           <motion.div
             key={post.id}
@@ -72,25 +72,25 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           >
             <Link
               href={`/news/${post.id}`}
-              className="group flex items-center border-b border-white/[0.05] last:border-b-0 hover:bg-white/[0.04] transition-colors duration-200 overflow-hidden"
+              className="group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] transition-colors duration-200"
             >
               {/* Category colour left bar */}
               <div
                 className="w-[3px] self-stretch flex-shrink-0 opacity-60"
-                style={{ backgroundColor: CATEGORY_COLOR[post.category] ?? '#2563eb' }}
+                style={{ backgroundColor: CATEGORY_COLOR[post.category] ?? '#0a84ff' }}
                 aria-hidden="true"
               />
               <div className="flex items-center gap-4 flex-1 min-w-0 px-4 sm:px-5 py-4">
                 {/* Rank number */}
                 <span
-                  className="text-[28px] sm:text-[32px] font-black tracking-tighter text-zinc-700 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
+                  className="text-[28px] sm:text-[32px] font-black tracking-tighter text-slate-300 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
                   aria-hidden="true"
                 >
                   {String(index + 1).padStart(2, '0')}
                 </span>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-white line-clamp-2 leading-snug group-hover:text-accent transition-colors duration-200">
+                  <p className="text-[14px] font-semibold text-slate-900 line-clamp-2 leading-snug group-hover:text-accent transition-colors duration-200">
                     {post.headline}
                   </p>
                   <div className="mt-1.5"><CategoryTag category={post.category} /></div>
@@ -100,7 +100,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                   <CredibilityBadge score={post.credibility_score} compact />
                 </div>
 
-                <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" />
               </div>
             </Link>
           </motion.div>

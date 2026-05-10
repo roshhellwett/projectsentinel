@@ -228,7 +228,7 @@ export function InfiniteFeed({
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-5">
+        <div className="w-16 h-16 rounded-full bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mb-5">
           <svg
             className="w-7 h-7 text-zinc-500"
             fill="none"
@@ -239,8 +239,8 @@ export function InfiniteFeed({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-white mb-1.5">No verified news found</h3>
-        <p className="text-sm text-zinc-500 max-w-sm">
+        <h3 className="text-lg font-semibold text-slate-950 mb-1.5">No verified news found</h3>
+        <p className="text-sm text-slate-500 max-w-sm">
           We couldn&apos;t find any articles. Try a different category or check back in a few minutes.
         </p>
       </div>
@@ -288,14 +288,14 @@ export function InfiniteFeed({
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-[200px] rounded-2xl border border-white/[0.06] bg-white/[0.02] animate-shimmer"
+              className="h-[200px] rounded-2xl border border-slate-950/[0.08] bg-white/60 animate-shimmer"
             />
           ))}
         </div>
       )}
 
       {exhausted && posts.length > pageSize && (
-        <p className="text-center text-xs text-zinc-600 mt-12">
+        <p className="text-center text-xs text-slate-500 mt-12">
           You&apos;ve reached the end — {posts.length} verified stories.
         </p>
       )}
