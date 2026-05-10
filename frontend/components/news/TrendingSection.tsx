@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Flame, ChevronRight } from 'lucide-react';
 import { Post } from '@/types';
 import { CredibilityBadge } from './CredibilityBadge';
+import { CategoryTag } from './CategoryTag';
 
 interface TrendingSectionProps {
   posts: Post[];
@@ -72,7 +73,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                 <p className="text-[14px] font-medium text-white line-clamp-2 leading-snug group-hover:text-accent transition-colors duration-200">
                   {post.headline}
                 </p>
-                <p className="text-[11px] text-zinc-500 mt-1 capitalize">{post.category}</p>
+                <div className="mt-1.5"><CategoryTag category={post.category} /></div>
               </div>
 
               <div className="flex-shrink-0">

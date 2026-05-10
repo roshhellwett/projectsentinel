@@ -63,18 +63,16 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
 
       {/* Inner content */}
       <div className="flex flex-col flex-1 p-5">
-        {/* Breaking pill */}
-        {breaking && (
-          <div className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cred-low/90 text-white text-[9px] font-bold uppercase tracking-wider shadow-lg">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse flex-shrink-0" />
-            <span>Breaking</span>
-          </div>
-        )}
-
-        {/* Top row — category + time */}
-        <div className="flex items-center justify-between gap-2 mb-3.5">
+        {/* Top row — category + breaking badge + time */}
+        <div className="flex items-center gap-2 mb-3.5">
           <CategoryTag category={post.category} />
-          <span className="text-[10px] font-medium text-zinc-600 flex-shrink-0">
+          {breaking && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-bold uppercase tracking-wider flex-shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              Breaking
+            </span>
+          )}
+          <span className="text-[10px] font-medium text-zinc-500 flex-shrink-0 ml-auto">
             {formatTimeAgo(post.published_at)}
           </span>
         </div>
@@ -93,8 +91,13 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
         <div className="flex items-center justify-between gap-2 mt-4 pt-3.5 border-t border-white/[0.05]">
           <CredibilityBadge score={post.credibility_score} compact />
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-medium text-zinc-600">
-              {post.source_count} source{post.source_count === 1 ? '' : 's'}
+            <span
+              className="text-[10px] font-medium text-zinc-500 truncate max-w-[100px]"
+              title={post.sources?.[0]?.title ?? post.sources?.[0]?.name ?? ''}
+            >
+              {post.sources?.[0]?.title ?? post.sources?.[0]?.name
+                ? `${post.sources[0].title ?? post.sources[0].name}${post.source_count > 1 ? ` +${post.source_count - 1}` : ''}`
+                : `${post.source_count} source${post.source_count === 1 ? '' : 's'}`}
             </span>
             <a
               href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}`)}`}
