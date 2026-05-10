@@ -74,6 +74,7 @@ export default async function HomePage() {
           <InfiniteFeed
             initialPosts={feedPosts}
             initialCount={Math.max(0, postsResult.count - trendingIds.size - (heroPost ? 1 : 0))}
+            excludeIds={trendingIds}
           />
         </section>
       </div>

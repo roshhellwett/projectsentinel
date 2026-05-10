@@ -1,17 +1,101 @@
 """
 Groq AI verification - uses Llama 3.3 70B for news verification.
 Token-optimized: system+user split, minimal prompt, model fallback.
+Multi-key rotation: up to 3 API keys, lowest-usage-first selection,
+with per-key daily counters and 429-aware exhaustion tracking.
 """
 
 import json
 import os
 import re
 import time
+import threading
+from datetime import date
+from typing import Optional
 
 import requests
 
 from logger.pipeline_logger import PipelineLogger
 from rate_limiter.limiter import RateLimiter, RateLimitExceededError
+
+
+class AllKeysExhaustedError(Exception):
+    """Raised when all verification API keys are rate-limited for this run."""
+
+
+class _KeyPool:
+    """
+    Thread-safe pool of Groq API keys with per-key daily usage tracking.
+
+    Selection strategy: lowest-calls-today first (load-equalizing).
+    Keys that return 429 are skipped for the remainder of the current run.
+    Daily counters reset automatically at midnight (calendar date change).
+    """
+
+    def __init__(self, keys: list[str]) -> None:
+        self._lock = threading.Lock()
+        self._slots: list[dict] = [
+            {
+                "key": k,
+                "calls_today": 0,
+                "day": str(date.today()),
+                "skip_this_run": False,
+            }
+            for k in keys
+        ]
+
+    def _refresh_slot(self, slot: dict) -> None:
+        """Reset counter if calendar date has changed. Must be called with lock held."""
+        today = str(date.today())
+        if slot["day"] != today:
+            slot["calls_today"] = 0
+            slot["day"] = today
+            slot["skip_this_run"] = False
+
+    def pick(self) -> tuple[int, str]:
+        """
+        Return (slot_index, api_key) for the key with fewest calls today
+        that has not been skipped this run.
+        Raises AllKeysExhaustedError if no usable key exists.
+        """
+        with self._lock:
+            for slot in self._slots:
+                self._refresh_slot(slot)
+
+            available = [
+                (i, s)
+                for i, s in enumerate(self._slots)
+                if not s["skip_this_run"] and s["key"]
+            ]
+            if not available:
+                raise AllKeysExhaustedError(
+                    "All Groq verification keys are rate-limited for this run"
+                )
+
+            idx, _ = min(available, key=lambda x: x[1]["calls_today"])
+            return idx, self._slots[idx]["key"]
+
+    def record_success(self, idx: int) -> None:
+        """Increment daily counter for slot after a successful API call."""
+        with self._lock:
+            self._slots[idx]["calls_today"] += 1
+
+    def mark_exhausted(self, idx: int) -> None:
+        """Mark slot as unusable for the rest of this run (429 received)."""
+        with self._lock:
+            self._slots[idx]["skip_this_run"] = True
+
+    def get_stats(self) -> list[dict]:
+        """Return a snapshot of all slot stats (for logging)."""
+        with self._lock:
+            return [
+                {
+                    "key_index": i + 1,
+                    "calls_today": s["calls_today"],
+                    "skip_this_run": s["skip_this_run"],
+                }
+                for i, s in enumerate(self._slots)
+            ]
 
 
 class GroqVerifier:
@@ -21,6 +105,10 @@ class GroqVerifier:
     MAX_RETRIES = 3
     RETRY_DELAY = 10
     MIN_DELAY_SECONDS = 8
+
+    # Shared key pool – class-level so concurrent pipeline runs share one counter set.
+    _key_pool: Optional["_KeyPool"] = None
+    _key_pool_lock = threading.Lock()
 
     SYSTEM_PROMPT = (
         "You are a news verification assistant. "
@@ -54,9 +142,52 @@ class GroqVerifier:
 
     def __init__(self):
         self.logger = PipelineLogger()
-        self.api_key = os.getenv("GROQ_API_KEY_VERIFY", "")
         self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
-        self.rate_limiter = RateLimiter.get_global("groq_verify", self.MIN_DELAY_SECONDS, max_calls_per_day=400)
+        # Daily cap removed – per-key counters in _KeyPool own quota tracking.
+        self.rate_limiter = RateLimiter.get_global("groq_verify", self.MIN_DELAY_SECONDS)
+
+    # ------------------------------------------------------------------
+    # Class-level key pool management
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def _ensure_pool(cls) -> Optional["_KeyPool"]:
+        """Lazily initialise the shared key pool. Returns None if no keys are configured."""
+        with cls._key_pool_lock:
+            if cls._key_pool is None:
+                keys = cls._load_verify_keys()
+                if keys:
+                    cls._key_pool = _KeyPool(keys)
+            return cls._key_pool
+
+    @classmethod
+    def _reset_pool(cls) -> None:
+        """Reset the shared key pool. Intended for use in tests only."""
+        with cls._key_pool_lock:
+            cls._key_pool = None
+
+    @staticmethod
+    def _load_verify_keys() -> list[str]:
+        """
+        Load verification API keys from environment variables.
+        Priority:
+          1. GROQ_API_KEY_VERIFY_1, GROQ_API_KEY_VERIFY_2, GROQ_API_KEY_VERIFY_3
+          2. GROQ_API_KEY_VERIFY  (legacy single-key fallback)
+        """
+        keys = []
+        for i in range(1, 4):
+            k = os.getenv(f"GROQ_API_KEY_VERIFY_{i}", "").strip()
+            if k:
+                keys.append(k)
+        if not keys:
+            legacy = os.getenv("GROQ_API_KEY_VERIFY", "").strip()
+            if legacy:
+                keys.append(legacy)
+        return keys
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
 
     def verify(self, article_group: list[dict]) -> dict:
         """
@@ -68,19 +199,35 @@ class GroqVerifier:
         Returns:
             Dict with score, reason, key_facts, category
         """
-        if not self.api_key:
+        pool = self._ensure_pool()
+        if pool is None:
             raise Exception("Groq verification API key not configured")
 
         user_content = self._build_prompt(article_group)
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
 
         for attempt in range(self.MAX_RETRIES):
+            # Select the key with fewest calls today (skips 429-exhausted keys).
+            try:
+                slot_idx, api_key = pool.pick()
+            except AllKeysExhaustedError as exc:
+                self.logger.log("GROQ_VERIFY_ERROR", str(exc))
+                raise
+
             model = (
                 self.verify_model
                 if attempt == 0
                 else self.FALLBACK_MODELS[min(attempt - 1, len(self.FALLBACK_MODELS) - 1)]
             )
 
+            stats = pool.get_stats()
+            self.logger.log(
+                "GROQ_VERIFY",
+                f"Attempt {attempt + 1}/{self.MAX_RETRIES}: key=#{slot_idx + 1}, "
+                f"calls_today={stats[slot_idx]['calls_today']}, model={model}",
+                {"key_stats": stats},
+            )
+
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
             data = {
                 "model": model,
                 "messages": [
@@ -96,14 +243,35 @@ class GroqVerifier:
                 self.rate_limiter.wait_if_needed()
 
                 response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
+
+                # Handle 429 before raise_for_status to enable immediate key rotation.
+                if response.status_code == 429:
+                    pool.mark_exhausted(slot_idx)
+                    retry_after = self._extract_429_wait(response)
+                    self.logger.log(
+                        "GROQ_VERIFY",
+                        f"Key #{slot_idx + 1} rate-limited (429), rotating to next key",
+                        {"retry_after_seconds": retry_after},
+                    )
+                    if retry_after > 0:
+                        time.sleep(retry_after)
+                    continue
+
                 response.raise_for_status()
+                pool.record_success(slot_idx)
 
                 result = response.json()
                 content = result["choices"][0]["message"]["content"]
 
                 parsed = self._parse_response(content)
                 if parsed is not None:
-                    self.logger.log("GROQ_VERIFY", f"Verified article: score={parsed.get('score', 0)}, model={model}")
+                    updated = pool.get_stats()
+                    self.logger.log(
+                        "GROQ_VERIFY",
+                        f"Verified article: score={parsed.get('score', 0)}, "
+                        f"model={model}, key=#{slot_idx + 1}",
+                        {"key_stats": updated},
+                    )
                     return parsed
 
             except RateLimitExceededError:
@@ -124,7 +292,27 @@ class GroqVerifier:
                 self.logger.log("GROQ_VERIFY_ERROR", f"Verification failed: {str(e)}")
                 raise
 
+        # If every attempt was consumed by 429s, surface the more specific error.
+        try:
+            pool.pick()
+        except AllKeysExhaustedError:
+            raise
         raise Exception("Max retries exceeded for Groq verification")
+
+    # ------------------------------------------------------------------
+    # Private helpers
+    # ------------------------------------------------------------------
+
+    def _extract_429_wait(self, response: requests.Response) -> int:
+        """Extract wait seconds from a 429 response (Retry-After header or body text)."""
+        retry_after = response.headers.get("Retry-After", "").strip()
+        if retry_after.isdigit():
+            return int(retry_after) + 1
+        body = response.text
+        match = re.search(r"retry in (\d+(?:\.\d+)?)s", body, re.IGNORECASE)
+        if match:
+            return int(float(match.group(1))) + 2
+        return 0
 
     def _extract_retry_delay(self, error_str: str, attempt: int) -> int:
         """Extract retry delay from error message or compute exponential backoff."""

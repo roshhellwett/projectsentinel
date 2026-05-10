@@ -185,10 +185,36 @@ export function InfiniteFeed({
       }
     };
 
-    const id = window.setInterval(tick, POLL_INTERVAL_MS);
+    let id: number | null = null;
+
+    const start = () => {
+      if (id !== null) return;
+      id = window.setInterval(tick, POLL_INTERVAL_MS);
+    };
+
+    const stop = () => {
+      if (id !== null) {
+        window.clearInterval(id);
+        id = null;
+      }
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        stop();
+      } else {
+        tick();
+        start();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    start();
+
     return () => {
       cancelled = true;
-      window.clearInterval(id);
+      stop();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [category]);
 
