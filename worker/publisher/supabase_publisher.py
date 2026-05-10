@@ -6,6 +6,7 @@ import hashlib
 import re
 
 from database.client import get_supabase
+from fetcher.url_tools import title_similarity
 from logger.pipeline_logger import PipelineLogger
 
 _NORMALIZE_RE = re.compile(r"[^\w\s]")
@@ -63,7 +64,9 @@ class SupabasePublisher:
                         .execute()
                     )
                     for row in recent.data or []:
-                        if _normalize_headline(row.get("headline", "")) == norm_headline:
+                        existing = row.get("headline", "")
+                        if (_normalize_headline(existing) == norm_headline
+                                or title_similarity(headline, existing) >= 0.75):
                             self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
                             return False
                 except Exception as e:

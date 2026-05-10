@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types';
 
-const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment']);
+const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment', 'education']);
 const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
 
 let supabaseServerInstance: ReturnType<typeof createClient> | null = null;

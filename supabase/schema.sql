@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS posts (
     summary            TEXT        NOT NULL CHECK (length(trim(summary)) > 0),
     category           TEXT        NOT NULL CHECK (category IN (
                            'politics','business','sports','crime',
-                           'science','health','tech','world','entertainment'
+                           'science','health','tech','world','entertainment','education'
                        )),
     credibility_score  INTEGER     NOT NULL CHECK (credibility_score BETWEEN 0 AND 100),
     credibility_reason TEXT        NOT NULL DEFAULT '',

@@ -8,6 +8,7 @@ export const CATEGORIES = [
   { slug: 'tech', label: 'Tech' },
   { slug: 'world', label: 'World' },
   { slug: 'entertainment', label: 'Entertainment' },
+  { slug: 'education', label: 'Education' },
 ] as const;
 
 export type CategorySlug = typeof CATEGORIES[number]['slug'];

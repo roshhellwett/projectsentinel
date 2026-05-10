@@ -116,7 +116,7 @@ class GroqVerifier:
         "JSON format:\n"
         '{"score": <int 0-100>, "reason": "<one sentence explicitly justifying the score>", '
         '"key_facts": ["<fact1>",...,"<fact5>"], '
-        '"category": "<politics|business|sports|crime|science|health|tech|world|entertainment>", '
+        '"category": "<politics|business|sports|crime|science|health|tech|world|entertainment|education>", '
         '"headline": "<short neutral headline>", '
         '"summary": "<3 neutral sentences under 80 words>"}\n\n'
         "CATEGORY DEFINITIONS — choose exactly one:\n"
@@ -128,7 +128,8 @@ class GroqVerifier:
         "  health: medicine, diseases, hospitals, public health, fitness, nutrition\n"
         "  tech: technology, AI, software, gadgets, internet, cybersecurity, apps\n"
         "  world: international news, foreign policy, global events outside India\n"
-        "  entertainment: films, music, celebrities, TV, OTT, awards, pop culture\n\n"
+        "  entertainment: films, music, celebrities, TV, OTT, awards, pop culture\n"
+        "  education: schools, universities, exams, results, board, scholarship, students\n\n"
         "SCORING BANDS — assign a score that reflects the actual evidence quality:\n"
         "  90-100: 3+ authoritative named sources, specific data/dates/locations, official statements\n"
         "  70-89:  2 sources, some named officials, mostly factual with minor gaps\n"
@@ -380,6 +381,7 @@ class GroqVerifier:
             "business",
             "sports",
             "crime",
+            "education",
             "science",
             "health",
             "tech",

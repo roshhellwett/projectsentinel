@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 
 from archiver.old_post_archiver import OldPostArchiver
 from fetcher.deduplicator import Deduplicator
+from fetcher.url_tools import title_similarity
 from fetcher.factcheck_fetcher import FactCheckFetcher
 from fetcher.gnews_fetcher import GNewsFetcher
 from fetcher.newsapi_fetcher import NewsAPIFetcher
@@ -203,6 +204,20 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         stats["single_source"] = len(clean_articles) - articles_in_groups
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
+
+        # Pre-AI dedup: drop groups whose representative headline is a paraphrase
+        # of an already-queued group (catches cases SequenceMatcher would miss at 0.80).
+        unique_groups: list[list[dict]] = []
+        seen_rep_headlines: list[str] = []
+        for grp in verified_groups:
+            rep = grp[0].get("headline", "") if grp else ""
+            if any(title_similarity(rep, seen) >= 0.75 for seen in seen_rep_headlines):
+                deduplicator.mark_group_processed(grp)
+                logger.log("DEDUP", f"Skipped near-duplicate group: {rep[:70]}")
+            else:
+                unique_groups.append(grp)
+                seen_rep_headlines.append(rep)
+        verified_groups = unique_groups
 
         groups_to_process = verified_groups[:max_ai_groups]
         stats["ai_groups_skipped"] = max(0, len(verified_groups) - len(groups_to_process))
