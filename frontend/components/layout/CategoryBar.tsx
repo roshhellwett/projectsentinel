@@ -1,21 +1,89 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { CATEGORIES } from '@/lib/constants/categories';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
-const ALL_CATEGORIES = [{ slug: 'all', label: 'All' }, ...CATEGORIES.map((c) => ({ slug: c.slug, label: c.label }))];
+const categories = [
+  'All',
+  'Politics',
+  'Business',
+  'Sports',
+  'Tech',
+  'Entertainment',
+  'Education',
+  'Health',
+  'World'
+];
+
+function CategoryButton({ category, isSelected, href }: { category: string; isSelected: boolean; href: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const springX = useSpring(x, { stiffness: 300, damping: 20 });
+  const springY = useSpring(y, { stiffness: 300, damping: 20 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current || isSelected) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) * 0.25);
+    y.set((e.clientY - centerY) * 0.25);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <Link href={href} scroll={false}>
+      <motion.div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          x: springX,
+          y: springY,
+        }}
+        className="relative px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300"
+        whileHover={{ scale: isSelected ? 1 : 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isSelected && (
+          <motion.div
+            layoutId="category-bg"
+            className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-full shadow-sm"
+            transition={{
+              type: "spring",
+              bounce: 0.15,
+              duration: 0.6
+            }}
+          />
+        )}
+
+        {!isSelected && (
+          <span className="absolute inset-0 bg-white/60 backdrop-blur-xl border border-slate-200/60 rounded-full" />
+        )}
+
+        <span className={`relative z-10 tracking-wide ${isSelected ? 'text-white' : 'text-slate-700'}`}>
+          {category}
+        </span>
+      </motion.div>
+    </Link>
+  );
+}
 
 export function CategoryBar() {
   const pathname = usePathname();
   const currentCategory: string = pathname?.startsWith('/category/')
     ? pathname.split('/')[2]
     : 'all';
-
   const scrollRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef<HTMLAnchorElement>(null);
+  const activeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (activeRef.current && scrollRef.current) {
@@ -24,51 +92,28 @@ export function CategoryBar() {
   }, [currentCategory]);
 
   return (
-    <div className="relative -mx-4 px-4" role="tablist" aria-label="News categories">
-      {/* Edge fade indicators */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-
-      <div ref={scrollRef} className="overflow-x-auto scrollbar-hide py-2 -my-2">
-        <div className="flex items-center gap-2 min-w-max rounded-full border border-slate-950/[0.08] bg-white/70 p-1.5 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-          {ALL_CATEGORIES.map((cat) => {
-            const isActive = currentCategory === cat.slug;
+    <div className="relative">
+      <div ref={scrollRef} className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div ref={activeRef} className="flex items-center gap-2 px-0.5">
+          {categories.map((category) => {
+            const slug = category === 'All' ? 'all' : category.toLowerCase();
+            const isActive = currentCategory === slug;
+            const href = category === 'All' ? '/' : `/category/${slug}`;
             return (
-              <Link
-                key={cat.slug}
-                href={cat.slug === 'all' ? '/' : `/category/${cat.slug}/`}
-                ref={isActive ? activeRef : undefined}
-                role="tab"
-                aria-selected={isActive}
-                className="touch-polish relative isolate group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-              >
-                <span
-                  className={`relative z-10 inline-flex items-center px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all duration-200 active:scale-95 ${
-                    isActive
-                      ? 'text-slate-950'
-                      : 'text-slate-500 group-hover:text-slate-950'
-                  }`}
-                >
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeCategoryPill"
-                      className="absolute inset-0 -z-10 rounded-full bg-white border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_-18px_rgba(10,132,255,0.55)]"
-                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                    />
-                  )}
-                  {!isActive && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 -z-10 rounded-full bg-transparent group-hover:bg-slate-950/[0.04] group-hover:border group-hover:border-slate-950/[0.08] transition-colors duration-200"
-                    />
-                  )}
-                  {cat.label}
-                </span>
-              </Link>
+              <CategoryButton
+                key={category}
+                category={category}
+                isSelected={isActive}
+                href={href}
+              />
             );
           })}
         </div>
       </div>
+
+      {/* Fade edges for scroll indication */}
+      <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#fafafa] to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#fafafa] to-transparent pointer-events-none" />
     </div>
   );
 }

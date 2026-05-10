@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
+import { Toaster } from 'sonner';
 
 
 const inter = Inter({
@@ -121,11 +122,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </noscript>
         )}
-        {/* Fixed viewport-centered watermark — always behind content */}
-        <div className="watermark-fixed" aria-hidden="true">
-          <span>Verified News</span>
-        </div>
-        <div className="watermark-spotlight" aria-hidden="true" />
+        {/* Figma ambient background */}
+        <div className="figma-ambient" aria-hidden="true" />
 
         <a
           href="#main"
@@ -134,6 +132,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <Navbar />
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            duration: 2000,
+            style: { background: '#1e293b', color: '#f8fafc', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px' },
+          }}
+        />
         <main id="main" className="flex-1 w-full relative z-10 page-enter">
           {children}
         </main>

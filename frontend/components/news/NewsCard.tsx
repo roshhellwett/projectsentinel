@@ -1,30 +1,12 @@
 'use client';
 
-import { memo } from 'react';
+import { useState, useRef, memo } from 'react';
 import Link from 'next/link';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { Clock, Bookmark, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Post } from '@/types';
-import { CategoryTag } from './CategoryTag';
-import { CredibilityBadge } from './CredibilityBadge';
-import { formatTimeAgo } from '@/lib/utils/formatDate';
-import { truncateWords } from '@/lib/utils/truncate';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils/cn';
-import { ArrowRight } from 'lucide-react';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
-
-const CATEGORY_BORDER_COLOR: Record<string, string> = {
-  politics: '#f43f5e',
-  business: '#10b981',
-  sports: '#0ea5e9',
-  crime: '#f97316',
-  science: '#8b5cf6',
-  health: '#ec4899',
-  tech: '#06b6d4',
-  world: '#f59e0b',
-  entertainment: '#d946ef',
-  education: '#a78bfa',
-};
+import { formatTimeAgo, formatDate } from '@/lib/utils/formatDate';
 
 interface NewsCardProps {
   post: Post;
@@ -32,109 +14,169 @@ interface NewsCardProps {
   isNew?: boolean;
 }
 
-function isBreaking(post: Post): boolean {
-  const ageMs = Date.now() - new Date(post.published_at).getTime();
-  return ageMs < 90 * 60 * 1000 && post.credibility_score >= 80;
-}
+const categoryColors: Record<string, { gradient: string; light: string; border: string }> = {
+  politics: { gradient: 'from-purple-600 to-pink-600', light: 'bg-purple-50/80', border: 'border-purple-200/60' },
+  business: { gradient: 'from-blue-600 to-cyan-600', light: 'bg-blue-50/80', border: 'border-blue-200/60' },
+  sports: { gradient: 'from-orange-600 to-red-600', light: 'bg-orange-50/80', border: 'border-orange-200/60' },
+  tech: { gradient: 'from-green-600 to-emerald-600', light: 'bg-green-50/80', border: 'border-green-200/60' },
+  entertainment: { gradient: 'from-pink-600 to-rose-600', light: 'bg-pink-50/80', border: 'border-pink-200/60' },
+  education: { gradient: 'from-amber-500 to-orange-500', light: 'bg-amber-50/80', border: 'border-amber-200/60' },
+  health: { gradient: 'from-emerald-600 to-teal-600', light: 'bg-emerald-50/80', border: 'border-emerald-200/60' },
+  world: { gradient: 'from-indigo-600 to-violet-600', light: 'bg-indigo-50/80', border: 'border-indigo-200/60' },
+  crime: { gradient: 'from-red-600 to-rose-600', light: 'bg-red-50/80', border: 'border-red-200/60' },
+  science: { gradient: 'from-violet-600 to-purple-600', light: 'bg-violet-50/80', border: 'border-violet-200/60' },
+};
 
-const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
-  const breaking = isBreaking(post);
-  const accentColor = CATEGORY_BORDER_COLOR[post.category] ?? '#0a84ff';
-  const sourceName = post.sources?.[0]?.title ?? post.sources?.[0]?.name ?? null;
+const NewsCardComponent = ({ post, isNew = false }: NewsCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const colors = categoryColors[post.category] || { gradient: 'from-slate-600 to-slate-700', light: 'bg-slate-50/80', border: 'border-slate-200/60' };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onClick?.();
-    }
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), {
+    stiffness: 400,
+    damping: 30
+  });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), {
+    stiffness: 400,
+    damping: 30
+  });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    mouseX.set((e.clientX - centerX) / (rect.width / 2));
+    mouseY.set((e.clientY - centerY) / (rect.height / 2));
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    mouseX.set(0);
+    mouseY.set(0);
   };
 
   return (
-    <motion.div
-      layoutId={`card-${post.id}`}
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      role="button"
-      whileHover={{ y: -6, scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-      aria-label={`Read article: ${post.headline}`}
-      className={cn(
-        'group relative isolate flex flex-col h-full cursor-pointer',
-        'rounded-[1.65rem] overflow-hidden',
-        'premium-card',
-        'transition-shadow duration-300',
-        'hover:bg-white/90 hover:border-slate-950/[0.16]',
-        'hover:shadow-[0_24px_70px_-38px_rgba(10,132,255,0.36),0_28px_70px_-54px_rgba(15,23,42,0.34)]',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        isNew && 'flash-new-post'
-      )}
-      style={{ contain: 'layout paint' }}
-    >
-      {/* Category colour accent bar */}
-      <div
-        className="relative z-10 h-[3px] w-full flex-shrink-0 opacity-85"
-        style={{ backgroundColor: accentColor }}
-        aria-hidden="true"
-      />
-
-      {/* Inner content */}
-      <div className="relative z-10 flex flex-col flex-1 p-5">
-        {/* Source + breaking badge + time row */}
-        <div className="flex items-center gap-2 mb-3">
-          {sourceName ? (
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate max-w-[110px]">
-              {sourceName}
-            </span>
-          ) : (
-            <CategoryTag category={post.category} />
-          )}
-          {breaking && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/90 text-white text-[9px] font-bold uppercase tracking-wider flex-shrink-0 shadow-[0_0_18px_rgba(239,68,68,0.35)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              Breaking
-            </span>
-          )}
-          <span className="text-[10px] text-slate-500 flex-shrink-0 ml-auto">
-            {formatTimeAgo(post.published_at)}
-          </span>
+    <Link href={`/news/${post.id}`} className="block h-full">
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+        }}
+        whileHover={{ scale: 1.02 }}
+        transition={{
+          scale: { duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }
+        }}
+        className={`group relative overflow-hidden rounded-[24px] bg-white border border-slate-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_8px_24px_-8px_rgba(0,0,0,0.06)] hover:shadow-[0_1px_3px_rgba(0,0,0,0.05),0_20px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-500 h-full cursor-pointer ${isNew ? 'flash-new-post' : ''}`}
+      >
+        {/* Gradient mesh on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+          <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${colors.gradient} opacity-[0.07] rounded-full blur-3xl`} />
         </div>
 
-        {/* Headline */}
-        <h3 className="text-[16px] md:text-[18px] font-bold text-slate-950 tracking-tight line-clamp-3 mb-2.5 leading-snug group-hover:text-accent transition-colors duration-150">
-          {post.headline}
-        </h3>
+        {/* Shimmer effect */}
+        <motion.div
+          animate={{
+            opacity: isHovered ? 0.2 : 0,
+            x: isHovered ? 60 : -60,
+          }}
+          transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent skew-x-12 pointer-events-none"
+        />
 
-        {/* Excerpt */}
-        <p className="text-[13px] text-slate-600 line-clamp-2 leading-relaxed mb-auto">
-          {truncateWords(post.summary, 22)}
-        </p>
-
-        {/* Bottom row */}
-        <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-950/[0.08]">
-          <CredibilityBadge score={post.credibility_score} compact />
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-500">
-              {post.source_count} {post.source_count === 1 ? 'source' : 'sources'}
-            </span>
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="touch-polish text-slate-500 hover:text-[#25D366] transition-all duration-200 p-1 -m-1 rounded-full active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/60"
-              aria-label="Share on WhatsApp"
+        <div className="relative p-7 flex flex-col h-full" style={{ transform: "translateZ(12px)" }}>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-5">
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              className={`px-3.5 py-1.5 rounded-full ${colors.light} backdrop-blur-xl border ${colors.border} text-xs font-bold tracking-wide shadow-sm`}
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            </a>
-            <span className="text-slate-500 group-hover:text-accent transition-colors duration-200">
-              <ArrowRight className="w-3.5 h-3.5" />
-            </span>
+              <span className={`bg-gradient-to-r ${colors.gradient} bg-clip-text text-transparent`}>
+                {post.category.charAt(0).toUpperCase() + post.category.slice(1)}
+              </span>
+            </motion.span>
+
+            <motion.button
+              whileHover={{ scale: 1.15, rotate: 12 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (isBookmarked) {
+                  setIsBookmarked(false);
+                  toast('Bookmark removed');
+                } else {
+                  setIsBookmarked(true);
+                  toast.success('Article bookmarked!');
+                }
+              }}
+              className={`p-2 rounded-full backdrop-blur-xl border transition-colors shadow-sm ${
+                isBookmarked
+                  ? 'bg-emerald-50 border-emerald-200/60 hover:bg-emerald-100'
+                  : 'bg-slate-50/80 border-slate-200/60 hover:bg-white'
+              }`}
+              aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+            >
+              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-emerald-600 text-emerald-600' : 'text-slate-600'}`} />
+            </motion.button>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-xl font-bold text-slate-900 mb-4 leading-snug line-clamp-3 flex-grow group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:via-blue-600 group-hover:to-slate-900 group-hover:bg-clip-text transition-all duration-500 tracking-[-0.01em]">
+            {post.headline}
+          </h3>
+
+          {/* Excerpt */}
+          <p className="text-sm text-slate-600 mb-5 line-clamp-2 leading-relaxed font-light">
+            {post.summary}
+          </p>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-5 border-t border-slate-100/80 mt-auto">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{Math.max(1, Math.ceil((post.summary || '').split(' ').filter(Boolean).length / 200))} min read</span>
+              </div>
+              <div className="w-1 h-1 rounded-full bg-slate-300" />
+              <div className="text-xs text-slate-500 font-medium" title={formatDate(post.published_at)}>
+                <span>{formatTimeAgo(post.published_at)}</span>
+              </div>
+            </div>
+
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-emerald-50/80 backdrop-blur-xl border border-emerald-200/60 shadow-sm"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-xs font-bold text-emerald-700">{post.credibility_score}%</span>
+            </motion.div>
           </div>
         </div>
-      </div>
-    </motion.div>
+
+        {/* Bottom gradient accent */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
+          className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${colors.gradient} origin-left`}
+        />
+
+        {/* Border highlight */}
+        <div className="absolute inset-0 rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+          <div className={`absolute inset-[-1px] rounded-[24px] bg-gradient-to-r ${colors.gradient} opacity-20 blur-sm`} />
+        </div>
+      </motion.div>
+    </Link>
   );
 };
 

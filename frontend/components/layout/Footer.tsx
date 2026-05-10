@@ -1,97 +1,90 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Github } from 'lucide-react';
 
-const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/category/politics', label: 'Politics' },
-  { href: '/category/business', label: 'Business' },
-  { href: '/category/sports', label: 'Sports' },
-  { href: '/category/tech', label: 'Tech' },
-  { href: '/how-it-works', label: 'How It Works' },
-];
-
-const TRANSPARENCY = [
-  'No ads, no sponsored content',
-  'All source links visible',
-  'Open source codebase',
-  'AI verification pipeline',
-];
-
-const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
+const footerLinks: Record<string, { href: string; label: string }[]> = {
+  Links: [
+    { href: 'https://zenithopensourceprojects.vercel.app/', label: 'Company' },
+    { href: '/contact', label: 'Contact' },
+    { href: '/cookies', label: 'Cookies' },
+    { href: '/how-it-works', label: 'How it Works' },
+  ],
+};
 
 export function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="relative mt-auto bg-white/74 border-t border-slate-950/[0.08] backdrop-blur-2xl">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-      <div className="container mx-auto px-4 lg:px-6 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 mb-12">
-          {/* Column 1 — Brand */}
-          <div>
-            <Link href="/" className="touch-polish inline-flex items-center gap-2.5 group mb-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
-              <div className="w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-                <span className="text-[13px] font-black text-white tracking-tight leading-none drop-shadow">IV</span>
+    <footer className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+
+      {/* Gradient orbs */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 pt-16 pb-10">
+        {/* Top section */}
+        <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-12">
+          {/* Brand */}
+          <div className="max-w-sm">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-white to-slate-200 flex items-center justify-center shadow-lg flex-shrink-0">
+                <span className="text-slate-900 text-base font-black tracking-wider">IV</span>
               </div>
-              <span className="text-[15px] font-semibold tracking-tight text-slate-950">India Verified</span>
-            </Link>
-            <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-sm">
-              Premium verified news for a quieter, clearer India.
+              <div>
+                <h2 className="text-xl font-bold tracking-tight">India Verified</h2>
+                <p className="text-sm text-slate-400 font-medium">AI-Verified News</p>
+              </div>
+            </div>
+            <p className="text-slate-400 text-sm leading-relaxed mb-5">
+              Bringing you verified, unbiased news powered by AI. No ads, no noise, just the truth.
             </p>
-            <a
-              href={REPO_URL}
+            {/* GitHub only */}
+            <motion.a
+              href="https://github.com/roshhellwett/projectsentinel"
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(10,132,255,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              whileHover={{ scale: 1.1, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+              aria-label="GitHub"
             >
-              <Github className="w-3.5 h-3.5" />
-              GitHub
-            </a>
+              <Github className="w-4 h-4" />
+            </motion.a>
           </div>
 
-          {/* Column 2 — Navigate */}
-          <div>
-            <h3 className="text-[11px] font-semibold text-slate-950 uppercase tracking-[0.18em] mb-5">
-              Navigate
-            </h3>
-            <ul className="space-y-3 text-sm">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="touch-polish rounded-md text-slate-600 hover:text-slate-950 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3 — Transparency */}
-          <div>
-            <h3 className="text-[11px] font-semibold text-slate-950 uppercase tracking-[0.18em] mb-5">
-              Transparency
-            </h3>
-            <ul className="space-y-3 text-sm">
-              {TRANSPARENCY.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-slate-600">
-                  <span className="mt-2 w-1 h-1 rounded-full bg-accent flex-shrink-0" aria-hidden="true" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Footer links */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full md:w-auto">
+            {Object.entries(footerLinks).map(([category, links]) => (
+              <div key={category}>
+                <h3 className="text-sm font-bold mb-4 tracking-wide text-white/80">{category}</h3>
+                <ul className="space-y-3">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-slate-400 hover:text-white transition-colors inline-block"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Separator */}
-        <div className="h-px w-full bg-slate-950/[0.08] mb-8" />
-
-        {/* Bottom bar */}
-        <div className="flex flex-col items-center gap-2 text-center">
-          <p className="text-xs text-slate-500">
-            &copy; 2026 Zenith Open Source Projects. All rights reserved.
+        {/* Bottom section */}
+        <div className="pt-8 border-t border-white/10 space-y-3">
+          <p className="text-sm text-slate-400 text-center md:text-left">
+            &copy; {currentYear} Zenith Open Source Projects. All rights reserved.
           </p>
-          <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
-            Built with Next.js, Tailwind CSS &amp; Framer Motion · Designed by Roshhellwett · Powered by Claude &amp; Gemini
+          <p className="text-xs text-slate-500 text-center md:text-left leading-relaxed">
+            Built with Next.js, Tailwind CSS &amp; Framer Motion &middot; Designed by Roshhellwett &middot; Powered by Claude &amp; Gemini
           </p>
         </div>
       </div>

@@ -8,7 +8,7 @@ export interface Source {
   url: string;
 }
 
-export type Category = 'politics' | 'business' | 'sports' | 'crime' | 'science' | 'health' | 'tech' | 'world' | 'entertainment';
+export type Category = 'politics' | 'business' | 'sports' | 'crime' | 'science' | 'health' | 'tech' | 'world' | 'entertainment' | 'education';
 
 export type PostStatus = 'published' | 'corrected' | 'retracted';
 

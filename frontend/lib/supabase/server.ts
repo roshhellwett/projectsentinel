@@ -5,6 +5,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types';
+import { dedupeByTitle } from '@/lib/utils/dedupe';
 
 const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment', 'education']);
 const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
@@ -84,7 +85,8 @@ export async function fetchPosts(
       throw new Error(`fetchPosts error: ${error.message}`);
     }
 
-    return { posts: data as Post[], count: count || 0 };
+    const posts = dedupeByTitle(data as Post[]);
+    return { posts, count: count || 0 };
   });
 }
 

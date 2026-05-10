@@ -12,7 +12,7 @@
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
   /* Surfaces */
-  --c-bg: #fbfbfd;
+  --c-bg: #fafafa;
   --c-bg-2: #f2f4f8;
   --c-surface: rgba(255, 255, 255, 0.78);
   --c-surface-hover: rgba(255, 255, 255, 0.94);
@@ -51,9 +51,9 @@ html {
   body {
     @apply leading-normal antialiased;
     background:
-      radial-gradient(circle at 18% 0%, rgba(10, 132, 255, 0.13), transparent 31rem),
-      radial-gradient(circle at 86% 8%, rgba(191, 90, 242, 0.09), transparent 29rem),
-      linear-gradient(180deg, #ffffff 0%, var(--c-bg) 45%, #f6f7fb 100%);
+      radial-gradient(circle at 18% 0%, rgba(10, 132, 255, 0.06), transparent 36rem),
+      radial-gradient(circle at 86% 8%, rgba(139, 92, 246, 0.05), transparent 32rem),
+      linear-gradient(180deg, #ffffff 0%, var(--c-bg) 40%, #f5f6fa 100%);
     color: var(--c-text);
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
@@ -105,53 +105,16 @@ html {
 }
 
 /* ═══════════════════════════════════════════════
-   FIXED WATERMARK — "Verified News" viewport-centered bg
+   FIGMA AMBIENT BACKGROUND
 ═══════════════════════════════════════════════ */
-.watermark-fixed {
+.figma-ambient {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   pointer-events: none;
-  user-select: none;
-  overflow: hidden;
+  background:
+    radial-gradient(ellipse at top, rgba(139, 92, 246, 0.03), transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(59, 130, 246, 0.03), transparent 50%);
   z-index: 0;
-}
-.watermark-fixed > span {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(64px, 20vw, 240px);
-  line-height: 0.85;
-  letter-spacing: -0.04em;
-  color: rgba(15, 23, 42, 0.035);
-  text-align: center;
-  transform: translateY(-4vh);
-  /* Responsive: wrap on very small screens to prevent clipping */
-  white-space: nowrap;
-  padding: 0 4vw;
-}
-@media (max-width: 480px) {
-  .watermark-fixed > span {
-    font-size: clamp(48px, 20vw, 80px);
-    letter-spacing: -0.02em;
-    white-space: normal;
-    line-height: 0.9;
-    max-width: 90vw;
-  }
-}
-.watermark-spotlight {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(90vw, 900px);
-  height: min(90vw, 900px);
-  background: radial-gradient(circle, rgba(10, 132, 255, 0.10) 0%, rgba(90, 200, 250, 0.04) 34%, transparent 64%);
-  filter: blur(70px);
-  pointer-events: none;
-  z-index: 0;
-  animation: spotlightDrift 14s ease-in-out infinite alternate;
 }
 
 /* ═══════════════════════════════════════════════
@@ -273,6 +236,50 @@ html {
   scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════════════════════════
+   FIGMA SECTION HEADING ACCENT
+   Use on section title rows: flex items-center gap-4
+═══════════════════════════════════════════════ */
+.section-accent-bar {
+  width: 4px;
+  height: 2rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  animation: accentPulse 2s ease-in-out infinite;
+}
+.section-accent-bar-orange {
+  background: linear-gradient(to bottom, #f97316, #ef4444);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+}
+.section-accent-bar-blue {
+  background: linear-gradient(to bottom, #3b82f6, #6366f1);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+}
+
+@keyframes accentPulse {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.18); }
+}
+
+/* ═══════════════════════════════════════════════
+   FIGMA CARD BOTTOM ACCENT — animated on hover
+═══════════════════════════════════════════════ */
+.card-bottom-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.4s cubic-bezier(0.25, 0.4, 0.25, 1);
+  border-radius: 0 0 9999px 9999px;
+}
+.group:hover .card-bottom-accent,
+.group:focus-within .card-bottom-accent {
+  transform: scaleX(1);
+}
 
 /* ═══════════════════════════════════════════════
    FOCUS RING
