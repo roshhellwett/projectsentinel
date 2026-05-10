@@ -26,14 +26,14 @@ export default function Error({ error, reset }: ErrorProps) {
       <div className="flex gap-3">
         <button
           onClick={reset}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-semibold hover:bg-accent-hover transition-colors shadow-glow-accent"
+          className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-semibold hover:bg-accent-hover transition-all active:scale-95 shadow-glow-accent hover:shadow-glow-accent-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <RefreshCw className="w-4 h-4" />
           Try again
         </button>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-950/[0.12] text-slate-700 font-semibold hover:bg-slate-950/[0.06] transition-colors"
+          className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-950/[0.12] text-slate-700 font-semibold hover:bg-slate-950/[0.06] transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
         >
           Go home
         </Link>

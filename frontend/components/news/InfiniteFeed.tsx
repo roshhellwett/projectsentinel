@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
@@ -286,9 +287,9 @@ export function InfiniteFeed({
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
+            <Skeleton
               key={i}
-              className="h-[200px] rounded-2xl border border-slate-950/[0.08] bg-white/60 animate-shimmer"
+              className="h-[218px] rounded-[1.65rem]"
             />
           ))}
         </div>

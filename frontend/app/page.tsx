@@ -50,7 +50,7 @@ export default async function HomePage() {
 
       <div className="container mx-auto px-4 lg:px-6 pt-8 lg:pt-10 pb-14">
         <section className="relative mb-9 overflow-hidden rounded-[2rem] border border-slate-950/[0.10] bg-white/75 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_30px_100px_-76px_rgba(10,132,255,0.55)] backdrop-blur-2xl md:px-10 md:py-10">
-          <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
+          <div className="animate-soft-float absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
           <div className="absolute -bottom-32 left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
           <div className="relative max-w-4xl">
             <p className="editorial-kicker mb-4">

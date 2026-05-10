@@ -70,7 +70,7 @@ export function MobileBottomNav() {
                       key={cat.slug}
                       href={`/category/${cat.slug}`}
                       onClick={closeTopics}
-                      className={`flex items-center justify-center px-3 py-3.5 rounded-2xl text-center text-[12px] font-semibold transition-all duration-200 active:scale-95 ${
+                      className={`touch-polish flex items-center justify-center px-3 py-3.5 rounded-2xl text-center text-[12px] font-semibold transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                         active
                           ? 'bg-accent text-white shadow-glow-accent'
                           : 'bg-white/70 text-slate-700 border border-slate-950/[0.08] hover:bg-white hover:text-slate-950'
@@ -132,7 +132,7 @@ export function MobileBottomNav() {
                   <button
                     key={tab.id}
                     onClick={toggleTopics}
-                    className="focus:outline-none"
+                    className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                     aria-label="Browse topics"
                     aria-expanded={topicsOpen}
                   >
@@ -141,7 +141,13 @@ export function MobileBottomNav() {
                 );
               }
               return (
-                <Link key={tab.id} href={tab.href!} onClick={closeTopics} aria-label={tab.label}>
+                <Link
+                  key={tab.id}
+                  href={tab.href!}
+                  onClick={closeTopics}
+                  aria-label={tab.label}
+                  className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                >
                   {inner}
                 </Link>
               );

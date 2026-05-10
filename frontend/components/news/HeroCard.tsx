@@ -24,7 +24,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
     >
       <Link
         href={`/news/${post.id}`}
-        className="premium-card premium-card-hover block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="touch-polish premium-card premium-card-hover block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {/* Gradient accent bar */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
@@ -40,7 +40,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             />
             {/* Badge */}
             {badge && (
-              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/75 backdrop-blur-xl border border-slate-950/[0.10] text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)]">
+              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/75 backdrop-blur-xl border border-slate-950/[0.10] text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_42px_-28px_rgba(10,132,255,0.75)]">
                 <Flame className="w-3 h-3 text-accent" />
                 {badge === 'breaking' ? 'Breaking' : 'Trending'}
               </div>
@@ -77,7 +77,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
 
               <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-2.5 transition-all duration-300">
                 Read full story
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
               </span>
             </div>
           </div>

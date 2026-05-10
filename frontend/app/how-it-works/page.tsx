@@ -151,7 +151,7 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="premium-card group flex gap-5 p-6 rounded-2xl transition-all duration-300">
+            <div className="premium-card premium-card-hover group flex gap-5 p-6 rounded-2xl transition-all duration-300">
               <div className={`relative z-10 flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-white/70 border border-slate-950/[0.10] group-hover:border-accent/30 transition-colors`}>
                 <step.icon className="w-6 h-6 text-accent" />
               </div>
@@ -185,7 +185,7 @@ export default function HowItWorksPage() {
           {TRUSTED_SOURCES.map(source => (
             <span
               key={source}
-              className="px-4 py-2 bg-white/70 border border-slate-950/[0.08] rounded-xl text-sm font-medium text-slate-700 hover:bg-white hover:border-accent/20 transition-all"
+              className="touch-polish px-4 py-2 bg-white/70 border border-slate-950/[0.08] rounded-xl text-sm font-medium text-slate-700 hover:bg-white hover:border-accent/20 active:scale-95 transition-all"
             >
               {source}
             </span>
@@ -234,7 +234,7 @@ export default function HowItWorksPage() {
           href="https://github.com/roshhellwett/projectsentinel"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent-hover text-white font-semibold rounded-2xl transition-all duration-300 shadow-glow-accent hover:shadow-glow-accent-lg"
+          className="touch-polish inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent-hover text-white font-semibold rounded-2xl transition-all duration-300 shadow-glow-accent hover:shadow-glow-accent-lg active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <Github className="w-5 h-5" />
           View on GitHub
@@ -258,7 +258,7 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`premium-card rounded-2xl p-6 border ${ringColor}`}>
+    <div className={`premium-card premium-card-hover rounded-2xl p-6 border ${ringColor}`}>
       <div className={`relative z-10 inline-block px-3.5 py-1.5 bg-white/70 border border-slate-950/[0.10] ${color} text-sm font-bold rounded-xl mb-3`}>
         {range}
       </div>

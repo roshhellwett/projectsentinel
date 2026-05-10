@@ -1,5 +1,28 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="180" height="180" rx="42" fill="#0a0a0a"/>
-  <rect x="3" y="3" width="174" height="174" rx="39" stroke="#2563eb" stroke-width="4.5" stroke-opacity="0.25"/>
-  <text x="90" y="106" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="88" letter-spacing="-6" fill="#2563eb" text-anchor="middle" dominant-baseline="central">IV</text>
+  <defs>
+    <linearGradient id="surface" x1="30" y1="18" x2="150" y2="162" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.52" stop-color="#F6FBFF"/>
+      <stop offset="1" stop-color="#EAF4FF"/>
+    </linearGradient>
+    <radialGradient id="accentGlow" cx="50%" cy="48%" r="58%">
+      <stop offset="0%" stop-color="#5AC8FA" stop-opacity="0.42"/>
+      <stop offset="55%" stop-color="#0A84FF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#0A84FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mark" x1="55" y1="50" x2="125" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5AC8FA"/>
+      <stop offset="1" stop-color="#0A84FF"/>
+    </linearGradient>
+    <filter id="softShadow" x="8" y="10" width="164" height="164" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0F172A" flood-opacity="0.14"/>
+      <feDropShadow dx="0" dy="7" stdDeviation="12" flood-color="#0A84FF" flood-opacity="0.20"/>
+    </filter>
+  </defs>
+  <rect width="180" height="180" rx="42" fill="#FBFBFD"/>
+  <rect x="22" y="20" width="136" height="140" rx="38" fill="url(#surface)" filter="url(#softShadow)"/>
+  <rect x="22.75" y="20.75" width="134.5" height="138.5" rx="37.25" stroke="#0F172A" stroke-opacity="0.10" stroke-width="1.5"/>
+  <rect x="30" y="28" width="120" height="124" rx="32" fill="url(#accentGlow)"/>
+  <path d="M50 42C64 32 88 30 112 35C80 38 58 52 47 74C45 60 45 47 50 42Z" fill="white" fill-opacity="0.72"/>
+  <text x="90" y="101" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="900" font-size="55" letter-spacing="-4" fill="url(#mark)" text-anchor="middle" dominant-baseline="central">IV</text>
 </svg>

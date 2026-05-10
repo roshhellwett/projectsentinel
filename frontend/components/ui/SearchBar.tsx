@@ -11,6 +11,7 @@ import { X, Search } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface SearchBarProps {
   isOpen: boolean;
@@ -94,6 +95,12 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const id = window.setTimeout(() => inputRef.current?.focus(), 80);
+    return () => window.clearTimeout(id);
+  }, [isOpen]);
+
   const handleSelect = useCallback((post: Post) => {
     onClose();
     router.push(`/news/${post.id}`);
@@ -106,25 +113,32 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className="fixed inset-0 z-[100] bg-background/96 backdrop-blur-2xl"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-background/94 backdrop-blur-2xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
         >
-          <div className="container mx-auto px-4 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 14, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.985 }}
+            transition={{ type: 'spring', stiffness: 360, damping: 32 }}
+            className="container mx-auto px-4 py-8 md:py-10"
+          >
             <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="editorial-kicker mb-2">India Verified</p>
                 <h2 className="text-3xl md:text-5xl font-semibold text-slate-950 tracking-tighter">Search</h2>
               </div>
-              <button
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="p-2 hover:bg-slate-950/[0.06] rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
+                className="touch-polish p-2 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent active:bg-slate-950/[0.08]"
                 aria-label="Close search"
               >
                 <X className="w-6 h-6 text-slate-500" />
-              </button>
+              </motion.button>
             </div>
 
             <div className="relative max-w-3xl mx-auto mb-8">
@@ -136,14 +150,18 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories..."
-                className="w-full pl-12 pr-4 py-4 bg-white/80 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
+                className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(10,132,255,0.45)]"
                 autoFocus
               />
             </div>
 
             <div className="max-w-4xl mx-auto">
               {isLoading && (
-                <p className="text-center text-slate-500 py-8 animate-pulse">Loading articles...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-[190px] rounded-[1.65rem]" />
+                  ))}
+                </div>
               )}
               {error && (
                 <p className="text-center text-cred-low py-8">{error}</p>
@@ -164,7 +182,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

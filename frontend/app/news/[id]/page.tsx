@@ -91,7 +91,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
       <div className="container mx-auto px-4 pt-10 max-w-5xl">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-950 mb-8 transition-colors group"
+          className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 mb-8 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
         >
           <div className="p-1.5 rounded-full bg-white/70 border border-slate-950/[0.10] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
             <ArrowLeft className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {/* Reason Card */}
-          <div className="md:col-span-2 premium-card relative rounded-3xl p-8">
+          <div className="md:col-span-2 premium-card premium-card-hover relative rounded-3xl p-8">
             <div className="absolute -right-4 -top-4 text-accent/10">
               <ShieldCheck className="w-32 h-32" />
             </div>
@@ -174,7 +174,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
 
           {/* Sources Card */}
-          <div className="premium-card rounded-3xl p-8">
+          <div className="premium-card premium-card-hover rounded-3xl p-8">
             <h2 className="text-base font-bold text-slate-950 mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources
@@ -184,7 +184,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </div>
 
         {/* Transparency Banner */}
-        <div className="premium-card rounded-3xl p-6 mb-12">
+        <div className="premium-card premium-card-hover rounded-3xl p-6 mb-12">
           <h3 className="text-[11px] font-bold text-slate-500 mb-5 uppercase tracking-[0.18em] text-center">
             How This Story Was Built
           </h3>

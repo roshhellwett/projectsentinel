@@ -72,7 +72,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           >
             <Link
               href={`/news/${post.id}`}
-              className="group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] transition-colors duration-200"
+              className="touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset"
             >
               {/* Category colour left bar */}
               <div
@@ -100,7 +100,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                   <CredibilityBadge score={post.credibility_score} compact />
                 </div>
 
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-accent group-hover:translate-x-1 transition-all duration-200 flex-shrink-0" />
               </div>
             </Link>
           </motion.div>

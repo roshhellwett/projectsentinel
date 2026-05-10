@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { searchPosts } from '@/lib/supabase/server';
 import { SearchResultsGrid } from '@/components/news/SearchResultsGrid';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { SearchX } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -68,10 +69,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           fallback={
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-[200px] rounded-2xl border border-slate-950/[0.08] bg-white/60 animate-shimmer"
-                />
+                <Skeleton key={i} className="h-[218px] rounded-[1.65rem]" />
               ))}
             </div>
           }

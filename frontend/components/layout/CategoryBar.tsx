@@ -40,10 +40,10 @@ export function CategoryBar() {
                 ref={isActive ? activeRef : undefined}
                 role="tab"
                 aria-selected={isActive}
-                className="relative isolate group"
+                className="touch-polish relative isolate group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               >
                 <span
-                  className={`relative z-10 inline-flex items-center px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors duration-200 ${
+                  className={`relative z-10 inline-flex items-center px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all duration-200 active:scale-95 ${
                     isActive
                       ? 'text-slate-950'
                       : 'text-slate-500 group-hover:text-slate-950'

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { fetchPosts } from '@/lib/supabase/server';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { CategoryBar } from '@/components/layout/CategoryBar';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
 export const revalidate = 30;
@@ -86,7 +87,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <Suspense fallback={
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="h-[200px] rounded-2xl border border-slate-950/[0.08] bg-white/60 animate-shimmer" />
+              <Skeleton key={i} className="h-[218px] rounded-[1.65rem]" />
             ))}
           </div>
         }>

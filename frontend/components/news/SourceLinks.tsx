@@ -35,10 +35,10 @@ export function SourceLinks({ sources }: SourceLinksProps) {
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-accent hover:text-accent-hover transition-colors duration-200 group"
+              className="touch-polish flex items-center gap-2 rounded-lg px-2 py-1.5 -mx-2 text-sm text-accent hover:text-accent-hover hover:bg-accent/5 active:scale-[0.99] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               aria-label={`Read full article on ${label} (opens in new tab)`}
             >
-              <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+              <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               <span className="underline underline-offset-2">{label}</span>
             </a>
           </li>

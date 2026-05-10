@@ -1,61 +1,83 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0a0a0a"/>
-      <stop offset="1" stop-color="#050505"/>
+    <linearGradient id="bg" x1="600" y1="0" x2="600" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.48" stop-color="#FBFBFD"/>
+      <stop offset="1" stop-color="#F2F4F8"/>
     </linearGradient>
-    <radialGradient id="spotlight" cx="50%" cy="40%" r="50%">
-      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.15"/>
-      <stop offset="60%" stop-color="#2563eb" stop-opacity="0.04"/>
-      <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+    <radialGradient id="spotlight" cx="74%" cy="12%" r="58%">
+      <stop offset="0%" stop-color="#0A84FF" stop-opacity="0.18"/>
+      <stop offset="55%" stop-color="#5AC8FA" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0A84FF" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1" fill="#FFFFFF" fill-opacity="0.04"/>
+    <linearGradient id="glass" x1="72" y1="48" x2="1120" y2="582" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.94"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.66"/>
+    </linearGradient>
+    <linearGradient id="logoSurface" x1="96" y1="86" x2="170" y2="172" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EAF4FF"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="112" y1="100" x2="158" y2="154" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5AC8FA"/>
+      <stop offset="1" stop-color="#0A84FF"/>
+    </linearGradient>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#0F172A" fill-opacity="0.045"/>
     </pattern>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
   <rect width="1200" height="630" fill="url(#grid)"/>
   <rect width="1200" height="630" fill="url(#spotlight)"/>
+  <rect x="54" y="48" width="1092" height="534" rx="44" fill="url(#glass)" stroke="#111827" stroke-opacity="0.10"/>
 
   <!-- Massive "Verified News" watermark -->
-  <text x="600" y="420" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="clamp(80px,18vw,220px)" letter-spacing="-0.04em" fill="#FFFFFF" fill-opacity="0.03" text-anchor="middle" dominant-baseline="middle">Verified News</text>
+  <text x="600" y="376" font-family="Georgia,'Times New Roman',serif" font-weight="800" font-size="170" letter-spacing="-10" fill="#0F172A" fill-opacity="0.035" text-anchor="middle" dominant-baseline="middle">Verified News</text>
 
   <!-- IV Logo mark top-left -->
-  <g transform="translate(60, 54)">
-    <rect width="64" height="64" rx="18" fill="#FFFFFF" fill-opacity="0.04" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="1.5"/>
-    <text x="32" y="40" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="28" fill="#2563eb" text-anchor="middle" dominant-baseline="central">IV</text>
+  <g transform="translate(96, 96)">
+    <rect width="72" height="72" rx="22" fill="url(#logoSurface)" stroke="#111827" stroke-opacity="0.10" stroke-width="1.5"/>
+    <circle cx="36" cy="36" r="30" fill="#0A84FF" fill-opacity="0.10"/>
+    <text x="36" y="43" font-family="Inter,system-ui,-apple-system,sans-serif" font-weight="900" font-size="28" letter-spacing="-2.4" fill="url(#mark)" text-anchor="middle" dominant-baseline="central">IV</text>
   </g>
 
   <!-- Main headline -->
-  <g transform="translate(100, 240)">
-    <text font-family="system-ui,-apple-system,sans-serif" font-size="76" font-weight="800" fill="#FFFFFF" letter-spacing="-0.03em">India Verified</text>
-    <text y="72" font-family="system-ui,-apple-system,sans-serif" font-size="34" font-weight="500" fill="#a1a1aa">AI-Verified Indian News. No Ads. No Bias.</text>
+  <g transform="translate(186, 116)">
+    <text font-family="Inter,system-ui,-apple-system,sans-serif" font-size="26" font-weight="800" fill="#111827" letter-spacing="-0.8">India Verified</text>
+    <text y="28" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#7A8494" letter-spacing="3">AI-VERIFIED INDIAN NEWS</text>
+  </g>
+  <g transform="translate(96, 296)">
+    <text font-family="Inter,system-ui,-apple-system,sans-serif" font-size="76" font-weight="850" fill="#0F172A" letter-spacing="-4.2">A calmer, smarter</text>
+    <text y="74" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="76" font-weight="850" fill="#0F172A" letter-spacing="-4.2">front page for India.</text>
+    <text y="136" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="27" font-weight="400" fill="#4B5563">Cross-referenced stories, credibility scores, and clear source links.</text>
   </g>
 
   <!-- Trust badges bottom-right -->
-  <g transform="translate(770, 490)">
-    <rect x="0" y="0" width="120" height="40" rx="20" fill="#FFFFFF" fill-opacity="0.04" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1"/>
-    <text x="60" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="600" fill="#e4e4e7" text-anchor="middle" dominant-baseline="central">No Ads</text>
+  <g transform="translate(96, 480)">
+    <rect x="0" y="0" width="96" height="42" rx="21" fill="#FFFFFF" fill-opacity="0.74" stroke="#111827" stroke-opacity="0.10" stroke-width="1"/>
+    <text x="48" y="26" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#4B5563" text-anchor="middle" dominant-baseline="central">No ads</text>
 
-    <rect x="135" y="0" width="140" height="40" rx="20" fill="#FFFFFF" fill-opacity="0.04" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1"/>
-    <text x="205" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="600" fill="#e4e4e7" text-anchor="middle" dominant-baseline="central">AI Verified</text>
+    <rect x="112" y="0" width="136" height="42" rx="21" fill="#FFFFFF" fill-opacity="0.74" stroke="#111827" stroke-opacity="0.10" stroke-width="1"/>
+    <text x="180" y="26" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#4B5563" text-anchor="middle" dominant-baseline="central">Source-visible</text>
 
-    <rect x="290" y="0" width="140" height="40" rx="20" fill="#FFFFFF" fill-opacity="0.04" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1"/>
-    <text x="360" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="600" fill="#e4e4e7" text-anchor="middle" dominant-baseline="central">Open Source</text>
+    <rect x="264" y="0" width="118" height="42" rx="21" fill="#FFFFFF" fill-opacity="0.74" stroke="#111827" stroke-opacity="0.10" stroke-width="1"/>
+    <text x="323" y="26" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#4B5563" text-anchor="middle" dominant-baseline="central">AI verified</text>
   </g>
 
   <!-- Decorative glass card accent -->
-  <g transform="translate(820, 100)">
-    <rect width="280" height="340" rx="24" fill="#FFFFFF" fill-opacity="0.03" stroke="#2563eb" stroke-opacity="0.12" stroke-width="1.5"/>
-    <rect x="30" y="60" width="100" height="28" rx="14" fill="#2563eb" fill-opacity="0.15"/>
-    <text x="80" y="78" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#2563eb" text-anchor="middle" dominant-baseline="central">TRENDING</text>
-    <rect x="30" y="110" width="220" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.6"/>
-    <rect x="30" y="132" width="180" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.3"/>
-    <rect x="30" y="154" width="200" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.3"/>
-    <rect x="30" y="200" width="120" height="28" rx="14" fill="#22C55E" fill-opacity="0.15"/>
-    <text x="90" y="218" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#22C55E" text-anchor="middle" dominant-baseline="central">High Credibility</text>
-    <rect x="30" y="250" width="220" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.4"/>
-    <rect x="30" y="272" width="160" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.2"/>
+  <g transform="translate(834, 146)">
+    <rect width="270" height="338" rx="34" fill="#FFFFFF" fill-opacity="0.78" stroke="#111827" stroke-opacity="0.10" stroke-width="1.5"/>
+    <rect x="28" y="28" width="86" height="26" rx="13" fill="#0A84FF" fill-opacity="0.12" stroke="#0A84FF" stroke-opacity="0.24"/>
+    <rect x="28" y="86" width="214" height="18" rx="9" fill="#0F172A" fill-opacity="0.84"/>
+    <rect x="28" y="116" width="162" height="18" rx="9" fill="#0F172A" fill-opacity="0.84"/>
+    <rect x="28" y="160" width="214" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="28" y="180" width="184" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="28" y="200" width="142" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="28" y="252" width="214" height="58" rx="22" fill="#22C55E" fill-opacity="0.10" stroke="#22C55E" stroke-opacity="0.24"/>
+    <circle cx="70" cy="281" r="21" fill="none" stroke="#22C55E" stroke-width="4"/>
+    <text x="70" y="286" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="13" font-weight="900" fill="#0F172A" text-anchor="middle">92</text>
+    <text x="106" y="277" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="15" font-weight="800" fill="#0F172A">Verified</text>
+    <text x="106" y="296" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="11" font-weight="600" fill="#64748B">3 sources</text>
   </g>
 </svg>

@@ -27,8 +27,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 mb-12">
           {/* Column 1 — Brand */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-2.5 group mb-4">
-              <div className="w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center group-hover:scale-105 transition-all duration-300">
+            <Link href="/" className="touch-polish inline-flex items-center gap-2.5 group mb-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
+              <div className="w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
                 <span className="text-[13px] font-black text-white tracking-tight leading-none drop-shadow">IV</span>
               </div>
               <span className="text-[15px] font-semibold tracking-tight text-slate-950">India Verified</span>
@@ -40,7 +40,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
+              className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(10,132,255,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
             >
               <Github className="w-3.5 h-3.5" />
               GitHub
@@ -57,7 +57,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-slate-600 hover:text-slate-950 transition-colors duration-200"
+                    className="touch-polish rounded-md text-slate-600 hover:text-slate-950 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                   >
                     {link.label}
                   </Link>

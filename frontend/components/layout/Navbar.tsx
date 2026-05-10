@@ -74,9 +74,9 @@ export function Navbar() {
               <Link
                 href="/"
                 aria-label="India Verified — home"
-                className="flex items-center gap-3 group focus:outline-none"
+                className="touch-polish flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 rounded-2xl"
               >
-                <div className="relative w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_16px_42px_-22px_rgba(10,132,255,0.65)] group-hover:scale-105 transition-all duration-300">
+                <div className="relative w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_16px_42px_-22px_rgba(10,132,255,0.65)] group-hover:scale-105 group-active:scale-95 transition-all duration-300">
                   <span className="text-[13px] font-black text-white tracking-tight leading-none drop-shadow">IV</span>
                 </div>
                 <span className="hidden sm:flex flex-col leading-none">
@@ -95,8 +95,8 @@ export function Navbar() {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`relative px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
-                        active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950'
+                      className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                        active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.035]'
                       }`}
                     >
                       {link.label}
@@ -114,33 +114,35 @@ export function Navbar() {
 
               {/* Right actions */}
               <div className="flex items-center gap-2">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
                   onClick={openSearch}
                   aria-label="Search articles"
-                  className="p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-colors duration-200"
+                  className="touch-polish p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Search className="w-[18px] h-[18px]" strokeWidth={2} />
-                </button>
+                </motion.button>
 
                 <a
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
+                  className="touch-polish hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(10,132,255,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Github className="w-3.5 h-3.5" />
                   GitHub
                 </a>
 
                 {/* Mobile hamburger */}
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setIsMobileOpen((v) => !v)}
                   aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={isMobileOpen}
-                  className="lg:hidden p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-colors duration-200"
+                  className="touch-polish lg:hidden p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
@@ -180,7 +182,7 @@ export function Navbar() {
                 <button
                   onClick={() => setIsMobileOpen(false)}
                   aria-label="Close menu"
-                  className="p-2 text-slate-500 hover:text-slate-950 rounded-lg hover:bg-slate-950/[0.06]"
+                  className="touch-polish p-2 text-slate-500 hover:text-slate-950 rounded-lg hover:bg-slate-950/[0.06] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -197,7 +199,7 @@ export function Navbar() {
                     >
                       <Link
                         href={link.href}
-                        className={`block px-4 py-3 rounded-xl text-[15px] font-medium transition-colors ${
+                        className={`touch-polish block px-4 py-3 rounded-xl text-[15px] font-medium transition-all active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                           active
                             ? 'bg-slate-950/[0.055] text-slate-950 border border-slate-950/[0.10]'
                             : 'text-slate-600 hover:bg-slate-950/[0.04] border border-transparent'
@@ -214,7 +216,7 @@ export function Navbar() {
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-slate-950/[0.055] hover:bg-slate-950/[0.08] border border-slate-950/[0.10] text-sm font-medium text-slate-800 transition-all"
+                  className="touch-polish flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-slate-950/[0.055] hover:bg-slate-950/[0.08] border border-slate-950/[0.10] text-sm font-medium text-slate-800 transition-all active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Github className="w-4 h-4" />
                   View on GitHub
