@@ -232,7 +232,24 @@ CREATE TRIGGER update_posts_updated_at
 
 
 -- ---------------------------------------------------------------------------
--- 5. Realtime
+-- 5. Grants
+-- ---------------------------------------------------------------------------
+-- When tables are created via raw SQL (not Supabase dashboard migrations),
+-- the service_role must be granted access explicitly.
+GRANT USAGE ON SCHEMA public TO service_role, anon, authenticated;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON raw_articles      TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON posts             TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON discarded_articles TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON known_false_claims TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON pipeline_runs     TO service_role;
+
+-- anon key: public read on posts only (mirrors RLS policy).
+GRANT SELECT ON posts TO anon, authenticated;
+
+
+-- ---------------------------------------------------------------------------
+-- 6. Realtime
 -- ---------------------------------------------------------------------------
 -- Add the posts table to Supabase's realtime publication so the frontend
 -- receives live INSERT events via the browser Supabase client.
