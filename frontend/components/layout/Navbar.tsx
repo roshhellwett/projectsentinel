@@ -74,10 +74,17 @@ export function Navbar() {
               <Link
                 href="/"
                 aria-label="India Verified — home"
-                className="touch-polish flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 rounded-2xl"
+                className="touch-polish flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950/30 rounded-2xl"
               >
-                <div className="relative w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_16px_42px_-22px_rgba(10,132,255,0.65)] group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-                  <span className="text-[13px] font-black text-white tracking-tight leading-none drop-shadow">IV</span>
+                <div
+                  className="relative w-9 h-9 rounded-xl flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300"
+                  style={{
+                    background: 'linear-gradient(145deg, #111111, #0a0a0a)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px -8px rgba(0,0,0,0.35)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                  }}
+                >
+                  <span className="text-[12px] font-light text-white/90 tracking-[0.15em] leading-none" style={{ letterSpacing: '0.15em' }}>IV</span>
                 </div>
                 <span className="hidden sm:flex flex-col leading-none">
                   <span className="text-[15px] font-semibold tracking-tight text-slate-950">India Verified</span>

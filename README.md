@@ -1,131 +1,106 @@
-# India Verified
+![Repo Size](https://img.shields.io/github/repo-size/roshhellwett/projectsentinel?style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/roshhellwett/projectsentinel?style=for-the-badge)
+![Forks](https://img.shields.io/github/forks/roshhellwett/projectsentinel?style=for-the-badge)
+![Issues](https://img.shields.io/github/issues/roshhellwett/projectsentinel?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-Llama%203.3-0a84ff?style=for-the-badge)
 
-An AI-powered, fully automated Indian news aggregator that verifies stories through cross-referencing before publishing. Zero human intervention required.
+# INDIA VERIFIED
 
-## What It Does
+An AI-powered, fully automated Indian news aggregator that cross-references stories across multiple trusted sources before publishing. Zero human intervention. No ads. No bias.
 
-- **Fetches** news from trusted Indian sources every 30 minutes
-- **Verifies** stories by cross-referencing multiple sources using Groq AI (Llama 3.3 70B)
-- **Writes** neutral summaries using Groq AI (Llama 3.3 70B)
-- **Publishes** only verified stories with credibility scores and source links
-- **Operates** 24/7 without any human editors
+---
+
+## Key Features
+
+### AI Verification Pipeline
+- **Automated Fact-Checking**: Every story is verified using Groq Llama 3.3 70B before it reaches your screen
+- **Multi-Source Cross-Reference**: Stories must be confirmed by 2+ independent trusted sources or they are discarded
+- **Credibility Scoring**: Every article receives a 0–100 credibility score based on source authority, detail richness, and writing tone
+- **Neutral AI Writing**: Verified facts are rewritten into unbiased, factual summaries — no sensationalism, no spin
+
+### Fully Autonomous
+- **Runs 24/7**: Fetches news from RSS feeds and APIs every 30 minutes — no human editors needed
+- **SHA256 Deduplication**: Duplicate stories are automatically filtered out using URL hashing
+- **Domain Blocklist**: Known satire, spam, and fake-news domains are blocked at the pipeline level
+- **Structured Logging**: Full observability with detailed pipeline logs to stdout
+
+### Premium Reading Experience
+- **Clean, Distraction-Free**: Apple-inspired editorial design with frosted glass cards and subtle animations
+- **Infinite Scroll**: Smooth auto-loading feed with no pagination
+- **Real-Time Category Filtering**: Browse news by Politics, Business, Sports, Tech, and more
+- **RSS Feed**: Subscribe via your favourite RSS reader for offline access
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14 + TypeScript + Tailwind CSS |
+| Frontend | Next.js 15 + TypeScript + Tailwind CSS |
 | Backend | Python 3.11 + FastAPI |
 | Database | Supabase (PostgreSQL) |
 | AI Verification | Groq API (Llama 3.3 70B) |
 | AI Writing | Groq API (Llama 3.3 70B) |
-| Hosting | Vercel (frontend), Railway (backend) |
+| Hosting | Vercel (frontend), Railway (worker) |
+
+---
 
 ## Project Structure
 
 ```
 projectsentinel/
-├── frontend/          # Next.js application
-├── worker/            # Python pipeline
-├── supabase/          # Database migrations
-└── .github/           # CI/CD workflows
+├── frontend/              # Next.js application
+│   ├── app/               # App router (pages, API routes)
+│   ├── components/        # Reusable UI components
+│   ├── lib/               # Supabase client, utilities
+│   └── public/            # Static assets
+├── worker/                # Python verification pipeline
+│   ├── fetcher/           # RSS & API news fetching
+│   ├── verifier/          # Groq AI cross-referencing
+│   ├── writer/            # Neutral summary generation
+│   ├── publisher/         # Database insert logic
+│   └── scheduler/         # Cron-based orchestration
+├── supabase/              # Database migrations & schema
+└── .github/               # CI/CD workflows
 ```
 
-## Quick Start
-
-### 1. Clone and Setup
-
-```bash
-git clone https://github.com/yourusername/projectsentinel.git
-cd projectsentinel
-```
-
-### 2. Setup Supabase
-
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Open the SQL Editor
-3. Run the migration file: `supabase/migrations/001_initial_schema.sql`
-4. Enable real-time for the `posts` table in the dashboard
-5. Copy your project URL and keys
-
-### 3. Setup Backend (Worker)
-
-```bash
-cd worker
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
-# Create .env file from example
-cp .env.example .env
-# Edit .env with your actual values
-
-# Run locally
-python main.py
-```
-
-### 4. Setup Frontend
-
-```bash
-cd frontend
-npm install
-
-# Create .env.local file from example
-cp .env.example .env.local
-# Edit .env.local with your actual values
-
-# Run locally
-npm run dev
-```
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in all values:
-
-- **Supabase**: URL, anon key, service role key
-- **AI**: Groq API keys for verification and writing
-- **News APIs**: GNews API key, NewsAPI key
-- **Admin**: Password, secret token
-- **App**: Site URL, Supabase public config
-
-## Deployment
-
-### Frontend (Vercel)
-
-1. Push code to GitHub
-2. Import repo at [vercel.com](https://vercel.com)
-3. Set root directory to `frontend/`
-4. Add environment variables
-5. Deploy (auto-deploys on push)
-
-### Backend (Railway)
-
-1. Create project at [railway.app](https://railway.app)
-2. Connect GitHub repo, set root to `worker/`
-3. Add environment variables
-4. Deploy
-5. Set up [cron-job.org](https://cron-job.org) to ping `/health` every 10 minutes
+---
 
 ## How the Pipeline Works
 
+```
+Fetch → Deduplicate → Block Check → False Claim Match
+  → Cross-Source Check → AI Verification → AI Writing → Publish
+```
+
 1. **Fetch**: RSS feeds + news APIs → `raw_articles` table
-2. **Deduplicate**: SHA256 URL hashing
-3. **Block check**: Skip blocked/satire domains
-4. **False claim match**: Check against known false claims
-5. **Cross-source check**: Require 2+ sources
-6. **Groq verification**: Score 0-100, extract key facts, headline, and summary
-7. **Groq writing**: Write neutral headline + summary
-8. **Publish**: Insert to `posts` table
-9. **Log**: Structured logging to stdout
+2. **Deduplicate**: SHA256 URL hashing prevents duplicates
+3. **Block Check**: Skip known satire and spam domains
+4. **False Claim Match**: Cross-check against known false claims
+5. **Cross-Source Check**: Require 2+ independent sources
+6. **Groq Verification**: Score 0–100, extract key facts, headline, summary
+7. **Groq Writing**: Write neutral, factual headline + summary
+8. **Publish**: Insert verified story into `posts` table
+
+---
 
 ## License
 
 MIT — Open source and free to use.
 
+---
+
 ## Transparency
 
-- Full source code on GitHub
-- Credibility scores on every story
-- All source links visible
+- Full source code available on GitHub
+- Credibility score displayed on every story
+- All original source links visible
 - Correction system for errors
 - No ads, no sponsored content
+
+---
+
+© 2026 [Zenith Open Source Projects](https://zenithopensourceprojects.vercel.app/). All Rights Reserved.
+Zenith is an Open Source Project Idea by @roshhellwett

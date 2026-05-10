@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" fill="none">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1500" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#111111"/>
+    </linearGradient>
+
+    <!-- Subtle radial highlight top-left -->
+    <radialGradient id="highlight" cx="0%" cy="0%" r="60%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Glass sheen for icon -->
+    <linearGradient id="icon-glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.09"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Separator line gradient -->
+    <linearGradient id="sep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Dot pattern -->
+    <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ffffff" fill-opacity="0.035"/>
+    </pattern>
+
+    <clipPath id="icon-clip">
+      <rect x="120" y="170" width="160" height="160" rx="36" ry="36"/>
+    </clipPath>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="1500" height="500" fill="url(#bg)"/>
+
+  <!-- Dot grid overlay -->
+  <rect width="1500" height="500" fill="url(#dots)"/>
+
+  <!-- Radial highlight -->
+  <rect width="1500" height="500" fill="url(#highlight)"/>
+
+  <!-- Subtle top edge line -->
+  <line x1="0" y1="0.5" x2="1500" y2="0.5" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+  <!-- Subtle bottom edge line -->
+  <line x1="0" y1="499.5" x2="1500" y2="499.5" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+
+  <!-- ── LOGO ICON ── -->
+  <!-- Icon background -->
+  <rect x="120" y="170" width="160" height="160" rx="36" ry="36"
+    fill="#161616"
+    stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+  <!-- Icon glass sheen top half -->
+  <rect x="120" y="170" width="160" height="80" rx="36" ry="36"
+    fill="url(#icon-glass)"
+    clip-path="url(#icon-clip)"/>
+  <!-- IV text in icon -->
+  <text
+    x="200" y="267"
+    text-anchor="middle"
+    font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="56"
+    font-weight="200"
+    letter-spacing="7"
+    fill="#ffffff"
+    fill-opacity="0.90"
+  >IV</text>
+
+  <!-- ── VERTICAL SEPARATOR ── -->
+  <rect x="342" y="148" width="1" height="204" fill="url(#sep)"/>
+
+  <!-- ── TEXT CONTENT ── -->
+  <!-- Brand name -->
+  <text
+    x="384" y="247"
+    font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="72"
+    font-weight="700"
+    letter-spacing="-2"
+    fill="#ffffff"
+    fill-opacity="0.95"
+  >India Verified</text>
+
+  <!-- Tagline -->
+  <text
+    x="386" y="302"
+    font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="26"
+    font-weight="300"
+    letter-spacing="0.3"
+    fill="#ffffff"
+    fill-opacity="0.42"
+  >AI-Verified Indian News &#xB7; No Ads &#xB7; No Bias &#xB7; Open Source</text>
+
+  <!-- ── BOTTOM-RIGHT BADGE ── -->
+  <!-- Badge pill -->
+  <rect x="1296" y="420" width="160" height="38" rx="19" ry="19"
+    fill="#ffffff" fill-opacity="0.05"
+    stroke="#ffffff" stroke-opacity="0.10" stroke-width="1"/>
+  <text
+    x="1376" y="444"
+    text-anchor="middle"
+    font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="15"
+    font-weight="400"
+    letter-spacing="1.5"
+    fill="#ffffff"
+    fill-opacity="0.40"
+  >verifiedindian.vercel.app</text>
+</svg>
