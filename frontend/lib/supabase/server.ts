@@ -76,6 +76,11 @@ export async function fetchPosts(
     const { data, error, count } = await query;
 
     if (error) {
+      // Handle "Requested range not satisfiable" gracefully
+      // This occurs when pagination range exceeds available rows
+      if (error.message?.includes('Requested range not satisfiable')) {
+        return { posts: [], count: 0 };
+      }
       throw new Error(`fetchPosts error: ${error.message}`);
     }
 
