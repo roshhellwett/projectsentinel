@@ -31,19 +31,14 @@ class OldPostArchiver:
 
         try:
             cutoff_date = (datetime.now(UTC) - timedelta(days=180)).isoformat()
-            count_result = (
-                self.supabase.table("posts").select("id", count="exact").lt("published_at", cutoff_date).execute()
-            )
-
-            old_count = count_result.count if hasattr(count_result, "count") else 0
-
-            if old_count == 0:
-                self.logger.log("ARCHIVER", "No old posts to archive")
-                return 0
-
+            # Delete directly; the result tells us how many rows were affected,
+            # so the separate count query is unnecessary.
             delete_result = self.supabase.table("posts").delete().lt("published_at", cutoff_date).execute()
             deleted = len(delete_result.data) if delete_result.data else 0
-            self.logger.log("ARCHIVER", f"Archived {deleted} posts older than 6 months")
+            if deleted == 0:
+                self.logger.log("ARCHIVER", "No old posts to archive")
+            else:
+                self.logger.log("ARCHIVER", f"Archived {deleted} posts older than 6 months")
             return deleted
 
         except Exception as e:

@@ -23,6 +23,7 @@ class SupabasePublisher:
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
+        self._recent_headlines: list[str] | None = None
         self._init_supabase()
 
     def _init_supabase(self):
@@ -50,27 +51,17 @@ class SupabasePublisher:
             if source_urls:
                 post_data["story_fingerprint"] = hashlib.sha256("|".join(source_urls).encode()).hexdigest()
 
-            # Prevent duplicate headlines
+            # Prevent duplicate headlines (cached per pipeline run)
             headline = post_data.get("headline", "")
             if headline:
                 norm_headline = _normalize_headline(headline)
+                recent = self._get_recent_headlines()
 
-                try:
-                    recent = (
-                        self.supabase.table("posts")
-                        .select("headline")
-                        .order("published_at", desc=True)
-                        .limit(200)
-                        .execute()
-                    )
-                    for row in recent.data or []:
-                        existing = row.get("headline", "")
-                        if (_normalize_headline(existing) == norm_headline
-                                or title_similarity(headline, existing) >= 0.75):
-                            self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
-                            return False
-                except Exception as e:
-                    self.logger.log("PUBLISHER_WARN", f"Headline dedup check failed (proceeding): {str(e)[:80]}")
+                for existing in recent:
+                    if (_normalize_headline(existing) == norm_headline
+                            or title_similarity(headline, existing) >= 0.75):
+                        self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
+                        return False
 
             try:
                 result = self.supabase.table("posts").insert(post_data).execute()
@@ -83,6 +74,9 @@ class SupabasePublisher:
 
             if result.data:
                 self.logger.log("PUBLISH", f"Published: {post.get('headline', '')[:50]}")
+                # Update local cache so subsequent publishes in same run see this headline
+                if headline and self._recent_headlines is not None:
+                    self._recent_headlines.append(headline)
                 return True
             else:
                 self.logger.log("PUBLISHER_ERROR", "Insert returned no data")
@@ -91,3 +85,28 @@ class SupabasePublisher:
         except Exception as e:
             self.logger.log("PUBLISHER_ERROR", f"Failed to publish: {str(e)}")
             return False
+
+    def _get_recent_headlines(self) -> list[str]:
+        """Load recent headlines once per pipeline run, then cache."""
+        if self._recent_headlines is not None:
+            return self._recent_headlines
+
+        self._recent_headlines = []
+        if not self.supabase:
+            return self._recent_headlines
+
+        try:
+            recent = (
+                self.supabase.table("posts")
+                .select("headline")
+                .order("published_at", desc=True)
+                .limit(200)
+                .execute()
+            )
+            self._recent_headlines = [
+                row.get("headline", "") for row in (recent.data or []) if row.get("headline")
+            ]
+        except Exception as e:
+            self.logger.log("PUBLISHER_WARN", f"Headline dedup load failed (proceeding): {str(e)[:80]}")
+
+        return self._recent_headlines

@@ -6,8 +6,27 @@ Optimized: batch insert instead of N+1 queries.
 import re
 
 import feedparser
+import requests
 
 from logger.pipeline_logger import PipelineLogger
+
+
+_STOP_WORDS: frozenset[str] = frozenset(
+    {
+        "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+        "have", "has", "had", "do", "does", "did", "will", "would", "could",
+        "should", "may", "might", "must", "shall", "can", "need", "to", "of",
+        "in", "for", "on", "with", "at", "by", "from", "as", "into", "through",
+        "during", "before", "after", "above", "below", "between", "under",
+        "again", "further", "then", "once", "here", "there", "when", "where",
+        "why", "how", "all", "each", "few", "more", "most", "other", "some",
+        "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too",
+        "very", "just", "and", "but", "if", "or", "because", "until", "while",
+        "this", "that", "these", "those", "am", "s", "t", "don", "doesn",
+        "didn", "wasn", "weren", "haven", "hasn", "hadn", "won", "wouldn",
+        "shouldn", "mightn", "mustn", "isn", "aren",
+    }
+)
 
 
 class FactCheckFetcher:
@@ -40,14 +59,30 @@ class FactCheckFetcher:
         existing_urls = set()
 
         try:
-            existing = supabase.table("known_false_claims").select("fact_check_url").execute()
-            existing_urls = {row["fact_check_url"] for row in (existing.data or [])}
+            # Bound the query — fact-check feeds only republish recent items,
+            # so the latest 2000 URLs are sufficient for dedup.
+            existing = (
+                supabase.table("known_false_claims")
+                .select("fact_check_url")
+                .order("added_at", desc=True)
+                .limit(2000)
+                .execute()
+            )
+            existing_urls = {row["fact_check_url"] for row in (existing.data or []) if row.get("fact_check_url")}
         except Exception as e:
             self.logger.log("FACTCHECK_ERROR", f"Failed to get existing claims: {str(e)}")
 
         for feed_config in self.FACTCHECK_FEEDS:
             try:
-                feed = feedparser.parse(feed_config["url"])
+                # Use requests for the network call so we have a timeout
+                # (feedparser.parse(url) has no timeout and can hang the pipeline).
+                resp = requests.get(
+                    feed_config["url"],
+                    timeout=20,
+                    headers={"User-Agent": "IndiaVerified Bot/1.0"},
+                )
+                resp.raise_for_status()
+                feed = feedparser.parse(resp.content)
 
                 for entry in feed.entries:
                     claim = self._parse_factcheck(entry, feed_config["name"])
@@ -89,115 +124,7 @@ class FactCheckFetcher:
 
     def _extract_keywords(self, title: str) -> list[str]:
         """Extract relevant keywords from a fact-check title."""
-        stop_words = frozenset(
-            {
-                "the",
-                "a",
-                "an",
-                "is",
-                "are",
-                "was",
-                "were",
-                "be",
-                "been",
-                "being",
-                "have",
-                "has",
-                "had",
-                "do",
-                "does",
-                "did",
-                "will",
-                "would",
-                "could",
-                "should",
-                "may",
-                "might",
-                "must",
-                "shall",
-                "can",
-                "need",
-                "to",
-                "of",
-                "in",
-                "for",
-                "on",
-                "with",
-                "at",
-                "by",
-                "from",
-                "as",
-                "into",
-                "through",
-                "during",
-                "before",
-                "after",
-                "above",
-                "below",
-                "between",
-                "under",
-                "again",
-                "further",
-                "then",
-                "once",
-                "here",
-                "there",
-                "when",
-                "where",
-                "why",
-                "how",
-                "all",
-                "each",
-                "few",
-                "more",
-                "most",
-                "other",
-                "some",
-                "such",
-                "no",
-                "nor",
-                "not",
-                "only",
-                "own",
-                "same",
-                "so",
-                "than",
-                "too",
-                "very",
-                "just",
-                "and",
-                "but",
-                "if",
-                "or",
-                "because",
-                "until",
-                "while",
-                "this",
-                "that",
-                "these",
-                "those",
-                "am",
-                "s",
-                "t",
-                "don",
-                "doesn",
-                "didn",
-                "wasn",
-                "weren",
-                "haven",
-                "hasn",
-                "hadn",
-                "won",
-                "wouldn",
-                "shouldn",
-                "mightn",
-                "mustn",
-                "isn",
-                "aren",
-            }
-        )
-
         words = re.findall(r"\b\w+\b", title.lower())
-        keywords = [w for w in words if len(w) > 3 and w not in stop_words]
+        keywords = [w for w in words if len(w) > 3 and w not in _STOP_WORDS]
 
         return list(dict.fromkeys(keywords))[:10]

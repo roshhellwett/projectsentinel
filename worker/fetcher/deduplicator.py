@@ -35,9 +35,13 @@ class Deduplicator:
 
         try:
             cutoff = (datetime.now(UTC) - timedelta(days=45)).isoformat()
-            recent_result = self.supabase.table("raw_articles").select("url_hash").gte("fetched_at", cutoff).execute()
-            null_result = self.supabase.table("raw_articles").select("url_hash").is_("fetched_at", "null").execute()
-            rows = (recent_result.data or []) + (null_result.data or [])
+            result = (
+                self.supabase.table("raw_articles")
+                .select("url_hash")
+                .or_(f"fetched_at.gte.{cutoff},fetched_at.is.null")
+                .execute()
+            )
+            rows = result.data or []
             self._known_hashes = {row["url_hash"] for row in rows if row.get("url_hash")}
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
@@ -112,20 +116,31 @@ class Deduplicator:
             return 0
 
         try:
-            insert_data = [
-                {
-                    "url_hash": a["url_hash"],
-                    "url": a["url"],
-                    "headline": a["headline"],
-                    "excerpt": a.get("excerpt", ""),
-                    "source_name": a["source_name"],
-                    "source_url": a.get("source_url", ""),
-                    "category_hint": a.get("category_hint", "general"),
-                    "processed": False,
-                    "fetched_at": datetime.now(UTC).isoformat(),
-                }
-                for a in articles
-            ]
+            now_iso = datetime.now(UTC).isoformat()
+            insert_data = []
+            for a in articles:
+                url_hash = a.get("url_hash")
+                url = a.get("url")
+                headline = a.get("headline")
+                # Skip malformed entries so one bad article doesn't kill the whole batch.
+                if not url_hash or not url or not headline:
+                    continue
+                insert_data.append(
+                    {
+                        "url_hash": url_hash,
+                        "url": url,
+                        "headline": headline,
+                        "excerpt": a.get("excerpt", ""),
+                        "source_name": a.get("source_name", ""),
+                        "source_url": a.get("source_url", ""),
+                        "category_hint": a.get("category_hint", "general"),
+                        "processed": False,
+                        "fetched_at": now_iso,
+                    }
+                )
+
+            if not insert_data:
+                return 0
 
             try:
                 self.supabase.table("raw_articles").upsert(

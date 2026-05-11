@@ -41,6 +41,7 @@ class RateLimiter:
 
     def wait_if_needed(self):
         """Wait if needed to respect rate limits."""
+        sleep_duration = 0.0
         with self._lock:
             current_time = time.time()
 
@@ -53,10 +54,14 @@ class RateLimiter:
 
             time_since_last = current_time - self.last_call_time
             if time_since_last < self.min_delay:
-                time.sleep(self.min_delay - time_since_last)
+                sleep_duration = self.min_delay - time_since_last
 
-            self.last_call_time = time.time()
+            # Reserve the slot now; sleep happens outside the lock.
+            self.last_call_time = current_time + sleep_duration
             self.calls_today += 1
+
+        if sleep_duration > 0:
+            time.sleep(sleep_duration)
 
     def get_calls_remaining(self) -> int | None:
         """Get remaining calls for today."""

@@ -94,14 +94,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
     }
 
     try:
-        deduplicator = Deduplicator()
-        factcheck_matcher = FactCheckMatcher()
-        cross_source_checker = CrossSourceChecker()
-        groq_verifier = GroqVerifier()
-        groq_writer = GroqWriter()
-        post_builder = PostBuilder()
-        publisher = SupabasePublisher()
-
         if archive_only:
             archiver = OldPostArchiver()
             deleted_count = archiver.archive_old_posts()
@@ -110,6 +102,14 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             duration = (datetime.now(UTC) - start_time).total_seconds()
             _record_run_end(logger, run_id, duration, {"archived": deleted_count, **cleanup_counts})
             return
+
+        deduplicator = Deduplicator()
+        factcheck_matcher = FactCheckMatcher()
+        cross_source_checker = CrossSourceChecker()
+        groq_verifier = GroqVerifier()
+        groq_writer = GroqWriter()
+        post_builder = PostBuilder()
+        publisher = SupabasePublisher()
 
         all_articles: list[dict] = []
 
@@ -135,9 +135,12 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     except Exception as e:
                         logger.log("FETCH_ERROR", f"{name} failed: {str(e)}")
 
-        factcheck_fetcher = FactCheckFetcher()
-        new_fact_checks = factcheck_fetcher.update_known_false_claims()
-        logger.log("FACTCHECK", f"Updated {new_fact_checks} known false claims")
+        # Only refresh known-false-claims for the full pipeline; supplementary
+        # fetch just stores raw articles for the next main run.
+        if not supplementary_only:
+            factcheck_fetcher = FactCheckFetcher()
+            new_fact_checks = factcheck_fetcher.update_known_false_claims()
+            logger.log("FACTCHECK", f"Updated {new_fact_checks} known false claims")
 
         stats["fetched"] = len(all_articles)
 
@@ -205,6 +208,12 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
 
+        # Mark single-source articles as processed so they don't re-appear every run
+        grouped_hashes = {a.get("url_hash") for g in verified_groups for a in g if a.get("url_hash")}
+        single_source_articles = [a for a in clean_articles if a.get("url_hash") and a["url_hash"] not in grouped_hashes]
+        if single_source_articles:
+            deduplicator.mark_group_processed(single_source_articles)
+
         # Pre-AI dedup: drop groups whose representative headline is a paraphrase
         # of an already-queued group (catches cases SequenceMatcher would miss at 0.80).
         unique_groups: list[list[dict]] = []
@@ -220,10 +229,14 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         verified_groups = unique_groups
 
         groups_to_process = verified_groups[:max_ai_groups]
-        stats["ai_groups_skipped"] = max(0, len(verified_groups) - len(groups_to_process))
+        deferred_groups = verified_groups[max_ai_groups:]
+        stats["ai_groups_skipped"] = len(deferred_groups)
 
         if stats["ai_groups_skipped"]:
             logger.log("AI_BUDGET", f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run")
+            # Mark deferred groups as processed to prevent infinite re-processing backlog
+            for grp in deferred_groups:
+                deduplicator.mark_group_processed(grp)
 
         for group in groups_to_process:
             representative_url = group[0].get("url", "unknown") if group else "unknown"
@@ -263,7 +276,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     try:
                         writing = groq_writer.write(
                             key_facts=verification.get("key_facts", []),
-                            category=verification.get("category", "general"),
+                            category=verification.get("category", "world"),
                         )
                         headline = writing["headline"]
                         summary = writing["summary"]
@@ -283,15 +296,18 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 post = post_builder.build(
                     headline=headline,
                     summary=summary,
-                    category=verification.get("category", "general"),
+                    category=verification.get("category", "world"),
                     credibility_score=score,
                     credibility_reason=verification.get("reason", ""),
                     source_articles=group,
                 )
 
-                if publisher.publish(post):
+                published = publisher.publish(post)
+                deduplicator.mark_group_processed(group)
+                if published:
                     stats["published"] += 1
-                    deduplicator.mark_group_processed(group)
+                else:
+                    deduplicator.log_discarded_group(group, "publish_rejected_duplicate")
 
             except Exception as e:
                 logger.log(
@@ -304,7 +320,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         duration = (datetime.now(UTC) - start_time).total_seconds()
         logger.log("COMPLETE", f"Pipeline completed in {duration:.1f}s", stats)
-        groq_verifier.save_pool_stats()
         _record_run_end(logger, run_id, duration, stats)
 
     except Exception as e:
@@ -313,3 +328,9 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         duration = (datetime.now(UTC) - start_time).total_seconds()
         _record_run_end(logger, run_id, duration, {**stats, "error": str(e)})
         raise
+    finally:
+        # Always persist key usage stats, even on failure
+        try:
+            GroqVerifier.save_pool_stats()
+        except Exception:
+            pass

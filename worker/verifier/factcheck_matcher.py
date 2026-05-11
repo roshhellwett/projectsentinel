@@ -83,6 +83,8 @@ class FactCheckMatcher:
             claim_summary = claim.get("claim_summary", "").lower()
             if claim_summary and len(claim_summary) > 20:
                 claim_words = set(re.findall(r"\b\w+\b", claim_summary))
+                if not headline_words or not claim_words:
+                    continue
                 overlap = headline_words & claim_words
                 if len(overlap) >= 4 and len(overlap) / min(len(headline_words), len(claim_words)) >= 0.5:
                     self.logger.log("FACTCHECK_MATCHER", f"Word overlap match: {claim.get('claim_summary', '')[:50]}")

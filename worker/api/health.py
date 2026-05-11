@@ -58,7 +58,12 @@ async def pipeline_status():
                 last_run_at = run_result.data[0]["started_at"]
 
             today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-            count_result = sb.table("posts").select("id", count="exact").gte("published_at", today_start).execute()
+            count_result = (
+                sb.table("posts")
+                .select("id", count="exact", head=True)
+                .gte("published_at", today_start)
+                .execute()
+            )
             stories_today = count_result.count or 0
         except Exception:
             pass

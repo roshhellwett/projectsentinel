@@ -5,6 +5,7 @@ Starts FastAPI server and APScheduler for the news pipeline.
 
 import os
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
@@ -19,13 +20,24 @@ load_dotenv()
 
 scheduler = BackgroundScheduler(
     job_defaults={"coalesce": True, "misfire_grace_time": 300},
+    timezone="UTC",
 )
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage scheduler lifecycle."""
-    scheduler.add_job(run_pipeline, "interval", minutes=10, id="news_pipeline", replace_existing=True, max_instances=1)
+    # next_run_time=now ensures the main pipeline runs immediately on startup
+    # instead of waiting a full 10-minute interval.
+    scheduler.add_job(
+        run_pipeline,
+        "interval",
+        minutes=10,
+        id="news_pipeline",
+        replace_existing=True,
+        max_instances=1,
+        next_run_time=datetime.now(UTC),
+    )
 
     scheduler.add_job(
         run_pipeline,
@@ -56,6 +68,7 @@ async def lifespan(app: FastAPI):
         print("  - Archive job: 1st of month at 2 AM")
     except Exception as e:
         print(f"Scheduler failed to start: {e}")
+        raise RuntimeError(f"Scheduler failed to start: {e}") from e
 
     yield
 

@@ -18,6 +18,8 @@ def save_key_stats(stats: list[dict]) -> None:
     """Upsert today's key usage stats to Supabase. Non-fatal on error."""
     try:
         supabase = get_supabase()
+        if not supabase:
+            return
         today = str(date.today())
         (
             supabase.table("groq_usage")
@@ -35,6 +37,8 @@ def load_key_stats() -> list[dict]:
     """Load today's key usage stats from Supabase. Returns [] on miss or error."""
     try:
         supabase = get_supabase()
+        if not supabase:
+            return []
         today = str(date.today())
         result = (
             supabase.table("groq_usage")

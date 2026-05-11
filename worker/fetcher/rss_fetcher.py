@@ -3,6 +3,7 @@ RSS feed fetcher - parallel fetching with session reuse.
 Optimized: concurrent feed fetching, session passed to feedparser.
 """
 
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from urllib.parse import urlparse
@@ -19,9 +20,21 @@ from sources.rss_sources import get_rss_sources
 class RSSFetcher:
     """Fetches and parses RSS feeds from configured sources."""
 
+    _USER_AGENT = "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"
+
     def __init__(self, max_workers: int = 8):
         self.logger = PipelineLogger()
         self.max_workers = max_workers
+        self._local = threading.local()
+
+    def _get_session(self) -> requests.Session:
+        """Return a thread-local session (requests.Session is NOT thread-safe)."""
+        session = getattr(self._local, "session", None)
+        if session is None:
+            session = requests.Session()
+            session.headers.update({"User-Agent": self._USER_AGENT})
+            self._local.session = session
+        return session
 
     def fetch_all(self) -> list[dict]:
         """
@@ -59,14 +72,15 @@ class RSSFetcher:
         """
         articles = []
 
-        session = requests.Session()
-        session.headers.update({"User-Agent": "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"})
-
         try:
-            resp = session.get(source["url"], timeout=20)
+            resp = self._get_session().get(source["url"], timeout=20)
             resp.raise_for_status()
             feed = feedparser.parse(resp.content)
-        except Exception:
+        except Exception as e:
+            self.logger.log(
+                "RSS_ERROR",
+                f"Feed fetch failed for {source.get('name', source['url'])}: {str(e)[:120]}",
+            )
             return []
 
         for entry in feed.entries[:10]:

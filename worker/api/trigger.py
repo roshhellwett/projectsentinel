@@ -15,6 +15,8 @@ from scheduler.jobs import run_pipeline
 router = APIRouter()
 
 ADMIN_SECRET_TOKEN = os.getenv("ADMIN_SECRET_TOKEN", "")
+_pipeline_running = threading.Event()
+_pipeline_lock = threading.Lock()
 
 
 class TriggerResponse(BaseModel):
@@ -46,6 +48,14 @@ async def trigger_pipeline(
     if x_admin_token != ADMIN_SECRET_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid admin token")
 
+    # Atomic check-and-set under a lock so two concurrent triggers can't both pass.
+    with _pipeline_lock:
+        if _pipeline_running.is_set():
+            return TriggerResponse(
+                success=False, message="Pipeline is already running", timestamp=datetime.now(UTC).isoformat()
+            )
+        _pipeline_running.set()
+
     kwargs = {}
     if request:
         if request.supplementary_only:
@@ -53,8 +63,19 @@ async def trigger_pipeline(
         if request.archive_only:
             kwargs["archive_only"] = True
 
-    thread = threading.Thread(target=run_pipeline, kwargs=kwargs, daemon=True)
-    thread.start()
+    def _run_guarded(**kw):
+        try:
+            run_pipeline(**kw)
+        finally:
+            _pipeline_running.clear()
+
+    try:
+        thread = threading.Thread(target=_run_guarded, kwargs=kwargs, daemon=True)
+        thread.start()
+    except Exception:
+        # Spawn failed — release the guard so a future trigger can try again.
+        _pipeline_running.clear()
+        raise
 
     return TriggerResponse(
         success=True, message="Pipeline triggered successfully", timestamp=datetime.now(UTC).isoformat()

@@ -249,6 +249,7 @@ class GroqVerifier:
 
         user_content = self._build_prompt(article_group)
 
+        api_failures = 0
         for attempt in range(self.MAX_RETRIES):
             # Select the key with fewest calls today (skips 429-exhausted keys).
             try:
@@ -257,10 +258,11 @@ class GroqVerifier:
                 self.logger.log("GROQ_VERIFY_ERROR", str(exc))
                 raise
 
+            # Only downgrade model after actual API errors, not parse failures
             model = (
                 self.verify_model
-                if attempt == 0
-                else self.FALLBACK_MODELS[min(attempt - 1, len(self.FALLBACK_MODELS) - 1)]
+                if api_failures == 0
+                else self.FALLBACK_MODELS[min(api_failures - 1, len(self.FALLBACK_MODELS) - 1)]
             )
 
             stats = pool.get_stats()
@@ -302,25 +304,42 @@ class GroqVerifier:
                     continue
 
                 response.raise_for_status()
+                # Count any HTTP 200 toward the daily quota — Groq bills these
+                # whether or not the JSON is parseable on our side.
                 pool.record_success(slot_idx)
 
-                result = response.json()
-                content = result["choices"][0]["message"]["content"]
+                try:
+                    result = response.json()
+                    content = result["choices"][0]["message"]["content"]
+                except (ValueError, KeyError, IndexError, TypeError) as e:
+                    self.logger.log(
+                        "GROQ_VERIFY_ERROR",
+                        f"Malformed API response shape on attempt {attempt + 1}/{self.MAX_RETRIES}: {str(e)[:80]}",
+                    )
+                    continue
 
                 parsed = self._parse_response(content)
-                if parsed is not None:
-                    updated = pool.get_stats()
+                if parsed is None:
                     self.logger.log(
                         "GROQ_VERIFY",
-                        f"Verified article: score={parsed.get('score', 0)}, "
-                        f"model={model}, key=#{slot_idx + 1}",
-                        {"key_stats": updated},
+                        f"Unparseable response on attempt {attempt + 1}/{self.MAX_RETRIES}, "
+                        f"model={model} — retrying",
                     )
-                    return parsed
+                    continue
+
+                updated = pool.get_stats()
+                self.logger.log(
+                    "GROQ_VERIFY",
+                    f"Verified article: score={parsed.get('score', 0)}, "
+                    f"model={model}, key=#{slot_idx + 1}",
+                    {"key_stats": updated},
+                )
+                return parsed
 
             except RateLimitExceededError:
                 raise
             except requests.exceptions.RequestException as e:
+                api_failures += 1
                 error_str = str(e)
                 wait = self._extract_retry_delay(error_str, attempt)
                 self.logger.log(

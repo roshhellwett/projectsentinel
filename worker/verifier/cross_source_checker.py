@@ -19,9 +19,14 @@ class UnionFind:
         self.rank = [0] * n
 
     def find(self, x: int) -> int:
-        if self.parent[x] != x:
-            self.parent[x] = self.find(self.parent[x])
-        return self.parent[x]
+        # Iterative find with path compression (avoids recursion-depth crashes
+        # on long parent chains).
+        root = x
+        while self.parent[root] != root:
+            root = self.parent[root]
+        while self.parent[x] != root:
+            self.parent[x], x = root, self.parent[x]
+        return root
 
     def union(self, x: int, y: int) -> bool:
         px, py = self.find(x), self.find(y)
@@ -172,9 +177,11 @@ class CrossSourceChecker:
 
             result = (
                 self.supabase.table("raw_articles")
-                .select("*")
+                .select("url_hash,url,headline,excerpt,source_name,source_url,category_hint")
                 .eq("processed", False)
                 .gte("fetched_at", twelve_hours_ago)
+                .order("fetched_at", desc=True)
+                .limit(self.MAX_ARTICLES_TO_COMPARE)
                 .execute()
             )
 
@@ -208,7 +215,8 @@ class CrossSourceChecker:
 
         verified_groups = []
         for group in groups:
-            source_names = set(a.get("source_name", "") for a in group)
+            source_names = {a.get("source_name", "").strip().lower() for a in group}
+            source_names.discard("")
             if len(source_names) >= 2:
                 verified_groups.append(group[:5])
 
@@ -316,6 +324,9 @@ class CrossSourceChecker:
         headline = re.sub(r"[^\w\s]", " ", headline)
 
         words = headline.split()
-        significant = {w for w in words if len(w) > 3 and w not in STOP_WORDS}
+        # Keep 3-character words too — they include critical Indian-news acronyms
+        # (BJP, INC, AAP, CPI, ICC, RBI, SBI, IIT, IIM, CBI, NIA, etc.) that the
+        # previous len > 3 filter silently discarded, breaking story clustering.
+        significant = {w for w in words if len(w) >= 3 and w not in STOP_WORDS}
 
         return significant

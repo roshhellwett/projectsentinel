@@ -73,10 +73,27 @@ class GroqWriter:
                 response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
                 response.raise_for_status()
 
-                result = response.json()
-                content = result["choices"][0]["message"]["content"]
+                try:
+                    result = response.json()
+                    content = result["choices"][0]["message"]["content"]
+                except (ValueError, KeyError, IndexError, TypeError) as e:
+                    self.logger.log(
+                        "GROQ_ERROR",
+                        f"Malformed writer response shape on attempt {attempt + 1}: {str(e)[:80]}",
+                    )
+                    if attempt < self.MAX_RETRIES - 1:
+                        time.sleep(self.RETRY_DELAY)
+                    continue
 
                 parsed = self._parse_response(content)
+                if parsed is None:
+                    self.logger.log(
+                        "GROQ_ERROR",
+                        f"Unparseable writer response on attempt {attempt + 1}/{self.MAX_RETRIES} — retrying",
+                    )
+                    if attempt < self.MAX_RETRIES - 1:
+                        time.sleep(self.RETRY_DELAY)
+                    continue
                 self.logger.log("GROQ", f"Wrote article: {parsed.get('headline', '')[:50]}")
                 return parsed
 
@@ -112,8 +129,8 @@ class GroqWriter:
         facts_text = "\n".join(f"{i + 1}. {fact}" for i, fact in enumerate(key_facts))
         return f"Category: {category}\n\nVerified facts:\n{facts_text}"
 
-    def _parse_response(self, text: str) -> dict:
-        """Parse Groq JSON response."""
+    def _parse_response(self, text: str) -> dict | None:
+        """Parse Groq JSON response. Returns None on failure."""
         text = text.strip()
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text).strip()
 
@@ -121,15 +138,20 @@ class GroqWriter:
             result = json.loads(text)
         except json.JSONDecodeError:
             self.logger.log("GROQ_ERROR", f"Failed to parse JSON: {text[:100]}")
-            return {"headline": "News Update", "summary": "Details to follow."}
+            return None
 
         if not isinstance(result, dict) or "headline" not in result or "summary" not in result:
-            return {"headline": "News Update", "summary": "Details to follow."}
+            self.logger.log("GROQ_ERROR", "Response missing headline or summary field")
+            return None
 
         headline = str(result["headline"]).strip()
+        summary = str(result["summary"]).strip()
+
+        if not headline or not summary:
+            self.logger.log("GROQ_ERROR", "Empty headline or summary in response")
+            return None
+
         if len(headline.split()) > 15:
             headline = " ".join(headline.split()[:12]) + "..."
-
-        summary = str(result["summary"]).strip()
 
         return {"headline": headline, "summary": summary[:300]}

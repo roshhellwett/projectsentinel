@@ -44,4 +44,22 @@ def reset_client() -> None:
     Useful for tests or recovery after connection failures."""
     global _client_instance
     with _client_lock:
+        old = _client_instance
         _client_instance = None
+        # Best-effort cleanup of the previous client's underlying HTTP sessions
+        # so connections don't leak on repeated resets.
+        if old is not None:
+            for attr in ("postgrest", "storage", "auth", "realtime"):
+                inner = getattr(old, attr, None)
+                close = getattr(inner, "aclose", None) or getattr(inner, "close", None)
+                if callable(close):
+                    try:
+                        result = close()
+                        # If it returned a coroutine, just discard it — we can't await here.
+                        if hasattr(result, "close"):
+                            try:
+                                result.close()
+                            except Exception:
+                                pass
+                    except Exception:
+                        pass
