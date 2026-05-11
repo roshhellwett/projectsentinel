@@ -6,8 +6,22 @@ export const revalidate = 3600;
 
 async function fetchArticleUrls(): Promise<{ id: string; published_at: string }[]> {
   try {
-    const { posts } = await fetchPosts(1, 50);
-    return posts.map((p) => ({ id: p.id, published_at: p.published_at }));
+    // Paginate so the sitemap includes more than the latest page of articles.
+    // fetchPosts caps each page at 50 rows; we walk up to ~1000 most-recent
+    // posts which keeps the file well under Google's 50K-URL sitemap limit
+    // while no longer dropping the bulk of the archive from search engines.
+    const PAGE_SIZE = 50;
+    const MAX_PAGES = 20;
+    const collected: { id: string; published_at: string }[] = [];
+    for (let page = 1; page <= MAX_PAGES; page++) {
+      const { posts, count } = await fetchPosts(page, PAGE_SIZE);
+      if (!posts.length) break;
+      for (const p of posts) {
+        collected.push({ id: p.id, published_at: p.published_at });
+      }
+      if (collected.length >= count) break;
+    }
+    return collected;
   } catch {
     return [];
   }

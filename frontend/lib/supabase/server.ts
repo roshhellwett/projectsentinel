@@ -90,23 +90,28 @@ export async function fetchPosts(
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-// Fetch single post by ID
+// Fetch single post by ID (retried up to 3 times on transient failures).
 export async function fetchPostById(id: string): Promise<Post | null> {
   if (!UUID_RE.test(id)) {
     return null;
   }
 
-  const { data, error } = await getSupabaseServer()
-    .from('posts')
-    .select('*')
-    .eq('id', id)
-    .single();
-  
-  if (error) {
-    return null;
-  }
-  
-  return data as Post;
+  return withRetry(async () => {
+    const { data, error } = await getSupabaseServer()
+      .from('posts')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      // .single() returns PGRST116 when no row matches — that's a real 404,
+      // so propagate null without burning further retries.
+      if (error.code === 'PGRST116') return null;
+      throw new Error(`fetchPostById error: ${error.message}`);
+    }
+
+    return data as Post;
+  }).catch(() => null);
 }
 
 // Fetch trending post (highest score in last 24h)
@@ -183,11 +188,16 @@ export async function searchPosts(
 
   const safeLimit = Math.min(50, Math.max(1, limit));
 
+  // Search both headline AND summary so queries that only match the body
+  // still return results. PostgREST supports per-column FTS via the `fts`
+  // operator inside an `or` filter. Each term is escaped (single quotes →
+  // doubled) to keep user input literal and avoid breaking the filter syntax.
+  const ftsTerm = safeQuery.replace(/'/g, "''");
   const { data, error, count } = await getSupabaseServer()
     .from('posts')
     .select('*', { count: 'exact' })
     .eq('status', 'published')
-    .textSearch('headline', safeQuery, { type: 'plain', config: 'english' })
+    .or(`headline.fts(english).${ftsTerm},summary.fts(english).${ftsTerm}`)
     .order('published_at', { ascending: false })
     .limit(safeLimit);
 

@@ -20,6 +20,7 @@ const CATEGORY_TINT: Record<string, string> = {
   tech: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20',
   world: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
   entertainment: 'bg-fuchsia-500/10 text-fuchsia-700 border-fuchsia-500/20',
+  education: 'bg-violet-400/10 text-violet-700 border-violet-400/20',
 };
 
 export function CategoryTag({ category, className = '' }: CategoryTagProps) {

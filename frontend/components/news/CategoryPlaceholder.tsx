@@ -19,6 +19,7 @@ const CATEGORY_GRADIENT: Record<string, string> = {
   tech: 'from-cyan-500/30 via-cyan-500/10 to-transparent',
   world: 'from-amber-500/30 via-amber-500/10 to-transparent',
   entertainment: 'from-fuchsia-500/30 via-fuchsia-500/10 to-transparent',
+  education: 'from-violet-400/30 via-violet-400/10 to-transparent',
 };
 
 export function CategoryPlaceholder({

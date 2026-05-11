@@ -9,7 +9,9 @@
 import { Post } from '@/types';
 
 function stableKey(article: Post): string {
-  return article.id ?? (article as unknown as Record<string, string>).url ?? article.headline;
+  // Post.id is the DB primary key and is always present; headline is a safe
+  // fallback if a malformed payload ever reaches this layer.
+  return article.id ?? article.headline;
 }
 
 export function dedupe(articles: Post[]): Post[] {

@@ -11,24 +11,11 @@ import { SourceLinks } from './SourceLinks';
 import { CorrectionsNotice } from './CorrectionsNotice';
 import { ShareButtons } from './ShareButtons';
 import { formatDate } from '@/lib/utils/formatDate';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 interface NewsDrawerProps {
   post: Post | null;
   onClose: () => void;
-}
-
-let overflowCount = 0;
-
-function lockBody() {
-  overflowCount++;
-  document.body.style.overflow = 'hidden';
-}
-
-function unlockBody() {
-  overflowCount = Math.max(0, overflowCount - 1);
-  if (overflowCount === 0) {
-    document.body.style.overflow = '';
-  }
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
@@ -46,12 +33,12 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
     }
 
     previousFocusRef.current = document.activeElement as HTMLElement;
-    lockBody();
+    lockBodyScroll();
     const focusTimer = window.setTimeout(() => drawerRef.current?.focus(), 0);
 
     return () => {
       window.clearTimeout(focusTimer);
-      unlockBody();
+      unlockBodyScroll();
       previousFocusRef.current?.focus();
     };
   }, [post]);

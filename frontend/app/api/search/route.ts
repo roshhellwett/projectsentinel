@@ -4,7 +4,8 @@ import { searchPosts } from '@/lib/supabase/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = (searchParams.get('q') || '').trim();
-  const limit = Math.min(50, Math.max(1, Number.parseInt(searchParams.get('limit') || '20', 10)));
+  const parsedLimit = Number.parseInt(searchParams.get('limit') || '20', 10);
+  const limit = Math.min(50, Math.max(1, Number.isFinite(parsedLimit) ? parsedLimit : 20));
 
   if (!q) {
     return NextResponse.json({ posts: [], count: 0 });

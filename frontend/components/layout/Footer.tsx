@@ -88,7 +88,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col items-center gap-2 text-center">
           <p className="text-xs text-slate-500">
-            &copy; 2026 Zenith Open Source Projects. All rights reserved.
+            &copy; {new Date().getFullYear()} Zenith Open Source Projects. All rights reserved.
           </p>
           <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
             Built with Next.js, Tailwind CSS &amp; Framer Motion · Designed by Roshhellwett · Powered by Claude &amp; Gemini

@@ -36,7 +36,7 @@ const PIPELINE_STEPS = [
   {
     number: '01',
     title: 'Fetch News',
-    subtitle: 'Every 30 Minutes',
+    subtitle: 'Every 10 Minutes',
     description: 'Our system continuously monitors RSS feeds from 20+ trusted Indian news sources. We fetch headlines and the first 150 words of each article for efficiency.',
     icon: Clock,
     gradient: 'from-accent/40 to-cyan-500/20',
@@ -106,7 +106,7 @@ export default function HowItWorksPage() {
                 name: 'How does India Verified fetch news?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'Our system continuously monitors RSS feeds from 20+ trusted Indian news sources every 30 minutes.',
+                  text: 'Our system continuously monitors RSS feeds from 20+ trusted Indian news sources every 10 minutes.',
                 },
               },
               {

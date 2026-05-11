@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 interface SearchBarProps {
   isOpen: boolean;
@@ -81,12 +82,11 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      lockBodyScroll();
 
       return () => {
         document.removeEventListener('keydown', handleEscape);
-        document.body.style.overflow = previousOverflow;
+        unlockBodyScroll();
       };
     }
 
@@ -141,7 +141,18 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               </motion.button>
             </div>
 
-            <div className="relative max-w-3xl mx-auto mb-8">
+            <form
+              className="relative max-w-3xl mx-auto mb-8"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = query.trim();
+                if (!q) return;
+                // Enter escapes the in-memory quick filter and hits the proper
+                // /search page (server-side FTS over the whole archive).
+                onClose();
+                router.push(`/search?q=${encodeURIComponent(q)}`);
+              }}
+            >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
               <input
                 ref={inputRef}
@@ -149,11 +160,11 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search verified stories..."
+                placeholder="Search verified stories... (press Enter for full search)"
                 className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(10,132,255,0.45)]"
                 autoFocus
               />
-            </div>
+            </form>
 
             <div className="max-w-4xl mx-auto">
               {isLoading && (

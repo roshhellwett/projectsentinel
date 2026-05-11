@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Search, Github, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -27,15 +28,14 @@ export function Navbar() {
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 12));
 
-  // Lock body scroll when mobile drawer open
+  // Lock body scroll when mobile drawer open. Use the shared counter so we
+  // coexist with the SearchBar / NewsDrawer overlays without one's cleanup
+  // canceling another's lock.
   useEffect(() => {
-    if (isMobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isMobileOpen) return;
+    lockBodyScroll();
     return () => {
-      document.body.style.overflow = '';
+      unlockBodyScroll();
     };
   }, [isMobileOpen]);
 
