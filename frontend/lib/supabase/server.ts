@@ -189,10 +189,19 @@ export async function searchPosts(
   const safeLimit = Math.min(50, Math.max(1, limit));
 
   // Search both headline AND summary so queries that only match the body
-  // still return results. PostgREST supports per-column FTS via the `fts`
-  // operator inside an `or` filter. Each term is escaped (single quotes →
-  // doubled) to keep user input literal and avoid breaking the filter syntax.
-  const ftsTerm = safeQuery.replace(/'/g, "''");
+  // still return results. PostgREST's `fts` operator requires a tsquery
+  // string (e.g. `cat & dog`), NOT raw text. Splitting on whitespace and
+  // joining with `&` turns "modi education" into a valid AND-tsquery.
+  // We also strip any tsquery-significant punctuation to keep user input
+  // literal and avoid breaking the filter syntax.
+  const ftsTerm = safeQuery
+    .replace(/[\\&|!():*'"<>]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(' & ');
+
+  if (!ftsTerm) return { posts: [], count: 0 };
+
   const { data, error, count } = await getSupabaseServer()
     .from('posts')
     .select('*', { count: 'exact' })

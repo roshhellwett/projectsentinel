@@ -22,9 +22,9 @@ export async function GET() {
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>India Verified - AI-Verified Indian News</title>
+    <title><![CDATA[India Verified — AI-Verified Indian News]]></title>
     <link>${siteUrl}</link>
-    <description>Fully automated, AI-powered Indian news aggregator. Every story verified through cross-referencing multiple trusted sources.</description>
+    <description><![CDATA[Fully automated, AI-powered Indian news aggregator. Every story verified through cross-referencing multiple trusted sources.]]></description>
     <language>en-in</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>

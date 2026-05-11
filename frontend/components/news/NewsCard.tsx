@@ -1,7 +1,6 @@
 'use client';
 
 import { memo } from 'react';
-import Link from 'next/link';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
 import { CredibilityBadge } from './CredibilityBadge';

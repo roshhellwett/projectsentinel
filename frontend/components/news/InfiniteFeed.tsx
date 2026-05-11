@@ -3,13 +3,17 @@
 /**
  * InfiniteFeed — silent auto-loading feed.
  *
- * Two simultaneous behaviors:
+ * Three simultaneous behaviors:
  *  1) Infinite scroll: an IntersectionObserver sentinel near the bottom triggers
  *     the next page request once it enters the viewport. New cards are appended
  *     with a soft fade/slide-in animation. No buttons. No reload.
- *  2) Live prepend: every 60s, polls /api/posts for stories newer than the most
- *     recent currently-rendered post. Newer posts are prepended with a brief
- *     accent flash so the reader sees them appear without disruption.
+ *  2) Live prepend (at top): when the user is at/near the top of the page,
+ *     newly-arrived stories are prepended immediately with a brief accent flash.
+ *  3) iOS Dynamic Island queue (when scrolled): if the user has scrolled past
+ *     the queue threshold, new posts are held in a `pendingNew` queue and a
+ *     compact island pill appears at the top of the viewport showing the
+ *     count + latest headline. Tapping it flushes the queue and smooth-scrolls
+ *     to the top — preserving the user's reading rhythm.
  *
  * All deduplication is by post.id. Reduced-motion is respected via the global
  * media query in globals.css (Framer Motion respects it automatically).
@@ -20,6 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
+import { LiveUpdateIsland } from './LiveUpdateIsland';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface InfiniteFeedProps {
@@ -32,6 +37,13 @@ interface InfiniteFeedProps {
 }
 
 const POLL_INTERVAL_MS = 60_000;
+/**
+ * If the user has scrolled past this many pixels when fresh posts arrive,
+ * defer the prepend behind the LiveUpdateIsland instead of yanking the
+ * viewport. Below this threshold we prepend immediately because the user
+ * is right next to the top of the feed and will see the soft entry anim.
+ */
+const QUEUE_THRESHOLD_PX = 220;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -113,7 +125,11 @@ export function InfiniteFeed({
           (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
         );
         const merged = dedupeById([...prev, ...incoming]);
-        if (merged.length >= data.count || incoming.length === 0) {
+        // Exhaust only when the server itself returned nothing OR we've
+        // matched the total count. Using `incoming.length === 0` as a
+        // signal mistakenly exhausts the feed if every fetched item was
+        // already in `prev` (e.g. duplicated by the live-prepend tick).
+        if (data.posts.length === 0 || merged.length >= data.count) {
           setExhausted(true);
         }
         return merged;
@@ -145,6 +161,40 @@ export function InfiniteFeed({
     return () => obs.disconnect();
   }, [loadMore]);
 
+  // ── Pending queue surfaced via the Dynamic Island ──
+  const [pendingNew, setPendingNew] = useState<Post[]>([]);
+  const pendingRef = useRef(pendingNew);
+  pendingRef.current = pendingNew;
+
+  /** Flash a freshly-revealed batch of post IDs so the user can spot them. */
+  const flashFresh = useCallback((ids: string[]) => {
+    if (ids.length === 0) return;
+    setFreshIds((curr) => {
+      const next = new Set(curr);
+      for (const id of ids) next.add(id);
+      return next;
+    });
+    window.setTimeout(() => {
+      setFreshIds((curr) => {
+        const next = new Set(curr);
+        for (const id of ids) next.delete(id);
+        return next;
+      });
+    }, 3200);
+  }, []);
+
+  /** Tap-handler from <LiveUpdateIsland>: drop pending into the feed and rise. */
+  const flushPending = useCallback(() => {
+    const queued = pendingRef.current;
+    if (queued.length === 0) return;
+    setPendingNew([]);
+    setPosts((prev) => dedupeById([...queued, ...prev]));
+    flashFresh(queued.map((p) => p.id));
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [flashFresh]);
+
   // ── Live prepend: poll for newer posts every minute ──
   useEffect(() => {
     let cancelled = false;
@@ -160,27 +210,27 @@ export function InfiniteFeed({
 
         const existing = new Set(postsRef.current.map((p) => p.id));
         const excluded = excludeIdsRef.current;
+        const queuedIds = new Set(pendingRef.current.map((p) => p.id));
         const fresh = data.posts.filter(
-          (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
+          (p) =>
+            !existing.has(p.id) &&
+            !queuedIds.has(p.id) &&
+            !(excluded?.has(p.id)),
         );
         if (fresh.length === 0) return;
 
-        // Mark as fresh for flash animation
-        setFreshIds((curr) => {
-          const next = new Set(curr);
-          for (const f of fresh) next.add(f.id);
-          return next;
-        });
-        // Clear flash after 3s
-        window.setTimeout(() => {
-          setFreshIds((curr) => {
-            const next = new Set(curr);
-            for (const f of fresh) next.delete(f.id);
-            return next;
-          });
-        }, 3200);
+        // Decide: prepend immediately (user near top) vs. queue behind the
+        // Dynamic Island (user reading further down).
+        const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+        const userIsReading = scrollY > QUEUE_THRESHOLD_PX;
 
-        setPosts((prev) => dedupeById([...fresh, ...prev]));
+        if (userIsReading) {
+          // Queue + island. Newest first so the preview headline matches.
+          setPendingNew((curr) => dedupeById([...fresh, ...curr]));
+        } else {
+          flashFresh(fresh.map((p) => p.id));
+          setPosts((prev) => dedupeById([...fresh, ...prev]));
+        }
       } catch {
         /* silent */
       }
@@ -302,6 +352,11 @@ export function InfiniteFeed({
       )}
 
       <NewsDrawer post={selectedPost} onClose={() => setSelectedPost(null)} />
+
+      {/* iOS Dynamic Island — surfaces queued live posts while the user is
+          reading further down the feed. The component renders nothing when
+          pendingNew is empty, so it has zero visual cost at rest. */}
+      <LiveUpdateIsland pending={pendingNew} onReveal={flushPending} />
     </>
   );
 }
