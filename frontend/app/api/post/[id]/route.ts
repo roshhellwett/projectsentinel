@@ -7,6 +7,8 @@ import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { fetchPostById, updatePostStatus } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 const VALID_STATUSES = ['published', 'corrected', 'retracted'] as const;
 
 export async function GET(

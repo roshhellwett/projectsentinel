@@ -296,3 +296,119 @@ def test_verify_all_keys_429_raises(mock_post, mock_sleep):
         v = GroqVerifier()
         with pytest.raises(AllKeysExhaustedError):
             v.verify([{"headline": "test", "source_name": "src", "excerpt": "text"}])
+
+
+# ------------------------------------------------------------------
+# Two-tier fallback (keys 1-3 = tier 1, keys 4-6 = tier 2)
+# ------------------------------------------------------------------
+
+
+def test_verifier_six_keys_loaded_with_correct_tiers():
+    env = {f"GROQ_API_KEY_VERIFY_{i}": f"key{i}" for i in range(1, 7)}
+    with patch.dict(os.environ, env, clear=True):
+        v = GroqVerifier()
+        pool = v._ensure_pool()
+        stats = pool.get_stats()
+        assert len(stats) == 6
+        assert [s["tier"] for s in stats] == [1, 1, 1, 2, 2, 2]
+
+
+def test_key_pool_tier_two_dormant_until_tier_one_exhausted():
+    """Tier-2 keys must NOT be picked while any tier-1 key is still available."""
+    pool = _KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
+
+    # Saturate tier-1 calls so tier-2 would win on a pure lowest-calls basis
+    # if tiering weren't enforced.
+    for _ in range(50):
+        pool.record_success(0)
+        pool.record_success(1)
+        pool.record_success(2)
+
+    idx, key = pool.pick()
+    assert idx in (0, 1, 2), "Tier-2 must stay dormant while tier-1 has any usable key"
+    assert key in ("k1", "k2", "k3")
+
+
+def test_key_pool_tier_two_activates_after_tier_one_exhausted():
+    pool = _KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
+
+    # 429 every tier-1 key
+    pool.mark_exhausted(0)
+    pool.mark_exhausted(1)
+    pool.mark_exhausted(2)
+
+    idx, key = pool.pick()
+    assert idx in (3, 4, 5)
+    assert key in ("k4", "k5", "k6")
+
+    # Then 429 the rest – pool should fully exhaust.
+    pool.mark_exhausted(3)
+    pool.mark_exhausted(4)
+    pool.mark_exhausted(5)
+    with pytest.raises(AllKeysExhaustedError):
+        pool.pick()
+
+
+def test_key_pool_sparse_numbering_preserves_tier():
+    """Setting only keys 1, 2, 4 means slot for key 4 must remain in tier 2."""
+    pool = _KeyPool([(1, "k1"), (2, "k2"), (4, "k4")])
+    stats = pool.get_stats()
+    assert [s["tier"] for s in stats] == [1, 1, 2]
+
+    # While tier-1 (k1, k2) is alive, k4 must not be picked.
+    idx, _ = pool.pick()
+    assert idx in (0, 1)
+
+    pool.mark_exhausted(0)
+    pool.mark_exhausted(1)
+    idx, key = pool.pick()
+    assert idx == 2
+    assert key == "k4"
+
+
+@patch("verifier.groq_verifier.time.sleep", return_value=None)
+@patch("verifier.groq_verifier.requests.post")
+def test_verify_falls_through_to_tier_two_after_tier_one_429(mock_post, mock_sleep):
+    """Three tier-1 keys all 429 in one run; verify must rotate into tier-2 and succeed."""
+    good_content = json.dumps(
+        {
+            "score": 81,
+            "reason": "ok",
+            "key_facts": ["fact"],
+            "category": "tech",
+            "headline": "Headline",
+            "summary": "Summary.",
+        }
+    )
+
+    resp_429 = MagicMock()
+    resp_429.status_code = 429
+    resp_429.headers = {}
+    resp_429.text = ""
+
+    resp_ok = MagicMock()
+    resp_ok.status_code = 200
+    resp_ok.raise_for_status.return_value = None
+    resp_ok.json.return_value = {"choices": [{"message": {"content": good_content}}]}
+
+    # All three tier-1 keys 429 in succession; verify() must keep rotating
+    # (without consuming the retry budget) and succeed on the first tier-2 key.
+    mock_post.side_effect = [resp_429, resp_429, resp_429, resp_ok]
+
+    env = {f"GROQ_API_KEY_VERIFY_{i}": f"key{i}" for i in range(1, 7)}
+    with patch.dict(os.environ, env, clear=True):
+        v = GroqVerifier()
+        result = v.verify([{"headline": "test", "source_name": "src", "excerpt": "text"}])
+
+    assert result["score"] == 81
+    assert mock_post.call_count == 4
+    # The 4th call must have used a tier-2 key (k4/k5/k6).
+    last_call_headers = mock_post.call_args_list[-1].kwargs["headers"]
+    assert last_call_headers["Authorization"] in ("Bearer key4", "Bearer key5", "Bearer key6")
+    # And the first three calls all used tier-1 keys.
+    for call in mock_post.call_args_list[:3]:
+        assert call.kwargs["headers"]["Authorization"] in (
+            "Bearer key1",
+            "Bearer key2",
+            "Bearer key3",
+        )

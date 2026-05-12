@@ -47,15 +47,16 @@ def test_parse_response_valid():
 
 def test_parse_response_json_decode_error():
     w = GroqWriter()
-    result = w._parse_response("not json")
-    assert result["headline"] == "News Update"
-    assert result["summary"] == "Details to follow."
+    # Invalid JSON returns None so write() retries with the same model + key.
+    assert w._parse_response("not json") is None
 
 
 def test_parse_response_missing_fields():
     w = GroqWriter()
-    result = w._parse_response(json.dumps({"headline": "Test"}))
-    assert result["headline"] == "News Update"
+    # Missing required fields also returns None to trigger a retry.
+    assert w._parse_response(json.dumps({"headline": "Test"})) is None
+    assert w._parse_response(json.dumps({"summary": "Only summary"})) is None
+    assert w._parse_response(json.dumps({"headline": "", "summary": ""})) is None
 
 
 def test_parse_response_headline_too_long():

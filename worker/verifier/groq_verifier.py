@@ -1,8 +1,11 @@
 """
 Groq AI verification - uses Llama 3.3 70B for news verification.
 Token-optimized: system+user split, minimal prompt, model fallback.
-Multi-key rotation: up to 3 API keys, lowest-usage-first selection,
-with per-key daily counters and 429-aware exhaustion tracking.
+Multi-key rotation: up to 6 API keys arranged in two tiers of 3.
+Tier 1 (keys 1-3) is used exclusively until every tier-1 key is
+rate-limited for the current run; only then does tier 2 (keys 4-6)
+activate. Within an active tier, the lowest-`calls_today` key wins.
+Per-key daily counters and 429-aware exhaustion tracking are preserved.
 """
 
 import json
@@ -27,21 +30,38 @@ class _KeyPool:
     """
     Thread-safe pool of Groq API keys with per-key daily usage tracking.
 
-    Selection strategy: lowest-calls-today first (load-equalizing).
+    Tiering: keys are grouped into tiers of 3 by load order — slots 0-2 form
+    tier 1, slots 3-5 form tier 2. The pool only picks from the lowest tier
+    that still has at least one non-exhausted key. Within an active tier,
+    the lowest-calls-today key wins (load-equalizing).
+
     Keys that return 429 are skipped for the remainder of the current run.
     Daily counters reset automatically at midnight (calendar date change).
     """
 
-    def __init__(self, keys: list[str]) -> None:
+    TIER_SIZE = 3
+
+    def __init__(self, keys: list[str] | list[tuple[int, str]]) -> None:
         self._lock = threading.Lock()
+        # Accept either a flat list of keys (legacy) or a list of
+        # (env_number, key) tuples so tier can be derived from the
+        # caller's numbering rather than insertion order.
+        normalized: list[tuple[int, str]] = []
+        for i, item in enumerate(keys):
+            if isinstance(item, tuple):
+                normalized.append(item)
+            else:
+                normalized.append((i + 1, item))
+
         self._slots: list[dict] = [
             {
                 "key": k,
+                "tier": ((num - 1) // self.TIER_SIZE) + 1,
                 "calls_today": 0,
                 "day": str(date.today()),
                 "skip_this_run": False,
             }
-            for k in keys
+            for num, k in normalized
         ]
 
     def _refresh_slot(self, slot: dict) -> None:
@@ -72,7 +92,12 @@ class _KeyPool:
                     "All Groq verification keys are rate-limited for this run"
                 )
 
-            idx, _ = min(available, key=lambda x: x[1]["calls_today"])
+            # Tier fallback: only consider keys in the lowest tier that
+            # still has any non-exhausted slot. Higher tiers stay dormant
+            # until their predecessor tier is fully 429-skipped.
+            min_tier = min(s["tier"] for _, s in available)
+            in_tier = [(i, s) for i, s in available if s["tier"] == min_tier]
+            idx, _ = min(in_tier, key=lambda x: x[1]["calls_today"])
             return idx, self._slots[idx]["key"]
 
     def record_success(self, idx: int) -> None:
@@ -91,6 +116,7 @@ class _KeyPool:
             return [
                 {
                     "key_index": i + 1,
+                    "tier": s["tier"],
                     "calls_today": s["calls_today"],
                     "skip_this_run": s["skip_this_run"],
                 }
@@ -211,23 +237,31 @@ class GroqVerifier:
             cls._key_pool = None
 
     @staticmethod
-    def _load_verify_keys() -> list[str]:
+    def _load_verify_keys() -> list[tuple[int, str]]:
         """
         Load verification API keys from environment variables.
+
         Priority:
-          1. GROQ_API_KEY_VERIFY_1, GROQ_API_KEY_VERIFY_2, GROQ_API_KEY_VERIFY_3
-          2. GROQ_API_KEY_VERIFY  (legacy single-key fallback)
+          1. GROQ_API_KEY_VERIFY_1..GROQ_API_KEY_VERIFY_6
+             - Slots 1-3 form tier 1 (primary, used first).
+             - Slots 4-6 form tier 2 (fallback, only used after every
+               tier-1 key is rate-limited for the current run).
+             - Numbering may be sparse (e.g. only 1, 2, 4, 6 set); empty
+               or missing slots are skipped but tier ordering is preserved
+               based on the original 1-6 number.
+          2. GROQ_API_KEY_VERIFY (legacy single-key fallback) — only used
+             when none of the numbered variables are configured.
         """
-        keys = []
-        for i in range(1, 4):
+        keys: list[tuple[int, str]] = []
+        for i in range(1, 7):
             k = os.getenv(f"GROQ_API_KEY_VERIFY_{i}", "").strip()
             if k:
-                keys.append(k)
+                keys.append((i, k))
         if not keys:
             legacy = os.getenv("GROQ_API_KEY_VERIFY", "").strip()
             if legacy:
-                keys.append(legacy)
-        return keys
+                keys.append((1, legacy))
+        return keys  # type: ignore[return-value]
 
     # ------------------------------------------------------------------
     # Public API
@@ -249,8 +283,18 @@ class GroqVerifier:
 
         user_content = self._build_prompt(article_group)
 
-        api_failures = 0
-        for attempt in range(self.MAX_RETRIES):
+        # 429-driven key rotations don't consume the retry budget — only
+        # genuine errors do. This lets a single verify() call walk through
+        # tier 1, hit 429s on every key, then seamlessly fall through to
+        # tier 2 in the same call without surfacing "Max retries exceeded".
+        # We cap total iterations to avoid runaway loops in pathological
+        # cases (e.g. server returning malformed JSON forever).
+        retries_used = 0   # counts only network / parse / 5xx failures
+        rotations = 0      # counts 429-driven key rotations
+        # One rotation per slot is the most we'd ever need before AllKeysExhaustedError fires.
+        max_rotations = max(len(pool.get_stats()), 1) + 1
+
+        while retries_used < self.MAX_RETRIES and rotations <= max_rotations:
             # Select the key with fewest calls today (skips 429-exhausted keys).
             try:
                 slot_idx, api_key = pool.pick()
@@ -261,14 +305,16 @@ class GroqVerifier:
             # Only downgrade model after actual API errors, not parse failures
             model = (
                 self.verify_model
-                if api_failures == 0
-                else self.FALLBACK_MODELS[min(api_failures - 1, len(self.FALLBACK_MODELS) - 1)]
+                if retries_used == 0
+                else self.FALLBACK_MODELS[min(retries_used - 1, len(self.FALLBACK_MODELS) - 1)]
             )
 
             stats = pool.get_stats()
             self.logger.log(
                 "GROQ_VERIFY",
-                f"Attempt {attempt + 1}/{self.MAX_RETRIES}: key=#{slot_idx + 1}, "
+                f"Attempt retries={retries_used}/{self.MAX_RETRIES} "
+                f"rotations={rotations}/{max_rotations}: key=#{slot_idx + 1} "
+                f"(tier {stats[slot_idx]['tier']}), "
                 f"calls_today={stats[slot_idx]['calls_today']}, model={model}",
                 {"key_stats": stats},
             )
@@ -293,14 +339,17 @@ class GroqVerifier:
                 # Handle 429 before raise_for_status to enable immediate key rotation.
                 if response.status_code == 429:
                     pool.mark_exhausted(slot_idx)
+                    rotations += 1
                     retry_after = self._extract_429_wait(response)
                     self.logger.log(
                         "GROQ_VERIFY",
-                        f"Key #{slot_idx + 1} rate-limited (429), rotating to next key",
+                        f"Key #{slot_idx + 1} (tier {stats[slot_idx]['tier']}) rate-limited (429), "
+                        f"rotating to next key",
                         {"retry_after_seconds": retry_after},
                     )
-                    if retry_after > 0:
-                        time.sleep(retry_after)
+                    # Don't sleep when other keys are still available — we want to
+                    # rotate immediately. Only honor Retry-After when we've burned
+                    # through every key and would block on AllKeysExhaustedError anyway.
                     continue
 
                 response.raise_for_status()
@@ -312,17 +361,20 @@ class GroqVerifier:
                     result = response.json()
                     content = result["choices"][0]["message"]["content"]
                 except (ValueError, KeyError, IndexError, TypeError) as e:
+                    retries_used += 1
                     self.logger.log(
                         "GROQ_VERIFY_ERROR",
-                        f"Malformed API response shape on attempt {attempt + 1}/{self.MAX_RETRIES}: {str(e)[:80]}",
+                        f"Malformed API response shape (retry {retries_used}/{self.MAX_RETRIES}): "
+                        f"{str(e)[:80]}",
                     )
                     continue
 
                 parsed = self._parse_response(content)
                 if parsed is None:
+                    retries_used += 1
                     self.logger.log(
                         "GROQ_VERIFY",
-                        f"Unparseable response on attempt {attempt + 1}/{self.MAX_RETRIES}, "
+                        f"Unparseable response (retry {retries_used}/{self.MAX_RETRIES}), "
                         f"model={model} — retrying",
                     )
                     continue
@@ -331,7 +383,7 @@ class GroqVerifier:
                 self.logger.log(
                     "GROQ_VERIFY",
                     f"Verified article: score={parsed.get('score', 0)}, "
-                    f"model={model}, key=#{slot_idx + 1}",
+                    f"model={model}, key=#{slot_idx + 1} (tier {updated[slot_idx]['tier']})",
                     {"key_stats": updated},
                 )
                 return parsed
@@ -339,11 +391,12 @@ class GroqVerifier:
             except RateLimitExceededError:
                 raise
             except requests.exceptions.RequestException as e:
-                api_failures += 1
+                retries_used += 1
                 error_str = str(e)
-                wait = self._extract_retry_delay(error_str, attempt)
+                wait = self._extract_retry_delay(error_str, retries_used - 1)
                 self.logger.log(
-                    "GROQ_VERIFY", f"Request failed ({model}), attempt {attempt + 1}/{self.MAX_RETRIES}: {str(e)[:80]}"
+                    "GROQ_VERIFY",
+                    f"Request failed ({model}), retry {retries_used}/{self.MAX_RETRIES}: {str(e)[:80]}",
                 )
                 if wait > 0:
                     self.logger.log("GROQ_VERIFY", f"Waiting {wait}s before retry")

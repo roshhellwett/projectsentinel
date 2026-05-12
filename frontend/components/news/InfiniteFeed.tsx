@@ -124,17 +124,16 @@ export function InfiniteFeed({
         const incoming = data.posts.filter(
           (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
         );
-        const merged = dedupeById([...prev, ...incoming]);
-        // Exhaust only when the server itself returned nothing OR we've
-        // matched the total count. Using `incoming.length === 0` as a
-        // signal mistakenly exhausts the feed if every fetched item was
-        // already in `prev` (e.g. duplicated by the live-prepend tick).
-        if (data.posts.length === 0 || merged.length >= data.count) {
-          setExhausted(true);
-        }
-        return merged;
+        return dedupeById([...prev, ...incoming]);
       });
       setPage(next);
+      // Exhaust when the server returned fewer items than requested — that
+      // means we have reached the end of the dataset. Using `< pageSize`
+      // is reliable even on the home page where `excludeIds` causes
+      // `merged.length` to always stay below `data.count`.
+      if (data.posts.length === 0 || data.posts.length < pageSize) {
+        setExhausted(true);
+      }
     } catch {
       // Soft-fail: leave UI as-is. Next intersection will retry.
     } finally {
@@ -201,9 +200,9 @@ export function InfiniteFeed({
 
     const tick = async () => {
       try {
-        const params = new URLSearchParams({ page: '1', limit: '10' });
+        const params = new URLSearchParams({ page: '1', limit: '10', _t: String(Date.now()) });
         if (category) params.set('category', category);
-        const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
+        const res = await fetch(`/api/posts?${params.toString()}`);
         if (!res.ok) return;
         const data: { posts: Post[] } = await res.json();
         if (cancelled) return;
