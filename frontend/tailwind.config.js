@@ -10,26 +10,27 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Page surfaces
-        background: '#fbfbfd',
-        'background-2': '#f2f4f8',
-        foreground: '#111827',
-        surface: 'rgba(255, 255, 255, 0.78)',
-        'surface-hover': 'rgba(255, 255, 255, 0.94)',
+        // Page surfaces — soft white
+        background: '#ffffff',
+        'background-2': '#f7f7fb',
+        foreground: '#1e1b4b',
+        surface: 'rgba(255, 255, 255, 0.55)',
+        'surface-hover': 'rgba(255, 255, 255, 0.72)',
 
         // Text
-        muted: '#4b5563',
-        subtle: '#7a8494',
+        muted: '#4a5568',
+        subtle: '#94a3b8',
 
-        // Accent — Electric Blue
-        accent: '#0a84ff',
-        'accent-hover': '#5ac8fa',
-        'accent-soft': 'rgba(10, 132, 255, 0.14)',
+        // Accent — soft lavender
+        accent: '#8b7ff0',
+        'accent-hover': '#a08cdc',
+        'accent-soft': 'rgba(160, 140, 220, 0.18)',
 
-        // Credibility
-        'cred-high': '#22c55e',
-        'cred-mid': '#f59e0b',
-        'cred-low': '#ef4444',
+        // Credibility — pastel-coded per redesign spec
+        // 90-100 mint, 70-89 lavender, <70 peach.
+        'cred-high': '#10b981',
+        'cred-mid':  '#8b7ff0',
+        'cred-low':  '#f59e0b',
 
         // India tricolor — kept for subtle decorative accents only
         'india-saffron': '#ff9933',

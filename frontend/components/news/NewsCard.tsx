@@ -12,17 +12,55 @@ import { BookmarkButton } from './BookmarkButton';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
-const CATEGORY_BORDER_COLOR: Record<string, string> = {
-  politics: '#f43f5e',
-  business: '#10b981',
-  sports: '#0ea5e9',
-  crime: '#f97316',
-  science: '#8b5cf6',
-  health: '#ec4899',
-  tech: '#06b6d4',
-  world: '#f59e0b',
-  entertainment: '#d946ef',
-  education: '#a78bfa',
+/**
+ * Pastel surface tint per category — drives the entire card colour, matching
+ * the reference UI where each card carries its section's hue as a soft solid
+ * fill (politics → soft red, business → soft mint, sports → soft sky, etc.).
+ *
+ * `bg`        = card surface @ ~85% (high enough to read as solid, low enough
+ *               that the glass blur still reveals the pastel page gradient).
+ * `bgHover`   = brighter tint on hover.
+ * `border`    = same hue at higher saturation for the 1 px frame.
+ * `shadow`    = same hue, used for the lift glow on hover.
+ * `accent`    = dark variant of the hue, applied to the headline on hover so
+ *               the section colour echoes in typography too.
+ */
+type CategoryTint = {
+  bg: string;
+  bgHover: string;
+  border: string;
+  shadow: string;
+  accent: string;
+};
+
+const CATEGORY_TINT: Record<string, CategoryTint> = {
+  // Politics — warm muted blush
+  politics:      { bg: 'rgba(253, 236, 236, 0.72)', bgHover: 'rgba(252, 226, 226, 0.85)', border: 'rgba(159, 18, 57, 0.10)',  shadow: 'rgba(159, 18, 57, 0.10)',  accent: '#9f1239' },
+  // Business — Notion-style mint
+  business:      { bg: 'rgba(232, 245, 238, 0.72)', bgHover: 'rgba(221, 240, 229, 0.85)', border: 'rgba(6, 95, 70, 0.10)',    shadow: 'rgba(6, 95, 70, 0.08)',    accent: '#065f46' },
+  // Sports — soft powder blue
+  sports:        { bg: 'rgba(230, 241, 251, 0.72)', bgHover: 'rgba(220, 234, 248, 0.85)', border: 'rgba(7, 89, 133, 0.10)',   shadow: 'rgba(7, 89, 133, 0.08)',   accent: '#075985' },
+  // Tech — quiet periwinkle
+  tech:          { bg: 'rgba(236, 234, 248, 0.72)', bgHover: 'rgba(227, 224, 244, 0.85)', border: 'rgba(76, 29, 149, 0.10)',  shadow: 'rgba(76, 29, 149, 0.08)',  accent: '#4c1d95' },
+  // Crime — pale peach
+  crime:         { bg: 'rgba(251, 235, 220, 0.72)', bgHover: 'rgba(249, 225, 204, 0.85)', border: 'rgba(154, 52, 18, 0.10)',  shadow: 'rgba(154, 52, 18, 0.08)',  accent: '#9a3412' },
+  // Science — same family as tech, slightly cooler
+  science:       { bg: 'rgba(236, 234, 248, 0.72)', bgHover: 'rgba(227, 224, 244, 0.85)', border: 'rgba(91, 33, 182, 0.10)',  shadow: 'rgba(91, 33, 182, 0.08)',  accent: '#5b21b6' },
+  // Health — soft rose
+  health:        { bg: 'rgba(251, 234, 241, 0.72)', bgHover: 'rgba(249, 224, 234, 0.85)', border: 'rgba(157, 23, 77, 0.10)',  shadow: 'rgba(157, 23, 77, 0.08)',  accent: '#9d174d' },
+  // World — muted cream
+  world:         { bg: 'rgba(251, 241, 217, 0.72)', bgHover: 'rgba(249, 235, 201, 0.85)', border: 'rgba(133, 77, 14, 0.10)',  shadow: 'rgba(133, 77, 14, 0.08)',  accent: '#854d0e' },
+  // Entertainment — pale orchid
+  entertainment: { bg: 'rgba(246, 232, 248, 0.72)', bgHover: 'rgba(241, 222, 245, 0.85)', border: 'rgba(134, 25, 143, 0.10)', shadow: 'rgba(134, 25, 143, 0.08)', accent: '#86198f' },
+  education:     { bg: 'rgba(236, 234, 248, 0.72)', bgHover: 'rgba(227, 224, 244, 0.85)', border: 'rgba(91, 33, 182, 0.10)',  shadow: 'rgba(91, 33, 182, 0.08)',  accent: '#5b21b6' },
+};
+
+const DEFAULT_TINT: CategoryTint = {
+  bg: 'rgba(255, 255, 255, 0.65)',
+  bgHover: 'rgba(255, 255, 255, 0.80)',
+  border: 'rgba(15, 23, 42, 0.08)',
+  shadow: 'rgba(15, 23, 42, 0.08)',
+  accent: '#0f172a',
 };
 
 interface NewsCardProps {
@@ -40,7 +78,7 @@ function isBreaking(post: Post): boolean {
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
   const breaking = isBreaking(post);
-  const accentColor = CATEGORY_BORDER_COLOR[post.category] ?? '#0a84ff';
+  const tint = CATEGORY_TINT[post.category] ?? DEFAULT_TINT;
   const sourceName = post.sources?.[0]?.title ?? post.sources?.[0]?.name ?? null;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -56,43 +94,43 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      whileHover={{ y: -6, scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.985 }}
+      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
       aria-label={`Read article: ${post.headline}`}
       className={cn(
-        'group relative isolate flex flex-col h-full cursor-pointer',
-        'rounded-[1.65rem] overflow-hidden',
-        'premium-card',
-        'transition-shadow duration-300',
-        'hover:bg-white/90 hover:border-slate-950/[0.16]',
-        'hover:shadow-[0_24px_70px_-38px_rgba(10,132,255,0.36),0_28px_70px_-54px_rgba(15,23,42,0.34)]',
+        'news-card-tinted group relative isolate flex flex-col h-full cursor-pointer',
+        'rounded-3xl overflow-hidden border',
+        'transition-[background-color,border-color,box-shadow] duration-200 ease-out',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         isRead && 'news-card-read',
         isNew && 'flash-new-post'
       )}
       data-read={isRead ? 'true' : 'false'}
-      style={{ contain: 'layout paint' }}
+      style={{
+        backgroundColor: tint.bg,
+        borderColor: tint.border,
+        // Neutral, tight shadow — no coloured halo, just clean depth.
+        // Two stops: a 1 px contour, and a soft slate drop.
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 8px rgba(15,23,42,0.05)',
+        backdropFilter: 'blur(20px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+        contain: 'layout paint',
+        ['--tint-bg-hover' as string]: tint.bgHover,
+        ['--tint-accent' as string]: tint.accent,
+      }}
     >
-      {/* Category colour accent bar */}
-      <div
-        className="relative z-10 h-[3px] w-full flex-shrink-0 opacity-85"
-        style={{ backgroundColor: accentColor }}
-        aria-hidden="true"
-      />
-
       {/* Inner content */}
-      <div className="relative z-10 flex flex-col flex-1 p-5">
+      <div className="relative z-10 flex flex-col flex-1 p-6">
         {/* Source + breaking badge + time row */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3.5">
           {!isRead && (
             <span
-              className="relative inline-flex w-2 h-2 rounded-full bg-accent flex-shrink-0 shadow-[0_0_10px_rgba(10,132,255,0.85)]"
+              className="inline-flex w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: tint.accent }}
               aria-label="Unread"
               title="Unread"
-            >
-              <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" aria-hidden="true" />
-            </span>
+            />
           )}
           {sourceName ? (
             <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate max-w-[110px]">
@@ -119,17 +157,23 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         </div>
 
         {/* Headline */}
-        <h3 className="text-[16px] md:text-[18px] font-bold text-slate-950 tracking-tight line-clamp-3 mb-2.5 leading-snug group-hover:text-accent transition-colors duration-150">
+        <h3
+          className="text-[17px] md:text-[19px] font-bold tracking-tight line-clamp-3 mb-3 leading-[1.3] transition-colors duration-150"
+          style={{ color: '#0f172a', fontFamily: 'var(--font-display)' }}
+        >
           {post.headline}
         </h3>
 
         {/* Excerpt */}
-        <p className="text-[13px] text-slate-600 line-clamp-2 leading-relaxed mb-auto">
+        <p className="text-[13.5px] text-slate-600 line-clamp-2 leading-relaxed mb-auto">
           {truncateWords(post.summary, 22)}
         </p>
 
         {/* Bottom row */}
-        <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-950/[0.08]">
+        <div
+          className="flex items-center justify-between gap-2 mt-5 pt-4"
+          style={{ borderTop: `1px solid ${tint.border}` }}
+        >
           <CredibilityBadge score={post.credibility_score} compact />
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-slate-500">

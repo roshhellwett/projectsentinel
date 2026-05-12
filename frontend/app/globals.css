@@ -11,36 +11,38 @@
   --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
-  /* Surfaces */
-  --c-bg: #fbfbfd;
-  --c-bg-2: #f2f4f8;
-  --c-surface: rgba(255, 255, 255, 0.78);
-  --c-surface-hover: rgba(255, 255, 255, 0.94);
-  --c-border: rgba(17, 24, 39, 0.10);
-  --c-border-strong: rgba(17, 24, 39, 0.18);
+  /* Surfaces — soft white canvas */
+  --c-bg: #ffffff;
+  --c-bg-2: #f7f7fb;
+  --c-surface: rgba(255, 255, 255, 0.55);
+  --c-surface-hover: rgba(255, 255, 255, 0.72);
+  --c-border: rgba(255, 255, 255, 0.7);
+  --c-border-strong: rgba(255, 255, 255, 0.85);
 
-  /* Text */
-  --c-text: #111827;
-  --c-text-muted: #4b5563;
-  --c-text-subtle: #7a8494;
+  /* Text — softened ink so it reads well on the pastel gradient */
+  --c-text: #1e1b4b;
+  --c-text-muted: #4a5568;
+  --c-text-subtle: #94a3b8;
 
-  /* Accent — Electric Blue */
-  --c-accent: #0a84ff;
-  --c-accent-hover: #5ac8fa;
-  --c-accent-soft: rgba(10, 132, 255, 0.14);
-  --c-accent-glow: rgba(10, 132, 255, 0.36);
+  /* Accent — soft lavender (replaces electric blue) */
+  --c-accent: #8b7ff0;
+  --c-accent-hover: #a08cdc;
+  --c-accent-soft: rgba(160, 140, 220, 0.18);
+  --c-accent-glow: rgba(160, 140, 220, 0.42);
 
-  /* Credibility */
-  --c-cred-high: #22c55e;
-  --c-cred-mid: #f59e0b;
-  --c-cred-low: #ef4444;
+  /* Credibility — pastel-coded per spec */
+  --c-cred-high: #10b981; /* mint */
+  --c-cred-mid:  #8b7ff0; /* lavender (70-89 band) */
+  --c-cred-low:  #f59e0b; /* peach */
 
   color-scheme: light;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: var(--c-bg);
+  /* Hard white root so the canvas reads as white. Body paints corner
+     washes + grain on top of this. */
+  background-color: #ffffff;
   text-rendering: optimizeLegibility;
 }
 
@@ -50,10 +52,19 @@ html {
 @layer base {
   body {
     @apply leading-normal antialiased;
-    background:
-      radial-gradient(circle at 18% 0%, rgba(10, 132, 255, 0.13), transparent 31rem),
-      radial-gradient(circle at 86% 8%, rgba(191, 90, 242, 0.09), transparent 29rem),
-      linear-gradient(180deg, #ffffff 0%, var(--c-bg) 45%, #f6f7fb 100%);
+    /* Soft white canvas with three faint colored washes in the corners
+       plus an SVG turbulence noise layer baked as a data URI. The grain
+       is the FIRST background-image so it sits at the back of the stack
+       and is consumed by every card's translucency. */
+    background-image:
+      url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+      radial-gradient(1200px 600px at 0% -10%, rgba(139, 127, 240, 0.05), transparent 60%),
+      radial-gradient(1000px 520px at 100% -10%, rgba(120, 200, 200, 0.04), transparent 60%),
+      radial-gradient(1000px 700px at 50% 110%, rgba(250, 200, 170, 0.04), transparent 60%);
+    background-color: #ffffff;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+    background-size: 220px 220px, auto, auto, auto;
+    background-attachment: fixed, fixed, fixed, fixed;
     color: var(--c-text);
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
@@ -87,20 +98,25 @@ html {
    GLASS CARD — reusable utility
 ═══════════════════════════════════════════════ */
 .glass {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58));
-  backdrop-filter: blur(26px) saturate(160%);
-  -webkit-backdrop-filter: blur(26px) saturate(160%);
-  border: 1px solid var(--c-border);
+  background: rgba(255, 255, 255, 0.60);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 32px rgba(120, 100, 200, 0.10);
 }
 .glass-hover {
-  transition: background-color 260ms ease, border-color 260ms ease, transform 360ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 200ms ease, border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 @media (hover: hover) {
   .glass-hover:hover {
-    background: var(--c-surface-hover);
-    border-color: rgba(17, 24, 39, 0.18);
-    box-shadow: 0 28px 90px -48px rgba(15, 23, 42, 0.24), 0 20px 70px -50px rgba(10, 132, 255, 0.34);
-    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 8px 32px rgba(120, 100, 200, 0.18);
+    transform: translateY(-2px);
   }
 }
 
@@ -124,7 +140,7 @@ html {
   font-size: clamp(64px, 20vw, 240px);
   line-height: 0.85;
   letter-spacing: -0.04em;
-  color: rgba(15, 23, 42, 0.035);
+  color: rgba(30, 27, 75, 0.04);
   text-align: center;
   transform: translateY(-4vh);
   /* Responsive: wrap on very small screens to prevent clipping */
@@ -147,7 +163,8 @@ html {
   transform: translate(-50%, -50%);
   width: min(90vw, 900px);
   height: min(90vw, 900px);
-  background: radial-gradient(circle, rgba(10, 132, 255, 0.10) 0%, rgba(90, 200, 250, 0.04) 34%, transparent 64%);
+  /* Lavender → mint soft halo to match the pastel canvas */
+  background: radial-gradient(circle, rgba(160, 140, 220, 0.10) 0%, rgba(120, 200, 200, 0.04) 34%, transparent 64%);
   filter: blur(70px);
   pointer-events: none;
   z-index: 0;
@@ -158,25 +175,26 @@ html {
    SUBTLE BACKGROUND TEXTURE
 ═══════════════════════════════════════════════ */
 .bg-dot-grid {
+  /* On the pastel canvas we want a much fainter dot grid so it reads as
+     texture, not noise. */
   background-image:
-    linear-gradient(180deg, rgba(255,255,255,0.82), transparent 18rem),
-    radial-gradient(rgba(15,23,42,0.045) 1px, transparent 1px);
+    linear-gradient(180deg, rgba(255,255,255,0.40), transparent 18rem),
+    radial-gradient(rgba(120, 100, 200, 0.06) 1px, transparent 1px);
   background-size: auto, 44px 44px;
 }
 
 .premium-card {
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.66)),
-    rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(17, 24, 39, 0.10);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 24px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.86),
-    0 28px 78px -58px rgba(15, 23, 42, 0.32),
-    0 26px 82px -64px rgba(10, 132, 255, 0.42);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 12px 32px rgba(120, 100, 200, 0.10);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   transform: translateZ(0);
 }
 
@@ -200,22 +218,22 @@ html {
 }
 
 .premium-card-hover {
-  transition: transform 460ms cubic-bezier(0.16, 1, 0.3, 1), border-color 420ms ease, box-shadow 460ms cubic-bezier(0.16, 1, 0.3, 1), background 420ms ease;
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
   will-change: transform;
 }
 
 .premium-card-hover:active {
-  transform: translateY(-2px) scale(0.992);
+  transform: translateY(-1px) scale(0.994);
 }
 
 @media (hover: hover) {
   .premium-card-hover:hover {
-    transform: translateY(-7px);
-    border-color: rgba(17, 24, 39, 0.18);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.72);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.92),
-      0 44px 120px -70px rgba(15, 23, 42, 0.34),
-      0 36px 110px -62px rgba(10, 132, 255, 0.42);
+      0 8px 32px rgba(120, 100, 200, 0.18);
   }
 
   .premium-card-hover:hover::after {
@@ -261,12 +279,13 @@ html {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.16);
+  background: rgba(160, 140, 220, 0.4);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(10, 132, 255, 0.8);
+  background: rgba(120, 100, 200, 0.7);
 }
+html { scrollbar-color: rgba(160, 140, 220, 0.4) transparent; scrollbar-width: thin; }
 
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -332,12 +351,31 @@ html {
 }
 
 @keyframes flashBorder {
-  0%   { border-color: rgba(10, 132, 255, 0); box-shadow: 0 0 0 0 rgba(10, 132, 255, 0); }
-  30%  { border-color: rgba(90, 200, 250, 0.65); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.14); }
-  100% { border-color: rgba(10, 132, 255, 0); box-shadow: 0 0 0 0 rgba(10, 132, 255, 0); }
+  0%   { border-color: rgba(160, 140, 220, 0); box-shadow: 0 0 0 0 rgba(160, 140, 220, 0); }
+  30%  { border-color: rgba(160, 140, 220, 0.7);  box-shadow: 0 0 0 4px rgba(160, 140, 220, 0.18); }
+  100% { border-color: rgba(160, 140, 220, 0); box-shadow: 0 0 0 0 rgba(160, 140, 220, 0); }
 }
 .flash-new-post {
   animation: flashBorder 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1;
+}
+
+/* ═══════════════════════════════════════════════
+   NEWS CARD — per-category pastel tint
+   The colour comes from inline CSS custom properties set in NewsCard.tsx
+   (--tint-bg-hover, --tint-shadow, --tint-accent). Keeping the hover
+   declarative here means React doesn't have to swap inline styles on
+   every pointer enter/leave, which keeps a long feed buttery.
+═══════════════════════════════════════════════ */
+@media (hover: hover) {
+  .news-card-tinted:hover {
+    background-color: var(--tint-bg-hover) !important;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 12px 28px rgba(15, 23, 42, 0.08) !important;
+  }
+  .news-card-tinted:hover h3 {
+    color: var(--tint-accent) !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════
