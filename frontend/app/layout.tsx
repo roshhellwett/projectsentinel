@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
+import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 
 
 const inter = Inter({
@@ -94,10 +95,31 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  // Pre-warm DNS + TLS for the two third-party origins we hit most often:
+  // Supabase for the post API and Google for source favicons. Shaves
+  // ~100–200 ms off the first request on cold network paths.
+  const supabaseOrigin = (() => {
+    try {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin;
+      }
+    } catch {
+      /* ignore */
+    }
+    return null;
+  })();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {supabaseOrigin && (
+          <>
+            <link rel="preconnect" href={supabaseOrigin} crossOrigin="" />
+            <link rel="dns-prefetch" href={supabaseOrigin} />
+          </>
+        )}
+        <link rel="preconnect" href="https://www.google.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://www.google.com" />
         {gtmId && (
           <Script id="gtm-script" strategy="afterInteractive">
             {`
@@ -144,6 +166,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <MobileBottomNav />
         <ScrollToTop />
+        <KeyboardShortcuts />
       </body>
     </html>
   );

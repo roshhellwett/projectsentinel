@@ -36,6 +36,13 @@ export default async function HomePage() {
       .map(({ id }) => id),
   );
 
+  // Count of stories that landed in the last 24h — surfaced in the hero
+  // as social proof of how active the verification pipeline is.
+  const DAY_AGO = Date.now() - 24 * 3_600_000;
+  const verifiedToday = allPosts.filter(
+    (p) => new Date(p.published_at).getTime() >= DAY_AGO,
+  ).length + (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
+
   // Feed posts: everything EXCEPT hero and trending, ordered by a composite
   // score that blends credibility with recency. This guarantees the
   // highest-quality, freshest stories surface at the top of "Latest News"
@@ -81,6 +88,19 @@ export default async function HomePage() {
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600 md:text-lg">
               Stories are cross-referenced, scored, and written without ads or noise.
             </p>
+            {verifiedToday > 0 && (
+              <div className="mt-6 inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                <span className="relative inline-flex w-2 h-2 rounded-full bg-accent flex-shrink-0">
+                  <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" aria-hidden="true" />
+                </span>
+                <span className="text-[12px] font-semibold text-slate-700 tabular-nums">
+                  {verifiedToday}
+                </span>
+                <span className="text-[12px] font-medium text-slate-500">
+                  {verifiedToday === 1 ? 'story verified in the last 24 hours' : 'stories verified in the last 24 hours'}
+                </span>
+              </div>
+            )}
           </div>
         </section>
 

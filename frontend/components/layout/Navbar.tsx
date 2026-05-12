@@ -3,10 +3,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Github, Menu, X } from 'lucide-react';
+import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -14,6 +15,7 @@ const NAV_LINKS = [
   { href: '/category/business', label: 'Business' },
   { href: '/category/sports', label: 'Sports' },
   { href: '/category/tech', label: 'Tech' },
+  { href: '/saved', label: 'Saved' },
   { href: '/how-it-works', label: 'How It Works' },
 ] as const;
 
@@ -51,6 +53,14 @@ export function Navbar() {
 
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+
+  // Listen for the global "/" keyboard shortcut so the user can open
+  // search from anywhere without reaching for the mouse.
+  useEffect(() => {
+    const handler = () => setIsSearchOpen(true);
+    window.addEventListener(OPEN_SEARCH_EVENT, handler);
+    return () => window.removeEventListener(OPEN_SEARCH_EVENT, handler);
+  }, []);
 
   return (
     <>
@@ -102,6 +112,7 @@ export function Navbar() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      aria-current={active ? 'page' : undefined}
                       className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                         active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.035]'
                       }`}
@@ -206,13 +217,21 @@ export function Navbar() {
                     >
                       <Link
                         href={link.href}
+                        aria-current={active ? 'page' : undefined}
                         className={`touch-polish block px-4 py-3 rounded-xl text-[15px] font-medium transition-all active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                           active
                             ? 'bg-slate-950/[0.055] text-slate-950 border border-slate-950/[0.10]'
                             : 'text-slate-600 hover:bg-slate-950/[0.04] border border-transparent'
                         }`}
                       >
-                        {link.label}
+                        {link.label === 'Saved' ? (
+                          <span className="inline-flex items-center gap-2">
+                            <Bookmark className="w-3.5 h-3.5" />
+                            {link.label}
+                          </span>
+                        ) : (
+                          link.label
+                        )}
                       </Link>
                     </motion.div>
                   );

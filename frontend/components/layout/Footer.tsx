@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: '/category/business', label: 'Business' },
   { href: '/category/sports', label: 'Sports' },
   { href: '/category/tech', label: 'Tech' },
+  { href: '/saved', label: 'Saved stories' },
   { href: '/how-it-works', label: 'How It Works' },
 ];
 

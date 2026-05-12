@@ -10,6 +10,7 @@ import { CredibilityBadge } from './CredibilityBadge';
 import { SourceLinks } from './SourceLinks';
 import { CorrectionsNotice } from './CorrectionsNotice';
 import { ShareButtons } from './ShareButtons';
+import { BookmarkButton } from './BookmarkButton';
 import { formatDate } from '@/lib/utils/formatDate';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
@@ -166,6 +167,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
               <div className="flex flex-wrap items-center gap-3 mb-6">
                 <CredibilityBadge score={post.credibility_score} showTooltip />
                 <span className="text-sm text-zinc-500">{post.source_count} sources</span>
+                <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
                 <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}`} />
               </div>
 

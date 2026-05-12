@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useCallback } from 'react';
-import { Home, Search, LayoutGrid, Info } from 'lucide-react';
+import { Home, Search, LayoutGrid, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
 
@@ -11,7 +11,7 @@ const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
   { id: 'search', href: '/search', icon: Search, label: 'Search' },
   { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
-  { id: 'about', href: '/how-it-works', icon: Info, label: 'About' },
+  { id: 'saved', href: '/saved', icon: Bookmark, label: 'Saved' },
 ] as const;
 
 export function MobileBottomNav() {

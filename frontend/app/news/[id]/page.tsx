@@ -7,8 +7,10 @@ import { CredibilityBadge } from '@/components/news/CredibilityBadge';
 import { SourceLinks } from '@/components/news/SourceLinks';
 import { CorrectionsNotice } from '@/components/news/CorrectionsNotice';
 import { ShareButtons } from '@/components/news/ShareButtons';
+import { BookmarkButton } from '@/components/news/BookmarkButton';
 import { RelatedStories } from '@/components/news/RelatedStories';
 import { ReadingTime } from '@/components/news/ReadingTime';
+import { ReadingProgress } from '@/components/ui/ReadingProgress';
 import { formatDate } from '@/lib/utils/formatDate';
 import { newsArticleJsonLd, breadcrumbJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { ArrowLeft, Clock, ShieldCheck, Database, Calendar } from 'lucide-react';
@@ -78,6 +80,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
   return (
     <div className="relative min-h-screen overflow-hidden pb-12">
+      <ReadingProgress targetSelector="#article-body" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -111,7 +114,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         )}
 
         {/* Article Header Card */}
-        <article className={`premium-card relative rounded-[2rem] overflow-hidden mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
+        <article id="article-body" className={`premium-card relative rounded-[2rem] overflow-hidden mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
           
           <div className="p-8 md:p-12">
@@ -141,7 +144,10 @@ export default async function NewsPage({ params }: NewsPageProps) {
                   {post.source_count} Sources Verified
                 </div>
               </div>
-              <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}`} />
+              <div className="flex flex-wrap items-center gap-3">
+                <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
+                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}`} />
+              </div>
             </div>
 
             {/* Summary / Body */}
