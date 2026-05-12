@@ -32,12 +32,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteUrl, lastModified: new Date(), changeFrequency: 'hourly', priority: 1.0 },
-    { url: `${siteUrl}/how-it-works`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${siteUrl}/search`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
+    { url: `${siteUrl}/how-it-works/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${siteUrl}/search/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
   ];
 
   const categoryRoutes: MetadataRoute.Sitemap = CATEGORY_SLUGS.map((category) => ({
-    url: `${siteUrl}/category/${category}`,
+    url: `${siteUrl}/category/${category}/`,
     lastModified: new Date(),
     changeFrequency: 'hourly' as const,
     priority: 0.8,
@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const articles = await fetchArticleUrls();
   const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${siteUrl}/news/${article.id}`,
+    url: `${siteUrl}/news/${article.id}/`,
     lastModified: new Date(article.published_at),
     changeFrequency: 'monthly' as const,
     priority: 0.7,

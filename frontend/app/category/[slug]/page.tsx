@@ -63,7 +63,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             '@type': 'CollectionPage',
             name: `${categoryName} News`,
             description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
-            url: `${siteUrl}/category/${slug}`,
+            url: `${siteUrl}/category/${slug}/`,
             publisher: { '@type': 'Organization', name: 'India Verified' },
           }),
         }}

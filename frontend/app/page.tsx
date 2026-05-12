@@ -21,49 +21,46 @@ export default async function HomePage() {
       : postsResult.posts,
   );
 
-  // Trending: top 5 by credibility × freshness — these IDs will be
-  // excluded from the Latest News feed to prevent the same card
-  // appearing in both sections.
-  const trendingIds = new Set(
-    [...allPosts]
-      .map((post) => {
-        const ageHours = (Date.now() - new Date(post.published_at).getTime()) / 3_600_000;
-        const freshness = Math.max(0, 1 - ageHours / 12);
-        return { id: post.id, score: post.credibility_score * 0.6 + freshness * 40 };
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5)
-      .map(({ id }) => id),
-  );
+  // Trending: top 5 by credibility × freshness, computed ONCE on the server.
+  // Previously this composite ran twice — here for the exclusion set, and
+  // again inside <TrendingSection> on the client — using different
+  // `Date.now()` values, which let a story near the 12-hour freshness cliff
+  // appear in both Trending AND the Latest feed simultaneously. By computing
+  // the resolved post list here and passing it down as a prop, the two
+  // sections stay perfectly disjoint regardless of hydration timing.
+  const NOW = Date.now();
+  const trendingPosts = [...allPosts]
+    .map((post) => {
+      const ageHours = (NOW - new Date(post.published_at).getTime()) / 3_600_000;
+      const freshness = Math.max(0, 1 - ageHours / 12);
+      return { post, score: post.credibility_score * 0.6 + freshness * 40 };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5)
+    .map(({ post }) => post);
+  const trendingIds = new Set(trendingPosts.map((p) => p.id));
 
   // Count of stories that landed in the last 24h — surfaced in the hero
   // as social proof of how active the verification pipeline is.
-  const DAY_AGO = Date.now() - 24 * 3_600_000;
+  const DAY_AGO = NOW - 24 * 3_600_000;
   const verifiedToday = allPosts.filter(
     (p) => new Date(p.published_at).getTime() >= DAY_AGO,
   ).length + (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
 
-  // Feed posts: everything EXCEPT hero and trending, ordered by a composite
-  // score that blends credibility with recency. This guarantees the
-  // highest-quality, freshest stories surface at the top of "Latest News"
-  // — matching the rest of the page's top-to-bottom score hierarchy
-  // (Hero → Trending → Latest). Stories older than 24h fall back to plain
-  // recency so legitimate older context isn't ranked above today's news.
-  const NOW = Date.now();
+  // Feed posts: everything EXCEPT hero and trending, in PURE chronological
+  // order (newest first). The previous implementation re-ranked page 1 by a
+  // composite score, but subsequent pages from /api/posts come back in raw
+  // published_at-DESC order — creating a visible discontinuity at the
+  // page-1/page-2 boundary where an older composite-promoted story sat
+  // above newer chronologically-correct ones. A single ordering rule across
+  // every page also matches the "Latest News" section title and the user's
+  // mental model: top of the feed = most recent.
   const feedPosts = allPosts
     .filter((post) => !trendingIds.has(post.id))
-    .map((post) => {
-      const ageHours = (NOW - new Date(post.published_at).getTime()) / 3_600_000;
-      const freshness = Math.max(0, 1 - ageHours / 24);
-      const composite = post.credibility_score * 0.55 + freshness * 45;
-      return { post, composite, ageHours };
-    })
-    .sort((a, b) => {
-      // Keep same-day stories ranked by composite; older fall back to recency.
-      if (a.ageHours < 24 && b.ageHours < 24) return b.composite - a.composite;
-      return a.ageHours - b.ageHours;
-    })
-    .map(({ post }) => post);
+    .sort(
+      (a, b) =>
+        new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+    );
 
   return (
     <div className="relative min-h-screen">
@@ -116,8 +113,8 @@ export default async function HomePage() {
           </div>
         )}
 
-        {/* Trending */}
-        {allPosts.length > 0 && <TrendingSection posts={allPosts} />}
+        {/* Trending — server-resolved, disjoint from feedPosts by construction */}
+        {trendingPosts.length > 0 && <TrendingSection posts={trendingPosts} />}
 
         {/* Latest verified news — auto-loading infinite feed */}
         <section aria-label="Latest verified news">

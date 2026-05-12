@@ -23,7 +23,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
       className="relative group [perspective:1200px]"
     >
       <Link
-        href={`/news/${post.id}`}
+        href={`/news/${post.id}/`}
         className="touch-polish premium-card premium-card-hover block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {/* Gradient accent bar */}

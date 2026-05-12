@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       description: post.summary,
       type: 'article',
       publishedTime: post.published_at,
-      url: `${siteUrl}/news/${post.id}`,
+      url: `${siteUrl}/news/${post.id}/`,
     },
     twitter: {
       card: 'summary_large_image',
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       description: post.summary,
     },
     alternates: {
-      canonical: `${siteUrl}/news/${post.id}`,
+      canonical: `${siteUrl}/news/${post.id}/`,
     },
   };
 }
@@ -73,8 +73,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
     newsArticleJsonLd(post),
     breadcrumbJsonLd([
       { name: 'Home', url: siteUrl },
-      { name: post.category.charAt(0).toUpperCase() + post.category.slice(1), url: `${siteUrl}/category/${post.category}` },
-      { name: post.headline, url: `${siteUrl}/news/${post.id}` },
+      { name: post.category.charAt(0).toUpperCase() + post.category.slice(1), url: `${siteUrl}/category/${post.category}/` },
+      { name: post.headline, url: `${siteUrl}/news/${post.id}/` },
     ]),
   ];
 
@@ -146,7 +146,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
-                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}`} />
+                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
               </div>
             </div>
 

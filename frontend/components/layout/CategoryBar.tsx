@@ -18,9 +18,29 @@ export function CategoryBar() {
   const activeRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
-    if (activeRef.current && scrollRef.current) {
-      activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    const container = scrollRef.current;
+    const active = activeRef.current;
+    if (!container || !active) return;
+
+    // Center the active pill horizontally inside its scroll container without
+    // ever touching window scroll. `scrollIntoView` (even with
+    // `block: 'nearest'`) was scrolling the whole page on iOS Safari and
+    // some Android Chromes whenever the element hadn't fully laid out yet,
+    // which made the homepage visibly lurch on first paint.
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = active.getBoundingClientRect();
+    const offsetWithin =
+      activeRect.left - containerRect.left + container.scrollLeft;
+    const target = Math.max(
+      0,
+      offsetWithin - container.clientWidth / 2 + activeRect.width / 2,
+    );
+
+    // If the pill is already comfortably inside the viewport, don't animate —
+    // avoids a jittery 1-px nudge on first mount.
+    if (Math.abs(container.scrollLeft - target) < 4) return;
+
+    container.scrollTo({ left: target, behavior: 'smooth' });
   }, [currentCategory]);
 
   return (

@@ -8,8 +8,8 @@ export async function GET() {
     <item>
       <title><![CDATA[${post.headline}]]></title>
       <description><![CDATA[${post.summary}]]></description>
-      <link>${siteUrl}/news/${post.id}</link>
-      <guid isPermaLink="true">${siteUrl}/news/${post.id}</guid>
+      <link>${siteUrl}/news/${post.id}/</link>
+      <guid isPermaLink="true">${siteUrl}/news/${post.id}/</guid>
       <category>${post.category}</category>
       <pubDate>${new Date(post.published_at).toUTCString()}</pubDate>
       <source url="${siteUrl}/rss.xml">India Verified</source>

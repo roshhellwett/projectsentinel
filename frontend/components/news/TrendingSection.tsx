@@ -26,24 +26,20 @@ interface TrendingSectionProps {
 }
 
 export function TrendingSection({ posts }: TrendingSectionProps) {
+  // Trending is now resolved server-side and passed in already in the
+  // correct order. We only dedupe + cap defensively so this component
+  // remains safe if a caller passes a raw list.
   const trending = useMemo(() => {
     if (!posts || posts.length === 0) return [];
     const seen = new Set<string>();
-    const unique = posts.filter((p) => {
-      if (seen.has(p.id)) return false;
+    const out: Post[] = [];
+    for (const p of posts) {
+      if (seen.has(p.id)) continue;
       seen.add(p.id);
-      return true;
-    });
-    const now = Date.now();
-    return [...unique]
-      .map((post) => {
-        const ageHours = (now - new Date(post.published_at).getTime()) / 3_600_000;
-        const freshness = Math.max(0, 1 - ageHours / 12);
-        return { post, score: post.credibility_score * 0.6 + freshness * 40 };
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5)
-      .map(({ post }) => post);
+      out.push(p);
+      if (out.length === 5) break;
+    }
+    return out;
   }, [posts]);
 
   if (trending.length === 0) return null;
@@ -71,7 +67,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             transition={{ delay: index * 0.05, duration: 0.4 }}
           >
             <Link
-              href={`/news/${post.id}`}
+              href={`/news/${post.id}/`}
               className="touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset"
             >
               {/* Category colour left bar */}

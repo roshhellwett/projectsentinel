@@ -9,9 +9,9 @@ import { CATEGORIES } from '@/lib/constants/categories';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
-  { id: 'search', href: '/search', icon: Search, label: 'Search' },
+  { id: 'search', href: '/search/', icon: Search, label: 'Search' },
   { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
-  { id: 'saved', href: '/saved', icon: Bookmark, label: 'Saved' },
+  { id: 'saved', href: '/saved/', icon: Bookmark, label: 'Saved' },
 ] as const;
 
 export function MobileBottomNav() {
@@ -64,11 +64,11 @@ export function MobileBottomNav() {
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {CATEGORIES.map((cat) => {
-                  const active = pathname === `/category/${cat.slug}`;
+                  const active = pathname === `/category/${cat.slug}/`;
                   return (
                     <Link
                       key={cat.slug}
-                      href={`/category/${cat.slug}`}
+                      href={`/category/${cat.slug}/`}
                       onClick={closeTopics}
                       className={`touch-polish flex items-center justify-center px-3 py-3.5 rounded-2xl text-center text-[12px] font-semibold transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                         active

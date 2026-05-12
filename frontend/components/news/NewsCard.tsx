@@ -52,7 +52,6 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
 
   return (
     <motion.div
-      layoutId={`card-${post.id}`}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}

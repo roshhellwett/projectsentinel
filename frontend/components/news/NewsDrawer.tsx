@@ -216,7 +216,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
               </motion.a>
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={() => { onClose(); router.push(`/news/${post.id}`); }}
+                onClick={() => { onClose(); router.push(`/news/${post.id}/`); }}
                 className="touch-polish flex-1 text-center py-3.5 px-4 bg-accent hover:bg-accent-hover text-white font-semibold rounded-2xl transition-all duration-300 shadow-glow-accent hover:shadow-glow-accent-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Read Full Article →

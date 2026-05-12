@@ -23,57 +23,56 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Post[]>([]);
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [resultCount, setResultCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasFetched, setHasFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Live full-text search against the whole archive. Previously this
+  // overlay loaded the 50 most-recent posts and ran an in-memory substring
+  // filter — which silently hid every match older than ~a day and made
+  // the "N results" line a lie. We now debounce 200 ms, hit the proper
+  // /api/search FTS endpoint, and abort any in-flight request when the
+  // user keeps typing or closes the overlay.
   useEffect(() => {
-    if (!isOpen || hasFetched) {
+    if (!isOpen) return;
+    const q = query.trim();
+    if (!q) {
+      setResults([]);
+      setResultCount(0);
+      setIsLoading(false);
+      setError(null);
       return;
     }
 
     const controller = new AbortController();
-    setIsLoading(true);
-    setError(null);
-
-    fetch('/api/posts?page=1&limit=50', { signal: controller.signal })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch');
-        return res.json();
+    const timer = window.setTimeout(() => {
+      setIsLoading(true);
+      setError(null);
+      fetch(`/api/search?q=${encodeURIComponent(q)}&limit=10`, {
+        signal: controller.signal,
       })
-      .then(data => {
-        setAllPosts(data.posts || []);
-        setHasFetched(true);
-        setIsLoading(false);
-      })
-      .catch((fetchError) => {
-        if (fetchError.name === 'AbortError') return;
-        setError('Failed to load articles');
-        setIsLoading(false);
-      });
+        .then((res) => {
+          if (!res.ok) throw new Error('search failed');
+          return res.json();
+        })
+        .then((data: { posts?: Post[]; count?: number }) => {
+          setResults(data.posts || []);
+          setResultCount(typeof data.count === 'number' ? data.count : (data.posts?.length ?? 0));
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          if (err.name === 'AbortError') return;
+          setError('Search failed');
+          setIsLoading(false);
+        });
+    }, 200);
 
-    return () => controller.abort();
-  }, [hasFetched, isOpen]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (query.trim() && allPosts.length > 0) {
-        const q = query.toLowerCase();
-        const filtered = allPosts.filter(post =>
-          post.headline.toLowerCase().includes(q) ||
-          post.summary.toLowerCase().includes(q) ||
-          post.category.toLowerCase().includes(q)
-        );
-        setResults(filtered.slice(0, 10));
-      } else {
-        setResults([]);
-      }
-    }, 150);
-
-    return () => clearTimeout(timer);
-  }, [query, allPosts]);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [query, isOpen]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -108,11 +107,14 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     if (isOpen) return;
     setQuery('');
     setResults([]);
+    setResultCount(0);
+    setError(null);
+    setIsLoading(false);
   }, [isOpen]);
 
   const handleSelect = useCallback((post: Post) => {
     onClose();
-    router.push(`/news/${post.id}`);
+    router.push(`/news/${post.id}/`);
   }, [onClose, router]);
 
   return (
@@ -159,7 +161,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 // Enter escapes the in-memory quick filter and hits the proper
                 // /search page (server-side FTS over the whole archive).
                 onClose();
-                router.push(`/search?q=${encodeURIComponent(q)}`);
+                router.push(`/search/?q=${encodeURIComponent(q)}`);
               }}
             >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
@@ -188,9 +190,12 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               {error && (
                 <p className="text-center text-cred-low py-8">{error}</p>
               )}
-              {query.trim() && !isLoading && (
+              {query.trim() && !isLoading && !error && (
                 <p className="text-sm text-slate-500 mb-4">
-                  {results.length} results for &quot;{query}&quot;
+                  {resultCount === 0
+                    ? <>No matches for &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;. Press Enter to broaden.</>
+                    : <><span className="text-slate-700 font-medium tabular-nums">{resultCount}</span> {resultCount === 1 ? 'match' : 'matches'} for &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;{resultCount > results.length ? <> — showing top {results.length}</> : null}</>
+                  }
                 </p>
               )}
 

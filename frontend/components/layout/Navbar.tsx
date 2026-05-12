@@ -11,12 +11,12 @@ import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/category/politics', label: 'Politics' },
-  { href: '/category/business', label: 'Business' },
-  { href: '/category/sports', label: 'Sports' },
-  { href: '/category/tech', label: 'Tech' },
-  { href: '/saved', label: 'Saved' },
-  { href: '/how-it-works', label: 'How It Works' },
+  { href: '/category/politics/', label: 'Politics' },
+  { href: '/category/business/', label: 'Business' },
+  { href: '/category/sports/', label: 'Sports' },
+  { href: '/category/tech/', label: 'Tech' },
+  { href: '/saved/', label: 'Saved' },
+  { href: '/how-it-works/', label: 'How It Works' },
 ] as const;
 
 const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
