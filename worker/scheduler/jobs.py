@@ -120,20 +120,43 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             all_articles.extend(rss_articles)
             logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
 
-        if supplementary_only or len(rss_articles) == 0:
-            with ThreadPoolExecutor(max_workers=2) as executor:
-                futures = {
-                    executor.submit(GNewsFetcher().fetch): "GNews",
-                    executor.submit(NewsAPIFetcher().fetch): "NewsAPI",
-                }
-                for future in as_completed(futures):
-                    name = futures[future]
-                    try:
-                        api_articles = future.result(timeout=30)
-                        all_articles.extend(api_articles)
-                        logger.log("FETCH", f"Fetched {len(api_articles)} articles from {name}")
-                    except Exception as e:
-                        logger.log("FETCH_ERROR", f"{name} failed: {str(e)}")
+        # Supplementary fetch decision:
+        #   - Always run when explicitly requested (the every-2h job).
+        #   - On the main pipeline, only fall back when RSS returned nothing
+        #     AND at least one supplementary pool still has quota for today.
+        #     This prevents a transient RSS hiccup from burning the whole
+        #     daily quota across the 144 ten-minute ticks per day.
+        should_supplement = supplementary_only or (
+            len(rss_articles) == 0
+            and (GNewsFetcher.has_quota() or NewsAPIFetcher.has_quota())
+        )
+
+        if not should_supplement and len(rss_articles) == 0 and not supplementary_only:
+            logger.log(
+                "FETCH",
+                "RSS returned 0 articles but supplementary pools are out of quota for today, skipping",
+            )
+
+        if should_supplement:
+            tasks = []
+            if GNewsFetcher.has_quota():
+                tasks.append((GNewsFetcher().fetch, "GNews"))
+            if NewsAPIFetcher.has_quota():
+                tasks.append((NewsAPIFetcher().fetch, "NewsAPI"))
+
+            if tasks:
+                with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
+                    futures = {executor.submit(fn): name for fn, name in tasks}
+                    for future in as_completed(futures):
+                        name = futures[future]
+                        try:
+                            api_articles = future.result(timeout=30)
+                            all_articles.extend(api_articles)
+                            logger.log("FETCH", f"Fetched {len(api_articles)} articles from {name}")
+                        except Exception as e:
+                            logger.log("FETCH_ERROR", f"{name} failed: {str(e)}")
+            else:
+                logger.log("FETCH", "Supplementary requested but all keys exhausted, skipping API calls")
 
         # Only refresh known-false-claims for the full pipeline; supplementary
         # fetch just stores raw articles for the next main run.

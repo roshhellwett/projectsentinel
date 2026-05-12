@@ -13,138 +13,18 @@ import os
 import re
 import time
 import threading
-from datetime import date
 from typing import Optional
 
 import requests
 
 from logger.pipeline_logger import PipelineLogger
 from rate_limiter.limiter import RateLimiter, RateLimitExceededError
+from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
 
-
-class AllKeysExhaustedError(Exception):
-    """Raised when all verification API keys are rate-limited for this run."""
-
-
-class _KeyPool:
-    """
-    Thread-safe pool of Groq API keys with per-key daily usage tracking.
-
-    Tiering: keys are grouped into tiers of 3 by load order — slots 0-2 form
-    tier 1, slots 3-5 form tier 2. The pool only picks from the lowest tier
-    that still has at least one non-exhausted key. Within an active tier,
-    the lowest-calls-today key wins (load-equalizing).
-
-    Keys that return 429 are skipped for the remainder of the current run.
-    Daily counters reset automatically at midnight (calendar date change).
-    """
-
-    TIER_SIZE = 3
-
-    def __init__(self, keys: list[str] | list[tuple[int, str]]) -> None:
-        self._lock = threading.Lock()
-        # Accept either a flat list of keys (legacy) or a list of
-        # (env_number, key) tuples so tier can be derived from the
-        # caller's numbering rather than insertion order.
-        normalized: list[tuple[int, str]] = []
-        for i, item in enumerate(keys):
-            if isinstance(item, tuple):
-                normalized.append(item)
-            else:
-                normalized.append((i + 1, item))
-
-        self._slots: list[dict] = [
-            {
-                "key": k,
-                "tier": ((num - 1) // self.TIER_SIZE) + 1,
-                "calls_today": 0,
-                "day": str(date.today()),
-                "skip_this_run": False,
-            }
-            for num, k in normalized
-        ]
-
-    def _refresh_slot(self, slot: dict) -> None:
-        """Reset counter if calendar date has changed. Must be called with lock held."""
-        today = str(date.today())
-        if slot["day"] != today:
-            slot["calls_today"] = 0
-            slot["day"] = today
-            slot["skip_this_run"] = False
-
-    def pick(self) -> tuple[int, str]:
-        """
-        Return (slot_index, api_key) for the key with fewest calls today
-        that has not been skipped this run.
-        Raises AllKeysExhaustedError if no usable key exists.
-        """
-        with self._lock:
-            for slot in self._slots:
-                self._refresh_slot(slot)
-
-            available = [
-                (i, s)
-                for i, s in enumerate(self._slots)
-                if not s["skip_this_run"] and s["key"]
-            ]
-            if not available:
-                raise AllKeysExhaustedError(
-                    "All Groq verification keys are rate-limited for this run"
-                )
-
-            # Tier fallback: only consider keys in the lowest tier that
-            # still has any non-exhausted slot. Higher tiers stay dormant
-            # until their predecessor tier is fully 429-skipped.
-            min_tier = min(s["tier"] for _, s in available)
-            in_tier = [(i, s) for i, s in available if s["tier"] == min_tier]
-            idx, _ = min(in_tier, key=lambda x: x[1]["calls_today"])
-            return idx, self._slots[idx]["key"]
-
-    def record_success(self, idx: int) -> None:
-        """Increment daily counter for slot after a successful API call."""
-        with self._lock:
-            self._slots[idx]["calls_today"] += 1
-
-    def mark_exhausted(self, idx: int) -> None:
-        """Mark slot as unusable for the rest of this run (429 received)."""
-        with self._lock:
-            self._slots[idx]["skip_this_run"] = True
-
-    def get_stats(self) -> list[dict]:
-        """Return a snapshot of all slot stats (for logging)."""
-        with self._lock:
-            return [
-                {
-                    "key_index": i + 1,
-                    "tier": s["tier"],
-                    "calls_today": s["calls_today"],
-                    "skip_this_run": s["skip_this_run"],
-                }
-                for i, s in enumerate(self._slots)
-            ]
-
-    def get_persist_stats(self) -> list[dict]:
-        """Return stats formatted for Supabase persistence (0-based index + day)."""
-        with self._lock:
-            return [
-                {"index": i, "calls_today": s["calls_today"], "day": s["day"]}
-                for i, s in enumerate(self._slots)
-            ]
-
-    def restore_stats(self, persisted: list[dict]) -> None:
-        """Restore daily counters from Supabase. Only applies entries from today."""
-        today = str(date.today())
-        with self._lock:
-            for entry in persisted:
-                idx = entry.get("index")
-                if not isinstance(idx, int) or not (0 <= idx < len(self._slots)):
-                    continue
-                if entry.get("day") != today:
-                    continue
-                self._slots[idx]["calls_today"] = max(
-                    self._slots[idx]["calls_today"],
-                    int(entry.get("calls_today", 0)),
-                )
+# Re-exports preserved for backwards compatibility with existing call sites
+# and tests that import `_KeyPool` / `AllKeysExhaustedError` from this module.
+_KeyPool = KeyPool
+__all__ = ["AllKeysExhaustedError", "GroqVerifier", "_KeyPool"]
 
 
 class GroqVerifier:
@@ -156,7 +36,7 @@ class GroqVerifier:
     MIN_DELAY_SECONDS = 8
 
     # Shared key pool – class-level so concurrent pipeline runs share one counter set.
-    _key_pool: Optional["_KeyPool"] = None
+    _key_pool: Optional[KeyPool] = None
     _key_pool_lock = threading.Lock()
 
     SYSTEM_PROMPT = (
@@ -201,13 +81,13 @@ class GroqVerifier:
     # ------------------------------------------------------------------
 
     @classmethod
-    def _ensure_pool(cls) -> Optional["_KeyPool"]:
+    def _ensure_pool(cls) -> Optional[KeyPool]:
         """Lazily initialise the shared key pool. Returns None if no keys are configured."""
         with cls._key_pool_lock:
             if cls._key_pool is None:
                 keys = cls._load_verify_keys()
                 if keys:
-                    cls._key_pool = _KeyPool(keys)
+                    cls._key_pool = KeyPool(keys, name="Groq verification")
                     try:
                         from persistence.groq_usage import load_key_stats
                         persisted = load_key_stats()
@@ -252,16 +132,7 @@ class GroqVerifier:
           2. GROQ_API_KEY_VERIFY (legacy single-key fallback) — only used
              when none of the numbered variables are configured.
         """
-        keys: list[tuple[int, str]] = []
-        for i in range(1, 7):
-            k = os.getenv(f"GROQ_API_KEY_VERIFY_{i}", "").strip()
-            if k:
-                keys.append((i, k))
-        if not keys:
-            legacy = os.getenv("GROQ_API_KEY_VERIFY", "").strip()
-            if legacy:
-                keys.append((1, legacy))
-        return keys  # type: ignore[return-value]
+        return load_numbered_keys(os.getenv, "GROQ_API_KEY_VERIFY", max_keys=6)
 
     # ------------------------------------------------------------------
     # Public API

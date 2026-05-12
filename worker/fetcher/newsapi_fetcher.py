@@ -1,76 +1,164 @@
 """
 NewsAPI.org fetcher - supplementary news source.
-Limited to 6 calls per day to stay within free tier (100 req/day).
+
+Multi-key tier rotation: up to 6 keys via NEWSAPI_KEY_1..NEWSAPI_KEY_6.
+Tier 1 (keys 1-3) is used until every tier-1 key is 429/quota-exhausted
+for the run, then tier 2 (keys 4-6) activates. Falls back to the legacy
+single NEWSAPI_KEY when no numbered variant is configured.
+
+NewsAPI's free "Developer" tier returns 429 with `code=rateLimited` once
+the daily quota is reached. We treat both HTTP 429 and the in-body
+`rateLimited` / `maximumResultsReached` status codes as exhaustion signals.
 """
 
 import os
+import threading
 from datetime import UTC, datetime, timedelta
+from typing import Optional
 from urllib.parse import urlparse
 
 import requests
 
 from fetcher.url_tools import compute_url_hash, normalize_url
 from logger.pipeline_logger import PipelineLogger
+from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
 
 
 class NewsAPIFetcher:
-    """Fetches news from NewsAPI.org."""
+    """Fetches news from NewsAPI.org with multi-key tier rotation."""
 
     API_URL = "https://newsapi.org/v2/everything"
+    PAGE_SIZE = 100  # NewsAPI free tier allows up to 100 results per page.
+    MAX_429_ROTATIONS = 6
+
+    # In-body quota-exhaustion error codes returned with HTTP 200/401/429.
+    _QUOTA_CODES = {"rateLimited", "maximumResultsReached"}
+
+    _key_pool: Optional[KeyPool] = None
+    _key_pool_lock = threading.Lock()
 
     def __init__(self):
-        self.api_key = os.getenv("NEWSAPI_KEY", "")
         self.logger = PipelineLogger()
         self.session = requests.Session()
 
+    # ------------------------------------------------------------------
+    # Pool management
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def _ensure_pool(cls) -> Optional[KeyPool]:
+        with cls._key_pool_lock:
+            if cls._key_pool is None:
+                keys = load_numbered_keys(os.getenv, "NEWSAPI_KEY", max_keys=6)
+                if keys:
+                    cls._key_pool = KeyPool(keys, name="NewsAPI")
+            return cls._key_pool
+
+    @classmethod
+    def _reset_pool(cls) -> None:
+        """Reset the shared pool. Intended for tests only."""
+        with cls._key_pool_lock:
+            cls._key_pool = None
+
+    @classmethod
+    def has_quota(cls) -> bool:
+        """True if at least one NewsAPI key is still usable this run."""
+        pool = cls._ensure_pool()
+        return bool(pool and pool.has_available())
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
     def fetch(self) -> list[dict]:
         """
-        Fetch Indian news from NewsAPI.
-        Uses 1 API call per run - stays within 100 req/day limit.
-
-        Returns:
-            List of article dicts
+        Fetch Indian news from NewsAPI with tier rotation on 429 / quota errors.
         """
-        if not self.api_key:
+        pool = self._ensure_pool()
+        if pool is None:
             self.logger.log("NEWSAPI", "No API key configured, skipping")
             return []
 
-        articles = []
-
-        # Search for India news from last 24 hours
         yesterday = (datetime.now(UTC) - timedelta(days=1)).strftime("%Y-%m-%d")
 
-        params = {
-            "q": "India",
-            "language": "en",
-            "from": yesterday,
-            "sortBy": "publishedAt",
-            "pageSize": 20,
-            "apiKey": self.api_key,
-        }
-
-        try:
-            response = self.session.get(self.API_URL, params=params, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-
-            if data.get("status") != "ok":
-                self.logger.log("NEWSAPI_ERROR", f"API error: {data.get('message', 'Unknown')}")
+        rotations = 0
+        while rotations <= self.MAX_429_ROTATIONS:
+            try:
+                slot_idx, api_key = pool.pick()
+            except AllKeysExhaustedError:
+                self.logger.log(
+                    "NEWSAPI",
+                    "All NewsAPI keys are rate-limited for this run, skipping",
+                    {"key_stats": pool.get_stats()},
+                )
                 return []
 
-            for item in data.get("articles", []):
-                article = self._parse_item(item)
-                if article:
-                    articles.append(article)
+            stats = pool.get_stats()
+            params = {
+                "q": "India",
+                "language": "en",
+                "from": yesterday,
+                "sortBy": "publishedAt",
+                "pageSize": self.PAGE_SIZE,
+                "apiKey": api_key,
+            }
 
-            self.logger.log("NEWSAPI", f"Fetched {len(articles)} articles")
+            try:
+                response = self.session.get(self.API_URL, params=params, timeout=30)
 
-        except requests.exceptions.RequestException as e:
-            self.logger.log("NEWSAPI_ERROR", f"API request failed: {str(e)}")
-        except Exception as e:
-            self.logger.log("NEWSAPI_ERROR", f"Unexpected error: {str(e)}")
+                if response.status_code == 429:
+                    pool.mark_exhausted(slot_idx)
+                    rotations += 1
+                    self.logger.log(
+                        "NEWSAPI",
+                        f"Key #{slot_idx + 1} (tier {stats[slot_idx]['tier']}) HTTP 429, rotating",
+                    )
+                    continue
 
-        return articles
+                response.raise_for_status()
+                data = response.json()
+
+                # NewsAPI uses status=error with code=rateLimited even on HTTP 200
+                # for some quota cases. Treat those as key exhaustion too.
+                if data.get("status") != "ok":
+                    code = data.get("code", "")
+                    msg = data.get("message", "Unknown")
+                    if code in self._QUOTA_CODES:
+                        pool.mark_exhausted(slot_idx)
+                        rotations += 1
+                        self.logger.log(
+                            "NEWSAPI",
+                            f"Key #{slot_idx + 1} quota error ({code}), rotating: {msg[:80]}",
+                        )
+                        continue
+                    self.logger.log("NEWSAPI_ERROR", f"API error: {msg[:120]} (code={code})")
+                    return []
+
+                pool.record_success(slot_idx)
+
+                articles = []
+                for item in data.get("articles", []):
+                    article = self._parse_item(item)
+                    if article:
+                        articles.append(article)
+
+                updated = pool.get_stats()
+                self.logger.log(
+                    "NEWSAPI",
+                    f"Fetched {len(articles)} articles via key #{slot_idx + 1} "
+                    f"(tier {updated[slot_idx]['tier']}, calls_today={updated[slot_idx]['calls_today']})",
+                )
+                return articles
+
+            except requests.exceptions.RequestException as e:
+                self.logger.log("NEWSAPI_ERROR", f"API request failed: {str(e)[:120]}")
+                return []
+            except Exception as e:
+                self.logger.log("NEWSAPI_ERROR", f"Unexpected error: {str(e)[:120]}")
+                return []
+
+        self.logger.log("NEWSAPI", "Exceeded 429 rotation cap, giving up for this run")
+        return []
 
     def _parse_item(self, item: dict) -> dict | None:
         """
