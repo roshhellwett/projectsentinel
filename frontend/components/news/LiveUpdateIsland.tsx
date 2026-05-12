@@ -38,8 +38,17 @@ import { subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScr
 interface LiveUpdateIslandProps {
   /** Posts queued for prepend. Empty array = island hidden. */
   pending: Post[];
-  /** Called when the user taps the island. Parent should flush + scroll-to-top. */
-  onReveal: () => void;
+  /**
+   * Called when the user taps the island.
+   *
+   * The parent receives the newest queued post (i.e. `pending[0]`) so it
+   * can open that specific story in the drawer — matching the iOS-Dynamic-
+   * Island mental model of "tap the notification, jump to that thing". The
+   * parent is also responsible for clearing the queue and marking every
+   * acknowledged ID as already-seen so the same post never bubbles back up
+   * on the next poll tick.
+   */
+  onTap: (newest: Post) => void;
 }
 
 /**
@@ -50,7 +59,7 @@ interface LiveUpdateIslandProps {
  */
 const HIDE_AT_SCROLL_Y = 140;
 
-export function LiveUpdateIsland({ pending, onReveal }: LiveUpdateIslandProps) {
+export function LiveUpdateIsland({ pending, onTap }: LiveUpdateIslandProps) {
   const [nearTop, setNearTop] = useState(true);
   const [overlayOpen, setOverlayOpen] = useState(false);
 
@@ -102,7 +111,10 @@ export function LiveUpdateIsland({ pending, onReveal }: LiveUpdateIslandProps) {
           <motion.button
             type="button"
             key="live-island"
-            onClick={onReveal}
+            onClick={() => {
+              const newest = pending[0];
+              if (newest) onTap(newest);
+            }}
             // Pinhole-grow reveal — width and scale spring from a near-zero
             // origin to give the unmistakable Dynamic Island feel.
             initial={{ opacity: 0, scale: 0.55, y: -12, filter: 'blur(6px)' }}

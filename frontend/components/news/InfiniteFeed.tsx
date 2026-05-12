@@ -174,6 +174,41 @@ export function InfiniteFeed({
   const pendingRef = useRef(pendingNew);
   pendingRef.current = pendingNew;
 
+  // Session-scoped set of post IDs the user has already been notified about
+  // via the LiveUpdateIsland. Without this set, the polling tick would keep
+  // re-detecting the same post as "fresh" every 30 s as soon as it left the
+  // pending queue (e.g. after auto-flush or after the user navigated away
+  // and back). Persisted to sessionStorage so it survives drawer opens,
+  // soft route changes, and accidental tab refreshes within the same
+  // session — but resets cleanly when the tab closes.
+  const DISMISSED_KEY = 'iv:liveDismissedIds';
+  const dismissedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = sessionStorage.getItem(DISMISSED_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) dismissedRef.current = new Set(parsed.filter((x) => typeof x === 'string'));
+      }
+    } catch { /* corrupt JSON — start fresh */ }
+  }, []);
+
+  /** Cap the dismissed set so it cannot grow unbounded across a long session. */
+  const markDismissed = useCallback((ids: string[]) => {
+    if (ids.length === 0) return;
+    const next = dismissedRef.current;
+    for (const id of ids) next.add(id);
+    // FIFO trim — keep the last 200 dismissed IDs.
+    if (next.size > 200) {
+      const arr = Array.from(next);
+      dismissedRef.current = new Set(arr.slice(arr.length - 200));
+    }
+    try {
+      sessionStorage.setItem(DISMISSED_KEY, JSON.stringify(Array.from(dismissedRef.current)));
+    } catch { /* quota/private-mode — non-fatal */ }
+  }, []);
+
   /** Flash a freshly-revealed batch of post IDs so the user can spot them. */
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
@@ -201,11 +236,30 @@ export function InfiniteFeed({
     if (queued.length === 0) return;
     setPendingNew([]);
     setPosts((prev) => dedupeById([...queued, ...prev]));
-    flashFresh(queued.map((p) => p.id));
+    const ids = queued.map((p) => p.id);
+    flashFresh(ids);
+    markDismissed(ids);
     if (opts.scroll && typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [flashFresh]);
+  }, [flashFresh, markDismissed]);
+
+  /**
+   * Tap-handler from <LiveUpdateIsland>: open the newest queued post in the
+   * drawer (matching the iOS-Dynamic-Island "tap the notification → jump to
+   * the thing" mental model). All other queued posts are silently merged
+   * into the feed and every acknowledged ID is recorded as dismissed so
+   * the same story can never bubble back up on the next poll tick.
+   */
+  const openFromIsland = useCallback((newest: Post) => {
+    const queued = pendingRef.current;
+    setPendingNew([]);
+    setPosts((prev) => dedupeById([newest, ...queued.filter((p) => p.id !== newest.id), ...prev]));
+    flashFresh(queued.map((p) => p.id));
+    markDismissed(queued.map((p) => p.id));
+    markRead(newest.id);
+    setSelectedPost(newest);
+  }, [flashFresh, markDismissed, markRead]);
 
   // ── Auto-flush: when the user voluntarily scrolls back near the top,
   // surface any queued posts silently instead of leaving them stuck behind
@@ -243,10 +297,12 @@ export function InfiniteFeed({
         const existing = new Set(postsRef.current.map((p) => p.id));
         const excluded = excludeIdsRef.current;
         const queuedIds = new Set(pendingRef.current.map((p) => p.id));
+        const dismissed = dismissedRef.current;
         const fresh = data.posts.filter(
           (p) =>
             !existing.has(p.id) &&
             !queuedIds.has(p.id) &&
+            !dismissed.has(p.id) &&
             !(excluded?.has(p.id)),
         );
         if (fresh.length === 0) return;
@@ -407,7 +463,7 @@ export function InfiniteFeed({
       {/* iOS Dynamic Island — surfaces queued live posts while the user is
           reading further down the feed. The component renders nothing when
           pendingNew is empty, so it has zero visual cost at rest. */}
-      <LiveUpdateIsland pending={pendingNew} onReveal={() => flushPending({ scroll: true })} />
+      <LiveUpdateIsland pending={pendingNew} onTap={openFromIsland} />
     </>
   );
 }

@@ -86,7 +86,10 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-slate-950/22 backdrop-blur-md z-40"
+            // z-[60] — above the fixed Navbar (z-50) so the page chrome is
+            // dimmed while reading and the drawer's close button is never
+            // hidden behind the navbar's safe-area chrome on iOS.
+            className="fixed inset-0 bg-slate-950/30 backdrop-blur-md z-[60]"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -117,7 +120,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 y.set(0);
               }
             }}
-            className="fixed z-50 bg-white/95 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-[0_30px_120px_-52px_rgba(15,23,42,0.46)] lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[540px] bottom-0 left-0 right-0 h-[92vh] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
+            className="fixed z-[65] bg-white/95 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-[0_30px_120px_-52px_rgba(15,23,42,0.46)] lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[540px] bottom-0 left-0 right-0 h-[92vh] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}

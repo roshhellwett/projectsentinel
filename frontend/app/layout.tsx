@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
+import { ScrollRestorer } from '@/components/ui/ScrollRestorer';
 
 
 const inter = Inter({
@@ -167,6 +168,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MobileBottomNav />
         <ScrollToTop />
         <KeyboardShortcuts />
+        <ScrollRestorer />
       </body>
     </html>
   );

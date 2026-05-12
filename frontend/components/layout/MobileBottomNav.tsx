@@ -6,10 +6,14 @@ import { useState, useCallback } from 'react';
 import { Home, Search, LayoutGrid, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
+import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
-  { id: 'search', href: '/search/', icon: Search, label: 'Search' },
+  // `search` has no href — it dispatches OPEN_SEARCH_EVENT so the proper
+  // SearchBar overlay (with auto-focused keyboard) appears instead of
+  // navigating to a near-empty /search page.
+  { id: 'search', href: null, icon: Search, label: 'Search' },
   { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
   { id: 'saved', href: '/saved/', icon: Bookmark, label: 'Saved' },
 ] as const;
@@ -135,6 +139,21 @@ export function MobileBottomNav() {
                     className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                     aria-label="Browse topics"
                     aria-expanded={topicsOpen}
+                  >
+                    {inner}
+                  </button>
+                );
+              }
+              if (tab.id === 'search') {
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      closeTopics();
+                      window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
+                    }}
+                    aria-label="Open search"
+                    className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                   >
                     {inner}
                   </button>
