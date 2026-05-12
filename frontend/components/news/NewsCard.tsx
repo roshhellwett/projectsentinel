@@ -29,6 +29,8 @@ interface NewsCardProps {
   post: Post;
   onClick?: () => void;
   isNew?: boolean;
+  /** When true, dim the card and hide the unread dot — user has already opened this story. */
+  isRead?: boolean;
 }
 
 function isBreaking(post: Post): boolean {
@@ -36,7 +38,7 @@ function isBreaking(post: Post): boolean {
   return ageMs < 90 * 60 * 1000 && post.credibility_score >= 80;
 }
 
-const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
+const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
   const breaking = isBreaking(post);
   const accentColor = CATEGORY_BORDER_COLOR[post.category] ?? '#0a84ff';
   const sourceName = post.sources?.[0]?.title ?? post.sources?.[0]?.name ?? null;
@@ -67,8 +69,10 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
         'hover:bg-white/90 hover:border-slate-950/[0.16]',
         'hover:shadow-[0_24px_70px_-38px_rgba(10,132,255,0.36),0_28px_70px_-54px_rgba(15,23,42,0.34)]',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        isRead && 'news-card-read',
         isNew && 'flash-new-post'
       )}
+      data-read={isRead ? 'true' : 'false'}
       style={{ contain: 'layout paint' }}
     >
       {/* Category colour accent bar */}
@@ -82,6 +86,15 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
       <div className="relative z-10 flex flex-col flex-1 p-5">
         {/* Source + breaking badge + time row */}
         <div className="flex items-center gap-2 mb-3">
+          {!isRead && (
+            <span
+              className="relative inline-flex w-2 h-2 rounded-full bg-accent flex-shrink-0 shadow-[0_0_10px_rgba(10,132,255,0.85)]"
+              aria-label="Unread"
+              title="Unread"
+            >
+              <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" aria-hidden="true" />
+            </span>
+          )}
           {sourceName ? (
             <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate max-w-[110px]">
               {sourceName}
@@ -90,12 +103,18 @@ const NewsCardComponent = ({ post, onClick, isNew = false }: NewsCardProps) => {
             <CategoryTag category={post.category} />
           )}
           {breaking && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/90 text-white text-[9px] font-bold uppercase tracking-wider flex-shrink-0 shadow-[0_0_18px_rgba(239,68,68,0.35)]">
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/90 text-white text-[9px] font-bold uppercase tracking-wider flex-shrink-0 shadow-[0_0_18px_rgba(239,68,68,0.35)]"
+              suppressHydrationWarning
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
               Breaking
             </span>
           )}
-          <span className="text-[10px] text-slate-500 flex-shrink-0 ml-auto">
+          <span
+            className="text-[10px] text-slate-500 flex-shrink-0 ml-auto"
+            suppressHydrationWarning
+          >
             {formatTimeAgo(post.published_at)}
           </span>
         </div>

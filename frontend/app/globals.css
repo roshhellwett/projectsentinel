@@ -341,6 +341,46 @@ html {
 }
 
 /* ═══════════════════════════════════════════════
+   READ / UNREAD STATE
+   Visually distinguish stories the reader has already opened so
+   they can scan the feed and instantly see what's new — without
+   hiding anything. Subtle, not punishing.
+═══════════════════════════════════════════════ */
+.news-card-read {
+  opacity: 0.72;
+  filter: saturate(0.86);
+  transition: opacity 260ms ease, filter 260ms ease;
+}
+.news-card-read:hover {
+  opacity: 1;
+  filter: saturate(1);
+}
+.news-card-read h3 {
+  color: #4b5563 !important;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLL & PAINT PERFORMANCE
+   Keep the long news feed buttery on lower-end devices. These
+   are conservative — they only enable GPU-friendly compositing and
+   tell the browser it can defer painting offscreen cards.
+═══════════════════════════════════════════════ */
+@supports (content-visibility: auto) {
+  .feed-grid > * {
+    content-visibility: auto;
+    contain-intrinsic-size: 260px;
+  }
+}
+
+/* Override the global smooth-scroll for programmatic scrolls only when
+   the user is actively scrolling — keeps the iOS Dynamic Island flush
+   feeling instantaneous without affecting in-page anchor jumps. */
+html.flushing-pending {
+  scroll-behavior: auto;
+}
+
+/* ═══════════════════════════════════════════════
    LIVE-UPDATE DYNAMIC ISLAND
    Engraved-coin pill that surfaces newly-arrived posts.
 ═══════════════════════════════════════════════ */

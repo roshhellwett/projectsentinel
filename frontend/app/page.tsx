@@ -36,8 +36,27 @@ export default async function HomePage() {
       .map(({ id }) => id),
   );
 
-  // Feed posts: everything EXCEPT hero and trending
-  const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
+  // Feed posts: everything EXCEPT hero and trending, ordered by a composite
+  // score that blends credibility with recency. This guarantees the
+  // highest-quality, freshest stories surface at the top of "Latest News"
+  // — matching the rest of the page's top-to-bottom score hierarchy
+  // (Hero → Trending → Latest). Stories older than 24h fall back to plain
+  // recency so legitimate older context isn't ranked above today's news.
+  const NOW = Date.now();
+  const feedPosts = allPosts
+    .filter((post) => !trendingIds.has(post.id))
+    .map((post) => {
+      const ageHours = (NOW - new Date(post.published_at).getTime()) / 3_600_000;
+      const freshness = Math.max(0, 1 - ageHours / 24);
+      const composite = post.credibility_score * 0.55 + freshness * 45;
+      return { post, composite, ageHours };
+    })
+    .sort((a, b) => {
+      // Keep same-day stories ranked by composite; older fall back to recency.
+      if (a.ageHours < 24 && b.ageHours < 24) return b.composite - a.composite;
+      return a.ageHours - b.ageHours;
+    })
+    .map(({ post }) => post);
 
   return (
     <div className="relative min-h-screen">

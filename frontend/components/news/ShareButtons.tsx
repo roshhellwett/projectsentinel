@@ -20,11 +20,14 @@ const SHARE_PLATFORMS = [
   },
   {
     name: 'LinkedIn',
-    getUrl: (url: string, text: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+    // LinkedIn's share dialog ignores text, so we only pass the URL. The
+    // `_text` arg keeps a uniform signature across all platforms.
+    getUrl: (url: string, _text: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   },
   {
     name: 'Facebook',
-    getUrl: (url: string, text: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    // Facebook auto-fetches the OpenGraph title; the text arg is unused.
+    getUrl: (url: string, _text: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
   },
   {
     name: 'Telegram',

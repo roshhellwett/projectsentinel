@@ -79,7 +79,9 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
     apple: '/apple-touch-icon.svg',
   },
-  manifest: '/manifest',
+  // Next.js automatically links app/manifest.ts at /manifest.webmanifest;
+  // we point at the correct file rather than the previous '/manifest' 404.
+  manifest: '/manifest.webmanifest',
 };
 
 export const viewport: Viewport = {

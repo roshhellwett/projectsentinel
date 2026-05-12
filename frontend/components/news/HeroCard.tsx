@@ -51,7 +51,10 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
           <div className="relative lg:col-span-3 p-7 md:p-10 lg:p-12 flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-5">
               <CategoryTag category={post.category} />
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-500">
+              <span
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-500"
+                suppressHydrationWarning
+              >
                 <Clock className="w-3 h-3" />
                 {formatTimeAgo(post.published_at)}
               </span>

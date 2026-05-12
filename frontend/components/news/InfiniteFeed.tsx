@@ -19,13 +19,14 @@
  * media query in globals.css (Framer Motion respects it automatically).
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
 import { LiveUpdateIsland } from './LiveUpdateIsland';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useReadPosts } from '@/lib/utils/readPosts';
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
@@ -36,7 +37,7 @@ interface InfiniteFeedProps {
   excludeIds?: Set<string>;
 }
 
-const POLL_INTERVAL_MS = 60_000;
+const POLL_INTERVAL_MS = 30_000;
 /**
  * If the user has scrolled past this many pixels when fresh posts arrive,
  * defer the prepend behind the LiveUpdateIsland instead of yanking the
@@ -45,14 +46,17 @@ const POLL_INTERVAL_MS = 60_000;
  */
 const QUEUE_THRESHOLD_PX = 220;
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
-};
+/**
+ * When the user scrolls back into this zone with pending posts queued,
+ * we auto-flush them so the feed silently refreshes — no tap, no hard
+ * reload required. Tuned slightly under QUEUE_THRESHOLD_PX so the
+ * transition feels coordinated with the LiveUpdateIsland fade-out.
+ */
+const AUTO_FLUSH_AT_SCROLL_Y = 140;
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 26 } },
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 360, damping: 30, mass: 0.6 } },
 };
 
 /**
@@ -95,6 +99,11 @@ export function InfiniteFeed({
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
 
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
+  // Persistent read/unread tracking via localStorage. We memo the membership
+  // test by post.id so individual NewsCard memo()s only re-render when their
+  // own read state changes — not on every poll tick.
+  const { readIds, markRead } = useReadPosts();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
@@ -182,17 +191,41 @@ export function InfiniteFeed({
     }, 3200);
   }, []);
 
-  /** Tap-handler from <LiveUpdateIsland>: drop pending into the feed and rise. */
-  const flushPending = useCallback(() => {
+  /**
+   * Tap-handler from <LiveUpdateIsland>: drop pending into the feed and rise.
+   * Also reused internally by the auto-flush scroll watcher so behaviour
+   * stays identical whether the user taps or scrolls.
+   */
+  const flushPending = useCallback((opts: { scroll?: boolean } = { scroll: true }) => {
     const queued = pendingRef.current;
     if (queued.length === 0) return;
     setPendingNew([]);
     setPosts((prev) => dedupeById([...queued, ...prev]));
     flashFresh(queued.map((p) => p.id));
-    if (typeof window !== 'undefined') {
+    if (opts.scroll && typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [flashFresh]);
+
+  // ── Auto-flush: when the user voluntarily scrolls back near the top,
+  // surface any queued posts silently instead of leaving them stuck behind
+  // the (now-hidden) Dynamic Island. This is the root-cause fix for the
+  // “had to hard refresh to see new news” bug.
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        if (window.scrollY < AUTO_FLUSH_AT_SCROLL_Y && pendingRef.current.length > 0) {
+          flushPending({ scroll: false });
+        }
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [flushPending]);
 
   // ── Live prepend: poll for newer posts every minute ──
   useEffect(() => {
@@ -253,20 +286,33 @@ export function InfiniteFeed({
       if (document.visibilityState === 'hidden') {
         stop();
       } else {
+        // Tab regained focus — fetch immediately so the user never sees
+        // stale headlines after coming back from another app/tab.
         tick();
         start();
       }
     };
 
+    // Refetch the moment the device comes back online.
+    const onOnline = () => { tick(); start(); };
+
+    // Refetch when the window regains focus (covers desktop-tab-switching
+    // where visibilitychange may not fire on every browser).
+    const onFocus = () => { tick(); };
+
     document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('focus', onFocus);
     start();
 
     return () => {
       cancelled = true;
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('focus', onFocus);
     };
-  }, [category]);
+  }, [category, flashFresh]);
 
   // Close drawer if the post no longer exists in current list
   useEffect(() => {
@@ -274,6 +320,16 @@ export function InfiniteFeed({
       setSelectedPost(null);
     }
   }, [posts, selectedPost]);
+
+  /** Open a post (drawer) and mark it as read for this device. */
+  const handleOpen = useCallback((post: Post) => {
+    markRead(post.id);
+    setSelectedPost(post);
+  }, [markRead]);
+
+  // Pre-compute the read flag per post id so framer-motion doesn't have to
+  // re-create transition objects on every render.
+  const readMap = useMemo(() => readIds, [readIds]);
 
   if (posts.length === 0) {
     return (
@@ -299,33 +355,29 @@ export function InfiniteFeed({
 
   return (
     <>
-      <motion.div
-        layout
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch"
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
         <AnimatePresence initial={false}>
           {posts.map((post) => (
             <motion.div
               key={post.id}
-              layout
+              layout="position"
               initial="hidden"
               animate="show"
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.18 } }}
               variants={itemVariants}
               className="h-full"
+              style={{ contentVisibility: 'auto', containIntrinsicSize: '260px' } as React.CSSProperties}
             >
               <NewsCard
                 post={post}
-                onClick={() => setSelectedPost(post)}
+                onClick={() => handleOpen(post)}
                 isNew={freshIds.has(post.id)}
+                isRead={readMap.has(post.id)}
               />
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       {/* Sentinel for infinite scroll */}
       {!exhausted && (
@@ -355,7 +407,7 @@ export function InfiniteFeed({
       {/* iOS Dynamic Island — surfaces queued live posts while the user is
           reading further down the feed. The component renders nothing when
           pendingNew is empty, so it has zero visual cost at rest. */}
-      <LiveUpdateIsland pending={pendingNew} onReveal={flushPending} />
+      <LiveUpdateIsland pending={pendingNew} onReveal={() => flushPending({ scroll: true })} />
     </>
   );
 }

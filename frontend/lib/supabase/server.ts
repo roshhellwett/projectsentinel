@@ -194,8 +194,13 @@ export async function searchPosts(
   // joining with `&` turns "modi education" into a valid AND-tsquery.
   // We also strip any tsquery-significant punctuation to keep user input
   // literal and avoid breaking the filter syntax.
+  // Strip every character that has special meaning in either a tsquery or
+  // PostgREST's `.or()` filter grammar. Commas in particular act as predicate
+  // separators inside `.or(...)` — leaving them in would silently corrupt
+  // the filter and drop half the user's query. Periods are stripped to avoid
+  // collisions with the `column.operator.value` syntax PostgREST uses.
   const ftsTerm = safeQuery
-    .replace(/[\\&|!():*'"<>]/g, ' ')
+    .replace(/[\\&|!():*'"<>,.;]/g, ' ')
     .split(/\s+/)
     .filter(Boolean)
     .join(' & ');

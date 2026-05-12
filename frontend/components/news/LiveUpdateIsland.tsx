@@ -43,11 +43,12 @@ interface LiveUpdateIslandProps {
 }
 
 /**
- * Hide the island once the user is back near the top, since the new posts
- * will already be visible (or about to be after a flush). 220px is a soft
- * threshold tuned to feel natural with the navbar + hero spacer.
+ * Hide the island once the user is back near the top. Aligned with
+ * `AUTO_FLUSH_AT_SCROLL_Y` in InfiniteFeed so the island fades out at the
+ * exact instant pending posts are silently prepended — no deadband where
+ * the island is gone but the new headlines are still invisible.
  */
-const HIDE_AT_SCROLL_Y = 220;
+const HIDE_AT_SCROLL_Y = 140;
 
 export function LiveUpdateIsland({ pending, onReveal }: LiveUpdateIslandProps) {
   const [nearTop, setNearTop] = useState(true);
