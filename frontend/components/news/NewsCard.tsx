@@ -1,68 +1,151 @@
 'use client';
 
 import { memo } from 'react';
-import { Post } from '@/types';
-import { CategoryTag } from './CategoryTag';
-import { CredibilityBadge } from './CredibilityBadge';
+import { motion } from 'framer-motion';
+import { ExternalLink, ShieldCheck } from 'lucide-react';
+import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { truncateWords } from '@/lib/utils/truncate';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 import { BookmarkButton } from './BookmarkButton';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
-/**
- * Pastel surface tint per category — drives the entire card colour, matching
- * the reference UI where each card carries its section's hue as a soft solid
- * fill (politics → soft red, business → soft mint, sports → soft sky, etc.).
- *
- * `bg`        = card surface @ ~85% (high enough to read as solid, low enough
- *               that the glass blur still reveals the pastel page gradient).
- * `bgHover`   = brighter tint on hover.
- * `border`    = same hue at higher saturation for the 1 px frame.
- * `shadow`    = same hue, used for the lift glow on hover.
- * `accent`    = dark variant of the hue, applied to the headline on hover so
- *               the section colour echoes in typography too.
- */
-type CategoryTint = {
-  bg: string;
-  bgHover: string;
-  border: string;
-  shadow: string;
-  accent: string;
+// ─────────────────────────────────────────────────────────────────────────────
+// Design system: ONE accent colour per category, used sparingly (small chip
+// + hover left-edge bar + score-gauge ring tint). The card body stays neutral
+// so the feed reads as a single cohesive surface, not a patchwork of pastels.
+// Premium aesthetic reference: linear.app, vercel.com, apple.com/newsroom.
+// ─────────────────────────────────────────────────────────────────────────────
+const CATEGORY_META: Record<string, { color: string; label: string }> = {
+  politics:      { color: '#7c3aed', label: 'Politics' },
+  business:      { color: '#059669', label: 'Business' },
+  sports:        { color: '#ea580c', label: 'Sports' },
+  tech:          { color: '#2563eb', label: 'Tech' },
+  crime:         { color: '#dc2626', label: 'Crime' },
+  science:       { color: '#0891b2', label: 'Science' },
+  health:        { color: '#16a34a', label: 'Health' },
+  world:         { color: '#db2777', label: 'World' },
+  entertainment: { color: '#ca8a04', label: 'Entertainment' },
+  education:     { color: '#9333ea', label: 'Education' },
 };
 
-const CATEGORY_TINT: Record<string, CategoryTint> = {
-  // Politics — warm muted blush
-  politics:      { bg: 'rgba(253, 236, 236, 0.72)', bgHover: 'rgba(252, 226, 226, 0.85)', border: 'rgba(159, 18, 57, 0.10)',  shadow: 'rgba(159, 18, 57, 0.10)',  accent: '#9f1239' },
-  // Business — Notion-style mint
-  business:      { bg: 'rgba(232, 245, 238, 0.72)', bgHover: 'rgba(221, 240, 229, 0.85)', border: 'rgba(6, 95, 70, 0.10)',    shadow: 'rgba(6, 95, 70, 0.08)',    accent: '#065f46' },
-  // Sports — soft powder blue
-  sports:        { bg: 'rgba(230, 241, 251, 0.72)', bgHover: 'rgba(220, 234, 248, 0.85)', border: 'rgba(7, 89, 133, 0.10)',   shadow: 'rgba(7, 89, 133, 0.08)',   accent: '#075985' },
-  // Tech — quiet periwinkle
-  tech:          { bg: 'rgba(236, 234, 248, 0.72)', bgHover: 'rgba(227, 224, 244, 0.85)', border: 'rgba(76, 29, 149, 0.10)',  shadow: 'rgba(76, 29, 149, 0.08)',  accent: '#4c1d95' },
-  // Crime — pale peach
-  crime:         { bg: 'rgba(251, 235, 220, 0.72)', bgHover: 'rgba(249, 225, 204, 0.85)', border: 'rgba(154, 52, 18, 0.10)',  shadow: 'rgba(154, 52, 18, 0.08)',  accent: '#9a3412' },
-  // Science — same family as tech, slightly cooler
-  science:       { bg: 'rgba(236, 234, 248, 0.72)', bgHover: 'rgba(227, 224, 244, 0.85)', border: 'rgba(91, 33, 182, 0.10)',  shadow: 'rgba(91, 33, 182, 0.08)',  accent: '#5b21b6' },
-  // Health — soft rose
-  health:        { bg: 'rgba(251, 234, 241, 0.72)', bgHover: 'rgba(249, 224, 234, 0.85)', border: 'rgba(157, 23, 77, 0.10)',  shadow: 'rgba(157, 23, 77, 0.08)',  accent: '#9d174d' },
-  // World — muted cream
-  world:         { bg: 'rgba(251, 241, 217, 0.72)', bgHover: 'rgba(249, 235, 201, 0.85)', border: 'rgba(133, 77, 14, 0.10)',  shadow: 'rgba(133, 77, 14, 0.08)',  accent: '#854d0e' },
-  // Entertainment — pale orchid
-  entertainment: { bg: 'rgba(246, 232, 248, 0.72)', bgHover: 'rgba(241, 222, 245, 0.85)', border: 'rgba(134, 25, 143, 0.10)', shadow: 'rgba(134, 25, 143, 0.08)', accent: '#86198f' },
-  education:     { bg: 'rgba(236, 234, 248, 0.72)', bgHover: 'rgba(227, 224, 244, 0.85)', border: 'rgba(91, 33, 182, 0.10)',  shadow: 'rgba(91, 33, 182, 0.08)',  accent: '#5b21b6' },
-};
+const DEFAULT_META = { color: '#475569', label: 'News' };
 
-const DEFAULT_TINT: CategoryTint = {
-  bg: 'rgba(255, 255, 255, 0.65)',
-  bgHover: 'rgba(255, 255, 255, 0.80)',
-  border: 'rgba(15, 23, 42, 0.08)',
-  shadow: 'rgba(15, 23, 42, 0.08)',
-  accent: '#0f172a',
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// CredibilityGauge — animated circular SVG arc. The HERO element of the card.
+// On mount, the ring fills from 0 to the score over ~1.1s with an ease-out
+// cubic so it lands in a way that draws the eye without being theatrical.
+// Colour band: 85+ green (trustworthy), 70–84 amber (caveat), <70 red (low).
+// ─────────────────────────────────────────────────────────────────────────────
+function CredibilityGauge({ score }: { score: number }) {
+  const size = 48;
+  const stroke = 4;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const clamped = Math.max(0, Math.min(100, score));
+  const offset = circumference * (1 - clamped / 100);
 
+  const color =
+    clamped >= 85 ? '#10b981' :
+    clamped >= 70 ? '#f59e0b' :
+                    '#ef4444';
+
+  return (
+    <div
+      className="relative inline-flex flex-shrink-0"
+      style={{ width: size, height: size }}
+      aria-label={`AI credibility score: ${score} out of 100`}
+      role="img"
+    >
+      <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
+          stroke="#e2e8f0"
+          strokeWidth={stroke}
+          fill="none"
+        />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={radius}
+          stroke={color}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center leading-none">
+        <span
+          className="text-[13px] font-semibold tabular-nums"
+          style={{ color, fontFamily: 'var(--font-geist-mono)' }}
+        >
+          {score}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SourceChip — single tappable pill with favicon + name. This is the TRUST
+// MOAT: no other Indian news app shows sources inline on the card. Tap the
+// chip and you go straight to the original article without dismissing the
+// card itself (stopPropagation on the card-level onClick).
+// ─────────────────────────────────────────────────────────────────────────────
+function getHostname(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
+
+function getSourceLabel(source: Source): string {
+  if (source.title?.trim()) return source.title.trim();
+  if (source.name?.trim())  return source.name.trim();
+  const host = getHostname(source.url);
+  return host || 'Source';
+}
+
+function SourceChip({ source }: { source: Source }) {
+  const host = getHostname(source.url);
+  const label = getSourceLabel(source);
+
+  return (
+    <a
+      href={source.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 text-[11px] font-medium text-slate-700 hover:border-slate-400 hover:text-slate-950 hover:bg-white transition-all duration-150 max-w-[140px] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+      aria-label={`Source: ${label} (opens in new tab)`}
+    >
+      {host && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host)}`}
+          alt=""
+          width={12}
+          height={12}
+          loading="lazy"
+          decoding="async"
+          className="w-3 h-3 rounded-sm flex-shrink-0"
+        />
+      )}
+      <span className="truncate">{label}</span>
+    </a>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NewsCard — premium light-theme card.
+// Drop-in replacement for the previous pastel-tinted card: same props, same
+// export name, so InfiniteFeed, search results, related stories, etc. all
+// pick it up without any change at the call site.
+// ─────────────────────────────────────────────────────────────────────────────
 interface NewsCardProps {
   post: Post;
   onClick?: () => void;
@@ -78,8 +161,9 @@ function isBreaking(post: Post): boolean {
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
   const breaking = isBreaking(post);
-  const tint = CATEGORY_TINT[post.category] ?? DEFAULT_TINT;
-  const sourceName = post.sources?.[0]?.title ?? post.sources?.[0]?.name ?? null;
+  const meta = CATEGORY_META[post.category] ?? DEFAULT_META;
+  const topSources = (post.sources ?? []).slice(0, 3);
+  const extraSources = Math.max(0, (post.source_count ?? 0) - topSources.length);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -89,102 +173,120 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
   };
 
   return (
-    <motion.div
+    <motion.article
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.985 }}
-      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
       aria-label={`Read article: ${post.headline}`}
-      className={cn(
-        'news-card-tinted group relative isolate flex flex-col h-full cursor-pointer',
-        'rounded-3xl overflow-hidden border',
-        'transition-[background-color,border-color,box-shadow] duration-200 ease-out',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        isRead && 'news-card-read',
-        isNew && 'flash-new-post'
-      )}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.985 }}
       data-read={isRead ? 'true' : 'false'}
-      style={{
-        backgroundColor: tint.bg,
-        borderColor: tint.border,
-        // Neutral, tight shadow — no coloured halo, just clean depth.
-        // Two stops: a 1 px contour, and a soft slate drop.
-        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 2px 8px rgba(15,23,42,0.05)',
-        backdropFilter: 'blur(20px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-        contain: 'layout paint',
-        ['--tint-bg-hover' as string]: tint.bgHover,
-        ['--tint-accent' as string]: tint.accent,
-      }}
+      className={cn(
+        'news-card-premium group relative flex flex-col h-full cursor-pointer overflow-hidden',
+        'rounded-3xl bg-white border border-slate-200/70',
+        'shadow-[0_1px_2px_rgba(15,23,42,0.04),0_2px_8px_rgba(15,23,42,0.04)]',
+        'transition-[border-color,box-shadow,transform] duration-200 ease-out',
+        'hover:border-slate-300 hover:shadow-[0_8px_24px_-12px_rgba(15,23,42,0.18)]',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        isRead && 'opacity-70',
+        isNew && 'flash-new-post',
+      )}
+      style={{ contain: 'layout paint' }}
     >
-      {/* Inner content */}
-      <div className="relative z-10 flex flex-col flex-1 p-6">
-        {/* Source + breaking badge + time row */}
-        <div className="flex items-center gap-2 mb-3.5">
-          {!isRead && (
+      {/* Left-edge accent bar — appears on hover, hue matches category */}
+      <span
+        aria-hidden="true"
+        className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{ backgroundColor: meta.color }}
+      />
+
+      <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
+        {/* ── Top row: category + breaking + timestamp · gauge ── */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
             <span
-              className="inline-flex w-1.5 h-1.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: tint.accent }}
-              aria-label="Unread"
-              title="Unread"
-            />
-          )}
-          {sourceName ? (
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate max-w-[110px]">
-              {sourceName}
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+              style={{
+                color: meta.color,
+                backgroundColor: `${meta.color}14`,
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: meta.color }} />
+              {meta.label}
             </span>
-          ) : (
-            <CategoryTag category={post.category} />
-          )}
-          {breaking && (
+
+            {breaking && (
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold uppercase tracking-wider shadow-[0_2px_8px_rgba(239,68,68,0.25)]"
+                suppressHydrationWarning
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                Live
+              </span>
+            )}
+
             <span
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/90 text-white text-[9px] font-bold uppercase tracking-wider flex-shrink-0 shadow-[0_0_18px_rgba(239,68,68,0.35)]"
+              className="text-[10px] text-slate-500 font-medium tabular-nums"
+              style={{ fontFamily: 'var(--font-geist-mono)' }}
               suppressHydrationWarning
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              Breaking
+              {formatTimeAgo(post.published_at)}
             </span>
-          )}
-          <span
-            className="text-[10px] text-slate-500 flex-shrink-0 ml-auto"
-            suppressHydrationWarning
-          >
-            {formatTimeAgo(post.published_at)}
-          </span>
+          </div>
+
+          <CredibilityGauge score={post.credibility_score} />
         </div>
 
-        {/* Headline */}
+        {/* ── Headline (serif, the visual anchor of the card) ── */}
         <h3
-          className="text-[17px] md:text-[19px] font-bold tracking-tight line-clamp-3 mb-3 leading-[1.3] transition-colors duration-150"
-          style={{ color: '#0f172a', fontFamily: 'var(--font-display)' }}
+          className="text-[19px] md:text-[21px] font-bold leading-[1.25] tracking-tight text-slate-950 line-clamp-3 mb-2.5 transition-colors"
+          style={{ fontFamily: 'var(--font-newsreader)' }}
         >
           {post.headline}
         </h3>
 
-        {/* Excerpt */}
-        <p className="text-[13.5px] text-slate-600 line-clamp-2 leading-relaxed mb-auto">
-          {truncateWords(post.summary, 22)}
+        {/* ── Summary ── */}
+        <p className="text-[14px] text-slate-600 leading-relaxed line-clamp-2 mb-auto">
+          {truncateWords(post.summary, 24)}
         </p>
 
-        {/* Bottom row */}
-        <div
-          className="flex items-center justify-between gap-2 mt-5 pt-4"
-          style={{ borderTop: `1px solid ${tint.border}` }}
-        >
-          <CredibilityBadge score={post.credibility_score} compact />
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-500">
-              {post.source_count} {post.source_count === 1 ? 'source' : 'sources'}
+        {/* ── Source chips (trust moat) ── */}
+        {topSources.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 mt-4">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mr-1">
+              Sources
             </span>
+            {topSources.map((src, i) => (
+              <SourceChip key={src.url || i} source={src} />
+            ))}
+            {extraSources > 0 && (
+              <span className="text-[10px] text-slate-500 font-medium">
+                +{extraSources} more
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* ── Bottom action row ── */}
+        <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
+          <span className="text-[10px] text-slate-500 inline-flex items-center gap-1">
+            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: meta.color }} />
+            Read full story
+            <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+          </span>
+
+          <div className="flex items-center gap-1">
             <a
               href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="touch-polish text-slate-500 hover:text-[#25D366] transition-all duration-200 p-1 -m-1 rounded-full active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/60"
+              className="p-1.5 -m-1 rounded-full text-slate-400 hover:text-[#25D366] hover:bg-[#25D366]/10 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/60"
               aria-label="Share on WhatsApp"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -193,7 +295,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 };
 
