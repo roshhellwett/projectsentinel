@@ -27,6 +27,7 @@ import { NewsDrawer } from './NewsDrawer';
 import { LiveUpdateIsland } from './LiveUpdateIsland';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useReadPosts } from '@/lib/utils/readPosts';
+import { subscribeToPosts } from '@/lib/supabase/client';
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
@@ -281,7 +282,65 @@ export function InfiniteFeed({
     return () => window.removeEventListener('scroll', onScroll);
   }, [flushPending]);
 
-  // ── Live prepend: poll for newer posts every minute ──
+  // ── Shared incoming-post pipeline ──
+  // Both the realtime subscription and the 30s polling fallback feed
+  // through this single function so dedup, category-filter, and the
+  // "prepend vs queue" decision are identical regardless of source.
+  const processIncomingPosts = useCallback((incoming: Post[]) => {
+    if (incoming.length === 0) return;
+    const existing = new Set(postsRef.current.map((p) => p.id));
+    const queuedIds = new Set(pendingRef.current.map((p) => p.id));
+    const dismissed = dismissedRef.current;
+    const excluded = excludeIdsRef.current;
+    const fresh = incoming.filter(
+      (p) =>
+        !existing.has(p.id) &&
+        !queuedIds.has(p.id) &&
+        !dismissed.has(p.id) &&
+        !(excluded?.has(p.id)) &&
+        // Realtime pushes ALL published posts; the polling endpoint already
+        // filters by category server-side. Apply the same filter here so
+        // realtime events can't slip a wrong-category post into a category
+        // page's feed.
+        (!category || p.category === category),
+    );
+    if (fresh.length === 0) return;
+
+    // Decide: prepend immediately (user near top) vs. queue behind the
+    // Dynamic Island (user reading further down).
+    const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    const userIsReading = scrollY > QUEUE_THRESHOLD_PX;
+
+    if (userIsReading) {
+      setPendingNew((curr) => dedupeById([...fresh, ...curr]));
+    } else {
+      flashFresh(fresh.map((p) => p.id));
+      setPosts((prev) => dedupeById([...fresh, ...prev]));
+    }
+  }, [category, flashFresh]);
+
+  // ── Realtime push: sub-second delivery for new posts ──
+  // Falls back silently to the polling tick below if Supabase realtime
+  // is unavailable (env vars missing, channel error, network drop).
+  useEffect(() => {
+    let subscription: ReturnType<typeof subscribeToPosts> | null = null;
+    try {
+      subscription = subscribeToPosts((post) => {
+        processIncomingPosts([post]);
+      });
+    } catch {
+      // anon-key not configured or browser client unavailable — the
+      // 30s poll loop below still keeps the feed fresh.
+    }
+    return () => {
+      if (subscription) {
+        try { subscription.unsubscribe(); } catch { /* non-fatal */ }
+      }
+    };
+  }, [processIncomingPosts]);
+
+  // ── Polling fallback: catches anything realtime missed (channel drops,
+  // events delivered while tab was hidden, etc.). Runs every 30s. ──
   useEffect(() => {
     let cancelled = false;
 
@@ -293,32 +352,7 @@ export function InfiniteFeed({
         if (!res.ok) return;
         const data: { posts: Post[] } = await res.json();
         if (cancelled) return;
-
-        const existing = new Set(postsRef.current.map((p) => p.id));
-        const excluded = excludeIdsRef.current;
-        const queuedIds = new Set(pendingRef.current.map((p) => p.id));
-        const dismissed = dismissedRef.current;
-        const fresh = data.posts.filter(
-          (p) =>
-            !existing.has(p.id) &&
-            !queuedIds.has(p.id) &&
-            !dismissed.has(p.id) &&
-            !(excluded?.has(p.id)),
-        );
-        if (fresh.length === 0) return;
-
-        // Decide: prepend immediately (user near top) vs. queue behind the
-        // Dynamic Island (user reading further down).
-        const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-        const userIsReading = scrollY > QUEUE_THRESHOLD_PX;
-
-        if (userIsReading) {
-          // Queue + island. Newest first so the preview headline matches.
-          setPendingNew((curr) => dedupeById([...fresh, ...curr]));
-        } else {
-          flashFresh(fresh.map((p) => p.id));
-          setPosts((prev) => dedupeById([...fresh, ...prev]));
-        }
+        processIncomingPosts(data.posts);
       } catch {
         /* silent */
       }
@@ -368,7 +402,7 @@ export function InfiniteFeed({
       window.removeEventListener('online', onOnline);
       window.removeEventListener('focus', onFocus);
     };
-  }, [category, flashFresh]);
+  }, [category, processIncomingPosts]);
 
   // Close drawer if the post no longer exists in current list
   useEffect(() => {

@@ -1,25 +1,38 @@
 """
 Groq AI verification - uses Llama 3.3 70B for news verification.
-Token-optimized: system+user split, minimal prompt, model fallback.
-Multi-key rotation: up to 6 API keys arranged in two tiers of 3.
-Tier 1 (keys 1-3) is used exclusively until every tier-1 key is
-rate-limited for the current run; only then does tier 2 (keys 4-6)
-activate. Within an active tier, the lowest-`calls_today` key wins.
-Per-key daily counters and 429-aware exhaustion tracking are preserved.
+
+Multi-key tiering: keys 1-3 form tier 1, 4-6 form tier 2 (configured via
+GROQ_API_KEY_VERIFY_1..6, with GROQ_API_KEY_1..6 as fallback). The shared
+`utils.groq_pool.get_verify_pool` enforces per-key RPM/TPM/RPD windows so
+we pre-emptively avoid 429s instead of just reacting to them.
+
+429 handling: each rate-limit response sets `cooldown_until` on the offending
+slot using the server's Retry-After hint, and `pick()` skips slots in
+cooldown. Tier 2 activates as soon as every tier-1 slot is cooldowned, dead,
+or window-saturated.
+
+Token-optimized prompts. Estimated tokens are passed to the pool's
+admission control; actual `usage.total_tokens` is recorded after each
+successful response.
 """
 
 import json
 import os
 import re
-import time
 import threading
+import time
 from typing import Optional
 
 import requests
 
 from logger.pipeline_logger import PipelineLogger
-from rate_limiter.limiter import RateLimiter, RateLimitExceededError
-from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
+from utils.groq_pool import (
+    get_groq_pool,
+    get_verify_model_chain,
+    reset_pool,
+    save_verify_pool_stats,
+)
+from utils.key_pool import AllKeysExhaustedError, KeyPool
 
 # Re-exports preserved for backwards compatibility with existing call sites
 # and tests that import `_KeyPool` / `AllKeysExhaustedError` from this module.
@@ -33,9 +46,12 @@ class GroqVerifier:
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
     RETRY_DELAY = 10
-    MIN_DELAY_SECONDS = 8
 
-    # Shared key pool – class-level so concurrent pipeline runs share one counter set.
+    # Conservative token estimate per verify call (input ~600 + output ~250).
+    # Used by the pool to pre-emptively avoid TPM blowups.
+    EST_TOKENS_PER_CALL = 850
+
+    # Class-level singleton lock for legacy reset/_ensure_pool API.
     _key_pool: Optional[KeyPool] = None
     _key_pool_lock = threading.Lock()
 
@@ -68,71 +84,35 @@ class GroqVerifier:
         "Key facts: 3-5 verified info points only. Headline and summary must use only those facts."
     )
 
-    FALLBACK_MODELS = ["llama3-8b-8192", "llama-3.1-8b-instant"]
+    FALLBACK_MODELS = ["llama-3.1-8b-instant"]
 
     def __init__(self):
         self.logger = PipelineLogger()
         self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
-        # Daily cap removed – per-key counters in _KeyPool own quota tracking.
-        self.rate_limiter = RateLimiter.get_global("groq_verify", self.MIN_DELAY_SECONDS)
 
     # ------------------------------------------------------------------
-    # Class-level key pool management
+    # Pool management (legacy class-level API kept for tests)
     # ------------------------------------------------------------------
 
     @classmethod
     def _ensure_pool(cls) -> Optional[KeyPool]:
-        """Lazily initialise the shared key pool. Returns None if no keys are configured."""
+        """Return the shared Groq pool. Legacy entrypoint for existing tests."""
         with cls._key_pool_lock:
             if cls._key_pool is None:
-                keys = cls._load_verify_keys()
-                if keys:
-                    cls._key_pool = KeyPool(keys, name="Groq verification")
-                    try:
-                        from persistence.groq_usage import load_key_stats
-                        persisted = load_key_stats()
-                        if persisted:
-                            cls._key_pool.restore_stats(persisted)
-                    except Exception:
-                        pass  # Non-fatal: fresh counters are safe
+                cls._key_pool = get_groq_pool()
             return cls._key_pool
 
     @classmethod
     def save_pool_stats(cls) -> None:
         """Persist current key counters to Supabase. Called at end of each pipeline run."""
-        with cls._key_pool_lock:
-            pool = cls._key_pool
-        if pool is None:
-            return
-        try:
-            from persistence.groq_usage import save_key_stats
-            save_key_stats(pool.get_persist_stats())
-        except Exception:
-            pass  # Non-fatal
+        save_verify_pool_stats()
 
     @classmethod
     def _reset_pool(cls) -> None:
         """Reset the shared key pool. Intended for use in tests only."""
         with cls._key_pool_lock:
             cls._key_pool = None
-
-    @staticmethod
-    def _load_verify_keys() -> list[tuple[int, str]]:
-        """
-        Load verification API keys from environment variables.
-
-        Priority:
-          1. GROQ_API_KEY_VERIFY_1..GROQ_API_KEY_VERIFY_6
-             - Slots 1-3 form tier 1 (primary, used first).
-             - Slots 4-6 form tier 2 (fallback, only used after every
-               tier-1 key is rate-limited for the current run).
-             - Numbering may be sparse (e.g. only 1, 2, 4, 6 set); empty
-               or missing slots are skipped but tier ordering is preserved
-               based on the original 1-6 number.
-          2. GROQ_API_KEY_VERIFY (legacy single-key fallback) — only used
-             when none of the numbered variables are configured.
-        """
-        return load_numbered_keys(os.getenv, "GROQ_API_KEY_VERIFY", max_keys=6)
+        reset_pool()
 
     # ------------------------------------------------------------------
     # Public API
@@ -140,47 +120,79 @@ class GroqVerifier:
 
     def verify(self, article_group: list[dict]) -> dict:
         """
-        Verify an article group using Groq.
-
-        Args:
-            article_group: List of articles about the same event (2+ sources)
+        Verify an article group using Groq, cascading across the model chain
+        when keys exhaust on a given model.
 
         Returns:
-            Dict with score, reason, key_facts, category
+            Dict with score, reason, key_facts, category, headline, summary
+
+        Raises:
+            AllKeysExhaustedError when every (model, key) combination in
+            the chain is exhausted for the day.
+            Exception on non-recoverable network/parse failures.
         """
         pool = self._ensure_pool()
         if pool is None:
             raise Exception("Groq verification API key not configured")
 
         user_content = self._build_prompt(article_group)
+        chain = get_verify_model_chain()
 
-        # 429-driven key rotations don't consume the retry budget — only
-        # genuine errors do. This lets a single verify() call walk through
-        # tier 1, hit 429s on every key, then seamlessly fall through to
-        # tier 2 in the same call without surfacing "Max retries exceeded".
-        # We cap total iterations to avoid runaway loops in pathological
-        # cases (e.g. server returning malformed JSON forever).
-        retries_used = 0   # counts only network / parse / 5xx failures
-        rotations = 0      # counts 429-driven key rotations
-        # One rotation per slot is the most we'd ever need before AllKeysExhaustedError fires.
-        max_rotations = max(len(pool.get_stats()), 1) + 1
+        last_exhaustion: Optional[AllKeysExhaustedError] = None
+        for model_idx, model in enumerate(chain):
+            if model_idx > 0:
+                self.logger.log(
+                    "GROQ_VERIFY",
+                    f"Model fallback → {model}",
+                )
 
-        while retries_used < self.MAX_RETRIES and rotations <= max_rotations:
-            # Select the key with fewest calls today (skips 429-exhausted keys).
             try:
-                slot_idx, api_key = pool.pick()
+                return self._verify_with_model(model, pool, user_content)
             except AllKeysExhaustedError as exc:
-                self.logger.log("GROQ_VERIFY_ERROR", str(exc))
+                last_exhaustion = exc
+                if model_idx < len(chain) - 1:
+                    self.logger.log(
+                        "GROQ_VERIFY",
+                        f"All keys exhausted on {model}; cascading to next model in chain",
+                    )
+                    continue
+                self.logger.log(
+                    "GROQ_VERIFY_ERROR",
+                    f"Entire model chain exhausted: {exc}",
+                )
                 raise
 
-            # Only downgrade model after actual API errors, not parse failures
-            model = (
-                self.verify_model
-                if retries_used == 0
-                else self.FALLBACK_MODELS[min(retries_used - 1, len(self.FALLBACK_MODELS) - 1)]
-            )
+        # Defensive: chain was empty.
+        if last_exhaustion is not None:
+            raise last_exhaustion
+        raise Exception("Groq verify model chain is empty")
 
-            stats = pool.get_stats()
+    def _verify_with_model(
+        self, model: str, pool: KeyPool, user_content: str
+    ) -> dict:
+        """Run the verify loop bound to a single model. Raises
+        AllKeysExhaustedError when every key is exhausted for this model."""
+
+        # 429-driven key rotations don't consume the retry budget — only
+        # genuine errors do. This lets a single call walk through tier 1,
+        # hit 429s on every key, then seamlessly fall through to tier 2
+        # without surfacing "Max retries exceeded".
+        retries_used = 0   # counts only network / parse / 5xx failures
+        rotations = 0      # counts 429-driven key rotations
+        max_rotations = max(pool.size(), 1) + 1
+
+        while retries_used < self.MAX_RETRIES and rotations <= max_rotations:
+            try:
+                slot_idx, api_key = pool.pick(
+                    estimated_tokens=self.EST_TOKENS_PER_CALL,
+                    model=model,
+                )
+            except AllKeysExhaustedError:
+                # Surface to the outer chain loop — it decides whether to
+                # cascade to the next model.
+                raise
+
+            stats = pool.get_stats(model=model)
             self.logger.log(
                 "GROQ_VERIFY",
                 f"Attempt retries={retries_used}/{self.MAX_RETRIES} "
@@ -203,35 +215,57 @@ class GroqVerifier:
             }
 
             try:
-                self.rate_limiter.wait_if_needed()
-
                 response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
 
                 # Handle 429 before raise_for_status to enable immediate key rotation.
                 if response.status_code == 429:
-                    pool.mark_exhausted(slot_idx)
-                    rotations += 1
                     retry_after = self._extract_429_wait(response)
+                    pool.record_429(slot_idx, retry_after, model=model)
+                    rotations += 1
                     self.logger.log(
                         "GROQ_VERIFY",
                         f"Key #{slot_idx + 1} (tier {stats[slot_idx]['tier']}) rate-limited (429), "
-                        f"rotating to next key",
+                        f"cooldown={retry_after}s, rotating",
                         {"retry_after_seconds": retry_after},
                     )
-                    # Don't sleep when other keys are still available — we want to
-                    # rotate immediately. Only honor Retry-After when we've burned
-                    # through every key and would block on AllKeysExhaustedError anyway.
+                    continue
+
+                # 401/403 = revoked / invalid / billing-suspended key. Don't
+                # waste retries on it — disable the slot and rotate. Counts as
+                # a rotation, not a retry, so other slots get full retry budget.
+                if response.status_code in (401, 403):
+                    pool.mark_invalid(slot_idx)
+                    rotations += 1
+                    self.logger.log(
+                        "GROQ_VERIFY_ERROR",
+                        f"Key #{slot_idx + 1} returned {response.status_code} "
+                        f"(invalid/revoked), disabling and rotating",
+                    )
                     continue
 
                 response.raise_for_status()
-                # Count any HTTP 200 toward the daily quota — Groq bills these
-                # whether or not the JSON is parseable on our side.
-                pool.record_success(slot_idx)
+
+                # Record actual token usage (Groq returns it in `usage`).
+                try:
+                    payload = response.json()
+                    usage = payload.get("usage", {}) or {}
+                    total_tokens = int(usage.get("total_tokens") or self.EST_TOKENS_PER_CALL)
+                except Exception:
+                    payload = None
+                    total_tokens = self.EST_TOKENS_PER_CALL
+                pool.record_usage(slot_idx, total_tokens, model=model)
+
+                if payload is None:
+                    retries_used += 1
+                    self.logger.log(
+                        "GROQ_VERIFY_ERROR",
+                        f"Malformed API response shape (retry {retries_used}/{self.MAX_RETRIES})",
+                    )
+                    continue
 
                 try:
-                    result = response.json()
-                    content = result["choices"][0]["message"]["content"]
-                except (ValueError, KeyError, IndexError, TypeError) as e:
+                    content = payload["choices"][0]["message"]["content"]
+                except (KeyError, IndexError, TypeError) as e:
                     retries_used += 1
                     self.logger.log(
                         "GROQ_VERIFY_ERROR",
@@ -250,17 +284,16 @@ class GroqVerifier:
                     )
                     continue
 
-                updated = pool.get_stats()
+                updated = pool.get_stats(model=model)
                 self.logger.log(
                     "GROQ_VERIFY",
                     f"Verified article: score={parsed.get('score', 0)}, "
-                    f"model={model}, key=#{slot_idx + 1} (tier {updated[slot_idx]['tier']})",
+                    f"model={model}, key=#{slot_idx + 1} (tier {updated[slot_idx]['tier']}), "
+                    f"tokens={total_tokens}",
                     {"key_stats": updated},
                 )
                 return parsed
 
-            except RateLimitExceededError:
-                raise
             except requests.exceptions.RequestException as e:
                 retries_used += 1
                 error_str = str(e)
@@ -281,7 +314,7 @@ class GroqVerifier:
 
         # If every attempt was consumed by 429s, surface the more specific error.
         try:
-            pool.pick()
+            pool.pick(estimated_tokens=self.EST_TOKENS_PER_CALL, model=model)
         except AllKeysExhaustedError:
             raise
         raise Exception("Max retries exceeded for Groq verification")
@@ -295,10 +328,13 @@ class GroqVerifier:
         retry_after = response.headers.get("Retry-After", "").strip()
         if retry_after.isdigit():
             return int(retry_after) + 1
-        body = response.text
+        body = response.text or ""
         match = re.search(r"retry in (\d+(?:\.\d+)?)s", body, re.IGNORECASE)
         if match:
             return int(float(match.group(1))) + 2
+        # Daily-quota wording from Groq → very long cooldown
+        if re.search(r"per\s*day|daily\s*limit", body, re.IGNORECASE):
+            return 6 * 3600
         return 0
 
     def _extract_retry_delay(self, error_str: str, attempt: int) -> int:

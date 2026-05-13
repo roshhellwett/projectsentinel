@@ -19,12 +19,77 @@ from logger.pipeline_logger import PipelineLogger
 from publisher.supabase_publisher import SupabasePublisher
 from rate_limiter.limiter import RateLimitExceededError
 from sources.blocked_domains import is_blocked_domain
+from utils.groq_pool import VERIFY_MODEL_CHAIN, get_groq_pool, get_verify_model_chain
 from verifier.cross_source_checker import CrossSourceChecker
 from verifier.factcheck_matcher import FactCheckMatcher
 from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
 from verifier.score_evaluator import ScoreEvaluator
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
+
+
+def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
+    """
+    Clamp groups-per-run to evenly spread remaining daily Groq budget until
+    the next 00:00 UTC reset.
+
+    Reads `PIPELINE_INTERVAL_SECONDS` from env (default 600 = 10 min, matching
+    `main.py`'s APScheduler). Override locally for `loop_runner.py` (60s) via
+    that env var.
+
+    This is what makes the worker "never exhaust" across the day: as budget
+    drains, we slow down automatically; when only tier 3 is left, we crawl
+    just fast enough to coast to the reset.
+
+    Returns max(1, min(hard_cap, allowed)) so the worker always processes
+    at least one group per run if any budget exists.
+    """
+    pool = get_groq_pool()
+    if pool is None:
+        return hard_cap
+
+    # Sum remaining daily budget across the WHOLE verify-model cascade.
+    # If the primary model is exhausted but the cascade has 50K calls left
+    # on the 8B safety net, we should still let the worker run flat-out.
+    chain = get_verify_model_chain()
+    total_budget = sum(pool.remaining_daily_budget(model=m) for m in chain)
+    if total_budget <= 0:
+        return hard_cap
+
+    # The "active" model for rate-shaping is the first one in the chain
+    # that still has budget — that's where the next pipeline tick will
+    # spend its calls.
+    active_model = next(
+        (m for m in chain if pool.remaining_daily_budget(model=m) > 0),
+        chain[0],
+    )
+    rate_per_min = pool.target_rate_per_minute(model=active_model, safety_factor=0.92)
+    if rate_per_min <= 0:
+        return hard_cap
+
+    try:
+        interval_seconds = max(60, int(os.getenv("PIPELINE_INTERVAL_SECONDS", "600")))
+    except (ValueError, TypeError):
+        interval_seconds = 600
+
+    # Allowed verify-calls between this run and the next scheduled run.
+    allowed = max(1, int(rate_per_min * (interval_seconds / 60.0)))
+    clamped = min(hard_cap, allowed)
+
+    if clamped < hard_cap:
+        tiers_alive = pool.alive_tiers(model=active_model)
+        seconds_left = pool.seconds_until_utc_reset()
+        logger.log(
+            "AI_BUDGET",
+            f"Budget shaper: model={active_model}, tiers_alive={tiers_alive}, "
+            f"chain_budget={total_budget} calls "
+            f"(active_model_budget={pool.remaining_daily_budget(model=active_model)}), "
+            f"reset_in={seconds_left / 3600:.1f}h, "
+            f"target_rate={rate_per_min:.1f}/min, "
+            f"interval={interval_seconds}s, "
+            f"groups_this_run={clamped} (cap={hard_cap})",
+        )
+    return clamped
 
 
 def _record_run_start(logger: PipelineLogger, start_time: datetime, mode: str) -> str | None:
@@ -251,15 +316,28 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 seen_rep_headlines.append(rep)
         verified_groups = unique_groups
 
-        groups_to_process = verified_groups[:max_ai_groups]
-        deferred_groups = verified_groups[max_ai_groups:]
+        # Adaptive shaping: clamp groups for this run to whatever the daily
+        # budget can support, so we coast smoothly to 00:00 UTC reset instead
+        # of burning all 3 tiers in the first few hours.
+        effective_cap = _budgeted_groups_per_run(logger, max_ai_groups)
+        groups_to_process = verified_groups[:effective_cap]
+        deferred_groups = verified_groups[effective_cap:]
         stats["ai_groups_skipped"] = len(deferred_groups)
 
         if stats["ai_groups_skipped"]:
-            logger.log("AI_BUDGET", f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run")
-            # Mark deferred groups as processed to prevent infinite re-processing backlog
-            for grp in deferred_groups:
-                deduplicator.mark_group_processed(grp)
+            logger.log(
+                "AI_BUDGET",
+                f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run "
+                f"(effective_cap={effective_cap}, hard_cap={max_ai_groups})",
+            )
+            # Only drop overflow above the user-configured hard cap. Groups
+            # deferred purely by the budget shaper are kept un-marked so the
+            # next pipeline tick can pick them up — otherwise tight-budget
+            # days would silently discard real news.
+            if len(verified_groups) > max_ai_groups:
+                hard_overflow = verified_groups[max_ai_groups:]
+                for grp in hard_overflow:
+                    deduplicator.mark_group_processed(grp)
 
         for group in groups_to_process:
             representative_url = group[0].get("url", "unknown") if group else "unknown"
@@ -303,8 +381,12 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                         )
                         headline = writing["headline"]
                         summary = writing["summary"]
-                    except RateLimitExceededError:
-                        logger.log("AI_BUDGET", "Daily Groq writer limit reached — stopping AI processing")
+                    except (RateLimitExceededError, AllKeysExhaustedError) as budget_err:
+                        logger.log(
+                            "AI_BUDGET",
+                            f"Groq writer budget exhausted — stopping AI processing: {budget_err}",
+                        )
+                        # Don't mark this group as processed — next run can retry.
                         break
                     except Exception as write_err:
                         logger.log(

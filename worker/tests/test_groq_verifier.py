@@ -223,12 +223,15 @@ def test_key_pool_midnight_reset():
     from datetime import date, timedelta
 
     pool = _KeyPool(["key_a"])
-    pool.record_success(0)
-    pool.mark_exhausted(0)
+    pool.record_success(0)           # creates _default model state
+    pool.mark_exhausted(0)           # slot-level skip_this_run=True
 
     yesterday = str(date.today() - timedelta(days=1))
     with pool._lock:
-        pool._slots[0]["day"] = yesterday
+        # Roll BOTH slot-level day marker and the per-model day so the
+        # next pick triggers a full daily reset.
+        pool._slots[0]["_last_seen_day"] = yesterday
+        pool._slots[0]["_per_model"]["_default"]["day"] = yesterday
 
     # After pick(), the slot should be refreshed and available again
     idx, key = pool.pick()
@@ -364,6 +367,159 @@ def test_key_pool_sparse_numbering_preserves_tier():
     idx, key = pool.pick()
     assert idx == 2
     assert key == "k4"
+
+
+def test_pool_per_model_state_is_independent():
+    """Hitting RPD on llama-70b must NOT affect llama-8b counters on the same key."""
+    pool = _KeyPool(["k1"], rpd_limit=2)
+    # Burn 2 calls on model A → day_dead.
+    pool.record_usage(0, tokens=100, model="model_a")
+    pool.record_usage(0, tokens=100, model="model_a")
+    # Model A is exhausted, but model B is fresh.
+    with pytest.raises(AllKeysExhaustedError):
+        pool.pick(model="model_a")
+    idx, _ = pool.pick(model="model_b")
+    assert idx == 0
+
+
+def test_pool_equal_pressure_distribution_across_models():
+    """Across mixed verify+write traffic, load must spread, not stack on slot 0."""
+    pool = _KeyPool(["k1", "k2", "k3"])
+    # Simulate 6 verifies + 6 writes interleaved.
+    used_indices = []
+    for _ in range(6):
+        i, _ = pool.pick(model="verify")
+        pool.record_usage(i, tokens=100, model="verify")
+        used_indices.append(i)
+        j, _ = pool.pick(model="write")
+        pool.record_usage(j, tokens=50, model="write")
+        used_indices.append(j)
+    # No single slot should monopolize: each must be picked at least 2x out of 12.
+    counts = [used_indices.count(i) for i in range(3)]
+    assert min(counts) >= 2, f"Uneven load distribution: {counts}"
+
+
+def test_pool_lru_picks_oldest_within_tier():
+    """Within a tier, LRU+cross-model-load ordering must rotate keys."""
+    import time as _time
+
+    pool = _KeyPool(["k1", "k2", "k3"])
+    # Use slot 0 first → it should NOT be picked again immediately.
+    i1, _ = pool.pick(model="m")
+    pool.record_usage(i1, model="m")
+    _time.sleep(0.001)
+    i2, _ = pool.pick(model="m")
+    pool.record_usage(i2, model="m")
+    _time.sleep(0.001)
+    i3, _ = pool.pick(model="m")
+    # Three picks in a row must be three distinct slots (perfect rotation).
+    assert {i1, i2, i3} == {0, 1, 2}
+
+
+def test_pool_invalid_key_stays_dead_across_models():
+    """A key marked invalid (401) must be unusable on every model."""
+    pool = _KeyPool(["k1", "k2"])
+    pool.mark_invalid(0)
+    # Model A: only k2 should be available.
+    idx, _ = pool.pick(model="model_a")
+    assert idx == 1
+    # Model B (fresh per-model state): still only k2.
+    idx, _ = pool.pick(model="model_b")
+    assert idx == 1
+
+
+@patch("verifier.groq_verifier.time.sleep", return_value=None)
+@patch("verifier.groq_verifier.requests.post")
+def test_verify_cascades_to_next_model_when_keys_exhaust(mock_post, mock_sleep):
+    """When all keys hit RPD limit on llama-3.3-70b, verifier must switch to
+    the next model in the chain and succeed with fresh per-(account,model)
+    quotas. This is the model-fallback cascade in action."""
+
+    good_content = json.dumps(
+        {
+            "score": 88,
+            "reason": "ok",
+            "key_facts": ["fact"],
+            "category": "tech",
+            "headline": "H",
+            "summary": "S.",
+        }
+    )
+    resp_ok = MagicMock()
+    resp_ok.status_code = 200
+    resp_ok.raise_for_status.return_value = None
+    resp_ok.json.return_value = {
+        "choices": [{"message": {"content": good_content}}],
+        "usage": {"total_tokens": 800},
+    }
+    mock_post.return_value = resp_ok
+
+    env = {"GROQ_API_KEY_VERIFY_1": "k1", "GROQ_API_KEY_VERIFY_2": "k2"}
+    with patch.dict(os.environ, env, clear=True):
+        v = GroqVerifier()
+        pool = v._ensure_pool()
+
+        # Simulate "primary model RPD hit on every key" via a long-cooldown
+        # 429 (>= DAY_DEAD_THRESHOLD flips per-model day_dead). Other models
+        # in the cascade keep their fresh per-(account, model) buckets.
+        primary = "llama-3.3-70b-versatile"
+        for i in range(pool.size()):
+            pool.record_429(i, retry_after=86400, model=primary)
+
+        # The pick on primary now raises AllKeysExhaustedError, cascading
+        # to the next model in the chain — which has untouched RPD per key.
+        result = v.verify([{"headline": "t", "source_name": "s", "excerpt": "x"}])
+        assert result["score"] == 88
+
+        sent_model = mock_post.call_args.kwargs["json"]["model"]
+        assert sent_model != primary, (
+            f"Expected cascade to fallback model, got {sent_model}"
+        )
+        assert sent_model == "meta-llama/llama-4-scout-17b-16e-instruct", (
+            f"Expected first fallback to be llama-4-scout, got {sent_model}"
+        )
+
+
+@patch("verifier.groq_verifier.time.sleep", return_value=None)
+@patch("verifier.groq_verifier.requests.post")
+def test_verify_disables_revoked_key_on_401(mock_post, mock_sleep):
+    """A 401 must mark the slot invalid (not retry it) and rotate to next key."""
+    good_content = json.dumps(
+        {
+            "score": 70,
+            "reason": "ok",
+            "key_facts": ["fact"],
+            "category": "tech",
+            "headline": "H",
+            "summary": "S.",
+        }
+    )
+    resp_401 = MagicMock()
+    resp_401.status_code = 401
+    resp_401.headers = {}
+    resp_401.text = "invalid api key"
+
+    resp_ok = MagicMock()
+    resp_ok.status_code = 200
+    resp_ok.raise_for_status.return_value = None
+    resp_ok.json.return_value = {
+        "choices": [{"message": {"content": good_content}}],
+        "usage": {"total_tokens": 800},
+    }
+
+    mock_post.side_effect = [resp_401, resp_ok]
+
+    env = {"GROQ_API_KEY_VERIFY_1": "revoked", "GROQ_API_KEY_VERIFY_2": "good"}
+    with patch.dict(os.environ, env, clear=True):
+        v = GroqVerifier()
+        result = v.verify([{"headline": "test", "source_name": "src", "excerpt": "text"}])
+        # Only 2 calls — one 401 (rotated, not retried), one OK on next key.
+        assert mock_post.call_count == 2
+        assert result["score"] == 70
+
+        # Slot 0 must now be marked invalid (skip_this_run=True).
+        pool = v._ensure_pool()
+        assert pool.get_stats()[0]["skip_this_run"] is True
 
 
 @patch("verifier.groq_verifier.time.sleep", return_value=None)

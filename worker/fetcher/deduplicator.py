@@ -24,8 +24,19 @@ class Deduplicator:
         """Initialize Supabase client."""
         self.supabase = get_supabase()
 
+    # Supabase REST API caps a single SELECT at 1000 rows by default. We
+    # paginate explicitly so the dedup set stays correct on busy days.
+    _HASH_PAGE_SIZE = 1000
+    _HASH_LOOKBACK_DAYS = 21
+    _HASH_MAX_PAGES = 50  # hard ceiling: 50k hashes is plenty for a 21-day window
+
     def _load_known_hashes(self) -> set[str]:
-        """Load all known URL hashes from raw_articles (cached per pipeline run)."""
+        """Load all known URL hashes from raw_articles (cached per pipeline run).
+
+        Paginates the query so the Supabase 1000-row default doesn't silently
+        truncate the dedup set. Window shortened from 45→21 days because dedup
+        only needs to cover plausible source-republish horizons.
+        """
         if self._known_hashes is not None:
             return self._known_hashes
 
@@ -33,20 +44,33 @@ class Deduplicator:
             self._known_hashes = set()
             return self._known_hashes
 
+        hashes: set[str] = set()
         try:
-            cutoff = (datetime.now(UTC) - timedelta(days=45)).isoformat()
-            result = (
-                self.supabase.table("raw_articles")
-                .select("url_hash")
-                .or_(f"fetched_at.gte.{cutoff},fetched_at.is.null")
-                .execute()
-            )
-            rows = result.data or []
-            self._known_hashes = {row["url_hash"] for row in rows if row.get("url_hash")}
+            cutoff = (datetime.now(UTC) - timedelta(days=self._HASH_LOOKBACK_DAYS)).isoformat()
+            for page in range(self._HASH_MAX_PAGES):
+                start = page * self._HASH_PAGE_SIZE
+                end = start + self._HASH_PAGE_SIZE - 1
+                result = (
+                    self.supabase.table("raw_articles")
+                    .select("url_hash")
+                    .gte("fetched_at", cutoff)
+                    .order("fetched_at", desc=True)
+                    .range(start, end)
+                    .execute()
+                )
+                rows = result.data or []
+                if not rows:
+                    break
+                for row in rows:
+                    h = row.get("url_hash")
+                    if h:
+                        hashes.add(h)
+                if len(rows) < self._HASH_PAGE_SIZE:
+                    break  # last page
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
-            self._known_hashes = set()
 
+        self._known_hashes = hashes
         return self._known_hashes
 
     def _load_recent_post_headlines(self) -> list[str]:
