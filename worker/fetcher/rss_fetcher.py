@@ -1,9 +1,19 @@
 """
 RSS feed fetcher - parallel fetching with session reuse.
-Optimized: concurrent feed fetching, session passed to feedparser.
+
+Optimisations:
+  * Concurrent feed fetching via a thread pool.
+  * Per-thread `requests.Session` reuse (HTTPS keep-alive).
+  * **Auto-disable** of broken feeds: any feed that fails 3 fetches in a row
+    is parked for 24 hours and skipped until then. On the next attempt after
+    the park window, the feed is retried — if it recovers, the failure
+    counter resets to zero. State is kept in process memory (not persisted)
+    because a worker restart simply retries everything once and re-parks any
+    feed that's still broken, which is the same outcome at trivial cost.
 """
 
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from urllib.parse import urlparse
@@ -22,10 +32,65 @@ class RSSFetcher:
 
     _USER_AGENT = "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"
 
+    # ── Auto-disable tuning ──
+    # Three consecutive failures before parking. One success anywhere in
+    # between resets the streak. Tuned to absorb transient blips (publisher
+    # restarts, DNS flaps) without prematurely parking healthy feeds.
+    _FAIL_THRESHOLD = 3
+    _PARK_DURATION_SECONDS = 24 * 60 * 60  # 24h
+
+    # url → {"fails": int, "parked_until": float (epoch seconds)}
+    # Shared across all RSSFetcher instances and threads, guarded by lock.
+    _feed_health: dict[str, dict] = {}
+    _feed_health_lock = threading.Lock()
+
     def __init__(self, max_workers: int = 8):
         self.logger = PipelineLogger()
         self.max_workers = max_workers
         self._local = threading.local()
+
+    # ------------------------------------------------------------------
+    # Auto-disable state machine
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def _is_parked(cls, url: str) -> bool:
+        """True if this feed is currently in the 24h park window."""
+        now = time.time()
+        with cls._feed_health_lock:
+            state = cls._feed_health.get(url)
+            return bool(state and state.get("parked_until", 0) > now)
+
+    @classmethod
+    def _record_failure(cls, url: str) -> bool:
+        """
+        Bump the failure counter. Returns True iff this failure just tripped
+        the threshold and parked the feed, so the caller can log the event
+        exactly once instead of on every subsequent fail.
+        """
+        with cls._feed_health_lock:
+            state = cls._feed_health.setdefault(url, {"fails": 0, "parked_until": 0.0})
+            state["fails"] += 1
+            if state["fails"] >= cls._FAIL_THRESHOLD:
+                state["parked_until"] = time.time() + cls._PARK_DURATION_SECONDS
+                state["fails"] = 0  # reset; next failure starts a fresh streak
+                return True
+        return False
+
+    @classmethod
+    def _record_success(cls, url: str) -> None:
+        """Reset the failure streak and lift any active park for this feed."""
+        with cls._feed_health_lock:
+            state = cls._feed_health.get(url)
+            if state and (state["fails"] or state["parked_until"]):
+                state["fails"] = 0
+                state["parked_until"] = 0.0
+
+    @classmethod
+    def _reset_health(cls) -> None:
+        """Test-only hook to clear all per-feed health state."""
+        with cls._feed_health_lock:
+            cls._feed_health.clear()
 
     def _get_session(self) -> requests.Session:
         """Return a thread-local session (requests.Session is NOT thread-safe)."""
@@ -40,14 +105,34 @@ class RSSFetcher:
         """
         Fetch all RSS feeds concurrently and return list of raw articles.
 
+        Feeds currently in the 24h park window are skipped before they ever
+        reach the thread pool, so they don't consume a worker slot or HTTP
+        timeout budget.
+
         Returns:
             List of article dicts with headline, url, excerpt, source info
         """
         articles = []
-        sources = get_rss_sources()
+        all_sources = get_rss_sources()
+
+        # Partition parked vs. active sources up-front so we can log the
+        # skip count once instead of one line per parked feed.
+        active_sources = []
+        parked_count = 0
+        for source in all_sources:
+            if self._is_parked(source["url"]):
+                parked_count += 1
+            else:
+                active_sources.append(source)
+
+        if parked_count:
+            self.logger.log(
+                "RSS",
+                f"Skipping {parked_count} parked feed(s); fetching {len(active_sources)} active",
+            )
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_source = {executor.submit(self._fetch_feed, source): source for source in sources}
+            future_to_source = {executor.submit(self._fetch_feed, source): source for source in active_sources}
 
             for future in as_completed(future_to_source):
                 source = future_to_source[future]
@@ -71,17 +156,29 @@ class RSSFetcher:
             List of article dicts
         """
         articles = []
+        url = source["url"]
+        name = source.get("name", url)
 
         try:
-            resp = self._get_session().get(source["url"], timeout=20)
+            resp = self._get_session().get(url, timeout=20)
             resp.raise_for_status()
             feed = feedparser.parse(resp.content)
         except Exception as e:
-            self.logger.log(
-                "RSS_ERROR",
-                f"Feed fetch failed for {source.get('name', source['url'])}: {str(e)[:120]}",
-            )
+            just_parked = self._record_failure(url)
+            if just_parked:
+                self.logger.log(
+                    "RSS_PARK",
+                    f"Feed {name} parked for 24h after {self._FAIL_THRESHOLD} consecutive failures: {str(e)[:100]}",
+                )
+            else:
+                self.logger.log(
+                    "RSS_ERROR",
+                    f"Feed fetch failed for {name}: {str(e)[:120]}",
+                )
             return []
+
+        # HTTP succeeded — clear any prior failure streak / park.
+        self._record_success(url)
 
         for entry in feed.entries[:10]:
             try:
