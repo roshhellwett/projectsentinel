@@ -140,7 +140,7 @@ export function LiveUpdateIsland({ pending, onTap }: LiveUpdateIslandProps) {
               <span className="absolute inset-0 rounded-full bg-accent/45 blur-[6px]" aria-hidden="true" />
               <span className="relative flex items-center justify-center">
                 <span className="absolute w-2.5 h-2.5 rounded-full bg-accent/80 animate-ping" aria-hidden="true" />
-                <span className="relative w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_rgba(10,132,255,0.9)]" />
+                <span className="relative w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.9)]" />
               </span>
             </span>
 

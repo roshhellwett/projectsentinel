@@ -48,7 +48,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(10,132,255,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(139,127,240,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
             >
               <Github className="w-3.5 h-3.5" />
               GitHub

@@ -172,7 +172,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
-                className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(10,132,255,0.45)]"
+                className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(139,127,240,0.45)]"
                 // Focus is handled imperatively via the ref + setTimeout above
                 // to avoid React's autoFocus + ref double-focus warning.
                 aria-label="Search verified stories"

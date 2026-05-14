@@ -28,7 +28,7 @@ export function CategoryPlaceholder({
       aria-hidden="true"
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_22%),radial-gradient(circle_at_70%_70%,rgba(10,132,255,0.12),transparent_36%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_22%),radial-gradient(circle_at_70%_70%,rgba(139,127,240,0.12),transparent_36%)]" />
       <div
         className="absolute inset-0 opacity-40"
         style={{

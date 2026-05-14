@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-cred-low/10 border border-cred-low/30 text-cred-low rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-600 rounded-lg text-sm">
               {error}
             </div>
           )}

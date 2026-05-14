@@ -46,8 +46,8 @@ module.exports = {
         tight: '-0.02em',
       },
       boxShadow: {
-        'glow-accent': '0 0 0 1px rgba(10, 132, 255, 0.2), 0 18px 54px -18px rgba(10, 132, 255, 0.52)',
-        'glow-accent-lg': '0 0 0 1px rgba(90, 200, 250, 0.28), 0 30px 76px -18px rgba(10, 132, 255, 0.6)',
+        'glow-accent': '0 0 0 1px rgba(139, 127, 240, 0.2), 0 18px 54px -18px rgba(139, 127, 240, 0.52)',
+        'glow-accent-lg': '0 0 0 1px rgba(160, 140, 220, 0.28), 0 30px 76px -18px rgba(139, 127, 240, 0.6)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

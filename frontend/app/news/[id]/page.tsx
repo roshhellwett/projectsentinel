@@ -91,7 +91,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
       />
 
       {/* Decorative accent glow */}
-      <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(10,132,255,0.14),transparent_60%)] pointer-events-none -z-10" />
+      <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(139,127,240,0.14),transparent_60%)] pointer-events-none -z-10" />
 
       <div className="container mx-auto px-4 pt-10 max-w-5xl">
         <Link 
@@ -169,7 +169,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
             <div className="relative z-10">
               <h2 className="flex items-center gap-2 text-xl font-bold text-slate-950 mb-4">
-                <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(10,132,255,0.8)]" />
+                <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(139,127,240,0.8)]" />
                 AI Credibility Analysis
               </h2>
               <div className="inline-flex items-center gap-2 bg-white/70 border border-slate-950/[0.10] px-3 py-1 rounded-lg text-sm font-bold text-slate-950 mb-4">
@@ -204,7 +204,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               { label: 'Auto-Published', icon: <span className="text-base">⚡</span> },
             ].map((item) => (
               <div key={item.label} className="flex flex-col items-center text-center p-2">
-                <div className="w-9 h-9 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent mb-2.5 shadow-[0_12px_30px_-18px_rgba(10,132,255,0.85)]">
+                <div className="w-9 h-9 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent mb-2.5 shadow-[0_12px_30px_-18px_rgba(139,127,240,0.85)]">
                   {item.icon}
                 </div>
                 <span className="text-[11px] font-semibold text-slate-600">{item.label}</span>
@@ -216,7 +216,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         {/* Related Stories */}
         <div className="mt-16 border-t border-slate-950/[0.08] pt-12">
           <div className="flex items-center gap-3 mb-7">
-            <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(10,132,255,0.75)]" />
+            <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
             <h2 className="text-xl font-semibold text-slate-950 tracking-tight">
               Related News
             </h2>

@@ -72,7 +72,7 @@ export function CategoryBar() {
                   {isActive && (
                     <motion.span
                       layoutId="activeCategoryPill"
-                      className="absolute inset-0 -z-10 rounded-full bg-white border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_-18px_rgba(10,132,255,0.55)]"
+                      className="absolute inset-0 -z-10 rounded-full bg-white border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_-18px_rgba(139,127,240,0.55)]"
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}

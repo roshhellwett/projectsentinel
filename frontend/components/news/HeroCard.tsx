@@ -40,7 +40,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             />
             {/* Badge */}
             {badge && (
-              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/75 backdrop-blur-xl border border-slate-950/[0.10] text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_42px_-28px_rgba(10,132,255,0.75)]">
+              <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/75 backdrop-blur-xl border border-slate-950/[0.10] text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_42px_-28px_rgba(139,127,240,0.75)]">
                 <Flame className="w-3 h-3 text-accent" />
                 {badge === 'breaking' ? 'Breaking' : 'Trending'}
               </div>

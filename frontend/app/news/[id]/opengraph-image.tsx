@@ -38,9 +38,9 @@ const CATEGORY_META: Record<string, { color: string; label: string }> = {
 };
 
 function scoreColor(score: number): string {
-  if (score >= 85) return '#10b981';
-  if (score >= 70) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 90) return '#10b981';
+  if (score >= 70) return '#8b7ff0';
+  return '#f59e0b';
 }
 
 function hostnameOf(url: string): string {

@@ -4,9 +4,10 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Post } from '@/types';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 interface CorrectionFormProps {
   post: Post;
@@ -17,6 +18,21 @@ interface CorrectionFormProps {
 export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   const [note, setNote] = useState(post.correction_note || '');
   const [loading, setLoading] = useState(false);
+
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, []);
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +67,8 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   };
   
   return (
-    <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white/95 border border-slate-950/[0.10] rounded-xl p-6 w-full max-w-lg shadow-2xl">
+    <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white/95 border border-slate-950/[0.10] rounded-xl p-6 w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-medium">
             {type === 'corrected' ? 'Add Correction' : 'Retract Article'}
@@ -94,8 +110,8 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
               disabled={loading}
               className={`flex-1 py-3 text-white rounded-lg transition-colors disabled:opacity-50 ${
                 type === 'corrected' 
-                  ? 'bg-cred-mid hover:bg-cred-mid/80' 
-                  : 'bg-cred-low hover:bg-cred-low/80'
+                  ? 'bg-amber-500 hover:bg-amber-600' 
+                  : 'bg-red-500 hover:bg-red-600'
               }`}
             >
               {loading ? 'Saving...' : (type === 'corrected' ? 'Add Correction' : 'Retract')}

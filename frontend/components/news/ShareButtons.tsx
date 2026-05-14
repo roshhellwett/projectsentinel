@@ -61,7 +61,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
       <motion.button
         whileTap={{ scale: 0.94 }}
         onClick={() => setShowMenu(!showMenu)}
-        className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30 transition-all text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_14px_38px_-30px_rgba(10,132,255,0.58)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30 transition-all text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_14px_38px_-30px_rgba(139,127,240,0.58)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
         aria-label="Share this article"
         aria-expanded={showMenu}
       >
