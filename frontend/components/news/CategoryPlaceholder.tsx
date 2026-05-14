@@ -1,7 +1,11 @@
 /**
  * Decorative gradient placeholder shown when no image is available.
- * Used in featured / hero cards. Color is derived from category.
+ * Used in featured / hero cards. Color is derived from category via the
+ * unified theme so the hero card, badge, and trending bar all use the
+ * same family of hues for a given category.
  */
+
+import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 
 interface CategoryPlaceholderProps {
   category: string;
@@ -9,26 +13,14 @@ interface CategoryPlaceholderProps {
   showLabel?: boolean;
 }
 
-const CATEGORY_GRADIENT: Record<string, string> = {
-  politics: 'from-rose-500/30 via-rose-500/10 to-transparent',
-  business: 'from-emerald-500/30 via-emerald-500/10 to-transparent',
-  sports: 'from-sky-500/30 via-sky-500/10 to-transparent',
-  crime: 'from-orange-500/30 via-orange-500/10 to-transparent',
-  science: 'from-violet-500/30 via-violet-500/10 to-transparent',
-  health: 'from-pink-500/30 via-pink-500/10 to-transparent',
-  tech: 'from-cyan-500/30 via-cyan-500/10 to-transparent',
-  world: 'from-amber-500/30 via-amber-500/10 to-transparent',
-  entertainment: 'from-fuchsia-500/30 via-fuchsia-500/10 to-transparent',
-  education: 'from-violet-400/30 via-violet-400/10 to-transparent',
-};
-
 export function CategoryPlaceholder({
   category,
   className = '',
   showLabel = true,
 }: CategoryPlaceholderProps) {
-  const gradient = CATEGORY_GRADIENT[category] || 'from-accent/30 via-accent/10 to-transparent';
-  const label = category.charAt(0).toUpperCase() + category.slice(1);
+  const theme = getCategoryTheme(category);
+  const gradient = theme.gradient;
+  const label = theme.label;
 
   return (
     <div

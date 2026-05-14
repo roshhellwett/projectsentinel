@@ -11,6 +11,7 @@ import { BookmarkButton } from '@/components/news/BookmarkButton';
 import { RelatedStories } from '@/components/news/RelatedStories';
 import { ReadingTime } from '@/components/news/ReadingTime';
 import { ReadingProgress } from '@/components/ui/ReadingProgress';
+import { MarkReadOnMount } from '@/components/news/MarkReadOnMount';
 import { formatDate } from '@/lib/utils/formatDate';
 import { newsArticleJsonLd, breadcrumbJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { ArrowLeft, Clock, ShieldCheck, Database, Calendar } from 'lucide-react';
@@ -81,6 +82,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
   return (
     <div className="relative min-h-screen overflow-hidden pb-12">
       <ReadingProgress targetSelector="#article-body" />
+      <MarkReadOnMount postId={post.id} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

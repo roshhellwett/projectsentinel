@@ -3,23 +3,12 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, ChevronRight } from 'lucide-react';
+import { Check, Flame, ChevronRight } from 'lucide-react';
 import { Post } from '@/types';
 import { CredibilityBadge } from './CredibilityBadge';
 import { CategoryTag } from './CategoryTag';
-
-const CATEGORY_COLOR: Record<string, string> = {
-  politics: '#f43f5e',
-  business: '#10b981',
-  sports: '#0ea5e9',
-  crime: '#f97316',
-  science: '#8b5cf6',
-  health: '#ec4899',
-  tech: '#06b6d4',
-  world: '#f59e0b',
-  entertainment: '#d946ef',
-  education: '#a78bfa',
-};
+import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { useReadPosts } from '@/lib/utils/readPosts';
 
 interface TrendingSectionProps {
   posts: Post[];
@@ -42,6 +31,11 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     return out;
   }, [posts]);
 
+  // Persistent localStorage read state — also rendered as dimming in the
+  // home feed. Showing it here too means the user can scan trending and
+  // immediately see which stories they've already opened.
+  const { isRead } = useReadPosts();
+
   if (trending.length === 0) return null;
 
   return (
@@ -58,7 +52,9 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       </div>
 
       <div className="premium-card rounded-[1.6rem] overflow-hidden">
-        {trending.map((post, index) => (
+        {trending.map((post, index) => {
+          const read = isRead(post.id);
+          return (
           <motion.div
             key={post.id}
             initial={{ opacity: 0, x: -20 }}
@@ -68,12 +64,14 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           >
             <Link
               href={`/news/${post.id}/`}
-              className="touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset"
+              data-read={read ? 'true' : 'false'}
+              className={`touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset ${read ? 'opacity-60' : ''}`}
+              aria-label={read ? `${post.headline} (already read)` : post.headline}
             >
               {/* Category colour left bar */}
               <div
                 className="w-[3px] self-stretch flex-shrink-0 opacity-60"
-                style={{ backgroundColor: CATEGORY_COLOR[post.category] ?? '#0a84ff' }}
+                style={{ backgroundColor: getCategoryTheme(post.category).hex }}
                 aria-hidden="true"
               />
               <div className="flex items-center gap-4 flex-1 min-w-0 px-4 sm:px-5 py-4">
@@ -89,7 +87,18 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                   <p className="text-[14px] font-semibold text-slate-900 line-clamp-2 leading-snug group-hover:text-accent transition-colors duration-200">
                     {post.headline}
                   </p>
-                  <div className="mt-1.5"><CategoryTag category={post.category} /></div>
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <CategoryTag category={post.category} />
+                    {read && (
+                      <span
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-700 text-[9px] font-bold uppercase tracking-wider"
+                        title="You have read this story"
+                      >
+                        <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                        Read
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex-shrink-0">
@@ -100,7 +109,8 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
               </div>
             </Link>
           </motion.div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

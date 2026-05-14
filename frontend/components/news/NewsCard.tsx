@@ -2,12 +2,14 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, ShieldCheck } from 'lucide-react';
+import { Check, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { truncateWords } from '@/lib/utils/truncate';
 import { cn } from '@/lib/utils/cn';
 import { BookmarkButton } from './BookmarkButton';
+import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { getScoreHex } from '@/lib/utils/scoreColor';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
@@ -16,27 +18,18 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.verc
 // + hover left-edge bar + score-gauge ring tint). The card body stays neutral
 // so the feed reads as a single cohesive surface, not a patchwork of pastels.
 // Premium aesthetic reference: linear.app, vercel.com, apple.com/newsroom.
+//
+// Colour is resolved through `lib/theme/categoryTheme` so this card, the
+// trending list, the badge pill, and the hero placeholder all share the
+// same hue for a given category. Score tier comes from `scoreColor.ts` so
+// the gauge agrees with the trending badge on every borderline score.
 // ─────────────────────────────────────────────────────────────────────────────
-const CATEGORY_META: Record<string, { color: string; label: string }> = {
-  politics:      { color: '#7c3aed', label: 'Politics' },
-  business:      { color: '#059669', label: 'Business' },
-  sports:        { color: '#ea580c', label: 'Sports' },
-  tech:          { color: '#2563eb', label: 'Tech' },
-  crime:         { color: '#dc2626', label: 'Crime' },
-  science:       { color: '#0891b2', label: 'Science' },
-  health:        { color: '#16a34a', label: 'Health' },
-  world:         { color: '#db2777', label: 'World' },
-  entertainment: { color: '#ca8a04', label: 'Entertainment' },
-  education:     { color: '#9333ea', label: 'Education' },
-};
-
-const DEFAULT_META = { color: '#475569', label: 'News' };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CredibilityGauge — animated circular SVG arc. The HERO element of the card.
 // On mount, the ring fills from 0 to the score over ~1.1s with an ease-out
 // cubic so it lands in a way that draws the eye without being theatrical.
-// Colour band: 85+ green (trustworthy), 70–84 amber (caveat), <70 red (low).
+// Colour band: 90+ green (trustworthy), 70–89 amber (caveat), <70 red (low).
 // ─────────────────────────────────────────────────────────────────────────────
 function CredibilityGauge({ score }: { score: number }) {
   const size = 48;
@@ -46,10 +39,11 @@ function CredibilityGauge({ score }: { score: number }) {
   const clamped = Math.max(0, Math.min(100, score));
   const offset = circumference * (1 - clamped / 100);
 
-  const color =
-    clamped >= 85 ? '#10b981' :
-    clamped >= 70 ? '#f59e0b' :
-                    '#ef4444';
+  // Single source of truth for credibility colour bands (90+/70+/<70). The
+  // previous local 85/70 thresholds caused the same score (e.g. 87) to
+  // render green here but amber in the trending list — visible drift on the
+  // home page.
+  const color = getScoreHex(clamped);
 
   return (
     <div
@@ -161,7 +155,7 @@ function isBreaking(post: Post): boolean {
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
   const breaking = isBreaking(post);
-  const meta = CATEGORY_META[post.category] ?? DEFAULT_META;
+  const theme = getCategoryTheme(post.category);
   const topSources = (post.sources ?? []).slice(0, 3);
   const extraSources = Math.max(0, (post.source_count ?? 0) - topSources.length);
 
@@ -201,7 +195,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       <span
         aria-hidden="true"
         className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        style={{ backgroundColor: meta.color }}
+        style={{ backgroundColor: theme.hex }}
       />
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
@@ -211,12 +205,12 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             <span
               className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
               style={{
-                color: meta.color,
-                backgroundColor: `${meta.color}14`,
+                color: theme.hex,
+                backgroundColor: `${theme.hex}14`,
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: meta.color }} />
-              {meta.label}
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.hex }} />
+              {theme.label}
             </span>
 
             {breaking && (
@@ -236,6 +230,17 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             >
               {formatTimeAgo(post.published_at)}
             </span>
+
+            {isRead && (
+              <span
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-700 text-[9px] font-bold uppercase tracking-wider"
+                aria-label="You have read this story"
+                title="You have read this story"
+              >
+                <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                Read
+              </span>
+            )}
           </div>
 
           <CredibilityGauge score={post.credibility_score} />
@@ -275,7 +280,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         {/* ── Bottom action row ── */}
         <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
           <span className="text-[10px] text-slate-500 inline-flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: meta.color }} />
+            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: theme.hex }} />
             Read full story
             <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
           </span>
