@@ -56,12 +56,7 @@ export default async function HomePage() {
   // above newer chronologically-correct ones. A single ordering rule across
   // every page also matches the "Latest News" section title and the user's
   // mental model: top of the feed = most recent.
-  const feedPosts = allPosts
-    .filter((post) => !trendingIds.has(post.id))
-    .sort(
-      (a, b) =>
-        new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
-    );
+  const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
 
   return (
     <div className="relative min-h-screen">

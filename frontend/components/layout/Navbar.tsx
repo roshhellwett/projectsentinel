@@ -47,8 +47,11 @@ export function Navbar() {
   }, [pathname]);
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    return pathname.startsWith(href);
+    const normalize = (p: string) => (p.endsWith('/') ? p.slice(0, -1) : p) || '/';
+    const a = normalize(href);
+    const b = normalize(pathname);
+    if (a === '/') return b === '/';
+    return b === a || b.startsWith(a + '/');
   };
 
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
@@ -217,6 +220,7 @@ export function Navbar() {
                     >
                       <Link
                         href={link.href}
+                        onClick={() => setIsMobileOpen(false)}
                         aria-current={active ? 'page' : undefined}
                         className={`touch-polish block px-4 py-3 rounded-xl text-[15px] font-medium transition-all active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                           active

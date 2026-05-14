@@ -23,7 +23,7 @@ export function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return '';
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffInSeconds = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000));
 
   if (diffInSeconds < 60) {
     return 'just now';

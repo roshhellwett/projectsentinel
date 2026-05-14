@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Flame, ChevronRight } from 'lucide-react';
 import { Post } from '@/types';
@@ -35,6 +35,8 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   // home feed. Showing it here too means the user can scan trending and
   // immediately see which stories they've already opened.
   const { isRead } = useReadPosts();
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
 
   if (trending.length === 0) return null;
 
@@ -53,7 +55,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
 
       <div className="premium-card rounded-[1.6rem] overflow-hidden">
         {trending.map((post, index) => {
-          const read = isRead(post.id);
+          const read = hydrated && isRead(post.id);
           return (
           <motion.div
             key={post.id}

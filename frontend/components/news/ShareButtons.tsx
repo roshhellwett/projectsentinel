@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -38,12 +38,17 @@ const SHARE_PLATFORMS = [
 export function ShareButtons({ headline, url }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const copyTimerRef = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
+  }, []);
 
   const copyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
       const textArea = document.createElement('textarea');
       textArea.value = url;
@@ -55,7 +60,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
         textArea.select();
         document.execCommand('copy');
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
       } finally {
         document.body.removeChild(textArea);
       }

@@ -25,6 +25,8 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
   const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   const dragControls = useDragControls();
   const y = useMotionValue(0);
 
@@ -45,18 +47,15 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
   }, [post]);
 
   useEffect(() => {
+    if (!post) return;
+
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     };
 
-    if (post) {
-      document.addEventListener('keydown', handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [post, onClose]);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [post]);
 
   const handleTabKey = useCallback((e: React.KeyboardEvent) => {
     if (e.key !== 'Tab' || !drawerRef.current) return;

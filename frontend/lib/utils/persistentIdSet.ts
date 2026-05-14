@@ -19,7 +19,7 @@
  *     waiting for the next render tick.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Options {
   /** localStorage key */
@@ -129,7 +129,9 @@ export function usePersistentIdSet({ key, max = 500 }: Options) {
     notify(key);
   }, [key]);
 
-  const has = useCallback((id: string) => ids.has(id), [ids]);
+  const idsRef = useRef(ids);
+  idsRef.current = ids;
+  const has = useCallback((id: string) => idsRef.current.has(id), []);
 
   return { ids, add, remove, toggle, clear, has };
 }

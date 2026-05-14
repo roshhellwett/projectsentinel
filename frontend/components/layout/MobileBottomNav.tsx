@@ -43,33 +43,27 @@ export function MobileBottomNav() {
 
   return (
     <>
-      {/* Topics sheet backdrop */}
-      <AnimatePresence>
-        {topicsOpen && (
-          <motion.div
-            key="topics-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="md:hidden fixed inset-0 bg-slate-950/20 backdrop-blur-sm z-[55]"
-            onClick={closeTopics}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Topics category sheet */}
+      {/* Topics sheet */}
       <AnimatePresence>
         {topicsOpen && (
           <motion.div
             key="topics-sheet"
-            initial={{ y: '100%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '100%', opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-            className="md:hidden fixed left-3 right-3 z-[56] rounded-3xl overflow-hidden bg-white/92 backdrop-blur-2xl border border-slate-950/[0.10] shadow-2xl"
-            style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="md:hidden fixed inset-0 z-[55]"
           >
+            <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-sm" onClick={closeTopics} />
+            <motion.div
+              key="topics-sheet"
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+              className="absolute left-3 right-3 rounded-3xl overflow-hidden bg-white/92 backdrop-blur-2xl border border-slate-950/[0.10] shadow-2xl"
+              style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
+            >
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
             <div className="p-4 pb-5">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-3 px-1">
@@ -95,6 +89,7 @@ export function MobileBottomNav() {
                 })}
               </div>
             </div>
+          </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (data.success) {
-        document.cookie = `admin_token=${data.token}; path=/; max-age=86400; SameSite=Strict`;
+        document.cookie = `admin_token=${data.token}; path=/; max-age=86400; SameSite=Strict; Secure`;
         router.push('/admin/');
       } else {
         setError('Invalid password');
