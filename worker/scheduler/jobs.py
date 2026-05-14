@@ -176,6 +176,19 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         post_builder = PostBuilder()
         publisher = SupabasePublisher()
 
+        # Sweep stale unprocessed singletons before grouping. Articles fetched
+        # more than `STALE_SINGLETON_HOURS` ago that still haven't found a
+        # cross-source partner are accepted as genuinely single-source and
+        # removed from the grouping buffer. Without this sweep, the new
+        # buffering logic below would let the unprocessed pool grow unbounded.
+        try:
+            stale_hours = max(1, int(os.getenv("STALE_SINGLETON_HOURS", "4")))
+        except (ValueError, TypeError):
+            stale_hours = 4
+        swept = deduplicator.sweep_stale_unprocessed(hours=stale_hours)
+        if swept:
+            logger.log("DEDUP", f"Swept {swept} stale singleton(s) older than {stale_hours}h")
+
         all_articles: list[dict] = []
 
         rss_articles: list[dict] = []
@@ -296,11 +309,14 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
 
-        # Mark single-source articles as processed so they don't re-appear every run
-        grouped_hashes = {a.get("url_hash") for g in verified_groups for a in g if a.get("url_hash")}
-        single_source_articles = [a for a in clean_articles if a.get("url_hash") and a["url_hash"] not in grouped_hashes]
-        if single_source_articles:
-            deduplicator.mark_group_processed(single_source_articles)
+        # NOTE: We deliberately do NOT mark current-run single-source articles
+        # as processed. They need to stay in the unprocessed pool so the next
+        # ~`STALE_SINGLETON_HOURS` of pipeline ticks can pair them with later
+        # arrivals from other sources. The previous "mark singletons every
+        # run" logic killed every unverified story before its second source
+        # had a chance to publish, which is why "0 verified groups" appeared
+        # in ~67% of runs in production. Stale singletons are swept at the
+        # start of each pipeline tick — see `sweep_stale_unprocessed` above.
 
         # Pre-AI dedup: drop groups whose representative headline is a paraphrase
         # of an already-queued group (catches cases SequenceMatcher would miss at 0.80).

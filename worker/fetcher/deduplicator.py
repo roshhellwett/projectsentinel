@@ -237,6 +237,47 @@ class Deduplicator:
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to mark processed: {str(e)}")
 
+    def sweep_stale_unprocessed(self, hours: int = 4) -> int:
+        """Mark all `processed=False` raw_articles older than `hours` as processed.
+
+        The pipeline used to mark every single-source article as processed at
+        the end of each tick — but that prevented breaking news from ever
+        being verified, because a story published by source A at 10:00 was
+        already "processed" by the time source B picked it up at 10:08.
+
+        The new model lets singletons live for `hours` so a second source
+        has time to pair with them. This sweep is the upper bound on how
+        long they linger: after `hours` we accept the story is genuinely
+        single-source and remove it from the cross-source grouping buffer.
+
+        Run this at the start of each pipeline tick. Idempotent and cheap
+        (single UPDATE statement on an indexed column).
+
+        Args:
+            hours: Age threshold in hours. Articles fetched before
+                `now - hours` and still unprocessed will be marked.
+
+        Returns:
+            Number of articles marked. Best-effort — may return 0 if the
+            Supabase client fails or the response payload is suppressed.
+        """
+        if not self.supabase or hours <= 0:
+            return 0
+
+        cutoff = (datetime.now(UTC) - timedelta(hours=hours)).isoformat()
+        try:
+            result = (
+                self.supabase.table("raw_articles")
+                .update({"processed": True})
+                .eq("processed", False)
+                .lt("fetched_at", cutoff)
+                .execute()
+            )
+            return len(result.data or [])
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Stale-singleton sweep failed: {str(e)}")
+            return 0
+
     def compute_url_hash(self, url: str) -> str:
         """Compute SHA256 hash of URL."""
         return compute_url_hash(url)

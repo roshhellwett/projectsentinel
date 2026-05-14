@@ -32,11 +32,37 @@ def _make_failing_response():
 
 
 def _make_ok_response():
-    """Return a Mock that returns a valid (empty-entries) feed body."""
+    """Return a Mock that returns a valid feed with one parseable entry.
+
+    Note: under the post-fix `_fetch_feed` contract, a 200 OK with zero
+    entries is itself a failure (publishers who silently break their RSS
+    return exactly this). A "true success" therefore needs at least one
+    item that survives the headline length / link checks in `_parse_entry`.
+    """
     resp = MagicMock()
     resp.raise_for_status.return_value = None
-    # feedparser will parse this as zero entries — fine for testing fetch
-    # success without invoking the entry-parsing path.
+    resp.content = (
+        b"<?xml version='1.0'?>"
+        b"<rss><channel><title>t</title>"
+        b"<item>"
+        b"<title>Some real story headline that is long enough</title>"
+        b"<link>https://example.com/some-real-story</link>"
+        b"<description>desc</description>"
+        b"</item>"
+        b"</channel></rss>"
+    )
+    return resp
+
+
+def _make_empty_response():
+    """Return a Mock that returns 200 OK but with zero parseable entries.
+
+    Mirrors the production failure mode for HT, The Wire, Quint, WION,
+    Zee News, Jansatta, NDTV Business, etc. — HTTP succeeds, the body
+    parses as a valid feed shell, but no items are present.
+    """
+    resp = MagicMock()
+    resp.raise_for_status.return_value = None
     resp.content = b"<?xml version='1.0'?><rss><channel><title>t</title></channel></rss>"
     return resp
 
@@ -132,5 +158,46 @@ def test_park_lifts_after_duration_elapses():
     # Rewind `parked_until` to the past, simulating 24h+ elapsed.
     with RSSFetcher._feed_health_lock:
         RSSFetcher._feed_health[source["url"]]["parked_until"] = 0.0
+
+    assert RSSFetcher._is_parked(source["url"]) is False
+
+
+def test_three_consecutive_empty_fetches_parks_feed():
+    """200 OK with zero parsed articles must count as a failure.
+
+    Production-driven regression: HT, The Wire, Quint, WION, Zee News,
+    Jansatta, and NDTV Business all return HTTP 200 with empty bodies for
+    hours. Without this contract they never trip the failure threshold
+    and burn a thread-pool slot on every run forever.
+    """
+    source = {"name": "Test", "url": "https://example.com/feed", "category_hint": "general"}
+    fetcher = RSSFetcher()
+
+    with patch("requests.Session.get", return_value=_make_empty_response()):
+        fetcher._fetch_feed(source)
+        fetcher._fetch_feed(source)
+        assert RSSFetcher._is_parked(source["url"]) is False  # 2 empties — still alive
+        fetcher._fetch_feed(source)
+
+    assert RSSFetcher._is_parked(source["url"]) is True
+
+
+def test_real_success_resets_empty_fetch_streak():
+    """A non-empty fetch must clear an in-progress empty-fetch streak."""
+    source = {"name": "Test", "url": "https://example.com/feed", "category_hint": "general"}
+    fetcher = RSSFetcher()
+
+    with patch("requests.Session.get") as mock_get:
+        # empty, empty, real success, empty, empty — only 2 trailing
+        # empties after the success, so the feed should NOT be parked.
+        mock_get.side_effect = [
+            _make_empty_response(),
+            _make_empty_response(),
+            _make_ok_response(),
+            _make_empty_response(),
+            _make_empty_response(),
+        ]
+        for _ in range(5):
+            fetcher._fetch_feed(source)
 
     assert RSSFetcher._is_parked(source["url"]) is False

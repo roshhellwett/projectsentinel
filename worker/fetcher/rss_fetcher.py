@@ -177,9 +177,6 @@ class RSSFetcher:
                 )
             return []
 
-        # HTTP succeeded — clear any prior failure streak / park.
-        self._record_success(url)
-
         for entry in feed.entries[:10]:
             try:
                 article = self._parse_entry(entry, source)
@@ -189,6 +186,25 @@ class RSSFetcher:
                 self.logger.log("RSS_PARSE", f"Failed to parse entry: {str(e)}")
                 continue
 
+        # Treat "200 OK but zero usable articles" as a failure. Publishers
+        # who silently break their RSS (HTML wall, empty feed shell, schema
+        # we can't parse) return HTTP success but contribute nothing to the
+        # pipeline. Without this branch, such feeds never trip the park
+        # threshold and waste a thread-pool slot on every run forever — the
+        # exact failure mode observed for HT, The Wire, Quint, WION, Zee
+        # News, Jansatta, NDTV Business, etc. in production logs.
+        if not articles:
+            just_parked = self._record_failure(url)
+            if just_parked:
+                self.logger.log(
+                    "RSS_PARK",
+                    f"Feed {name} parked for 24h after {self._FAIL_THRESHOLD} consecutive empty fetches",
+                )
+            return []
+
+        # At least one usable article — count the run as healthy and lift
+        # any prior failure streak / park.
+        self._record_success(url)
         return articles
 
     def _parse_entry(self, entry, source: dict) -> dict | None:
