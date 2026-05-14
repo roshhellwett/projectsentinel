@@ -47,12 +47,18 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
     } catch {
       const textArea = document.createElement('textarea');
       textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.opacity = '0';
       document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        textArea.select();
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } finally {
+        document.body.removeChild(textArea);
+      }
     }
   }, [url]);
 

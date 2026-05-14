@@ -29,8 +29,13 @@ export default function SavedPage() {
   const [selected, setSelected] = useState<Post | null>(null);
 
   // Stable sorted list of IDs — newest-saved last, so we reverse for the
-  // most recently bookmarked story on top.
-  const idList = useMemo(() => [...savedIds].reverse(), [savedIds]);
+  // most recently bookmarked story on top. The join(',') key prevents
+  // re-fetches when the Set identity changes but its contents haven't.
+  const idKey = useMemo(() => [...savedIds].join(','), [savedIds]);
+  const idList = useMemo(() => {
+    if (!idKey) return [];
+    return idKey.split(',').reverse();
+  }, [idKey]);
 
   useEffect(() => {
     if (idList.length === 0) {

@@ -146,7 +146,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
               <motion.button
                 whileTap={{ scale: 0.88 }}
                 onClick={onClose}
-                className="touch-polish p-2 hover:bg-slate-950/[0.06] active:bg-slate-950/[0.08] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/60 flex-shrink-0"
+                className="touch-polish p-2 hover:bg-slate-950/[0.06] active:bg-slate-950/[0.08] rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 flex-shrink-0"
                 aria-label="Close article"
               >
                 <X className="w-5 h-5 text-slate-500" />
@@ -171,7 +171,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 <CredibilityBadge score={post.credibility_score} showTooltip />
                 <span className="text-sm text-zinc-500">{post.source_count} sources</span>
                 <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
-                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}`} />
+                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
               </div>
 
               {/* Summary */}
@@ -208,7 +208,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             >
               <motion.a
                 whileTap={{ scale: 0.95 }}
-                href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}/`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="touch-polish flex items-center justify-center gap-2 px-4 py-3.5 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 hover:border-[#25D366]/50 text-[#25D366] font-semibold rounded-2xl transition-all duration-200 text-sm flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/60"

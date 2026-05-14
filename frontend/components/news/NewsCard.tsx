@@ -287,7 +287,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
 
           <div className="flex items-center gap-1">
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}/`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}

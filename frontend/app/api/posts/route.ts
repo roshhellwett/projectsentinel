@@ -9,8 +9,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const page = Number.parseInt(searchParams.get('page') || '1', 10);
-  const limit = Number.parseInt(searchParams.get('limit') || '20', 10);
+  const rawPage = Number.parseInt(searchParams.get('page') || '1', 10);
+  const rawLimit = Number.parseInt(searchParams.get('limit') || '20', 10);
+  const page = Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
+  const limit = Math.min(50, Math.max(1, Number.isFinite(rawLimit) ? rawLimit : 20));
   const category = searchParams.get('category') || undefined;
   
   try {
