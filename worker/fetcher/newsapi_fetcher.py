@@ -32,7 +32,14 @@ class NewsAPIFetcher:
     MAX_429_ROTATIONS = 6
 
     # In-body quota-exhaustion error codes returned with HTTP 200/401/429.
-    _QUOTA_CODES = {"rateLimited", "maximumResultsReached"}
+    # `rateLimited` / `maximumResultsReached` / `apiKeyExhausted` all reset
+    # at midnight UTC, so we park the slot for the day only.
+    _QUOTA_CODES = {"rateLimited", "maximumResultsReached", "apiKeyExhausted"}
+
+    # In-body codes that indicate the key is permanently dead (revoked or
+    # account-disabled). Treat these like an HTTP 401/403 — disable the slot
+    # globally so we don't waste another HTTP call on it.
+    _INVALID_KEY_CODES = {"apiKeyInvalid", "apiKeyDisabled"}
 
     _key_pool: Optional[KeyPool] = None
     _key_pool_lock = threading.Lock()
@@ -118,11 +125,21 @@ class NewsAPIFetcher:
                 response.raise_for_status()
                 data = response.json()
 
-                # NewsAPI uses status=error with code=rateLimited even on HTTP 200
-                # for some quota cases. Treat those as key exhaustion too.
+                # NewsAPI uses status=error with various in-body codes even on
+                # HTTP 200 for some quota / auth cases. Translate them to the
+                # right pool-level signal so the key gets parked correctly.
                 if data.get("status") != "ok":
                     code = data.get("code", "")
                     msg = data.get("message", "Unknown")
+                    if code in self._INVALID_KEY_CODES:
+                        pool.mark_invalid(slot_idx)
+                        rotations += 1
+                        self.logger.log(
+                            "NEWSAPI_ERROR",
+                            f"Key #{slot_idx + 1} permanently invalid ({code}), "
+                            f"disabling and rotating: {msg[:80]}",
+                        )
+                        continue
                     if code in self._QUOTA_CODES:
                         pool.mark_exhausted(slot_idx)
                         rotations += 1
@@ -131,6 +148,8 @@ class NewsAPIFetcher:
                             f"Key #{slot_idx + 1} quota error ({code}), rotating: {msg[:80]}",
                         )
                         continue
+                    # Unknown error code: log and bail out without penalizing
+                    # the key (it's likely a caller-side parameter mistake).
                     self.logger.log("NEWSAPI_ERROR", f"API error: {msg[:120]} (code={code})")
                     return []
 

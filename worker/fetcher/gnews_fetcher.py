@@ -116,6 +116,19 @@ class GNewsFetcher:
                     )
                     continue
 
+                # 401/403 = revoked / invalid / billing-suspended key. Disable
+                # the slot permanently and rotate so we never waste another HTTP
+                # call on it. Mirrors the Groq verifier and NewsAPI handling.
+                if response.status_code in (401, 403):
+                    pool.mark_invalid(slot_idx)
+                    rotations += 1
+                    self.logger.log(
+                        "GNEWS_ERROR",
+                        f"Key #{slot_idx + 1} returned {response.status_code} "
+                        f"(invalid/revoked), disabling and rotating",
+                    )
+                    continue
+
                 response.raise_for_status()
                 pool.record_success(slot_idx)
                 data = response.json()

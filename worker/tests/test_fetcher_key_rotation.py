@@ -224,22 +224,120 @@ def test_newsapi_rotates_on_in_body_quota_error(mock_get):
 
 
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
-def test_newsapi_non_quota_error_does_not_rotate(mock_get):
-    """status=error with a non-quota code should NOT mark the key exhausted."""
+def test_newsapi_unknown_error_code_does_not_penalize_key(mock_get):
+    """Truly-unknown error codes (e.g. caller-side parameter mistakes) must
+    NOT mark the key exhausted/invalid — the key is fine, the request was."""
     err = MagicMock()
     err.status_code = 200
     err.raise_for_status.return_value = None
-    err.json.return_value = {"status": "error", "code": "apiKeyInvalid", "message": "Bad key"}
+    err.json.return_value = {
+        "status": "error",
+        "code": "parameterInvalid",
+        "message": "Bad parameter",
+    }
     mock_get.return_value = err
 
-    with patch.dict(os.environ, {"NEWSAPI_KEY_1": "bad"}, clear=True):
+    with patch.dict(os.environ, {"NEWSAPI_KEY_1": "good"}, clear=True):
         NewsAPIFetcher._reset_pool()
         result = NewsAPIFetcher().fetch()
 
     assert result == []
     assert mock_get.call_count == 1  # No retry — bail immediately
-    # Pool still considers the key "available" since it wasn't a quota error.
+    # Pool still considers the key "available" since the key itself is fine.
     assert NewsAPIFetcher.has_quota() is True
+
+
+@patch("fetcher.newsapi_fetcher.requests.Session.get")
+def test_newsapi_api_key_invalid_permanently_disables_slot(mock_get):
+    """`apiKeyInvalid` in the response body means the key is revoked. The
+    slot must be permanently invalidated and rotation must occur — otherwise
+    every subsequent supplementary run burns a wasted HTTP call on a dead key.
+    """
+    bad = MagicMock()
+    bad.status_code = 200
+    bad.raise_for_status.return_value = None
+    bad.json.return_value = {"status": "error", "code": "apiKeyInvalid", "message": "Bad key"}
+
+    good = _mock_newsapi_ok()
+
+    # Bad key first, then good key on rotation.
+    mock_get.side_effect = [bad, good]
+
+    with patch.dict(os.environ, {"NEWSAPI_KEY_1": "bad", "NEWSAPI_KEY_2": "good"}, clear=True):
+        NewsAPIFetcher._reset_pool()
+        result = NewsAPIFetcher().fetch()
+
+    assert len(result) == 1
+    assert mock_get.call_count == 2  # rotated to the second key
+    # Only one key is left alive (the second one). The first must be permanently dead.
+    stats = NewsAPIFetcher._key_pool.get_stats()
+    assert stats[0]["skip_this_run"] is True
+
+
+@patch("fetcher.newsapi_fetcher.requests.Session.get")
+def test_newsapi_api_key_exhausted_rotates_and_recovers_next_day(mock_get):
+    """`apiKeyExhausted` is a daily-cap signal — park the slot for today
+    only, rotate to the next key, and let the underlying KeyPool reset
+    the slot at midnight UTC."""
+    quota = MagicMock()
+    quota.status_code = 200
+    quota.raise_for_status.return_value = None
+    quota.json.return_value = {
+        "status": "error",
+        "code": "apiKeyExhausted",
+        "message": "Daily quota hit",
+    }
+    good = _mock_newsapi_ok()
+
+    mock_get.side_effect = [quota, good]
+
+    with patch.dict(os.environ, {"NEWSAPI_KEY_1": "tired", "NEWSAPI_KEY_2": "fresh"}, clear=True):
+        NewsAPIFetcher._reset_pool()
+        result = NewsAPIFetcher().fetch()
+
+    assert len(result) == 1
+    assert mock_get.call_count == 2  # rotated past the exhausted key
+
+
+@patch("fetcher.gnews_fetcher.requests.Session.get")
+def test_gnews_401_permanently_disables_slot(mock_get):
+    """A 401/403 from GNews means the key is revoked. The slot must be
+    permanently invalidated and rotation must occur in the same call."""
+    revoked = MagicMock()
+    revoked.status_code = 401
+
+    good = _mock_gnews_ok()
+
+    mock_get.side_effect = [revoked, good]
+
+    with patch.dict(os.environ, {"GNEWS_API_KEY_1": "dead", "GNEWS_API_KEY_2": "alive"}, clear=True):
+        GNewsFetcher._reset_pool()
+        result = GNewsFetcher().fetch()
+
+    assert len(result) == 1
+    assert mock_get.call_count == 2  # rotated to the second key
+    stats = GNewsFetcher._key_pool.get_stats()
+    assert stats[0]["skip_this_run"] is True
+
+
+@patch("fetcher.gnews_fetcher.requests.Session.get")
+def test_gnews_403_permanently_disables_slot(mock_get):
+    """403 (forbidden / billing suspended) should behave identically to 401."""
+    revoked = MagicMock()
+    revoked.status_code = 403
+
+    good = _mock_gnews_ok()
+
+    mock_get.side_effect = [revoked, good]
+
+    with patch.dict(os.environ, {"GNEWS_API_KEY_1": "dead", "GNEWS_API_KEY_2": "alive"}, clear=True):
+        GNewsFetcher._reset_pool()
+        result = GNewsFetcher().fetch()
+
+    assert len(result) == 1
+    assert mock_get.call_count == 2
+    stats = GNewsFetcher._key_pool.get_stats()
+    assert stats[0]["skip_this_run"] is True
 
 
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
