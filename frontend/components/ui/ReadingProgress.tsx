@@ -84,11 +84,12 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
       style={{ top: 'calc(env(safe-area-inset-top, 0px) + 4rem)' }}
     >
       <div
-        className="h-full bg-gradient-to-r from-accent via-accent-hover to-accent origin-left transition-opacity duration-300"
+        className="h-full origin-left transition-opacity duration-300"
         style={{
           transform: `scaleX(${progress})`,
           opacity: visible ? 1 : 0,
-          boxShadow: '0 0 12px rgba(10, 132, 255, 0.55)',
+          background: 'linear-gradient(to right, #8b7ff0, #a08cdc, #8b7ff0)',
+          boxShadow: '0 0 12px rgba(139, 127, 240, 0.55)',
           willChange: 'transform, opacity',
         }}
       />

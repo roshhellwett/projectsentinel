@@ -25,12 +25,12 @@ export function newsArticleJsonLd(post: Post): object {
       },
     },
     articleSection: post.category,
-    url: `${siteUrl}/news/${post.id}`,
+    url: `${siteUrl}/news/${post.id}/`,
     credibilityScore: post.credibility_score,
     sourceCount: post.source_count,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${siteUrl}/news/${post.id}`,
+      '@id': `${siteUrl}/news/${post.id}/`,
     },
   };
 }
@@ -49,7 +49,7 @@ export function websiteJsonLd(): object {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/?q={search_term_string}`,
+        urlTemplate: `${siteUrl}/search/?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },

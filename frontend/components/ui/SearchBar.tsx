@@ -145,7 +145,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="touch-polish p-2 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent active:bg-slate-950/[0.08]"
+                className="touch-polish p-2 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:bg-slate-950/[0.08]"
                 aria-label="Close search"
               >
                 <X className="w-6 h-6 text-slate-500" />
@@ -188,7 +188,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 </div>
               )}
               {error && (
-                <p className="text-center text-cred-low py-8">{error}</p>
+                <p className="text-center text-red-500 py-8">{error}</p>
               )}
               {query.trim() && !isLoading && !error && (
                 <p className="text-sm text-slate-500 mb-4">

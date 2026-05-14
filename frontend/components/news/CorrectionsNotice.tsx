@@ -16,12 +16,12 @@ export function CorrectionsNotice({ type, note }: CorrectionsNoticeProps) {
     <div className={`mb-6 p-4 rounded-lg ${isRetracted ? 'bg-red-500/10 border border-red-500/30' : 'bg-amber-500/10 border border-amber-500/30'}`}>
       <div className="flex items-start gap-3">
         {isRetracted ? (
-          <XCircle className="w-5 h-5 text-cred-low flex-shrink-0 mt-0.5" />
+          <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
         ) : (
-          <AlertTriangle className="w-5 h-5 text-cred-mid flex-shrink-0 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         )}
         <div>
-          <h4 className={`font-medium ${isRetracted ? 'text-cred-low' : 'text-cred-mid'}`}>
+          <h4 className={`font-medium ${isRetracted ? 'text-red-700' : 'text-amber-700'}`}>
             {isRetracted ? 'Article Retracted' : 'Correction Notice'}
           </h4>
           {note && (
@@ -34,3 +34,4 @@ export function CorrectionsNotice({ type, note }: CorrectionsNoticeProps) {
     </div>
   );
 }
+

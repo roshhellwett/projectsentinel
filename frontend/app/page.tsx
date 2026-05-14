@@ -38,7 +38,8 @@ export default async function HomePage() {
     .sort((a, b) => b.score - a.score)
     .slice(0, 5)
     .map(({ post }) => post);
-  const trendingIds = new Set(trendingPosts.map((p) => p.id));
+  const trendingIdList = trendingPosts.map((p) => p.id);
+  const trendingIds = new Set(trendingIdList);
 
   // Count of stories that landed in the last 24h — surfaced in the hero
   // as social proof of how active the verification pipeline is.
@@ -125,8 +126,8 @@ export default async function HomePage() {
           </div>
           <InfiniteFeed
             initialPosts={feedPosts}
-            initialCount={Math.max(0, postsResult.count - trendingIds.size - (heroPost ? 1 : 0))}
-            excludeIds={trendingIds}
+            initialCount={Math.max(0, postsResult.count - trendingIdList.length - (heroPost ? 1 : 0))}
+            excludeIds={[...trendingIdList, ...(heroPost ? [heroPost.id] : [])]}
           />
         </section>
       </div>

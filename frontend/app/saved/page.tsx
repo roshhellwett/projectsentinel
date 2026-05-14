@@ -120,7 +120,7 @@ export default function SavedPage() {
       )}
 
       {!loading && error && (
-        <p className="text-center text-cred-low py-12">{error}</p>
+        <p className="text-center text-red-500 py-12">{error}</p>
       )}
 
       {!loading && !error && posts.length === 0 && (

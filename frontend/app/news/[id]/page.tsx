@@ -137,7 +137,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </h1>
 
             {/* Score Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 py-6 border-y border-slate-950/[0.08] mb-8 bg-white/55 -mx-8 px-8">
+            <div className="flex flex-wrap items-center justify-between gap-4 py-6 border-y border-slate-950/[0.08] mb-8 bg-white/55 -mx-8 px-8 md:-mx-12 md:px-12">
               <div className="flex flex-wrap items-center gap-4">
                 <CredibilityBadge score={post.credibility_score} showTooltip />
                 <div className="hidden sm:block w-px h-6 bg-slate-950/10" />

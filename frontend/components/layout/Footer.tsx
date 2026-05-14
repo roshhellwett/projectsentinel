@@ -29,8 +29,15 @@ export function Footer() {
           {/* Column 1 — Brand */}
           <div>
             <Link href="/" className="touch-polish inline-flex items-center gap-2.5 group mb-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
-              <div className="w-9 h-9 rounded-xl premium-orb border border-slate-950/[0.10] flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-                <span className="text-[13px] font-black text-white tracking-tight leading-none drop-shadow">IV</span>
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(145deg, #111111, #0a0a0a)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px -8px rgba(0,0,0,0.35)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
+              >
+                <span className="text-[12px] font-light text-white/90 tracking-[0.15em] leading-none" style={{ letterSpacing: '0.15em' }}>IV</span>
               </div>
               <span className="text-[15px] font-semibold tracking-tight text-slate-950">India Verified</span>
             </Link>

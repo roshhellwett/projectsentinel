@@ -34,8 +34,10 @@ interface InfiniteFeedProps {
   initialCount: number;
   category?: string;
   pageSize?: number;
-  /** IDs to always exclude (e.g. hero + trending on homepage) */
-  excludeIds?: Set<string>;
+  /** IDs to always exclude (e.g. hero + trending on homepage).
+   *  Passed as a plain array because Set is not serializable across
+   *  the Next.js Server→Client Component boundary. */
+  excludeIds?: string[];
 }
 
 const POLL_INTERVAL_MS = 30_000;
@@ -90,6 +92,13 @@ export function InfiniteFeed({
   pageSize = 20,
   excludeIds,
 }: InfiniteFeedProps) {
+  // Convert the serialised array to a Set once for O(1) lookups.
+  const excludeSet = useMemo(
+    () => (excludeIds && excludeIds.length > 0 ? new Set(excludeIds) : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [excludeIds?.join(',')],
+  );
+
   // Dedupe initial just in case
   const dedupedInitial = dedupeById(initialPosts);
 
@@ -112,8 +121,8 @@ export function InfiniteFeed({
   postsRef.current = posts;
 
   // Keep a stable reference to excludeIds for callbacks
-  const excludeIdsRef = useRef(excludeIds);
-  excludeIdsRef.current = excludeIds;
+  const excludeIdsRef = useRef(excludeSet);
+  excludeIdsRef.current = excludeSet;
 
   // ── Infinite scroll: load next page when sentinel intersects ──
   const loadMore = useCallback(async () => {

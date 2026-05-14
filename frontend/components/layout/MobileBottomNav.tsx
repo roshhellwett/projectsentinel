@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Home, Search, LayoutGrid, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
@@ -24,6 +25,14 @@ export function MobileBottomNav() {
 
   const closeTopics = useCallback(() => setTopicsOpen(false), []);
   const toggleTopics = useCallback(() => setTopicsOpen((v) => !v), []);
+
+  // Lock body scroll when topics sheet is open so the user can't
+  // scroll the feed behind the translucent overlay.
+  useEffect(() => {
+    if (!topicsOpen) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [topicsOpen]);
 
   const isActive = (id: string, href: string | null) => {
     if (id === 'topics') return topicsOpen || pathname.startsWith('/category/');

@@ -121,7 +121,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
               className="touch-polish flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-[0.985] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-cred-high" />
+                <Check className="w-4 h-4 text-emerald-500" />
               ) : (
                 <LinkIcon className="w-4 h-4" />
               )}
