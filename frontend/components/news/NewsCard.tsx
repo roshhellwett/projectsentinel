@@ -7,6 +7,7 @@ import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { truncateWords } from '@/lib/utils/truncate';
 import { cn } from '@/lib/utils/cn';
+import { getHostname } from '@/lib/utils/getHostname';
 import { BookmarkButton } from './BookmarkButton';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 import { getScoreHex } from '@/lib/utils/scoreColor';
@@ -89,14 +90,6 @@ function CredibilityGauge({ score }: { score: number }) {
 // chip and you go straight to the original article without dismissing the
 // card itself (stopPropagation on the card-level onClick).
 // ─────────────────────────────────────────────────────────────────────────────
-function getHostname(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
-
 function getSourceLabel(source: Source): string {
   if (source.title?.trim()) return source.title.trim();
   if (source.name?.trim())  return source.name.trim();
@@ -167,7 +160,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
   };
 
   return (
-    <motion.article
+    <motion.div
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -300,7 +293,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           </div>
         </div>
       </div>
-    </motion.article>
+    </motion.div>
   );
 };
 

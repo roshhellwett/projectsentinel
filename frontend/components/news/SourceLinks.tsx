@@ -9,23 +9,17 @@
 import { useState } from 'react';
 import { ExternalLink, Globe } from 'lucide-react';
 import { Source } from '@/types';
+import { getHostname } from '@/lib/utils/getHostname';
 
 interface SourceLinksProps {
   sources: Source[];
 }
 
-function getHostname(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return null;
-  }
-}
-
 function getSourceLabel(source: Source): string {
   if (source.title && source.title.trim()) return source.title.trim();
   if (source.name && source.name.trim()) return source.name.trim();
-  return getHostname(source.url) ?? source.url ?? 'Source';
+  const host = getHostname(source.url);
+  return host || source.url || 'Source';
 }
 
 function SourceFavicon({ url }: { url: string }) {

@@ -64,6 +64,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
     const focusable = drawerRef.current.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
+    if (focusable.length === 0) return;
     const first = focusable[0] as HTMLElement;
     const last = focusable[focusable.length - 1] as HTMLElement;
 

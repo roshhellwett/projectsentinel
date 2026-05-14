@@ -18,6 +18,7 @@ interface CorrectionFormProps {
 export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   const [note, setNote] = useState(post.correction_note || '');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Lock body scroll while modal is open
   useEffect(() => {
@@ -37,6 +38,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
     try {
       const token = document.cookie
@@ -58,9 +60,12 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
       
       if (response.ok) {
         window.location.reload();
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setError(data?.error || `Request failed (${response.status})`);
       }
-    } catch (error) {
-      console.error('Failed to update:', error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
     } finally {
       setLoading(false);
     }
@@ -83,6 +88,11 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
         </p>
         
         <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {error}
+            </div>
+          )}
           <label className="block text-sm text-slate-600 mb-2">
             {type === 'corrected' ? 'Correction Note' : 'Retraction Reason'}
           </label>

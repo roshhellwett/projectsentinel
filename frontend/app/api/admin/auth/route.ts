@@ -5,14 +5,21 @@
 import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_SECRET = process.env.ADMIN_SECRET_TOKEN || '';
 
 export async function POST(request: Request) {
   try {
+    if (!ADMIN_PASSWORD) {
+      return NextResponse.json(
+        { success: false, error: 'Admin password not configured' },
+        { status: 500 }
+      );
+    }
+
     const { password } = await request.json();
     
-    if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { success: false, error: 'Invalid password' },
         { status: 401 }

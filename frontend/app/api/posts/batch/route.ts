@@ -8,25 +8,13 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types';
+import { getSupabaseServer } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_IDS = 100;
-
-let supabase: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
-  if (supabase) return supabase;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Supabase env vars missing');
-  supabase = createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  return supabase;
-}
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -53,7 +41,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data, error } = await getSupabase()
+    const { data, error } = await getSupabaseServer()
       .from('posts')
       .select('*')
       .in('id', valid);

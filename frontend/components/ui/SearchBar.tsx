@@ -75,22 +75,18 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   }, [query, isOpen]);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      lockBodyScroll();
-
-      return () => {
-        document.removeEventListener('keydown', handleEscape);
-        unlockBodyScroll();
-      };
-    }
+    document.addEventListener('keydown', handleEscape);
+    lockBodyScroll();
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
+      unlockBodyScroll();
     };
   }, [isOpen, onClose]);
 

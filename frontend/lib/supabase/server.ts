@@ -11,7 +11,7 @@ const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
 
 let supabaseServerInstance: ReturnType<typeof createClient> | null = null;
 
-function getSupabaseServer() {
+export function getSupabaseServer() {
   if (supabaseServerInstance) return supabaseServerInstance;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -110,26 +110,6 @@ export async function fetchPostById(id: string): Promise<Post | null> {
       throw new Error(`fetchPostById error: ${error.message}`);
     }
 
-    return data as Post;
-  }).catch(() => null);
-}
-
-// Fetch trending post (highest score in last 24h)
-export async function fetchTrendingPost(): Promise<Post | null> {
-  return withRetry(async () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const { data, error } = await getSupabaseServer()
-      .from('posts')
-      .select('*')
-      .eq('status', 'published')
-      .gte('published_at', yesterday.toISOString())
-      .order('credibility_score', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (error) return null;
     return data as Post;
   }).catch(() => null);
 }

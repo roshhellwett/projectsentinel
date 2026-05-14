@@ -15,41 +15,18 @@
 
 import { ImageResponse } from 'next/og';
 import { fetchPostById } from '@/lib/supabase/server';
+import { getScoreHex } from '@/lib/utils/scoreColor';
+import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { getHostname } from '@/lib/utils/getHostname';
 
 export const alt = 'India Verified — AI-verified news story';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Visual system — must mirror the in-app card (NewsCard.tsx) so users get a
-// consistent identity between social preview and the live site.
+// Visual system — mirrors the canonical theme tokens (categoryTheme.ts,
+// scoreColor.ts, getHostname.ts) so social unfurls match the live UI.
 // ─────────────────────────────────────────────────────────────────────────────
-const CATEGORY_META: Record<string, { color: string; label: string }> = {
-  politics:      { color: '#7c3aed', label: 'Politics' },
-  business:      { color: '#059669', label: 'Business' },
-  sports:        { color: '#ea580c', label: 'Sports' },
-  tech:          { color: '#2563eb', label: 'Tech' },
-  crime:         { color: '#dc2626', label: 'Crime' },
-  science:       { color: '#0891b2', label: 'Science' },
-  health:        { color: '#16a34a', label: 'Health' },
-  world:         { color: '#db2777', label: 'World' },
-  entertainment: { color: '#ca8a04', label: 'Entertainment' },
-  education:     { color: '#9333ea', label: 'Education' },
-};
-
-function scoreColor(score: number): string {
-  if (score >= 90) return '#10b981';
-  if (score >= 70) return '#8b7ff0';
-  return '#f59e0b';
-}
-
-function hostnameOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -87,8 +64,8 @@ export default async function PostOgImage(
     );
   }
 
-  const meta = CATEGORY_META[post.category] ?? { color: '#475569', label: 'News' };
-  const gauge = scoreColor(post.credibility_score);
+  const theme = getCategoryTheme(post.category);
+  const gauge = getScoreHex(post.credibility_score);
   const sources = (post.sources ?? []).slice(0, 3);
   const extra = Math.max(0, (post.source_count ?? 0) - sources.length);
 
@@ -132,7 +109,7 @@ export default async function PostOgImage(
             left: 0,
             right: 0,
             height: 6,
-            backgroundColor: meta.color,
+            backgroundColor: theme.hex,
           }}
         />
 
@@ -153,8 +130,8 @@ export default async function PostOgImage(
               gap: 14,
               padding: '10px 20px',
               borderRadius: 999,
-              backgroundColor: `${meta.color}14`,
-              border: `1px solid ${meta.color}33`,
+              backgroundColor: `${theme.hex}14`,
+              border: `1px solid ${theme.hex}33`,
             }}
           >
             <div
@@ -162,19 +139,19 @@ export default async function PostOgImage(
                 width: 12,
                 height: 12,
                 borderRadius: '50%',
-                backgroundColor: meta.color,
+                backgroundColor: theme.hex,
               }}
             />
             <span
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                color: meta.color,
+                color: theme.hex,
                 textTransform: 'uppercase',
                 letterSpacing: '2px',
               }}
             >
-              {meta.label}
+              {theme.label}
             </span>
           </div>
 
@@ -390,7 +367,7 @@ export default async function PostOgImage(
             </div>
 
             {sources.map((s, i) => {
-              const host = hostnameOf(s.url);
+              const host = getHostname(s.url);
               const label = (s.title || s.name || host || 'Source').slice(0, 24);
               if (!label) return null;
               return (

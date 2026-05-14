@@ -22,6 +22,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Post } from '@/types';
+import { dedupe } from '@/lib/utils/dedupe';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
 import { LiveUpdateIsland } from './LiveUpdateIsland';
@@ -62,29 +63,6 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 360, damping: 30, mass: 0.6 } },
 };
 
-/**
- * Dedupe an array of posts by `id` in place. In dev, logs removed titles.
- */
-function dedupeById(posts: Post[]): Post[] {
-  const seen = new Set<string>();
-  const dupes: string[] = [];
-  const result = posts.filter((p) => {
-    if (seen.has(p.id)) {
-      dupes.push(p.headline);
-      return false;
-    }
-    seen.add(p.id);
-    return true;
-  });
-  if (dupes.length > 0 && process.env.NODE_ENV === 'development') {
-    console.warn(
-      `[InfiniteFeed dedupe] Removed ${dupes.length} duplicate(s):`,
-      dupes,
-    );
-  }
-  return result;
-}
-
 export function InfiniteFeed({
   initialPosts,
   initialCount,
@@ -100,7 +78,7 @@ export function InfiniteFeed({
   );
 
   // Dedupe initial just in case
-  const dedupedInitial = dedupeById(initialPosts);
+  const dedupedInitial = dedupe(initialPosts);
 
   const [posts, setPosts] = useState<Post[]>(dedupedInitial);
   const [page, setPage] = useState(1);
@@ -143,7 +121,7 @@ export function InfiniteFeed({
         const incoming = data.posts.filter(
           (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
         );
-        return dedupeById([...prev, ...incoming]);
+        return dedupe([...prev, ...incoming]);
       });
       setPage(next);
       // Exhaust when the server returned fewer items than requested — that
@@ -245,7 +223,7 @@ export function InfiniteFeed({
     const queued = pendingRef.current;
     if (queued.length === 0) return;
     setPendingNew([]);
-    setPosts((prev) => dedupeById([...queued, ...prev]));
+    setPosts((prev) => dedupe([...queued, ...prev]));
     const ids = queued.map((p) => p.id);
     flashFresh(ids);
     markDismissed(ids);
@@ -264,7 +242,7 @@ export function InfiniteFeed({
   const openFromIsland = useCallback((newest: Post) => {
     const queued = pendingRef.current;
     setPendingNew([]);
-    setPosts((prev) => dedupeById([newest, ...queued.filter((p) => p.id !== newest.id), ...prev]));
+    setPosts((prev) => dedupe([newest, ...queued.filter((p) => p.id !== newest.id), ...prev]));
     flashFresh(queued.map((p) => p.id));
     markDismissed(queued.map((p) => p.id));
     markRead(newest.id);
@@ -321,10 +299,10 @@ export function InfiniteFeed({
     const userIsReading = scrollY > QUEUE_THRESHOLD_PX;
 
     if (userIsReading) {
-      setPendingNew((curr) => dedupeById([...fresh, ...curr]));
+      setPendingNew((curr) => dedupe([...fresh, ...curr]));
     } else {
       flashFresh(fresh.map((p) => p.id));
-      setPosts((prev) => dedupeById([...fresh, ...prev]));
+      setPosts((prev) => dedupe([...fresh, ...prev]));
     }
   }, [category, flashFresh]);
 
