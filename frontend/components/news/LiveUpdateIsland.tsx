@@ -120,7 +120,7 @@ export function LiveUpdateIsland({ pending, onTap }: LiveUpdateIslandProps) {
             initial={{ opacity: 0, scale: 0.55, y: -12, filter: 'blur(6px)' }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 0.6, y: -10, filter: 'blur(4px)' }}
-            transition={{ type: 'spring', stiffness: 360, damping: 28, mass: 0.7 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 26, mass: 0.75 }}
             whileHover={{ y: 1, scale: 1.015 }}
             whileTap={{ scale: 0.965 }}
             aria-label={`${count} new ${count === 1 ? 'story' : 'stories'} — tap to view`}

@@ -60,7 +60,7 @@ export function MobileBottomNav() {
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.85 }}
               className="absolute left-3 right-3 rounded-3xl overflow-hidden bg-white/92 backdrop-blur-2xl border border-slate-950/[0.10] shadow-2xl"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >

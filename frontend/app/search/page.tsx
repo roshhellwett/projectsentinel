@@ -52,7 +52,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14 max-w-6xl">
-      <div className="premium-card mb-8 rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
+      <div className="premium-card mb-8 rounded-[2rem] px-6 py-8 md:px-10 md:py-10 animate-fade-in-up">
         <p className="editorial-kicker mb-3">
           {query ? 'Search Results' : 'Search'}
         </p>

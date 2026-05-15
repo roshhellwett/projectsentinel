@@ -15,7 +15,7 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
+    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center animate-fade-in-up">
       <div className="w-20 h-20 rounded-full bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mb-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
         <AlertTriangle className="w-10 h-10 text-red-500" />
       </div>
@@ -24,16 +24,16 @@ export default function Error({ error, reset }: ErrorProps) {
         An unexpected error occurred. Try refreshing the page or go back to the homepage.
       </p>
       <div className="flex gap-3">
-        <button
-          onClick={reset}
-          className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-semibold hover:bg-accent-hover transition-all active:scale-95 shadow-glow-accent hover:shadow-glow-accent-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          <button
+            onClick={reset}
+            className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-semibold hover:bg-accent-hover transition-all duration-200 ease-smooth active:scale-95 shadow-glow-accent hover:shadow-glow-accent-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <RefreshCw className="w-4 h-4" />
           Try again
         </button>
         <Link
           href="/"
-          className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-950/[0.12] text-slate-700 font-semibold hover:bg-slate-950/[0.06] transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+          className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-950/[0.12] text-slate-700 font-semibold hover:bg-slate-950/[0.06] transition-all duration-200 ease-smooth active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
         >
           Go home
         </Link>

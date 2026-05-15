@@ -63,7 +63,7 @@ export function CategoryBar() {
                 className="touch-polish relative isolate group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               >
                 <span
-                  className={`relative z-10 inline-flex items-center px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all duration-200 active:scale-95 ${
+                  className={`relative z-10 inline-flex items-center px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all duration-250 ease-smooth active:scale-95 ${
                     isActive
                       ? 'text-slate-950'
                       : 'text-slate-500 group-hover:text-slate-950'
@@ -73,7 +73,7 @@ export function CategoryBar() {
                     <motion.span
                       layoutId="activeCategoryPill"
                       className="absolute inset-0 -z-10 rounded-full bg-white border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_-18px_rgba(139,127,240,0.55)]"
-                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 30, mass: 0.8 }}
                     />
                   )}
                   {!isActive && (

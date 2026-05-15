@@ -59,8 +59,8 @@ const QUEUE_THRESHOLD_PX = 220;
 const AUTO_FLUSH_AT_SCROLL_Y = 140;
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 360, damping: 30, mass: 0.6 } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 340, damping: 28, mass: 0.55 } },
 };
 
 export function InfiniteFeed({

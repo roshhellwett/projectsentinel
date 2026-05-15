@@ -61,13 +61,13 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             key={post.id}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-30px' }}
-            transition={{ delay: index * 0.05, duration: 0.4 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ delay: index * 0.05, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           >
             <Link
               href={`/news/${post.id}/`}
               data-read={read ? 'true' : 'false'}
-              className={`touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset ${read ? 'opacity-60' : ''}`}
+              className={`touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset ${read ? 'opacity-60' : ''}`}
               aria-label={read ? `${post.headline} (already read)` : post.headline}
             >
               {/* Category colour left bar */}

@@ -24,7 +24,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
     >
       <Link
         href={`/news/${post.id}/`}
-        className="touch-polish premium-card premium-card-hover block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="touch-polish premium-card premium-card-hover hover-lift block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {/* Gradient accent bar */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
@@ -78,9 +78,9 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
                 </span>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-2.5 transition-all duration-300">
+              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-3 transition-all duration-250 ease-smooth">
                 Read full story
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-250 ease-smooth" />
               </span>
             </div>
           </div>

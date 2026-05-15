@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md animate-fade-in-up">
         <div className="premium-card rounded-2xl p-8">
           <div className="flex items-center justify-center mb-6">
             <div className="w-12 h-12 bg-accent/15 border border-accent/30 rounded-xl flex items-center justify-center">

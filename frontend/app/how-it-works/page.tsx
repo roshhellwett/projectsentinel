@@ -131,7 +131,7 @@ export default function HowItWorksPage() {
       />
 
       {/* Hero */}
-      <div className="premium-card text-center mb-16 relative rounded-[2rem] px-6 py-12 md:px-10 md:py-16">
+      <div className="premium-card text-center mb-16 relative rounded-[2rem] px-6 py-12 md:px-10 md:py-16 animate-fade-in-up">
         <div className="absolute inset-0 -z-10 flex justify-center">
           <div className="w-72 h-72 bg-accent/[0.04] rounded-full blur-3xl" />
         </div>

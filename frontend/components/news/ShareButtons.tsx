@@ -95,10 +95,10 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
           <motion.div
             key="share-menu"
             className="absolute right-0 top-full mt-2 z-50 bg-white/95 backdrop-blur-2xl rounded-2xl border border-slate-950/[0.10] shadow-2xl p-2 min-w-[200px]"
-            initial={{ opacity: 0, y: -4, scale: 0.96 }}
+            initial={{ opacity: 0, y: -6, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
           >
             <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-slate-950/[0.08]">
               {SHARE_PLATFORMS.map((platform) => (
