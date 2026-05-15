@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock } from 'lucide-react';
+import { setCookie } from '@/lib/utils/cookies';
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
@@ -22,16 +23,21 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ password })
       });
 
+      if (!response.ok) {
+        throw new Error('Authentication failed');
+      }
+
       const data = await response.json();
 
-      if (data.success) {
-        document.cookie = `admin_token=${data.token}; path=/; max-age=86400; SameSite=Strict; Secure`;
-        router.push('/admin/');
-      } else {
-        setError('Invalid password');
+      if (!data.success || !data.token) {
+        setError(data.message || 'Invalid password');
+        return;
       }
-    } catch {
-      setError('Login failed');
+
+      setCookie('admin_token', data.token, { maxAge: 86400, path: '/', sameSite: 'Strict' });
+      router.push('/admin/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }
