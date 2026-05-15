@@ -9,8 +9,8 @@ import { truncateWords } from '@/lib/utils/truncate';
 import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
 import { BookmarkButton } from './BookmarkButton';
+import { CredibilityBar } from './CredibilityBar';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
-import { getScoreHex } from '@/lib/utils/scoreColor';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
@@ -25,64 +25,6 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.verc
 // same hue for a given category. Score tier comes from `scoreColor.ts` so
 // the gauge agrees with the trending badge on every borderline score.
 // ─────────────────────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CredibilityGauge — animated circular SVG arc. The HERO element of the card.
-// On mount, the ring fills from 0 to the score over ~1.1s with an ease-out
-// cubic so it lands in a way that draws the eye without being theatrical.
-// Colour band: 90+ green (trustworthy), 70–89 amber (caveat), <70 red (low).
-// ─────────────────────────────────────────────────────────────────────────────
-function CredibilityGauge({ score }: { score: number }) {
-  const size = 48;
-  const stroke = 4;
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const clamped = Math.max(0, Math.min(100, score));
-  const offset = circumference * (1 - clamped / 100);
-
-  // Single source of truth for credibility colour bands (90+/70+/<70). The
-  // previous local 85/70 thresholds caused the same score (e.g. 87) to
-  // render green here but amber in the trending list — visible drift on the
-  // home page.
-  const color = getScoreHex(clamped);
-
-  return (
-    <div
-      className="relative inline-flex flex-shrink-0"
-      style={{ width: size, height: size }}
-      aria-label={`AI credibility score: ${score} out of 100`}
-      role="img"
-    >
-      <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
-        <circle
-          cx={size / 2} cy={size / 2} r={radius}
-          stroke="#e2e8f0"
-          strokeWidth={stroke}
-          fill="none"
-        />
-        <motion.circle
-          cx={size / 2} cy={size / 2} r={radius}
-          stroke={color}
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          fill="none"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center leading-none">
-        <span
-          className="text-[13px] font-semibold tabular-nums"
-          style={{ color, fontFamily: 'var(--font-geist-mono)' }}
-        >
-          {score}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SourceChip — single tappable pill with favicon + name. This is the TRUST
@@ -236,7 +178,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             )}
           </div>
 
-          <CredibilityGauge score={post.credibility_score} />
+          <CredibilityBar score={post.credibility_score} />
         </div>
 
         {/* ── Headline (serif, the visual anchor of the card) ── */}
