@@ -104,7 +104,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                 </div>
 
                 <div className="hidden min-[360px]:block flex-shrink-0 w-24 sm:w-28">
-                  <CredibilityBar score={post.credibility_score} />
+                  <CredibilityBar score={post.credibility_score} compact />
                 </div>
 
                 <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-accent group-hover:translate-x-1 transition-all duration-200 flex-shrink-0" />

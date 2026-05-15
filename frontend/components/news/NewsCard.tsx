@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Check, ShieldCheck } from 'lucide-react';
 import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { truncateWords } from '@/lib/utils/truncate';
@@ -10,20 +10,21 @@ import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
 import { BookmarkButton } from './BookmarkButton';
 import { CredibilityBar } from './CredibilityBar';
+import { SourcePickerButton } from './SourcePickerButton';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Design system: ONE accent colour per category, used sparingly (small chip
-// + hover left-edge bar + score-gauge ring tint). The card body stays neutral
+// + hover left-edge bar + score bar detail). The card body stays neutral
 // so the feed reads as a single cohesive surface, not a patchwork of pastels.
 // Premium aesthetic reference: linear.app, vercel.com, apple.com/newsroom.
 //
 // Colour is resolved through `lib/theme/categoryTheme` so this card, the
 // trending list, the badge pill, and the hero placeholder all share the
 // same hue for a given category. Score tier comes from `scoreColor.ts` so
-// the gauge agrees with the trending badge on every borderline score.
+// every credibility bar agrees on borderline scores.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -115,7 +116,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       whileTap={{ scale: 0.975, transition: { duration: 0.1 } }}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'news-card-premium group relative flex flex-col h-full cursor-pointer overflow-hidden',
+        'news-card-premium group relative isolate flex flex-col h-full cursor-pointer overflow-visible',
         'rounded-3xl bg-white border border-slate-200/70',
         'shadow-[0_1px_2px_rgba(15,23,42,0.04),0_2px_8px_rgba(15,23,42,0.04)]',
         'smooth-shadow',
@@ -124,7 +125,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         isRead && 'opacity-70',
         isNew && 'flash-new-post',
       )}
-      style={{ contain: 'layout paint' }}
+      style={{ contain: 'layout' }}
     >
       {/* Left-edge accent bar — appears on hover, hue matches category */}
       <span
@@ -134,7 +135,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       />
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
-        {/* ── Top row: category + breaking + timestamp · gauge ── */}
+        {/* ── Top row: category + breaking + timestamp + score ── */}
         <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-2 flex-wrap min-w-0">
             <span
@@ -178,7 +179,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             )}
           </div>
 
-          <CredibilityBar score={post.credibility_score} className="sm:w-32" />
+          <CredibilityBar score={post.credibility_score} compact className="sm:w-32" />
         </div>
 
         {/* ── Headline (serif, the visual anchor of the card) ── */}
@@ -213,12 +214,13 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         )}
 
         {/* ── Bottom action row ── */}
-        <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
-          <span className="text-[10px] text-slate-500 inline-flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: theme.hex }} />
-            Read full story
-            <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-          </span>
+        <div className="relative z-20 flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
+          <SourcePickerButton
+            sources={post.sources}
+            label="Read full"
+            className="max-w-[58%]"
+            buttonClassName="px-3 py-1.5 text-[10px] font-semibold"
+          />
 
           <div className="flex items-center gap-1">
             <a

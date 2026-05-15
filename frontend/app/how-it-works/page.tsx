@@ -201,21 +201,21 @@ export default function HowItWorksPage() {
             range="90-100"
             label="High Credibility"
             color="text-cred-high"
-            ringColor="border-cred-high/20"
+            borderColor="border-cred-high/20"
             description="Multiple reputable sources agree, named officials cited, specific details provided."
           />
           <ScoreCard
             range="70-89"
             label="Moderate Credibility"
             color="text-cred-mid"
-            ringColor="border-cred-mid/20"
+            borderColor="border-cred-mid/20"
             description="Some sources agree, but fewer details or less authoritative sources."
           />
           <ScoreCard
             range="0-69"
             label="Low Credibility"
             color="text-cred-low"
-            ringColor="border-cred-low/20"
+            borderColor="border-cred-low/20"
             description="Vague claims, anonymous sources only, or emotionally manipulative language."
           />
         </div>
@@ -248,17 +248,17 @@ function ScoreCard({
   range,
   label,
   color,
-  ringColor,
+  borderColor,
   description,
 }: {
   range: string;
   label: string;
   color: string;
-  ringColor: string;
+  borderColor: string;
   description: string;
 }) {
   return (
-    <div className={`premium-card premium-card-hover rounded-2xl p-6 border ${ringColor}`}>
+    <div className={`premium-card premium-card-hover rounded-2xl p-6 border ${borderColor}`}>
       <div className={`relative z-10 inline-block px-3.5 py-1.5 bg-white/70 border border-slate-950/[0.10] ${color} text-sm font-bold rounded-xl mb-3`}>
         {range}
       </div>

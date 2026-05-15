@@ -95,7 +95,7 @@ export function MobileBottomNav() {
       </AnimatePresence>
 
       {/* Bottom navigation bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[57]" aria-label="Mobile navigation">
+      <nav className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57]" aria-label="Mobile navigation">
         <div
           className="relative border-t border-slate-950/[0.08] bg-white/82 backdrop-blur-2xl shadow-[0_-18px_55px_-42px_rgba(15,23,42,0.24)]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}

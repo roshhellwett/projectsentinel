@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { fetchPostById, fetchPosts } from '@/lib/supabase/server';
 import { CategoryTag } from '@/components/news/CategoryTag';
-import { CredibilityBadge } from '@/components/news/CredibilityBadge';
 import { CredibilityBar } from '@/components/news/CredibilityBar';
 import { SourceLinks } from '@/components/news/SourceLinks';
 import { CorrectionsNotice } from '@/components/news/CorrectionsNotice';
@@ -117,10 +116,10 @@ export default async function NewsPage({ params }: NewsPageProps) {
         )}
 
         {/* Article Header Card */}
-        <article id="article-body" className={`premium-card relative rounded-[2rem] overflow-hidden mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
+        <article id="article-body" className={`premium-card relative rounded-[2rem] overflow-hidden mb-10 md:mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
           
-          <div className="p-8 md:p-12">
+          <div className="p-5 sm:p-8 md:p-12">
             <div className="flex flex-wrap items-center gap-3 mb-6">
               <CategoryTag category={post.category} />
               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-white/70 border border-slate-950/[0.10] px-3 py-1.5 rounded-full">
@@ -133,32 +132,28 @@ export default async function NewsPage({ params }: NewsPageProps) {
               </span>
             </div>
 
-            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-slate-950 tracking-normal leading-[1.05] mb-8 ${isRetracted ? 'line-through text-slate-500' : ''}`}>
+            <h1 className={`text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-950 tracking-normal leading-[1.07] mb-7 ${isRetracted ? 'line-through text-slate-500' : ''}`}>
               {post.headline}
             </h1>
 
-            {/* Score Bar */}
-            <div className="flex flex-col gap-4 py-6 border-y border-slate-950/[0.08] mb-8 bg-white/55 -mx-8 px-8 md:-mx-12 md:px-12">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-4">
-                  <CredibilityBadge score={post.credibility_score} showTooltip />
-                  <div className="hidden sm:block w-px h-6 bg-slate-950/10" />
-                  <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                    <Database className="w-3.5 h-3.5 text-accent" />
-                    {post.source_count} Sources Verified
-                  </div>
+            {/* Score + actions */}
+            <div className="mb-8 rounded-2xl border border-slate-950/[0.10] bg-white/65 p-4 sm:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+              <CredibilityBar score={post.credibility_score} />
+              <div className="mt-4 flex flex-col gap-3 border-t border-slate-950/[0.07] pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                  <Database className="w-3.5 h-3.5 text-accent" />
+                  {post.source_count} {post.source_count === 1 ? 'Source' : 'Sources'} Verified
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2">
                   <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
                   <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
                 </div>
               </div>
-              <CredibilityBar score={post.credibility_score} />
             </div>
 
             {/* Summary / Body */}
             <div className="max-w-none">
-              <p className="text-lg md:text-xl leading-9 text-slate-700 font-normal">
+              <p className="text-[17px] md:text-xl leading-9 text-slate-700 font-normal">
                 {post.summary}
               </p>
             </div>
@@ -167,7 +162,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {/* Reason Card */}
-          <div className="md:col-span-2 premium-card premium-card-hover relative rounded-3xl p-8">
+          <div className="md:col-span-2 premium-card premium-card-hover relative rounded-3xl p-5 sm:p-8">
             <div className="absolute -right-4 -top-4 text-accent/10">
               <ShieldCheck className="w-32 h-32" />
             </div>
@@ -176,15 +171,14 @@ export default async function NewsPage({ params }: NewsPageProps) {
                 <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(139,127,240,0.8)]" />
                 AI Credibility Analysis
               </h2>
-              <CredibilityBar score={post.credibility_score} className="mb-4" />
-              <p className="text-slate-600 leading-relaxed text-base">
+              <p className="text-slate-600 leading-8 text-base">
                 {post.credibility_reason}
               </p>
             </div>
           </div>
 
           {/* Sources Card */}
-          <div className="premium-card premium-card-hover rounded-3xl p-8">
+          <div className="premium-card premium-card-hover rounded-3xl p-5 sm:p-8">
             <h2 className="text-base font-bold text-slate-950 mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources

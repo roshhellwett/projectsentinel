@@ -72,12 +72,12 @@ export function SourceLinks({ sources }: SourceLinksProps) {
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-polish flex items-center gap-2.5 rounded-lg px-2 py-1.5 -mx-2 text-sm text-accent hover:text-accent-hover hover:bg-accent/5 active:scale-[0.99] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="touch-polish flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm text-slate-700 hover:border-slate-950/[0.08] hover:bg-slate-50 hover:text-slate-950 active:scale-[0.99] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               aria-label={`Read full article on ${label} (opens in new tab)`}
             >
               <SourceFavicon url={source.url} />
-              <span className="underline underline-offset-2 flex-1 min-w-0 truncate">{label}</span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+              <span className="flex-1 min-w-0 truncate font-medium">{label}</span>
+              <ExternalLink className="w-3.5 h-3.5 text-accent opacity-65 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
             </a>
           </li>
         );

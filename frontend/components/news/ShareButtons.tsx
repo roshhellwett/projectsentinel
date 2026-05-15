@@ -3,10 +3,14 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { cn } from '@/lib/utils/cn';
 
 interface ShareButtonsProps {
   headline: string;
   url: string;
+  placement?: 'popover' | 'inline' | 'sheet';
+  className?: string;
+  buttonClassName?: string;
 }
 
 const SHARE_PLATFORMS = [
@@ -35,10 +39,20 @@ const SHARE_PLATFORMS = [
   },
 ];
 
-export function ShareButtons({ headline, url }: ShareButtonsProps) {
+export function ShareButtons({
+  headline,
+  url,
+  placement = 'popover',
+  className,
+  buttonClassName,
+}: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const copyTimerRef = useRef<number | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const isInline = placement === 'inline';
+  const isSheet = placement === 'sheet';
 
   useEffect(() => () => {
     if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
@@ -51,8 +65,18 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
       if (event.key === 'Escape') setShowMenu(false);
     };
 
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) return;
+      setShowMenu(false);
+    };
+
     window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('pointerdown', handlePointerDown);
+    };
   }, [showMenu]);
 
   const copyLink = useCallback(async () => {
@@ -81,11 +105,17 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
   }, [url]);
 
   return (
-    <div className="relative min-w-0">
+    <div className={cn('relative min-w-0', (isInline || isSheet) && 'w-full', className)}>
       <motion.button
+        ref={buttonRef}
+        type="button"
         whileTap={{ scale: 0.94 }}
         onClick={() => setShowMenu(!showMenu)}
-        className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30 transition-all text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_14px_38px_-30px_rgba(139,127,240,0.58)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className={cn(
+          'touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30 transition-all text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_14px_38px_-30px_rgba(139,127,240,0.58)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
+          (isInline || isSheet) && 'w-full justify-center',
+          buttonClassName,
+        )}
         aria-label="Share this article"
         aria-expanded={showMenu}
       >
@@ -95,25 +125,22 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
 
       <AnimatePresence>
         {showMenu && (
-          <>
           <motion.div
-            key="share-backdrop"
-            className="fixed inset-0 z-40"
-            onClick={() => setShowMenu(false)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14 }}
-          />
-          <motion.div
+            ref={menuRef}
             key="share-menu"
-            className="absolute right-0 top-full mt-2 z-50 w-max max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-2xl rounded-2xl border border-slate-950/[0.10] shadow-2xl p-2 min-w-[200px]"
+            className={cn(
+              'z-[90] w-[min(21rem,calc(100vw-2rem))]',
+              'rounded-2xl border border-slate-950/[0.10] bg-white/95 p-2.5 shadow-2xl backdrop-blur-2xl',
+              placement === 'popover' && 'absolute right-0 top-full mt-2',
+              placement === 'inline' && 'relative mt-3 w-full max-w-none shadow-[0_16px_42px_-30px_rgba(15,23,42,0.32)]',
+              placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_22px_54px_-34px_rgba(15,23,42,0.42)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
+            )}
             initial={{ opacity: 0, y: -6, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
           >
-            <div className="grid grid-cols-5 gap-1 mb-2 pb-2 border-b border-slate-950/[0.08]">
+            <div className="grid grid-cols-2 gap-1.5 mb-2 pb-2 border-b border-slate-950/[0.08]">
               {SHARE_PLATFORMS.map((platform) => (
                 <a
                   key={platform.name}
@@ -121,7 +148,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowMenu(false)}
-                  className="touch-polish flex flex-col items-center gap-1 p-2 rounded-lg text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish flex min-w-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-[0.985] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                   title={platform.name}
                 >
                   {platform.name === 'WhatsApp' ? (
@@ -135,14 +162,14 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
                   ) : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                   )}
-                  <span className="text-[10px] leading-tight text-center">{platform.name === 'Twitter / X' ? 'X' : platform.name}</span>
+                  <span className="min-w-0 truncate text-[12px] font-semibold leading-tight">{platform.name === 'Twitter / X' ? 'X / Twitter' : platform.name}</span>
                 </a>
               ))}
             </div>
 
             <button
               onClick={copyLink}
-              className="touch-polish flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-[0.985] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="touch-polish flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-[0.985] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
             >
               {copied ? (
                 <Check className="w-4 h-4 text-emerald-500" />
@@ -152,7 +179,6 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
               {copied ? 'Copied!' : 'Copy link'}
             </button>
           </motion.div>
-          </>
         )}
       </AnimatePresence>
     </div>

@@ -2,9 +2,9 @@
  * Score color utilities — single source of truth for credibility colors.
  *
  * IMPORTANT: These hex values MUST match the tailwind config tokens
- * (`cred-high`, `cred-mid`, `cred-low`) so that the circular gauge in
- * NewsCard, the ring in CredibilityBadge, and the text-cred-* utility
- * classes all render the same hue for a given score tier.
+ * (`cred-high`, `cred-mid`, `cred-low`) so credibility bars, compact
+ * badges, and text-cred-* utility classes render the same hue for a
+ * given score tier.
  *
  * Credibility tiers (per design spec):
  *   90–100 → High      (mint   #10b981)   — matches `cred-high`

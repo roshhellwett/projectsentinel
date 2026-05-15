@@ -1,6 +1,7 @@
 'use client';
 
-import { getScoreLabel, getScoreTier } from '@/lib/utils/scoreColor';
+import { cn } from '@/lib/utils/cn';
+import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
 
 interface CredibilityBadgeProps {
   score: number;
@@ -9,70 +10,48 @@ interface CredibilityBadgeProps {
 }
 
 export function CredibilityBadge({ score, showTooltip = false, compact = false }: CredibilityBadgeProps) {
-  const tier = getScoreTier(score);
-  const label = getScoreLabel(score);
-
-  const radius = 16;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (Math.max(0, Math.min(100, score)) / 100) * circumference;
-
-  const ringBg =
-    tier === 'high' ? 'text-cred-high/15'
-    : tier === 'mid' ? 'text-cred-mid/15'
-    : 'text-cred-low/15';
-
-  const ringFg =
-    tier === 'high' ? 'text-cred-high'
-    : tier === 'mid' ? 'text-cred-mid'
-    : 'text-cred-low';
+  const clamped = Math.min(100, Math.max(0, Number.isFinite(score) ? Math.round(score) : 0));
+  const label = getScoreLabel(clamped);
+  const scoreColor = getScoreHex(clamped);
 
   return (
     <div
-      className="relative group inline-flex items-center gap-2 max-w-full"
-      aria-label={`Credibility score: ${score}/100 — ${label}`}
+      className={cn(
+        'relative group inline-flex max-w-full items-center rounded-full border border-slate-950/[0.10] bg-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]',
+        compact ? 'gap-2 px-2.5 py-1.5' : 'gap-3 px-3 py-2',
+      )}
+      aria-label={`Credibility score: ${clamped}/100, ${label}`}
       role="img"
     >
-      <div className="relative w-9 h-9 flex-shrink-0 flex items-center justify-center">
-        <svg className="w-9 h-9 -rotate-90" viewBox="0 0 40 40">
-          <circle
-            className={`${ringBg} stroke-current`}
-            strokeWidth="3"
-            fill="transparent"
-            r={radius}
-            cx="20"
-            cy="20"
+      <div className={cn('flex min-w-0 flex-col', compact ? 'w-16' : 'w-24')}>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          {!compact && (
+            <span className="truncate text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              {label}
+            </span>
+          )}
+          <span className={cn('font-black tabular-nums text-slate-950', compact ? 'text-[11px]' : 'text-xs')}>
+            {clamped}
+          </span>
+        </div>
+        <div
+          className="relative h-1.5 rounded-full bg-slate-950/[0.08]"
+          style={{ background: 'linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)' }}
+        >
+          <div
+            className="absolute inset-0 rounded-full bg-white/45"
+            style={{ clipPath: `inset(0 0 0 ${clamped}%)` }}
+            aria-hidden="true"
           />
-          <circle
-            className={`${ringFg} stroke-current score-ring-animate`}
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="transparent"
-            r={radius}
-            cx="20"
-            cy="20"
-            style={
-              {
-                strokeDasharray: circumference,
-                strokeDashoffset: circumference,
-                ['--score-offset' as string]: String(offset),
-              } as React.CSSProperties
-            }
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[10px] font-bold text-slate-950 tabular-nums">{score}</span>
         </div>
       </div>
 
+      {!compact && <div className="h-5 w-px flex-shrink-0 bg-slate-950/10" aria-hidden="true" />}
+
       {!compact && (
-        <div className="flex flex-col justify-center min-w-0 max-w-[120px]" aria-hidden="true">
-          <span className="text-[10px] font-bold text-slate-950 uppercase tracking-wider leading-none mb-0.5 truncate">
-            {label}
-          </span>
-          <span className="text-[9px] text-slate-500 font-medium leading-none truncate">
-            Credibility
-          </span>
-        </div>
+        <span className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-wider text-slate-500" aria-hidden="true">
+          Credibility
+        </span>
       )}
 
       {showTooltip && (
@@ -80,7 +59,7 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
           className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-white border border-slate-950/[0.10] text-xs text-slate-950 font-medium rounded-lg shadow-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
           role="tooltip"
         >
-          {label} · score {score}/100
+          {label} · score {clamped}/100
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
         </div>
       )}

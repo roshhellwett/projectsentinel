@@ -15,7 +15,7 @@
 
 import { ImageResponse } from 'next/og';
 import { fetchPostById } from '@/lib/supabase/server';
-import { getScoreHex } from '@/lib/utils/scoreColor';
+import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 import { getHostname } from '@/lib/utils/getHostname';
 
@@ -65,16 +65,11 @@ export default async function PostOgImage(
   }
 
   const theme = getCategoryTheme(post.category);
-  const gauge = getScoreHex(post.credibility_score);
+  const score = Math.min(100, Math.max(0, Number.isFinite(post.credibility_score) ? Math.round(post.credibility_score) : 0));
+  const scoreColor = getScoreHex(score);
+  const scoreLabel = getScoreLabel(score);
   const sources = (post.sources ?? []).slice(0, 3);
   const extra = Math.max(0, (post.source_count ?? 0) - sources.length);
-
-  // SVG circular-arc geometry for the credibility gauge.
-  const gaugeSize = 140;
-  const gaugeStroke = 12;
-  const gaugeRadius = (gaugeSize - gaugeStroke) / 2;
-  const gaugeCirc = 2 * Math.PI * gaugeRadius;
-  const gaugeOffset = gaugeCirc * (1 - Math.max(0, Math.min(100, post.credibility_score)) / 100);
 
   return new ImageResponse(
     (
@@ -205,7 +200,7 @@ export default async function PostOgImage(
             display: 'flex',
             flex: 1,
             zIndex: 10,
-            paddingRight: 200, // reserve space for gauge on the right
+            paddingRight: 300,
           }}
         >
           <h1
@@ -227,99 +222,86 @@ export default async function PostOgImage(
           </h1>
         </div>
 
-        {/* ── Credibility gauge: top-right hero element ── */}
+        {/* ── Credibility score: top-right horizontal module ── */}
         <div
           style={{
             position: 'absolute',
-            top: 130,
+            top: 156,
             right: 64,
+            width: 260,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            padding: '22px 24px',
+            borderRadius: 28,
+            backgroundColor: 'rgba(255,255,255,0.86)',
+            border: '1px solid rgba(15,23,42,0.10)',
+            boxShadow: '0 20px 54px -34px rgba(15,23,42,0.32)',
             zIndex: 10,
           }}
         >
           <div
             style={{
-              position: 'relative',
-              width: gaugeSize,
-              height: gaugeSize,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 18,
             }}
           >
-            <svg
-              width={gaugeSize}
-              height={gaugeSize}
-              style={{ transform: 'rotate(-90deg)' }}
-            >
-              <circle
-                cx={gaugeSize / 2}
-                cy={gaugeSize / 2}
-                r={gaugeRadius}
-                stroke="#e2e8f0"
-                strokeWidth={gaugeStroke}
-                fill="none"
-              />
-              <circle
-                cx={gaugeSize / 2}
-                cy={gaugeSize / 2}
-                r={gaugeRadius}
-                stroke={gauge}
-                strokeWidth={gaugeStroke}
-                strokeLinecap="round"
-                fill="none"
-                strokeDasharray={gaugeCirc}
-                strokeDashoffset={gaugeOffset}
-              />
-            </svg>
-            <div
+            <span
               style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
+                fontSize: 18,
+                fontWeight: 800,
+                color: '#64748b',
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px',
               }}
             >
-              <span
-                style={{
-                  fontSize: 42,
-                  fontWeight: 800,
-                  color: gauge,
-                  lineHeight: 1,
-                  letterSpacing: '0',
-                }}
-              >
-                {post.credibility_score}
-              </span>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#94a3b8',
-                  marginTop: 4,
-                  letterSpacing: '1px',
-                }}
-              >
-                /100
-              </span>
-            </div>
+              Credibility
+            </span>
+            <span
+              style={{
+                fontSize: 40,
+                fontWeight: 900,
+                color: scoreColor,
+                lineHeight: 1,
+                letterSpacing: '0',
+              }}
+            >
+              {score}
+            </span>
           </div>
-          <span
+          <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: '#64748b',
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              marginTop: 8,
+              width: '100%',
+              height: 12,
+              borderRadius: 999,
+              backgroundColor: '#e2e8f0',
+              overflow: 'hidden',
+              marginBottom: 12,
             }}
           >
-            Credibility
-          </span>
+            <div
+              style={{
+                width: `${score}%`,
+                height: '100%',
+                borderRadius: 999,
+                backgroundColor: scoreColor,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: 15,
+              fontWeight: 700,
+              color: '#94a3b8',
+            }}
+          >
+            <span>{scoreLabel}</span>
+            <span>/100</span>
+          </div>
         </div>
 
         {/* ── Bottom bar: sources + URL footer ── */}

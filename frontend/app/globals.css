@@ -283,7 +283,21 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(120, 100, 200, 0.7);
 }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 html { scrollbar-color: rgba(160, 140, 220, 0.4) transparent; scrollbar-width: thin; }
+
+.article-drawer-scroll {
+  scrollbar-color: rgba(100, 116, 139, 0.28) transparent;
+}
+.article-drawer-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.article-drawer-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.28);
+}
+.article-drawer-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.42);
+}
 
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -403,9 +417,16 @@ html { scrollbar-color: rgba(160, 140, 220, 0.4) transparent; scrollbar-width: t
    tell the browser it can defer painting offscreen cards.
 ═══════════════════════════════════════════════ */
 @supports (content-visibility: auto) {
-  .feed-grid > * {
+  .feed-grid > .feed-card-shell {
     content-visibility: auto;
     contain-intrinsic-size: 260px;
+  }
+
+  .feed-grid > .feed-card-shell:focus-within,
+  .feed-grid > .feed-card-shell:hover,
+  .feed-grid > .feed-card-shell:has([aria-expanded="true"]) {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
   }
 }
 
@@ -414,6 +435,13 @@ html { scrollbar-color: rgba(160, 140, 220, 0.4) transparent; scrollbar-width: t
    feeling instantaneous without affecting in-page anchor jumps. */
 html.flushing-pending {
   scroll-behavior: auto;
+}
+
+body.article-overlay-open .mobile-bottom-nav,
+body.article-overlay-open .scroll-to-top {
+  opacity: 0;
+  transform: translateY(14px) scale(0.98);
+  pointer-events: none;
 }
 
 /* ═══════════════════════════════════════════════
@@ -448,12 +476,6 @@ html.flushing-pending {
       inset 0 -1px 0 rgba(0, 0, 0, 0.55);
   }
 }
-
-@keyframes scoreReveal {
-  from { stroke-dashoffset: 100.53; }
-  to   { stroke-dashoffset: var(--score-offset); }
-}
-.score-ring-animate { animation: scoreReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 img, video { max-width: 100%; height: auto; }
 

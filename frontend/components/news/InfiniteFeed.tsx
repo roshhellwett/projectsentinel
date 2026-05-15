@@ -432,7 +432,7 @@ export function InfiniteFeed({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+      <div className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
         <AnimatePresence initial={false}>
           {posts.map((post) => (
             <motion.div
@@ -442,8 +442,7 @@ export function InfiniteFeed({
               animate="show"
               exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.18 } }}
               variants={itemVariants}
-              className="h-full"
-              style={{ contentVisibility: 'auto', containIntrinsicSize: '260px' } as React.CSSProperties}
+              className="feed-card-shell h-full"
             >
               <NewsCard
                 post={post}

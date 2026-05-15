@@ -1,16 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { X, ExternalLink } from 'lucide-react';
 import { AnimatePresence, motion, useDragControls, useMotionValue } from 'framer-motion';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
-import { CredibilityBadge } from './CredibilityBadge';
+import { CredibilityBar } from './CredibilityBar';
 import { SourceLinks } from './SourceLinks';
 import { CorrectionsNotice } from './CorrectionsNotice';
 import { ShareButtons } from './ShareButtons';
 import { BookmarkButton } from './BookmarkButton';
+import { SourcePickerButton } from './SourcePickerButton';
 import { formatDate } from '@/lib/utils/formatDate';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
@@ -22,7 +22,6 @@ interface NewsDrawerProps {
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
 export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
-  const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
@@ -46,10 +45,12 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
 
     previousFocusRef.current = document.activeElement as HTMLElement;
     lockBodyScroll();
+    document.body.classList.add('article-overlay-open');
     const focusTimer = window.setTimeout(() => drawerRef.current?.focus(), 0);
 
     return () => {
       window.clearTimeout(focusTimer);
+      document.body.classList.remove('article-overlay-open');
       unlockBodyScroll();
       previousFocusRef.current?.focus();
     };
@@ -98,7 +99,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             // z-[60] — above the fixed Navbar (z-50) so the page chrome is
             // dimmed while reading and the drawer's close button is never
             // hidden behind the navbar's safe-area chrome on iOS.
-            className="fixed inset-0 bg-slate-950/30 backdrop-blur-md z-[60]"
+            className="fixed inset-0 bg-slate-950/20 backdrop-blur-[3px] z-[60]"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -129,7 +130,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 y.set(0);
               }
             }}
-            className="fixed z-[65] bg-white/95 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-[0_30px_120px_-52px_rgba(15,23,42,0.46)] lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[540px] bottom-0 left-0 right-0 h-[92vh] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
+            className="fixed z-[65] bg-white/96 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-[0_30px_120px_-52px_rgba(15,23,42,0.42)] lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
@@ -147,7 +148,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-950/[0.08] flex-shrink-0">
+            <div className="relative z-10 flex items-center justify-between gap-3 rounded-t-[28px] bg-white/90 px-5 py-3.5 border-b border-slate-950/[0.08] flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7">
               <div className="flex items-center gap-3 min-w-0">
                 <CategoryTag category={post.category} />
                 <span className="text-xs text-zinc-500 truncate">{formatDate(post.published_at)}</span>
@@ -163,7 +164,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             </div>
 
             {/* Content */}
-            <div className={`flex-1 overflow-y-auto overscroll-contain p-6 ${post.status === 'retracted' ? 'opacity-50' : ''}`}>
+            <div className={`article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain bg-white/95 px-5 pb-6 pt-5 sm:px-7 sm:pb-8 sm:pt-6 lg:px-8 ${post.status === 'retracted' ? 'opacity-50' : ''}`}>
               {post.status === 'corrected' && (
                 <CorrectionsNotice type="corrected" note={post.correction_note} />
               )}
@@ -171,32 +172,37 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 <CorrectionsNotice type="retracted" note={post.correction_note} />
               )}
 
-              <h2 className="text-3xl font-bold text-slate-950 tracking-normal mb-5 leading-tight">
+              <h2 className="text-[26px] sm:text-3xl lg:text-[32px] 2xl:text-[34px] font-bold text-slate-950 tracking-normal mb-5 leading-tight">
                 {post.headline}
               </h2>
 
-              {/* Score + sources row */}
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <CredibilityBadge score={post.credibility_score} showTooltip />
-                <span className="text-sm text-zinc-500">{post.source_count} sources</span>
-                <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
-                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
+              {/* Score + source count */}
+              <div className="mb-6 rounded-2xl border border-slate-950/[0.10] bg-white/75 p-4 lg:p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                <CredibilityBar score={post.credibility_score} />
+                <div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-950/[0.06] pt-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                    Verified Sources
+                  </span>
+                  <span className="text-sm font-semibold tabular-nums text-slate-600">
+                    {post.source_count} {post.source_count === 1 ? 'source' : 'sources'}
+                  </span>
+                </div>
               </div>
 
               {/* Summary */}
-              <div className="mb-8">
-                <p className="text-slate-600 leading-relaxed text-base">
+              <div className="mb-6">
+                <p className="text-[16px] leading-8 text-slate-600">
                   {post.summary}
                 </p>
               </div>
 
               {/* Credibility Reasoning */}
-              <div className="premium-card rounded-2xl p-5 mb-6">
-                <h3 className="text-sm font-bold text-slate-950 mb-2 flex items-center gap-2">
+              <div className="rounded-2xl border border-slate-950/[0.06] bg-slate-50/70 p-5 mb-6 shadow-[0_18px_60px_-48px_rgba(15,23,42,0.35)]">
+                <h3 className="text-sm font-bold text-slate-950 mb-3 flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent" />
                   Why this score?
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-7">
                   {post.credibility_reason}
                 </p>
               </div>
@@ -212,27 +218,28 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             </div>
 
             {/* Footer CTA */}
-            <div className="flex-shrink-0 p-4 border-t border-slate-950/[0.08] bg-white/75 backdrop-blur-2xl flex gap-3"
-              style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-            >
-              <motion.a
-                whileTap={{ scale: 0.95 }}
-                href={`https://wa.me/?text=${encodeURIComponent(`${post.headline} — ${siteUrl}/news/${post.id}/`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-polish flex items-center justify-center gap-2 px-4 py-3.5 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 hover:border-[#25D366]/50 text-[#25D366] font-semibold rounded-2xl transition-all duration-200 text-sm flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/60"
-                aria-label="Share on WhatsApp"
-              >
-                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                <span className="hidden sm:inline">Share</span>
-              </motion.a>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { onClose(); router.push(`/news/${post.id}/`); }}
-                className="touch-polish flex-1 text-center py-3.5 px-4 bg-accent hover:bg-accent-hover text-white font-semibold rounded-2xl transition-all duration-300 shadow-glow-accent hover:shadow-glow-accent-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              >
-                Read Full Article →
-              </motion.button>
+            <div className="relative z-20 flex-shrink-0 border-t border-slate-950/[0.08] bg-white/96 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-14px_44px_-38px_rgba(15,23,42,0.42)] backdrop-blur-xl sm:px-3.5 sm:pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pt-3.5 lg:px-4 lg:py-3 lg:shadow-[0_-10px_32px_-30px_rgba(15,23,42,0.36)]">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-2 lg:gap-2.5">
+                <BookmarkButton
+                  postId={post.id}
+                  variant="pill"
+                  stopPropagation={false}
+                  className="w-full justify-center rounded-xl px-2.5 py-2.5 text-xs sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm lg:rounded-xl lg:py-2.5"
+                />
+                <ShareButtons
+                  headline={post.headline}
+                  url={`${siteUrl}/news/${post.id}/`}
+                  placement="sheet"
+                  buttonClassName="rounded-xl px-2.5 py-2.5 text-xs sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm lg:rounded-xl lg:py-2.5"
+                />
+                <SourcePickerButton
+                  sources={post.sources}
+                  placement="sheet"
+                  label="Read Full"
+                  stopPropagation={false}
+                  buttonClassName="rounded-xl border-accent bg-accent px-2.5 py-2.5 text-xs text-white shadow-glow-accent hover:bg-accent-hover hover:text-white sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm lg:rounded-xl lg:py-2.5"
+                />
+              </div>
             </div>
           </motion.div>
         </>

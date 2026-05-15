@@ -38,7 +38,7 @@ export function ScrollToTop() {
     <button
       onClick={scrollToTop}
       className={`
-        fixed right-4 p-3
+        scroll-to-top fixed right-4 p-3
         bottom-24 md:bottom-8
         bg-accent hover:bg-accent-hover text-white rounded-full
         shadow-glow-accent hover:shadow-glow-accent-lg

@@ -29,7 +29,7 @@
 import type { CSSProperties } from 'react';
 
 export interface CategoryTheme {
-  /** Solid accent colour for left-bars, ring dots, gauge tints. */
+  /** Solid accent colour for left bars, dots, and category tints. */
   hex: string;
   /** Pre-built inline style for the badge pill (bg + border + text). */
   pill: CSSProperties;
