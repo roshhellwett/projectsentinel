@@ -139,7 +139,7 @@ export default function HowItWorksPage() {
           <Zap className="w-4 h-4" />
           Fully Automated
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold mb-5 text-slate-950 leading-tight tracking-tighter">
+        <h1 className="text-4xl md:text-6xl font-bold mb-5 text-slate-950 leading-tight tracking-normal">
           How India <span className="text-accent">Verified</span> Works
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">

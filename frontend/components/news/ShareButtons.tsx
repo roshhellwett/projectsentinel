@@ -44,10 +44,22 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
     if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
   }, []);
 
+  useEffect(() => {
+    if (!showMenu) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setShowMenu(false);
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [showMenu]);
+
   const copyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
       copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
       const textArea = document.createElement('textarea');
@@ -60,6 +72,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
         textArea.select();
         document.execCommand('copy');
         setCopied(true);
+        if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
         copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
       } finally {
         document.body.removeChild(textArea);
@@ -68,7 +81,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
   }, [url]);
 
   return (
-    <div className="relative">
+    <div className="relative min-w-0">
       <motion.button
         whileTap={{ scale: 0.94 }}
         onClick={() => setShowMenu(!showMenu)}
@@ -94,7 +107,7 @@ export function ShareButtons({ headline, url }: ShareButtonsProps) {
           />
           <motion.div
             key="share-menu"
-            className="absolute right-0 top-full mt-2 z-50 bg-white/95 backdrop-blur-2xl rounded-2xl border border-slate-950/[0.10] shadow-2xl p-2 min-w-[200px]"
+            className="absolute right-0 top-full mt-2 z-50 w-max max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-2xl rounded-2xl border border-slate-950/[0.10] shadow-2xl p-2 min-w-[200px]"
             initial={{ opacity: 0, y: -6, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.96 }}

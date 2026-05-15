@@ -53,7 +53,7 @@ export default async function PostOgImage(
             fontSize: 64,
             fontWeight: 700,
             color: '#0d0d0d',
-            letterSpacing: '-1.5px',
+            letterSpacing: '0',
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}
         >
@@ -191,7 +191,7 @@ export default async function PostOgImage(
                 fontSize: 24,
                 fontWeight: 700,
                 color: '#0d0d0d',
-                letterSpacing: '-0.5px',
+                letterSpacing: '0',
               }}
             >
               India Verified
@@ -214,7 +214,7 @@ export default async function PostOgImage(
               fontWeight: 800,
               color: '#0d0d0d',
               lineHeight: 1.1,
-              letterSpacing: '-2px',
+              letterSpacing: '0',
               margin: 0,
               // Hard-clamp visually to 4 lines worth at the chosen size.
               display: '-webkit-box',
@@ -290,7 +290,7 @@ export default async function PostOgImage(
                   fontWeight: 800,
                   color: gauge,
                   lineHeight: 1,
-                  letterSpacing: '-1px',
+                  letterSpacing: '0',
                 }}
               >
                 {post.credibility_score}

@@ -151,7 +151,7 @@ export function LiveUpdateIsland({ pending, onTap }: LiveUpdateIslandProps) {
                 initial={{ y: -6, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-                className="text-[12px] font-semibold tracking-wide text-white/95 uppercase letter-spacing-wide"
+                className="text-[12px] font-semibold tracking-normal text-white/95 uppercase"
               >
                 {count} New {count === 1 ? 'Story' : 'Stories'}
               </motion.span>

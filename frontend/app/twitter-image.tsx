@@ -67,7 +67,7 @@ export default async function Image() {
               fontSize: 64,
               fontWeight: 700,
               color: '#0d0d0d',
-              letterSpacing: '-1.5px',
+              letterSpacing: '0',
               lineHeight: 1,
               marginBottom: 20,
             }}

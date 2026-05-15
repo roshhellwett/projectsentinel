@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
 import { fetchPosts } from '@/lib/supabase/server';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { CategoryBar } from '@/components/layout/CategoryBar';
@@ -6,7 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
 export const revalidate = 30;
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 const VALID_CATEGORIES = CATEGORY_SLUGS;
 
@@ -24,6 +25,12 @@ function titleCase(str: string): string {
 
 export async function generateMetadata({ params }: CategoryPageProps) {
   const { slug } = await params;
+  if (!(VALID_CATEGORIES as readonly string[]).includes(slug)) {
+    return {
+      title: 'Category Not Found - India Verified',
+    };
+  }
+
   const category = titleCase(slug);
   return {
     title: `${category} News - India Verified`,
@@ -48,8 +55,12 @@ async function CategoryGrid({ slug }: { slug: string }) {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const categoryName = titleCase(slug);
   const isValidCategory = (VALID_CATEGORIES as readonly string[]).includes(slug);
+  if (!isValidCategory) {
+    notFound();
+  }
+
+  const categoryName = titleCase(slug);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
@@ -76,28 +87,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <header className="premium-card mb-10 rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
         <div className="relative z-10">
           <p className="editorial-kicker mb-3">Category</p>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-slate-950 mb-4">{categoryName}</h1>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-normal text-slate-950 mb-4">{categoryName}</h1>
           <p className="text-sm md:text-base leading-7 text-slate-600 max-w-xl">
             AI-verified {slug} stories cross-referenced across multiple trusted sources.
           </p>
         </div>
       </header>
 
-      {isValidCategory ? (
-        <Suspense fallback={
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <Skeleton key={i} className="h-[218px] rounded-[1.65rem]" />
-            ))}
-          </div>
-        }>
-          <CategoryGrid slug={slug} />
-        </Suspense>
-      ) : (
-        <p className="rounded-2xl border border-slate-950/[0.08] bg-white/70 p-6 text-slate-600">
-          This category does not exist yet.
-        </p>
-      )}
+      <Suspense fallback={
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Skeleton key={i} className="h-[218px] rounded-[1.65rem]" />
+          ))}
+        </div>
+      }>
+        <CategoryGrid slug={slug} />
+      </Suspense>
     </div>
   );
 }

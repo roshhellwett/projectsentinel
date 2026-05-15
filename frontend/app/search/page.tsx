@@ -56,7 +56,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <p className="editorial-kicker mb-3">
           {query ? 'Search Results' : 'Search'}
         </p>
-        <h1 className="text-4xl md:text-6xl font-bold text-slate-950 tracking-tighter mb-3">
+        <h1 className="text-4xl md:text-6xl font-bold text-slate-950 tracking-normal mb-3">
           {query ? query : 'Find verified news'}
         </h1>
         <p className="text-sm text-slate-600">

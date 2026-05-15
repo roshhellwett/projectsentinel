@@ -75,7 +75,7 @@ export default async function HomePage() {
             <p className="editorial-kicker mb-4">
               AI-verified Indian news
             </p>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-tighter text-slate-950 md:text-6xl lg:text-7xl">
+            <h1 className="max-w-3xl text-4xl font-bold tracking-normal text-slate-950 md:text-6xl lg:text-7xl">
               A calmer, smarter front page for India.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600 md:text-lg">
@@ -116,7 +116,7 @@ export default async function HomePage() {
         <section aria-label="Latest verified news">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
-            <h2 className="text-xl font-semibold text-slate-950 tracking-tight">Latest News</h2>
+            <h2 className="text-xl font-semibold text-slate-950 tracking-normal">Latest News</h2>
             <div className="h-px flex-1 bg-gradient-to-r from-slate-950/10 to-transparent" />
           </div>
           <InfiniteFeed

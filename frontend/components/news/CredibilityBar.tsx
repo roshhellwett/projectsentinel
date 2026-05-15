@@ -1,15 +1,18 @@
 'use client';
 
+import { cn } from '@/lib/utils/cn';
+
 interface CredibilityBarProps {
   score: number;
+  className?: string;
 }
 
-export function CredibilityBar({ score }: CredibilityBarProps) {
+export function CredibilityBar({ score, className }: CredibilityBarProps) {
   const clamped = Math.min(100, Math.max(0, score));
 
   return (
     <div
-      className="flex-shrink-0"
+      className={cn('w-full min-w-0 flex-shrink-0', className)}
       role="img"
       aria-label={`Credibility score: ${clamped} out of 100`}
     >

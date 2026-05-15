@@ -27,6 +27,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   // Live full-text search against the whole archive. Previously this
   // overlay loaded the 50 most-recent posts and ran an in-memory substring
@@ -75,7 +76,13 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   }, [query, isOpen]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
+      return;
+    }
+
+    previousFocusRef.current = document.activeElement as HTMLElement;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -136,7 +143,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="editorial-kicker mb-2">India Verified</p>
-                <h2 className="text-3xl md:text-5xl font-semibold text-slate-950 tracking-tighter">Search</h2>
+                <h2 className="text-3xl md:text-5xl font-semibold text-slate-950 tracking-normal">Search</h2>
               </div>
               <motion.button
                 whileTap={{ scale: 0.9 }}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ExternalLink } from 'lucide-react';
 import { AnimatePresence, motion, useDragControls, useMotionValue } from 'framer-motion';
@@ -29,6 +29,15 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
   onCloseRef.current = onClose;
   const dragControls = useDragControls();
   const y = useMotionValue(0);
+  const [canDrag, setCanDrag] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1023px)');
+    const sync = () => setCanDrag(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
 
   useEffect(() => {
     if (!post) {
@@ -107,7 +116,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
             tabIndex={-1}
             onKeyDown={handleTabKey}
             key={post.id}
-            drag="y"
+            drag={canDrag ? 'y' : false}
             dragControls={dragControls}
             dragListener={false}
             dragConstraints={{ top: 0 }}
@@ -162,7 +171,7 @@ export function NewsDrawer({ post, onClose }: NewsDrawerProps) {
                 <CorrectionsNotice type="retracted" note={post.correction_note} />
               )}
 
-              <h2 className="text-3xl font-bold text-slate-950 tracking-tighter mb-5 leading-tight">
+              <h2 className="text-3xl font-bold text-slate-950 tracking-normal mb-5 leading-tight">
                 {post.headline}
               </h2>
 

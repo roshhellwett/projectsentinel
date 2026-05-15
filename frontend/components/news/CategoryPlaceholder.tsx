@@ -39,7 +39,7 @@ export function CategoryPlaceholder({
       />
       {showLabel && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-3xl md:text-5xl font-black tracking-tighter text-slate-950/[0.10] uppercase select-none">
+          <span className="text-3xl md:text-5xl font-black tracking-normal text-slate-950/[0.10] uppercase select-none">
             {label}
           </span>
         </div>

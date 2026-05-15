@@ -36,6 +36,7 @@ export const OPEN_SEARCH_EVENT = 'iv:open-search';
 export function KeyboardShortcuts() {
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
   // Buffer for two-key sequences like `g h`. We reset it after 800 ms of
   // inactivity so a stale `g` doesn't hijack a much later `h`.
   const bufferRef = useRef<string>('');
@@ -45,7 +46,13 @@ export function KeyboardShortcuts() {
 
   // Lock body scroll while help is open.
   useEffect(() => {
-    if (!helpOpen) return;
+    if (!helpOpen) {
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
+      return;
+    }
+
+    previousFocusRef.current = document.activeElement as HTMLElement;
     lockBodyScroll();
     return () => unlockBodyScroll();
   }, [helpOpen]);
@@ -162,7 +169,7 @@ export function KeyboardShortcuts() {
                   <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
                     <Keyboard className="w-4 h-4 text-accent" />
                   </div>
-                  <h2 className="text-base font-semibold text-slate-950 tracking-tight">
+                  <h2 className="text-base font-semibold text-slate-950 tracking-normal">
                     Keyboard shortcuts
                   </h2>
                 </div>

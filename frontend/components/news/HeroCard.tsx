@@ -60,7 +60,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
               </span>
             </div>
 
-            <h2 className="text-[28px] md:text-[38px] lg:text-[46px] font-bold text-slate-950 tracking-tighter leading-[1.06] mb-5">
+            <h2 className="text-[28px] md:text-[38px] lg:text-[46px] font-bold text-slate-950 tracking-normal leading-[1.06] mb-5">
               {post.headline}
             </h2>
 

@@ -135,7 +135,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
         {/* ── Top row: category + breaking + timestamp · gauge ── */}
-        <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-2 flex-wrap min-w-0">
             <span
               className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
@@ -178,12 +178,12 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             )}
           </div>
 
-          <CredibilityBar score={post.credibility_score} />
+          <CredibilityBar score={post.credibility_score} className="sm:w-32" />
         </div>
 
         {/* ── Headline (serif, the visual anchor of the card) ── */}
         <h3
-          className="text-[19px] md:text-[21px] font-bold leading-[1.25] tracking-tight text-slate-950 line-clamp-3 mb-2.5 transition-colors"
+          className="text-[19px] md:text-[21px] font-bold leading-[1.25] tracking-normal text-slate-950 line-clamp-3 mb-2.5 transition-colors"
           style={{ fontFamily: 'var(--font-newsreader)' }}
         >
           {post.headline}

@@ -100,7 +100,7 @@ export function Navbar() {
                   <span className="text-[12px] font-light text-white/90 tracking-[0.15em] leading-none" style={{ letterSpacing: '0.15em' }}>IV</span>
                 </div>
                 <span className="hidden sm:flex flex-col leading-none">
-                  <span className="text-[15px] font-semibold tracking-tight text-slate-950">India Verified</span>
+                  <span className="text-[15px] font-semibold tracking-normal text-slate-950">India Verified</span>
                 </span>
               </Link>
 

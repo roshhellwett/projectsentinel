@@ -30,7 +30,7 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
             <div className="relative z-10 flex items-center gap-2 mb-3">
               <CategoryTag category={post.category} />
             </div>
-            <h3 className="relative z-10 text-[14px] font-semibold text-slate-950 tracking-tight line-clamp-2 group-hover:text-accent transition-colors mb-3 leading-snug">
+            <h3 className="relative z-10 text-[14px] font-semibold text-slate-950 tracking-normal line-clamp-2 group-hover:text-accent transition-colors mb-3 leading-snug">
               {post.headline}
             </h3>
             <p className="relative z-10 text-xs text-slate-600 line-clamp-2 mb-4 mt-auto">

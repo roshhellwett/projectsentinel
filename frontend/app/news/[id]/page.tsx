@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { fetchPostById, fetchPosts } from '@/lib/supabase/server';
 import { CategoryTag } from '@/components/news/CategoryTag';
 import { CredibilityBadge } from '@/components/news/CredibilityBadge';
+import { CredibilityBar } from '@/components/news/CredibilityBar';
 import { SourceLinks } from '@/components/news/SourceLinks';
 import { CorrectionsNotice } from '@/components/news/CorrectionsNotice';
 import { ShareButtons } from '@/components/news/ShareButtons';
@@ -132,24 +133,27 @@ export default async function NewsPage({ params }: NewsPageProps) {
               </span>
             </div>
 
-            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-slate-950 tracking-tighter leading-[1.05] mb-8 ${isRetracted ? 'line-through text-slate-500' : ''}`}>
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-slate-950 tracking-normal leading-[1.05] mb-8 ${isRetracted ? 'line-through text-slate-500' : ''}`}>
               {post.headline}
             </h1>
 
             {/* Score Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 py-6 border-y border-slate-950/[0.08] mb-8 bg-white/55 -mx-8 px-8 md:-mx-12 md:px-12">
-              <div className="flex flex-wrap items-center gap-4">
-                <CredibilityBadge score={post.credibility_score} showTooltip />
-                <div className="hidden sm:block w-px h-6 bg-slate-950/10" />
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                  <Database className="w-3.5 h-3.5 text-accent" />
-                  {post.source_count} Sources Verified
+            <div className="flex flex-col gap-4 py-6 border-y border-slate-950/[0.08] mb-8 bg-white/55 -mx-8 px-8 md:-mx-12 md:px-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-4">
+                  <CredibilityBadge score={post.credibility_score} showTooltip />
+                  <div className="hidden sm:block w-px h-6 bg-slate-950/10" />
+                  <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                    <Database className="w-3.5 h-3.5 text-accent" />
+                    {post.source_count} Sources Verified
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
+                  <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
-                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
-              </div>
+              <CredibilityBar score={post.credibility_score} />
             </div>
 
             {/* Summary / Body */}
@@ -172,9 +176,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                 <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(139,127,240,0.8)]" />
                 AI Credibility Analysis
               </h2>
-              <div className="inline-flex items-center gap-2 bg-white/70 border border-slate-950/[0.10] px-3 py-1 rounded-lg text-sm font-bold text-slate-950 mb-4">
-                Score: {post.credibility_score}/100
-              </div>
+              <CredibilityBar score={post.credibility_score} className="mb-4" />
               <p className="text-slate-600 leading-relaxed text-base">
                 {post.credibility_reason}
               </p>
@@ -217,7 +219,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         <div className="mt-16 border-t border-slate-950/[0.08] pt-12">
           <div className="flex items-center gap-3 mb-7">
             <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
-            <h2 className="text-xl font-semibold text-slate-950 tracking-tight">
+            <h2 className="text-xl font-semibold text-slate-950 tracking-normal">
               Related News
             </h2>
           </div>

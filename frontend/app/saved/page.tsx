@@ -90,7 +90,7 @@ export default function SavedPage() {
         <div className="relative z-10 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="editorial-kicker mb-3">Your reading list</p>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-slate-950 mb-3">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-normal text-slate-950 mb-3">
               Saved stories
             </h1>
             <p className="text-sm md:text-base text-slate-600 max-w-xl leading-7">

@@ -19,7 +19,7 @@ export default function Error({ error, reset }: ErrorProps) {
       <div className="w-20 h-20 rounded-full bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mb-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
         <AlertTriangle className="w-10 h-10 text-red-500" />
       </div>
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-950 mb-3">Something went wrong</h1>
+      <h1 className="text-4xl md:text-5xl font-bold tracking-normal text-slate-950 mb-3">Something went wrong</h1>
       <p className="text-slate-600 max-w-md mb-8">
         An unexpected error occurred. Try refreshing the page or go back to the homepage.
       </p>

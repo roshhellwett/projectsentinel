@@ -47,7 +47,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           <Flame className="w-4 h-4 text-accent" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-slate-950 tracking-tight">Trending Now</h2>
+          <h2 className="text-base font-semibold text-slate-950 tracking-normal">Trending Now</h2>
           <p className="text-[11px] text-slate-500">Top stories by credibility</p>
         </div>
         <div className="h-px flex-1 bg-gradient-to-r from-slate-950/10 to-transparent ml-3" />
@@ -79,7 +79,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
               <div className="flex items-center gap-4 flex-1 min-w-0 px-4 sm:px-5 py-4">
                 {/* Rank number */}
                 <span
-                  className="text-[28px] sm:text-[32px] font-black tracking-tighter text-slate-300 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
+                  className="text-[28px] sm:text-[32px] font-black tracking-normal text-slate-300 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
                   aria-hidden="true"
                 >
                   {String(index + 1).padStart(2, '0')}
@@ -103,7 +103,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0">
+                <div className="hidden min-[360px]:block flex-shrink-0 w-24 sm:w-28">
                   <CredibilityBar score={post.credibility_score} />
                 </div>
 

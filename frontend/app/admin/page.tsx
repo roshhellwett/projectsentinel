@@ -30,7 +30,7 @@ export default async function AdminPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-slate-950 mb-8 tracking-tight">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold text-slate-950 mb-8 tracking-normal">Admin Dashboard</h1>
 
       <div className="premium-card rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-slate-950 mb-4">All Posts</h2>
