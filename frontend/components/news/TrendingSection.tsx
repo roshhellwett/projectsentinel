@@ -5,7 +5,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Flame, ChevronRight } from 'lucide-react';
 import { Post } from '@/types';
-import { CredibilityBadge } from './CredibilityBadge';
+import { CredibilityBar } from './CredibilityBar';
 import { CategoryTag } from './CategoryTag';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 import { useReadPosts } from '@/lib/utils/readPosts';
@@ -104,7 +104,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                 </div>
 
                 <div className="flex-shrink-0">
-                  <CredibilityBadge score={post.credibility_score} compact />
+                  <CredibilityBar score={post.credibility_score} />
                 </div>
 
                 <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-accent group-hover:translate-x-1 transition-all duration-200 flex-shrink-0" />
