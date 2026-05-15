@@ -73,7 +73,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <CategoryBar />
       </div>
 
-      <header className="premium-card mb-10 rounded-[2rem] px-6 py-8 md:px-10 md:py-10 animate-fade-in-up">
+      <header className="premium-card mb-10 rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
         <div className="relative z-10">
           <p className="editorial-kicker mb-3">Category</p>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-slate-950 mb-4">{categoryName}</h1>

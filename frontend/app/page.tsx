@@ -68,7 +68,7 @@ export default async function HomePage() {
       />
 
       <div className="container mx-auto px-4 lg:px-6 pt-8 lg:pt-10 pb-14">
-        <section className="relative mb-9 overflow-hidden rounded-[2rem] border border-slate-950/[0.10] bg-white/75 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_30px_100px_-76px_rgba(139,127,240,0.55)] backdrop-blur-2xl md:px-10 md:py-10 animate-fade-in-up">
+        <section className="relative mb-9 overflow-hidden rounded-[2rem] border border-slate-950/[0.10] bg-white/75 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_30px_100px_-76px_rgba(139,127,240,0.55)] backdrop-blur-2xl md:px-10 md:py-10">
           <div className="animate-soft-float absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
           <div className="absolute -bottom-32 left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
           <div className="relative max-w-4xl">
@@ -104,16 +104,16 @@ export default async function HomePage() {
 
         {/* Featured story — always first */}
         {heroPost && (
-          <div id="latest" className="mb-12 scroll-mt-24 animate-fade-in-up" style={{ animationDelay: '0.07s' }}>
+          <div id="latest" className="mb-12 scroll-mt-24">
             <HeroCard post={heroPost} />
           </div>
         )}
 
         {/* Trending — server-resolved, disjoint from feedPosts by construction */}
-        {trendingPosts.length > 0 && <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}><TrendingSection posts={trendingPosts} /></div>}
+        {trendingPosts.length > 0 && <TrendingSection posts={trendingPosts} />}
 
         {/* Latest verified news — auto-loading infinite feed */}
-        <section aria-label="Latest verified news" className="animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+        <section aria-label="Latest verified news">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
             <h2 className="text-xl font-semibold text-slate-950 tracking-tight">Latest News</h2>

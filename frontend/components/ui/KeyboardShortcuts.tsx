@@ -170,7 +170,7 @@ export function KeyboardShortcuts() {
                   type="button"
                   onClick={closeHelp}
                   aria-label="Close shortcuts"
-                  className="touch-polish p-1.5 rounded-lg text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] active:scale-95 transition-all duration-200 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish p-1.5 rounded-lg text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <X className="w-4 h-4" />
                 </button>

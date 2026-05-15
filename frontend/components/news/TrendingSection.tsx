@@ -67,7 +67,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <Link
               href={`/news/${post.id}/`}
               data-read={read ? 'true' : 'false'}
-              className={`touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset ${read ? 'opacity-60' : ''}`}
+              className={`touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset ${read ? 'opacity-60' : ''}`}
               aria-label={read ? `${post.headline} (already read)` : post.headline}
             >
               {/* Category colour left bar */}

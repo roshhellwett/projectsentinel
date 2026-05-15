@@ -78,7 +78,7 @@ export default function SavedPage() {
     <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14 max-w-6xl">
       <Link
         href="/"
-        className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 mb-6 transition-all duration-200 ease-smooth active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
+        className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 mb-6 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
       >
         <div className="p-1.5 rounded-full bg-white/70 border border-slate-950/[0.10] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
           <ArrowLeft className="w-4 h-4" />
@@ -86,7 +86,7 @@ export default function SavedPage() {
         Back to all news
       </Link>
 
-      <section className="premium-card relative mb-9 rounded-[2rem] px-6 py-8 md:px-10 md:py-10 animate-fade-in-up">
+      <section className="premium-card relative mb-9 rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
         <div className="relative z-10 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="editorial-kicker mb-3">Your reading list</p>
@@ -104,7 +104,7 @@ export default function SavedPage() {
               onClick={() => {
                 if (window.confirm('Clear all saved stories?')) clearSaved();
               }}
-              className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-slate-950/[0.10] text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-white transition-all duration-200 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-slate-950/[0.10] text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-white transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               aria-label="Clear all saved stories"
             >
               <Trash2 className="w-3.5 h-3.5" />

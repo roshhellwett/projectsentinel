@@ -139,9 +139,9 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 <h2 className="text-3xl md:text-5xl font-semibold text-slate-950 tracking-tighter">Search</h2>
               </div>
               <motion.button
-                whileTap={{ scale: 0.88 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="touch-polish p-2 hover:bg-slate-950/[0.06] rounded-full transition-all duration-250 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:bg-slate-950/[0.08]"
+                className="touch-polish p-2 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:bg-slate-950/[0.08]"
                 aria-label="Close search"
               >
                 <X className="w-6 h-6 text-slate-500" />
@@ -168,7 +168,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
-                className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-350 ease-smooth shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(139,127,240,0.45)]"
+                className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(139,127,240,0.45)]"
                 // Focus is handled imperatively via the ref + setTimeout above
                 // to avoid React's autoFocus + ref double-focus warning.
                 aria-label="Search verified stories"

@@ -78,9 +78,9 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
                 </span>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-3 transition-all duration-250 ease-smooth">
+              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-2.5 transition-all duration-300">
                 Read full story
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-250 ease-smooth" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
               </span>
             </div>
           </div>

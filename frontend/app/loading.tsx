@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function Loading() {
   return (
-    <div className="container mx-auto px-4 lg:px-6 py-8 animate-fade-in-up">
+    <div className="container mx-auto px-4 lg:px-6 py-8">
       <div className="mb-9 overflow-hidden rounded-[2rem] border border-slate-950/[0.08] bg-white/60 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-2xl md:px-10 md:py-10">
         <Skeleton className="mb-4 h-3 w-48 rounded-full" />
         <Skeleton className="mb-4 h-12 w-full max-w-2xl rounded-2xl md:h-16" />

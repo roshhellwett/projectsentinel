@@ -75,9 +75,9 @@ export function Navbar() {
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div
-          className={`w-full blur-transition ${
+          className={`w-full transition-all duration-500 ${
             scrolled
-              ? 'bg-white/82 backdrop-blur-2xl border-b border-slate-950/[0.08] shadow-[0_18px_55px_-42px_rgba(15,23,42,0.28)]'
+              ? 'bg-white/78 backdrop-blur-2xl border-b border-slate-950/[0.08] shadow-[0_18px_55px_-42px_rgba(15,23,42,0.28)]'
               : 'bg-white/58 backdrop-blur-xl border-b border-slate-950/[0.04]'
           }`}
         >
@@ -116,7 +116,7 @@ export function Navbar() {
                       key={link.href}
                       href={link.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-250 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                      className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                         active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.035]'
                       }`}
                     >
@@ -139,7 +139,7 @@ export function Navbar() {
                   whileTap={{ scale: 0.9 }}
                   onClick={openSearch}
                   aria-label="Search articles"
-                  className="touch-polish p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-250 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Search className="w-[18px] h-[18px]" strokeWidth={2} />
                 </motion.button>
@@ -148,7 +148,7 @@ export function Navbar() {
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="touch-polish hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all duration-250 ease-smooth shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(139,127,240,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(139,127,240,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Github className="w-3.5 h-3.5" />
                   GitHub
@@ -160,7 +160,7 @@ export function Navbar() {
                   onClick={() => setIsMobileOpen((v) => !v)}
                   aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={isMobileOpen}
-                  className="touch-polish lg:hidden p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-250 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish lg:hidden p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
                 </motion.button>
@@ -222,7 +222,7 @@ export function Navbar() {
                         href={link.href}
                         onClick={() => setIsMobileOpen(false)}
                         aria-current={active ? 'page' : undefined}
-                        className={`touch-polish block px-4 py-3 rounded-xl text-[15px] font-medium transition-all duration-200 ease-smooth active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                        className={`touch-polish block px-4 py-3 rounded-xl text-[15px] font-medium transition-all duration-200 active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                           active
                             ? 'bg-slate-950/[0.055] text-slate-950 border border-slate-950/[0.10]'
                             : 'text-slate-600 hover:bg-slate-950/[0.04] border border-transparent'
@@ -246,7 +246,7 @@ export function Navbar() {
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="touch-polish flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-slate-950/[0.055] hover:bg-slate-950/[0.08] border border-slate-950/[0.10] text-sm font-medium text-slate-800 transition-all duration-200 ease-smooth active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-slate-950/[0.055] hover:bg-slate-950/[0.08] border border-slate-950/[0.10] text-sm font-medium text-slate-800 transition-all active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Github className="w-4 h-4" />
                   View on GitHub
