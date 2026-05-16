@@ -299,37 +299,66 @@ export function InfiniteFeed({
     }
   }, [category, flashFresh]);
 
-  // ── Realtime push: sub-second delivery for new posts ──
-  // Falls back silently to the polling tick below if Supabase realtime
-  // is unavailable (env vars missing, channel error, network drop).
+  // ── Realtime push + robust reconnection ──
+  // The Supabase realtime WebSocket frequently dies when the browser
+  // throttles a backgrounded tab (especially on mobile). We tear down
+  // and rebuild the channel every time the tab returns to the foreground
+  // to guarantee sub-second delivery resumes immediately.
   useEffect(() => {
-    let subscription: ReturnType<typeof subscribeToPosts> | null = null;
-    try {
-      subscription = subscribeToPosts((post) => {
-        processIncomingPosts([post]);
-      });
-    } catch {
-      // anon-key not configured or browser client unavailable — the
-      // 30s poll loop below still keeps the feed fresh.
-    }
+    let sub: { unsubscribe: () => void } | null = null;
+
+    const connect = () => {
+      // Tear down any lingering channel first
+      if (sub) {
+        try { sub.unsubscribe(); } catch { /* non-fatal */ }
+        sub = null;
+      }
+      try {
+        sub = subscribeToPosts((post) => {
+          processIncomingPosts([post]);
+        });
+      } catch {
+        // anon-key not configured or browser client unavailable — the
+        // poll loop below still keeps the feed fresh.
+      }
+    };
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') connect();
+    };
+
+    connect();
+    document.addEventListener('visibilitychange', onVisible);
+
     return () => {
-      if (subscription) {
-        try { subscription.unsubscribe(); } catch { /* non-fatal */ }
+      document.removeEventListener('visibilitychange', onVisible);
+      if (sub) {
+        try { sub.unsubscribe(); } catch { /* non-fatal */ }
       }
     };
   }, [processIncomingPosts]);
 
   // ── Polling fallback: catches anything realtime missed (channel drops,
-  // events delivered while tab was hidden, etc.). Runs every 30s. ──
+  // events delivered while tab was hidden, etc.). ──
+  //
+  // CRITICAL: polling NEVER stops. When the tab is hidden we slow down to
+  // BACKGROUND_POLL_MS (60 s) instead of halting — this is the root fix
+  // for "I have to refresh 2-3 times to see new posts". Posts that arrive
+  // while the tab is backgrounded accumulate in the pending queue and are
+  // surfaced instantly via the LiveUpdateIsland the moment the user returns.
   useEffect(() => {
     let cancelled = false;
 
+    const FOREGROUND_MS = POLL_INTERVAL_MS;     // 30 s
+    const BACKGROUND_MS = 60_000;                // 60 s — gentler when hidden
+
     const tick = async () => {
+      if (cancelled) return;
       try {
         const params = new URLSearchParams({ page: '1', limit: '10', _t: String(Date.now()) });
         if (category) params.set('category', category);
         const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
-        if (!res.ok) return;
+        if (!res.ok || cancelled) return;
         const data: { posts: Post[] } = await res.json();
         if (cancelled) return;
         processIncomingPosts(data.posts);
@@ -338,50 +367,61 @@ export function InfiniteFeed({
       }
     };
 
-    let id: number | null = null;
+    let timerId: ReturnType<typeof setTimeout> | null = null;
 
-    const start = () => {
-      if (id !== null) return;
-      id = window.setInterval(tick, POLL_INTERVAL_MS);
-    };
-
-    const stop = () => {
-      if (id !== null) {
-        window.clearInterval(id);
-        id = null;
-      }
+    /** Schedule the next tick after `ms` milliseconds. */
+    const scheduleNext = (ms: number) => {
+      if (timerId !== null) clearTimeout(timerId);
+      timerId = setTimeout(async () => {
+        await tick();
+        if (!cancelled) {
+          // Re-schedule with the interval appropriate for current visibility
+          const interval = document.visibilityState === 'hidden' ? BACKGROUND_MS : FOREGROUND_MS;
+          scheduleNext(interval);
+        }
+      }, ms);
     };
 
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        stop();
-      } else {
-        // Tab regained focus — fetch immediately so the user never sees
-        // stale headlines after coming back from another app/tab.
+      if (document.visibilityState === 'visible') {
+        // Tab regained focus — fetch immediately and switch to fast cadence
         tick();
-        start();
+        scheduleNext(FOREGROUND_MS);
+      } else {
+        // Tab hidden — switch to slow cadence but do NOT stop
+        scheduleNext(BACKGROUND_MS);
       }
     };
 
     // Refetch the moment the device comes back online.
-    const onOnline = () => { tick(); start(); };
+    const onOnline = () => { tick(); scheduleNext(FOREGROUND_MS); };
 
     // Refetch when the window regains focus (covers desktop-tab-switching
     // where visibilitychange may not fire on every browser).
     const onFocus = () => { tick(); };
 
+    // Mobile: refetch when user taps into the PWA / switches back via
+    // the app-switcher. pageshow fires reliably on iOS Safari.
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) tick();
+    };
+
     document.addEventListener('visibilitychange', onVisibilityChange);
     window.addEventListener('online', onOnline);
     window.addEventListener('focus', onFocus);
-    start();
+    window.addEventListener('pageshow', onPageShow);
+
+    // Initial tick + schedule
     tick();
+    scheduleNext(FOREGROUND_MS);
 
     return () => {
       cancelled = true;
-      stop();
+      if (timerId !== null) clearTimeout(timerId);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('online', onOnline);
       window.removeEventListener('focus', onFocus);
+      window.removeEventListener('pageshow', onPageShow);
     };
   }, [category, processIncomingPosts]);
 

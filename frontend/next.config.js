@@ -69,18 +69,19 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // Cache API responses moderately
+      // API responses must never be cached — the polling client needs fresh data
       {
         source: '/api/(.*)',
         headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'CDN-Cache-Control', value: 'no-store' },
         ],
       },
-      // Cache HTML minimally for freshness
+      // HTML pages: short CDN cache matching ISR revalidation (30s)
       {
         source: '/:path((?!.*\\..*|_next).*)',
         headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
+          { key: 'Cache-Control', value: 'public, s-maxage=30, stale-while-revalidate=59' },
         ],
       },
     ];

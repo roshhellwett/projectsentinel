@@ -1,11 +1,26 @@
 /**
  * API route for fetching posts
+ *
+ * Must always return fresh data — the polling client hits this every 30s.
+ * Explicit no-cache headers are set on every response as defense-in-depth
+ * against CDN/edge caching layers that might ignore route-level config.
  */
 
 import { NextResponse } from 'next/server';
 import { fetchPosts } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
+/** Shared response headers that guarantee fresh data on every call. */
+const FRESH_HEADERS = {
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'CDN-Cache-Control': 'no-store',
+  'Vercel-CDN-Cache-Control': 'no-store',
+  Pragma: 'no-cache',
+  Expires: '0',
+} as const;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,14 +29,14 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
   const limit = Math.min(50, Math.max(1, Number.isFinite(rawLimit) ? rawLimit : 20));
   const category = searchParams.get('category') || undefined;
-  
+
   try {
     const { posts, count } = await fetchPosts(page, limit, category);
-    return NextResponse.json({ posts, count });
+    return NextResponse.json({ posts, count }, { headers: FRESH_HEADERS });
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch posts' },
-      { status: 500 }
+      { status: 500, headers: FRESH_HEADERS },
     );
   }
 }
