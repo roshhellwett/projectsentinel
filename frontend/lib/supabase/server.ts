@@ -223,7 +223,9 @@ export async function fetchAllPosts(): Promise<Post[]> {
     .limit(500);
   
   if (error) {
-    console.error(`fetchAllPosts error: ${error.message}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`fetchAllPosts error: ${error.message}`);
+    }
     return [];
   }
   

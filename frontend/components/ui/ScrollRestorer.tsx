@@ -123,7 +123,7 @@ export function ScrollRestorer() {
   // the new key's scrollY if we have one. Otherwise scroll to top — which
   // matches Next.js's default behaviour for "fresh" navigations.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
 
     const prev = previousKeyRef.current;
     if (prev && prev !== key) {
@@ -152,6 +152,7 @@ export function ScrollRestorer() {
     }
 
     previousKeyRef.current = key;
+    return undefined;
     // No stored entry — leave the default-top behaviour to Next.js.
   }, [key]);
 

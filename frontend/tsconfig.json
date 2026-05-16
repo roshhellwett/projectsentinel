@@ -8,6 +8,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -16,6 +17,16 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "useDefineForClassFields": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "plugins": [
       {
         "name": "next"
@@ -26,7 +37,10 @@
         "./*"
       ]
     },
-    "target": "ES2017"
+    "target": "ES2020",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
   },
   "include": [
     "next-env.d.ts",
@@ -35,6 +49,10 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "build",
+    "dist",
+    ".next"
   ]
 }
+

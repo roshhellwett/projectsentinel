@@ -29,6 +29,12 @@ import { LiveUpdateIsland } from './LiveUpdateIsland';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { subscribeToPosts } from '@/lib/supabase/client';
+import {
+  POLL_INTERVAL_MS,
+  QUEUE_THRESHOLD_PX,
+  AUTO_FLUSH_AT_SCROLL_Y,
+  DEFAULT_PAGE_SIZE,
+} from '@/lib/config/constants';
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
@@ -41,33 +47,20 @@ interface InfiniteFeedProps {
   excludeIds?: string[];
 }
 
-const POLL_INTERVAL_MS = 30_000;
-/**
- * If the user has scrolled past this many pixels when fresh posts arrive,
- * defer the prepend behind the LiveUpdateIsland instead of yanking the
- * viewport. Below this threshold we prepend immediately because the user
- * is right next to the top of the feed and will see the soft entry anim.
- */
-const QUEUE_THRESHOLD_PX = 220;
-
-/**
- * When the user scrolls back into this zone with pending posts queued,
- * we auto-flush them so the feed silently refreshes — no tap, no hard
- * reload required. Tuned slightly under QUEUE_THRESHOLD_PX so the
- * transition feels coordinated with the LiveUpdateIsland fade-out.
- */
-const AUTO_FLUSH_AT_SCROLL_Y = 140;
-
 const itemVariants = {
   hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 340, damping: 28, mass: 0.55 } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring' as const, stiffness: 340, damping: 28, mass: 0.55 },
+  },
 };
 
 export function InfiniteFeed({
   initialPosts,
   initialCount,
   category,
-  pageSize = 20,
+  pageSize = DEFAULT_PAGE_SIZE,
   excludeIds,
 }: InfiniteFeedProps) {
   // Convert the serialised array to a Set once for O(1) lookups.

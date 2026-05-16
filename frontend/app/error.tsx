@@ -11,7 +11,9 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('App error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('App error:', error);
+    }
   }, [error]);
 
   return (

@@ -18,8 +18,7 @@ export async function GET(request: Request) {
   try {
     const { posts, count } = await fetchPosts(page, limit, category);
     return NextResponse.json({ posts, count });
-  } catch (error) {
-    console.error('Error fetching posts:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch posts' },
       { status: 500 }

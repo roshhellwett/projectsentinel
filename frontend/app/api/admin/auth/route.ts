@@ -40,8 +40,7 @@ export async function POST(request: Request) {
       .sign(new TextEncoder().encode(ADMIN_SECRET));
     
     return NextResponse.json({ success: true, token });
-  } catch (error) {
-    console.error('Auth error:', error);
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Authentication failed' },
       { status: 500 }

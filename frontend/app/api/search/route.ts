@@ -16,8 +16,7 @@ export async function GET(request: Request) {
   try {
     const result = await searchPosts(q, limit);
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Search error:', error);
+  } catch {
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }
