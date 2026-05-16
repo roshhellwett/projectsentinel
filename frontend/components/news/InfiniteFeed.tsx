@@ -104,7 +104,7 @@ export function InfiniteFeed({
       const next = page + 1;
       const params = new URLSearchParams({ page: String(next), limit: String(pageSize) });
       if (category) params.set('category', category);
-      const res = await fetch(`/api/posts?${params.toString()}`);
+      const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load posts');
       const data: { posts: Post[]; count: number } = await res.json();
 
@@ -328,7 +328,7 @@ export function InfiniteFeed({
       try {
         const params = new URLSearchParams({ page: '1', limit: '10', _t: String(Date.now()) });
         if (category) params.set('category', category);
-        const res = await fetch(`/api/posts?${params.toString()}`);
+        const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
         if (!res.ok) return;
         const data: { posts: Post[] } = await res.json();
         if (cancelled) return;
@@ -374,6 +374,7 @@ export function InfiniteFeed({
     window.addEventListener('online', onOnline);
     window.addEventListener('focus', onFocus);
     start();
+    tick();
 
     return () => {
       cancelled = true;
