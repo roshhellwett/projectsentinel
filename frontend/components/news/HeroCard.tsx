@@ -4,12 +4,12 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock, Database, Flame } from 'lucide-react';
+import { ArrowRight, Clock, Database, Flame, ShieldCheck } from 'lucide-react';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
-import { CredibilityBadge } from './CredibilityBadge';
 import { CategoryPlaceholder } from './CategoryPlaceholder';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
+import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
 
 interface HeroCardProps {
   post: Post;
@@ -17,6 +17,9 @@ interface HeroCardProps {
 }
 
 export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
+  const clampedScore = Math.min(100, Math.max(0, Math.round(post.credibility_score ?? 0)));
+  const scoreLabel = getScoreLabel(clampedScore);
+  const scoreHex = getScoreHex(clampedScore);
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -70,19 +73,36 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
               {post.summary}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.88)]">
-                <CredibilityBadge score={post.credibility_score} compact />
-                <div className="h-3.5 w-px bg-slate-950/10" />
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-                  <Database className="w-3 h-3" />
-                  {post.source_count} sources
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div className="inline-flex items-center gap-3.5 rounded-full border border-slate-950/[0.10] bg-white/80 px-4 py-2.5 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_18px_50px_-32px_rgba(139,127,240,0.45)]">
+                <span
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full"
+                  style={{ backgroundColor: `${scoreHex}1F`, color: scoreHex }}
+                  aria-hidden="true"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2.4} />
+                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[18px] font-black tabular-nums leading-none text-slate-950">
+                    {clampedScore}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                    {scoreLabel}
+                  </span>
+                </div>
+                <div className="h-5 w-px bg-slate-950/[0.12]" aria-hidden="true" />
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-600">
+                  <Database className="h-3 w-3 text-accent" />
+                  <span className="tabular-nums text-slate-950">{post.source_count}</span>
+                  <span className="font-medium text-slate-500">
+                    {post.source_count === 1 ? 'source verified' : 'sources verified'}
+                  </span>
                 </span>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent group-hover:gap-2.5 transition-all duration-300">
+              <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent transition-all duration-300 group-hover:gap-2.5">
                 Read full story
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </div>
           </div>
