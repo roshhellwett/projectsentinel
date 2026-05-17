@@ -42,34 +42,35 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
     return () => query.removeEventListener('change', sync);
   }, []);
 
+  const isOpen = post !== null;
+  const postId = post?.id;
   useEffect(() => {
-    if (!post) {
-      return;
-    }
+    if (!isOpen) return;
+    const t = window.setTimeout(() => drawerRef.current?.focus(), 0);
+    return () => window.clearTimeout(t);
+  }, [postId, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     previousFocusRef.current = document.activeElement as HTMLElement;
     lockBodyScroll();
     document.body.classList.add('article-overlay-open');
     const focusTimer = window.setTimeout(() => drawerRef.current?.focus(), 0);
 
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseRef.current();
+    };
+    document.addEventListener('keydown', handleEscape);
+
     return () => {
       window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handleEscape);
       document.body.classList.remove('article-overlay-open');
       unlockBodyScroll();
       previousFocusRef.current?.focus();
     };
-  }, [post]);
-
-  useEffect(() => {
-    if (!post) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCloseRef.current();
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [post]);
+  }, [isOpen]);
 
   const handleTabKey = useCallback((e: React.KeyboardEvent) => {
     if (e.key !== 'Tab' || !drawerRef.current) return;
