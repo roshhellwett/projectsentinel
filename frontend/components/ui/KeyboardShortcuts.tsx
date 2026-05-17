@@ -23,12 +23,10 @@ export function KeyboardShortcuts() {
   const [helpOpen, setHelpOpen] = useState(false);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-
   const bufferRef = useRef<string>('');
   const bufferTimerRef = useRef<number | null>(null);
 
   const closeHelp = useCallback(() => setHelpOpen(false), []);
-
 
   useEffect(() => {
     if (!helpOpen) {
@@ -65,7 +63,6 @@ export function KeyboardShortcuts() {
 
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-
       if (e.key === 'Escape') {
         if (helpOpen) {
           e.preventDefault();
@@ -74,7 +71,6 @@ export function KeyboardShortcuts() {
         return;
       }
 
-
       if (e.key === '/') {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
@@ -82,14 +78,12 @@ export function KeyboardShortcuts() {
         return;
       }
 
-
       if (e.key === '?') {
         e.preventDefault();
         setHelpOpen((v) => !v);
         resetBuffer();
         return;
       }
-
 
       if (bufferRef.current === 'g') {
         if (e.key === 'h') {

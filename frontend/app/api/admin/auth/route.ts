@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       );
     }
 
-
     const token = await new SignJWT({ role: 'admin' })
       .setProtectedHeader({ alg: 'HS256' })
       .setExpirationTime('24h')

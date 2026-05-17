@@ -28,7 +28,6 @@ function createEnvConfig(): EnvConfig {
   const isDev = mode === 'development';
   const isProd = mode === 'production';
 
-
   const supabaseUrl = validateRequiredEnv(
     'NEXT_PUBLIC_SUPABASE_URL',
     process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -37,7 +36,6 @@ function createEnvConfig(): EnvConfig {
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
-
 
   try {
     new URL(supabaseUrl);

@@ -27,7 +27,6 @@ const SHARE_PLATFORMS = [
   {
     name: 'LinkedIn',
 
-
     getUrl: (url: string, _text: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   },
   {

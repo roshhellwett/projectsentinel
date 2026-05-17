@@ -17,8 +17,6 @@ interface TrendingSectionProps {
 
 export function TrendingSection({ posts }: TrendingSectionProps) {
 
-
-
   const trending = useMemo(() => {
     if (!posts || posts.length === 0) return [];
     const seen = new Set<string>();
@@ -31,9 +29,6 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     }
     return out;
   }, [posts]);
-
-
-
 
   const { isRead } = useReadPosts();
   const [hydrated, setHydrated] = useState(false);

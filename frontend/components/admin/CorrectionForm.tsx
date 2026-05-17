@@ -18,12 +18,10 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     lockBodyScroll();
     return () => unlockBodyScroll();
   }, []);
-
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

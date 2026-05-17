@@ -48,11 +48,11 @@ export function BreakingTicker() {
   }, []);
 
   if (items.length === 0) {
-    // Render a 24px placeholder so layout doesn't shift when items arrive.
+
     return <div aria-hidden="true" className="h-7 border-b border-rule bg-paper" />;
   }
 
-  // Duplicate the list so the CSS translateX(-50%) seam is invisible.
+
   const loop = [...items, ...items];
 
   return (

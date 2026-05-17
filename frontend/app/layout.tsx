@@ -85,7 +85,6 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.svg',
   },
 
-
   manifest: '/manifest.webmanifest',
 };
 
@@ -103,8 +102,6 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
-
-
   const supabaseOrigin = (() => {
     try {
       if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -119,8 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Theme boot — synchronous to prevent light/dark flash. Reads
-            localStorage('iv-theme') first, then falls back to OS preference. */}
+
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var s=localStorage.getItem('iv-theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
@@ -159,7 +155,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </noscript>
         )}
-
 
         <a
           href="#main"

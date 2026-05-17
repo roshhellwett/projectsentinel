@@ -16,8 +16,6 @@ export default async function PostOgImage(
   const { id } = await params;
   const post = await fetchPostById(id).catch(() => null);
 
-
-
   if (!post) {
     return new ImageResponse(
       (
@@ -75,7 +73,6 @@ export default async function PostOgImage(
           }}
         />
 
-
         <div
           style={{
             position: 'absolute',
@@ -86,7 +83,6 @@ export default async function PostOgImage(
             backgroundColor: theme.hex,
           }}
         />
-
 
         <div
           style={{
@@ -173,7 +169,6 @@ export default async function PostOgImage(
           </div>
         </div>
 
-
         <div
           style={{
             display: 'flex',
@@ -200,7 +195,6 @@ export default async function PostOgImage(
             {post.headline}
           </h1>
         </div>
-
 
         <div
           style={{
@@ -282,7 +276,6 @@ export default async function PostOgImage(
             <span>/100</span>
           </div>
         </div>
-
 
         <div
           style={{
@@ -369,7 +362,6 @@ export default async function PostOgImage(
               </span>
             )}
           </div>
-
 
           <span
             style={{

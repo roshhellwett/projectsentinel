@@ -8,8 +8,6 @@ interface CategoryTagProps {
   className?: string;
 }
 
-// Editorial: every category renders as a crimson uppercase eyebrow label.
-// We keep the per-category theme lookup only for the human-readable label.
 export function CategoryTag({ category, className = '' }: CategoryTagProps) {
   const theme = getCategoryTheme(category);
 

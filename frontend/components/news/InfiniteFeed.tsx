@@ -8,7 +8,6 @@ import { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
-import { LiveUpdateIsland } from './LiveUpdateIsland';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { subscribeToPosts } from '@/lib/supabase/client';
@@ -16,8 +15,6 @@ import { markFresh } from '@/lib/utils/freshSignal';
 import {
   POLL_INTERVAL_MS,
   BACKGROUND_POLL_INTERVAL_MS,
-  QUEUE_THRESHOLD_PX,
-  AUTO_FLUSH_AT_SCROLL_Y,
   DEFAULT_PAGE_SIZE,
 } from '@/lib/config/constants';
 
@@ -60,7 +57,6 @@ export function InfiniteFeed({
     [excludeKey],
   );
 
-
   const dedupedInitial = dedupe(initialPosts);
 
   const [posts, setPosts] = useState<Post[]>(dedupedInitial);
@@ -78,9 +74,6 @@ export function InfiniteFeed({
     return () => window.clearTimeout(t);
   }, [lastOpenedId]);
 
-
-
-
   const { readIds, markRead } = useReadPosts();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -88,10 +81,8 @@ export function InfiniteFeed({
   const postsRef = useRef(posts);
   postsRef.current = posts;
 
-
   const excludeIdsRef = useRef(excludeSet);
   excludeIdsRef.current = excludeSet;
-
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || exhausted) return;
@@ -114,9 +105,6 @@ export function InfiniteFeed({
         return dedupe([...prev, ...incoming]);
       });
       setPage(next);
-
-
-
 
       if (data.posts.length === 0 || data.posts.length < pageSize) {
         setExhausted(true);
@@ -147,18 +135,6 @@ export function InfiniteFeed({
     return () => obs.disconnect();
   }, [loadMore]);
 
-
-  const [pendingNew, setPendingNew] = useState<Post[]>([]);
-  const pendingRef = useRef(pendingNew);
-  pendingRef.current = pendingNew;
-
-
-
-
-
-
-
-
   const DISMISSED_KEY = 'iv:liveDismissedIds';
   const dismissedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -171,7 +147,6 @@ export function InfiniteFeed({
       }
     } catch { /* corrupt JSON — start fresh */ }
   }, []);
-
 
   const markDismissed = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
@@ -186,7 +161,6 @@ export function InfiniteFeed({
       sessionStorage.setItem(DISMISSED_KEY, JSON.stringify(Array.from(dismissedRef.current)));
     } catch { /* quota/private-mode — non-fatal */ }
   }, []);
-
 
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
@@ -204,92 +178,22 @@ export function InfiniteFeed({
     }, 3200);
   }, []);
 
-
-  const flushPending = useCallback((opts: { scroll?: boolean } = { scroll: true }) => {
-    const queued = pendingRef.current;
-    if (queued.length === 0) return;
-    setPendingNew([]);
-    setPosts((prev) => dedupe([...queued, ...prev]));
-    const ids = queued.map((p) => p.id);
-    flashFresh(ids);
-    markDismissed(ids);
-    if (opts.scroll && typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [flashFresh, markDismissed]);
-
-
-  const openFromIsland = useCallback((newest: Post) => {
-    const queued = pendingRef.current;
-    setPendingNew([]);
-    setPosts((prev) => dedupe([newest, ...queued.filter((p) => p.id !== newest.id), ...prev]));
-    flashFresh(queued.map((p) => p.id));
-    markDismissed(queued.map((p) => p.id));
-    markRead(newest.id);
-    setSelectedPost(newest);
-  }, [flashFresh, markDismissed, markRead]);
-
-
-
-
-
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => {
-        if (window.scrollY < AUTO_FLUSH_AT_SCROLL_Y && pendingRef.current.length > 0) {
-          flushPending({ scroll: false });
-        }
-        ticking = false;
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [flushPending]);
-
-
-
-
-
   const processIncomingPosts = useCallback((incoming: Post[]) => {
     if (incoming.length === 0) return;
     const existing = new Set(postsRef.current.map((p) => p.id));
-    const queuedIds = new Set(pendingRef.current.map((p) => p.id));
     const dismissed = dismissedRef.current;
     const excluded = excludeIdsRef.current;
     const fresh = incoming.filter(
       (p) =>
         !existing.has(p.id) &&
-        !queuedIds.has(p.id) &&
         !dismissed.has(p.id) &&
         !(excluded?.has(p.id)) &&
-
-
-
-
         (!category || p.category === category),
     );
     if (fresh.length === 0) return;
-
-
-
-    const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-    const userIsReading = scrollY > QUEUE_THRESHOLD_PX;
-
-    if (userIsReading) {
-      setPendingNew((curr) => dedupe([...fresh, ...curr]));
-    } else {
-      flashFresh(fresh.map((p) => p.id));
-      setPosts((prev) => dedupe([...fresh, ...prev]));
-    }
+    flashFresh(fresh.map((p) => p.id));
+    setPosts((prev) => dedupe([...fresh, ...prev]));
   }, [category, flashFresh]);
-
-
-
-
-
 
   useEffect(() => {
     let sub: { unsubscribe: () => void } | null = null;
@@ -325,14 +229,6 @@ export function InfiniteFeed({
     };
   }, [processIncomingPosts]);
 
-
-
-
-
-
-
-
-
   useEffect(() => {
     let cancelled = false;
 
@@ -357,7 +253,6 @@ export function InfiniteFeed({
 
     let timerId: ReturnType<typeof setTimeout> | null = null;
 
-
     const scheduleNext = (ms: number) => {
       if (timerId !== null) clearTimeout(timerId);
       timerId = setTimeout(async () => {
@@ -381,14 +276,9 @@ export function InfiniteFeed({
       }
     };
 
-
     const onOnline = () => { tick(); scheduleNext(FOREGROUND_MS); };
 
-
-
     const onFocus = () => { tick(); };
-
-
 
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) tick();
@@ -398,7 +288,6 @@ export function InfiniteFeed({
     window.addEventListener('online', onOnline);
     window.addEventListener('focus', onFocus);
     window.addEventListener('pageshow', onPageShow);
-
 
     tick();
     scheduleNext(FOREGROUND_MS);
@@ -413,20 +302,16 @@ export function InfiniteFeed({
     };
   }, [category, processIncomingPosts]);
 
-
   useEffect(() => {
     if (selectedPost && !posts.find((p) => p.id === selectedPost.id)) {
       setSelectedPost(null);
     }
   }, [posts, selectedPost]);
 
-
   const handleOpen = useCallback((post: Post) => {
     markRead(post.id);
     setSelectedPost(post);
   }, [markRead]);
-
-
 
   const readMap = useMemo(() => readIds, [readIds]);
 
@@ -487,7 +372,6 @@ export function InfiniteFeed({
         <div ref={sentinelRef} className="h-12 w-full mt-8" aria-hidden="true" />
       )}
 
-
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -518,8 +402,6 @@ export function InfiniteFeed({
         }}
       />
 
-
-      <LiveUpdateIsland pending={pendingNew} onTap={openFromIsland} />
     </>
   );
 }

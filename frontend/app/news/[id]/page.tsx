@@ -94,7 +94,6 @@ export default async function NewsPage({ params }: NewsPageProps) {
         }}
       />
 
-
       <div className="container mx-auto px-4 pt-10 max-w-5xl">
         <div className="flex items-center justify-between gap-3 mb-7 flex-wrap">
           <Link
@@ -127,9 +126,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         )}
 
-
         <article id="article-body" className={`relative mb-10 md:mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
-          {/* Crimson rule above eyebrow */}
+
           <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
@@ -165,7 +163,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </div>
 
-          {/* Article body — editorial measure (≈70ch) */}
+
           <div className="max-w-[68ch]">
             <p className="font-display text-[18px] md:text-[20px] leading-[1.7] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.4em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:text-accent">
               {post.summary}
@@ -194,7 +192,6 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
         </div>
 
-
         <div className="rounded-md border border-rule bg-paper-2 p-6 mb-12">
           <h3 className="text-[11px] font-bold text-accent mb-5 uppercase tracking-[0.18em] text-center">
             How this story was built
@@ -215,7 +212,6 @@ export default async function NewsPage({ params }: NewsPageProps) {
             ))}
           </div>
         </div>
-
 
         <div id="related-news" className="mt-16 border-t border-rule pt-12">
           <h2 className="section-rule mb-7">

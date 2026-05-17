@@ -57,7 +57,6 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
     };
   }, [targetSelector]);
 
-
   const visible = progress > 0.005 && progress < 0.995;
 
   return (

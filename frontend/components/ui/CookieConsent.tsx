@@ -30,7 +30,7 @@ export function CookieConsent() {
 
   useEffect(() => {
     if (readDecision() !== null) return;
-    // Defer mount so it doesn't compete with above-the-fold paint.
+
     const t = window.setTimeout(() => setOpen(true), 600);
     return () => window.clearTimeout(t);
   }, []);

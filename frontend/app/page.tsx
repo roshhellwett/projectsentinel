@@ -34,19 +34,11 @@ export default async function HomePage() {
     fetchPosts(1, 20),
   ]);
 
-
   const allPosts = dedupe(
     heroPost
       ? postsResult.posts.filter((post) => post.id !== heroPost.id)
       : postsResult.posts,
   );
-
-
-
-
-
-
-
 
   const NOW = Date.now();
   const trendingPosts = [...allPosts]
@@ -61,20 +53,10 @@ export default async function HomePage() {
   const trendingIdList = trendingPosts.map((p) => p.id);
   const trendingIds = new Set(trendingIdList);
 
-
-
   const DAY_AGO = NOW - 24 * 3_600_000;
   const verifiedToday = allPosts.filter(
     (p) => new Date(p.published_at).getTime() >= DAY_AGO,
   ).length + (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
-
-
-
-
-
-
-
-
 
   const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
 
@@ -88,7 +70,7 @@ export default async function HomePage() {
       />
 
       <div className="container mx-auto px-4 lg:px-6 pt-8 lg:pt-12 pb-16">
-        {/* ── Editorial masthead block — flat paper, generous type, hairline rule. */}
+
         <section
           aria-label="Today's masthead"
           className="relative mb-10 pb-10 border-b border-rule"
@@ -112,7 +94,7 @@ export default async function HomePage() {
             <LiveClock variant="hero" />
           </div>
 
-          {/* Mobile masthead */}
+
           <div className="md:hidden">
             <p className="editorial-kicker mb-4">
               <span>{getIndianGreeting()}</span>
@@ -142,11 +124,9 @@ export default async function HomePage() {
           )}
         </section>
 
-
         <div className="mb-8">
           <CategoryBar />
         </div>
-
 
         {heroPost && (
           <div id="latest" className="mb-12 scroll-mt-24">
@@ -154,9 +134,7 @@ export default async function HomePage() {
           </div>
         )}
 
-
         {trendingPosts.length > 0 && <TrendingSection posts={trendingPosts} />}
-
 
         <section aria-label="Latest verified news">
           <h2 className="section-rule mb-7">

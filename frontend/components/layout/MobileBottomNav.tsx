@@ -14,8 +14,6 @@ import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScroll
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
 
-
-
   { id: 'search', href: null, icon: Search, label: 'Search' },
   { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
   { id: 'saved', href: '/saved/', icon: Bookmark, label: 'Saved' },
@@ -28,8 +26,6 @@ export function MobileBottomNav() {
 
   const closeTopics = useCallback(() => setTopicsOpen(false), []);
   const toggleTopics = useCallback(() => setTopicsOpen((v) => !v), []);
-
-
 
   useEffect(() => {
     if (!topicsOpen) return;
@@ -103,7 +99,6 @@ export function MobileBottomNav() {
           </motion.div>
         )}
       </AnimatePresence>
-
 
       <nav
         className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57] transition-[opacity,transform] duration-200 ${

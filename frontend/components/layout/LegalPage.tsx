@@ -12,11 +12,6 @@ interface LegalPageProps {
   children: ReactNode;
 }
 
-/**
- * Editorial scaffolding for a long-form policy page.
- * Renders an ink-on-paper masthead, crimson rule, and a constrained measure
- * (~68ch) for the body so legal prose stays readable.
- */
 export function LegalPage({ kicker, title, lastUpdated, intro, children }: LegalPageProps) {
   return (
     <div className="relative min-h-screen pb-16">

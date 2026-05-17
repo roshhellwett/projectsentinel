@@ -26,8 +26,8 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
   const firstHost = firstSource ? getHostname(firstSource.url) : '';
   const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
 
-  // Subtle parallax kept on the placeholder image but the lavender orb
-  // is gone — editorial layout, no decorative glow.
+
+
   const { scrollY } = useScroll();
   const imgY = useTransform(scrollY, [0, 600], [0, 30]);
 
@@ -42,11 +42,11 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
         href={`/news/${post.id}/`}
         className="block relative overflow-hidden rounded-md bg-paper border border-rule transition-[border-color,box-shadow] duration-200 hover:border-rule-strong hover:shadow-paper-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
       >
-        {/* Crimson hairline at the very top — the only chrome flourish. */}
+
         <span aria-hidden="true" className="absolute top-0 left-0 right-0 h-[2px] bg-accent" />
 
         <div className="relative grid grid-cols-1 lg:grid-cols-5 min-h-[320px] lg:min-h-[420px]">
-          {/* Image / placeholder column */}
+
           <motion.div
             className="relative lg:col-span-2 min-h-[200px] lg:min-h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-rule"
             style={{ y: imgY }}
@@ -61,7 +61,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             )}
           </motion.div>
 
-          {/* Editorial column */}
+
           <div className="relative lg:col-span-3 p-7 md:p-10 lg:p-12 flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <CategoryTag category={post.category} />

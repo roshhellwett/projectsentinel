@@ -24,11 +24,6 @@ export function CategoryBar() {
     const active = activeRef.current;
     if (!container || !active) return;
 
-
-
-
-
-
     const containerRect = container.getBoundingClientRect();
     const activeRect = active.getBoundingClientRect();
     const offsetWithin =
@@ -37,8 +32,6 @@ export function CategoryBar() {
       0,
       offsetWithin - container.clientWidth / 2 + activeRect.width / 2,
     );
-
-
 
     if (Math.abs(container.scrollLeft - target) < 4) return;
 
@@ -51,7 +44,7 @@ export function CategoryBar() {
       role="tablist"
       aria-label="News categories"
     >
-      {/* Edge fades to hint scrollability */}
+
       <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-paper to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-paper to-transparent z-10 pointer-events-none" />
 

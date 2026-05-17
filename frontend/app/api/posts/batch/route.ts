@@ -43,8 +43,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-
-
     const byId = new Map((data as Post[]).map((p) => [p.id, p]));
     const ordered = valid.map((id) => byId.get(id)).filter(Boolean) as Post[];
 

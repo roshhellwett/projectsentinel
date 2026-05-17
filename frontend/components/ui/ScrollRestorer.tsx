@@ -27,8 +27,6 @@ function writeMap(map: Record<string, number>) {
     const keys = Object.keys(map);
     if (keys.length > MAX_ENTRIES) {
 
-
-
       const trimmed: Record<string, number> = {};
       for (const k of keys.slice(keys.length - MAX_ENTRIES)) trimmed[k] = map[k];
       map = trimmed;
@@ -43,8 +41,6 @@ export function ScrollRestorer() {
   const pathname = usePathname();
   const key = pathname ?? '/';
   const previousKeyRef = useRef<string | null>(null);
-
-
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -87,9 +83,6 @@ export function ScrollRestorer() {
     };
   }, [key]);
 
-
-
-
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
@@ -108,7 +101,6 @@ export function ScrollRestorer() {
       window.requestAnimationFrame(() => {
         window.scrollTo({ top: stored, behavior: 'auto' });
       });
-
 
       const retry = window.setTimeout(() => {
         if (Math.abs(window.scrollY - stored) > 4) {

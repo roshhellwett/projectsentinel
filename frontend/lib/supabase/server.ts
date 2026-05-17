@@ -72,7 +72,6 @@ export async function fetchPosts(
 
     if (error) {
 
-
       if (error.message?.includes('Requested range not satisfiable')) {
         return { posts: [], count: 0 };
       }
@@ -98,7 +97,6 @@ export async function fetchPostById(id: string): Promise<Post | null> {
       .single();
 
     if (error) {
-
 
       if (error.code === 'PGRST116') return null;
       throw new Error(`fetchPostById error: ${error.message}`);
@@ -159,17 +157,6 @@ export async function searchPosts(
 
   const safeLimit = Math.min(50, Math.max(1, limit));
 
-
-
-
-
-
-
-
-
-
-
-
   const ftsTerm = safeQuery
     .replace(/[\\&|!():*'"<>,.;]/g, ' ')
     .split(/\s+/)
@@ -187,7 +174,6 @@ export async function searchPosts(
     .limit(safeLimit);
 
   if (error) {
-
 
     const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
     const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()

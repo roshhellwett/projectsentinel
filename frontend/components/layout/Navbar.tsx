@@ -16,8 +16,6 @@ import { BreakingTicker } from '@/components/layout/BreakingTicker';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
-// Editorial nav: Home omitted (the wordmark links there) so the row reads
-// as a topic taxonomy rather than a chrome strip.
 const NAV_LINKS = [
   { href: '/category/politics/',   label: 'Politics' },
   { href: '/category/business/',   label: 'Business' },
@@ -68,7 +66,7 @@ export function Navbar() {
         className="sticky top-0 inset-x-0 z-50 bg-paper border-b border-rule"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
-        {/* ── Masthead row */}
+
         <div className="container mx-auto px-4 lg:px-6">
           <div className="flex items-center justify-between gap-4 h-14 lg:h-16">
             <Link
@@ -92,7 +90,7 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Desktop nav — simple eyebrow links with crimson active underline. */}
+
             <nav
               aria-label="Main navigation"
               className="hidden lg:flex items-center gap-1"
@@ -123,7 +121,7 @@ export function Navbar() {
               })}
             </nav>
 
-            {/* Action cluster */}
+
             <div className="flex items-center gap-1 sm:gap-2">
               <LastRefreshed />
               <ConnectionStatus />
@@ -170,11 +168,11 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* ── Breaking-news ticker rail (sticky beneath the masthead). */}
+
         <BreakingTicker />
       </header>
 
-      {/* Mobile drawer */}
+
       <AnimatePresence>
         {isMobileOpen && (
           <>

@@ -26,12 +26,6 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-
-
-
-
-
-
   useEffect(() => {
     if (!isOpen) return;
     const q = query.trim();
@@ -100,9 +94,6 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     return () => window.clearTimeout(id);
   }, [isOpen]);
 
-
-
-
   useEffect(() => {
     if (isOpen) return;
     setQuery('');
@@ -159,7 +150,6 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 const q = query.trim();
                 if (!q) return;
 
-
                 onClose();
                 router.push(`/search/?q=${encodeURIComponent(q)}`);
               }}
@@ -173,7 +163,6 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
                 className="w-full pl-12 pr-4 py-3.5 bg-paper border border-rule-strong rounded text-ink placeholder-subtle focus:outline-none focus:border-accent transition-colors duration-200"
-
 
                 aria-label="Search verified stories"
               />

@@ -32,9 +32,7 @@ export default async function Image() {
           }}
         />
 
-
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10 }}>
-
 
           <div
             style={{
@@ -63,7 +61,6 @@ export default async function Image() {
             </span>
           </div>
 
-
           <div
             style={{
               fontSize: 64,
@@ -77,7 +74,6 @@ export default async function Image() {
             India Verified
           </div>
 
-
           <div
             style={{
               fontSize: 28,
@@ -88,7 +84,6 @@ export default async function Image() {
           >
             AI-Verified Indian News · No Ads · No Bias
           </div>
-
 
           <div
             style={{

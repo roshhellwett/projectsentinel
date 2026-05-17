@@ -9,9 +9,6 @@ export const revalidate = 3600;
 async function fetchArticleUrls(): Promise<{ id: string; published_at: string }[]> {
   try {
 
-
-
-
     const PAGE_SIZE = 50;
     const MAX_PAGES = 20;
     const collected: { id: string; published_at: string }[] = [];

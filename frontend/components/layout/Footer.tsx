@@ -17,7 +17,6 @@ const ABOUT_LINKS = [
   { href: '/saved/',        label: 'Saved stories' },
 ];
 
-// Required for any news publication. Each maps to a real /policies page.
 const LEGAL_LINKS = [
   { href: '/privacy/',     label: 'Privacy Policy' },
   { href: '/terms/',       label: 'Terms of Use' },
@@ -47,11 +46,11 @@ export function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="relative mt-auto bg-paper-2 border-t border-rule-strong">
-      {/* Hairline crimson rule across the very top — the only flourish. */}
+
       <div className="absolute top-0 inset-x-0 h-[2px] bg-accent" aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-6 pt-12 pb-10">
-        {/* Top row: brand + masthead statement */}
+
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-10 mb-10 border-b border-rule">
           <div>
             <Link
@@ -101,7 +100,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Columns */}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-12">
           <div>
             <ColumnHeading>News</ColumnHeading>
@@ -164,7 +163,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright bar */}
+
         <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-rule">
           <p className="text-xs text-subtle">
             &copy; {year} Zenith Open Source Projects. Reporting cross-verified by AI;

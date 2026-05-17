@@ -132,7 +132,6 @@ export function getCategoryTheme(category: string | undefined | null): CategoryT
   return THEME[category.toLowerCase()] ?? {
     ...DEFAULT_THEME,
 
-
     label: category.charAt(0).toUpperCase() + category.slice(1),
   };
 }

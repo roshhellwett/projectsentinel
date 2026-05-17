@@ -102,8 +102,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
 
           <motion.div
 
-
-
             className="fixed inset-0 bg-ink/35 backdrop-blur-[2px] z-[60]"
             onClick={onClose}
             aria-hidden="true"
@@ -112,7 +110,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
           />
-
 
           <motion.div
             ref={drawerRef}
@@ -144,14 +141,12 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
 
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />
 
-
             <div
               className="lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none"
               onPointerDown={(e) => dragControls.start(e)}
             >
               <div className="w-10 h-1 rounded-full bg-rule-strong" />
             </div>
-
 
             <div className="relative z-10 flex items-center justify-between gap-3 rounded-t-xl bg-paper px-5 py-3.5 border-b border-rule flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7">
               <div className="flex items-center gap-3 min-w-0">
@@ -168,7 +163,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
               </motion.button>
             </div>
 
-
             <div className={`article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain bg-paper px-5 pb-6 pt-5 sm:px-7 sm:pb-8 sm:pt-6 lg:px-8 lg:pt-10 lg:pb-10 flex flex-col ${post.status === 'retracted' ? 'opacity-50' : ''}`}>
               {post.status === 'corrected' && (
                 <CorrectionsNotice type="corrected" note={post.correction_note} />
@@ -180,7 +174,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
               <h2 className="font-display text-[26px] sm:text-3xl lg:text-[32px] 2xl:text-[34px] font-bold text-ink tracking-tight mb-5 leading-[1.12]">
                 {post.headline}
               </h2>
-
 
               <div className="mb-6 rounded border border-rule bg-paper-2 p-4 lg:p-3.5">
                 <CredibilityBar score={post.credibility_score} />
@@ -194,13 +187,11 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 </div>
               </div>
 
-
               <div className="mb-6">
                 <p className="text-[16px] leading-8 text-ink-soft">
                   {post.summary}
                 </p>
               </div>
-
 
               <div className="rounded border border-rule bg-paper-2 p-5 mb-6">
                 <h3 className="font-display text-sm font-bold text-ink mb-3 flex items-center gap-2">
@@ -212,7 +203,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 </p>
               </div>
 
-
               <div>
                 <h3 className="font-display text-sm font-bold text-ink mb-3 flex items-center gap-2">
                   <ExternalLink className="w-4 h-4 text-accent" />
@@ -221,9 +211,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 <SourceLinks sources={post.sources} />
               </div>
 
-              {/* End-of-story mark: hairline + tiny editorial seal, pushed
-                  to the bottom of the scroll container by mt-auto so any
-                  unused vertical space sits ABOVE this seal (not below it). */}
+
               <div className="mt-auto pt-10 flex flex-col items-center text-center">
                 <span aria-hidden="true" className="block w-10 h-px bg-rule-strong mb-3" />
                 <span className="font-display text-[11px] font-bold uppercase tracking-[0.22em] text-subtle">
@@ -235,7 +223,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 <DrawerRelated currentPost={post} onSelect={onSelectRelated} />
               )}
             </div>
-
 
             <div className="relative z-20 flex-shrink-0 border-t border-rule-strong bg-paper px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 sm:px-3.5 sm:pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pt-3.5 lg:px-4 lg:py-3">
               <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-2 lg:gap-2.5">

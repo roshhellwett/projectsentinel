@@ -33,11 +33,6 @@ function SourceFavicon({ url }: { url: string }) {
     );
   }
 
-
-
-
-
-
   return (
 
     <img

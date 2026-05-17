@@ -35,7 +35,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     applyTheme(next);
     setMounted(true);
 
-    // React to OS-level changes only when the user hasn't pinned a choice.
+
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = (e: MediaQueryListEvent) => {
       if (readStored()) return;
@@ -60,7 +60,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     });
   }, []);
 
-  // Render a stable placeholder during SSR/hydration so the icon doesn't flash.
+
   const Icon = mounted ? (theme === 'dark' ? Sun : Moon) : Moon;
   const label = mounted
     ? `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`

@@ -56,7 +56,6 @@ function persistToStorage(key: string, ids: string[]) {
 export function usePersistentIdSet({ key, max = 500 }: Options) {
   const [ids, setIds] = useState<Set<string>>(() => new Set());
 
-
   useEffect(() => {
     setIds(new Set(loadFromStorage(key)));
 
