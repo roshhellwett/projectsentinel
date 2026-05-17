@@ -22,7 +22,11 @@ export function SearchResultsGrid({ posts }: Props) {
           <NewsCard key={post.id} post={post} onClick={() => setSelected(post)} />
         ))}
       </div>
-      <NewsDrawer post={selected} onClose={close} />
+      <NewsDrawer
+        post={selected}
+        onClose={close}
+        onSelectRelated={(next) => setSelected(next)}
+      />
     </>
   );
 }

@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 import { Post } from '@/types';
 import { subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
+import { AUTO_FLUSH_AT_SCROLL_Y } from '@/lib/config/constants';
 
 interface LiveUpdateIslandProps {
 
@@ -15,7 +16,7 @@ interface LiveUpdateIslandProps {
   onTap: (newest: Post) => void;
 }
 
-const HIDE_AT_SCROLL_Y = 140;
+const HIDE_AT_SCROLL_Y = AUTO_FLUSH_AT_SCROLL_Y;
 
 export function LiveUpdateIsland({ pending, onTap }: LiveUpdateIslandProps) {
   const [nearTop, setNearTop] = useState(true);

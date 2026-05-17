@@ -58,7 +58,7 @@ export function MobileBottomNav() {
           >
             <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-sm" onClick={closeTopics} />
             <motion.div
-              key="topics-sheet"
+              key="topics-sheet-inner"
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}

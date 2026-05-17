@@ -153,7 +153,14 @@ export default function SavedPage() {
         </div>
       )}
 
-      <NewsDrawer post={selected} onClose={() => setSelected(null)} />
+      <NewsDrawer
+        post={selected}
+        onClose={() => setSelected(null)}
+        onSelectRelated={(next) => {
+          markRead(next.id);
+          setSelected(next);
+        }}
+      />
     </div>
   );
 }

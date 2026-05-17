@@ -173,7 +173,11 @@ export function Navbar() {
       </motion.header>
 
 
-      <div className="h-16 lg:h-[68px] flex-shrink-0" aria-hidden="true" />
+      <div
+        className="h-16 lg:h-[68px] flex-shrink-0"
+        style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}
+        aria-hidden="true"
+      />
 
 
       <AnimatePresence>
