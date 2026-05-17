@@ -4,7 +4,7 @@
 
 import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ShieldCheck, Globe } from 'lucide-react';
+import { Check, ShieldCheck, Globe, BookOpen } from 'lucide-react';
 import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { truncateWords } from '@/lib/utils/truncate';
@@ -14,6 +14,19 @@ import { BookmarkButton } from './BookmarkButton';
 import { CredibilityBar } from './CredibilityBar';
 import { SourcePickerButton } from './SourcePickerButton';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+
+function ageHexFromMs(ageMs: number): string {
+  if (ageMs < 60 * 60 * 1000) return '#8b7ff0';
+  if (ageMs < 6 * 60 * 60 * 1000) return '#10b981';
+  if (ageMs < 24 * 60 * 60 * 1000) return '#94a3b8';
+  return '#cbd5e1';
+}
+
+function estimateReadMinutes(text: string | null | undefined): number {
+  if (!text) return 1;
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
@@ -63,6 +76,7 @@ interface NewsCardProps {
   isNew?: boolean;
 
   isRead?: boolean;
+  wasRecentlyOpened?: boolean;
 }
 
 function isBreaking(post: Post): boolean {
@@ -70,11 +84,21 @@ function isBreaking(post: Post): boolean {
   return ageMs < 90 * 60 * 1000 && post.credibility_score >= 80;
 }
 
-const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
+const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRecentlyOpened = false }: NewsCardProps) => {
   const breaking = isBreaking(post);
   const theme = getCategoryTheme(post.category);
   const topSources = (post.sources ?? []).slice(0, 3);
   const extraSources = Math.max(0, (post.source_count ?? 0) - topSources.length);
+  const ageMs = Date.now() - new Date(post.published_at).getTime();
+  const ageDotHex = ageHexFromMs(ageMs);
+  const readMinutes = estimateReadMinutes(post.summary);
+  const uniqueHostCount = new Set(
+    (post.sources ?? []).map((s) => getHostname(s.url)).filter(Boolean),
+  ).size;
+  const sourcesTotal = post.source_count ?? topSources.length;
+  const sourcesLabel = uniqueHostCount > 1 && uniqueHostCount === sourcesTotal
+    ? `${uniqueHostCount} ${uniqueHostCount === 1 ? 'publication' : 'publications'}`
+    : `${sourcesTotal} ${sourcesTotal === 1 ? 'source' : 'sources'}`;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -105,6 +129,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         isRead && 'opacity-70',
         isNew && 'flash-new-post',
+        wasRecentlyOpened && 'memory-ring',
       )}
       style={{ contain: 'layout' }}
     >
@@ -139,12 +164,26 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             </span>
           )}
 
-          <span
-            className="text-[10px] text-slate-500 font-medium tabular-nums"
-            style={{ fontFamily: 'var(--font-geist-mono)' }}
-            suppressHydrationWarning
-          >
-            {formatTimeAgo(post.published_at)}
+          <span className="inline-flex items-center gap-1.5">
+            <span
+              className="inline-block w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: ageDotHex }}
+              aria-hidden="true"
+              suppressHydrationWarning
+            />
+            <span
+              className="text-[10px] text-slate-500 font-medium tabular-nums"
+              style={{ fontFamily: 'var(--font-geist-mono)' }}
+              suppressHydrationWarning
+            >
+              {formatTimeAgo(post.published_at)}
+            </span>
+          </span>
+
+          <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 font-medium">
+            <BookOpen className="w-2.5 h-2.5" aria-hidden="true" />
+            <span className="tabular-nums">{readMinutes}</span>
+            <span>min read</span>
           </span>
 
           {isRead && (
@@ -181,11 +220,14 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             {topSources.length > 0 && (
               <span
                 className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 flex-shrink-0"
-                aria-label={`${post.source_count ?? topSources.length} verified sources`}
+                aria-label={`Verified by ${sourcesLabel}`}
+                title={`Verified by ${sourcesLabel}`}
               >
                 <ShieldCheck className="w-3 h-3 text-emerald-600" aria-hidden="true" />
-                <span className="tabular-nums text-slate-700">{post.source_count ?? topSources.length}</span>
-                {(post.source_count ?? topSources.length) === 1 ? 'source' : 'sources'}
+                <span className="tabular-nums text-slate-700">{sourcesTotal}</span>
+                {uniqueHostCount > 1 && uniqueHostCount === sourcesTotal
+                  ? (sourcesTotal === 1 ? 'publication' : 'publications')
+                  : (sourcesTotal === 1 ? 'source' : 'sources')}
               </span>
             )}
           </div>

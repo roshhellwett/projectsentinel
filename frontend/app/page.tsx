@@ -5,8 +5,26 @@ import { CategoryBar } from '@/components/layout/CategoryBar';
 import { HeroCard } from '@/components/news/HeroCard';
 import { TrendingSection } from '@/components/news/TrendingSection';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+import { LiveClock } from '@/components/layout/LiveClock';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { dedupe } from '@/lib/utils/dedupe';
+
+const IST_HOUR_FMT = new Intl.DateTimeFormat('en-GB', {
+  hour: '2-digit',
+  hour12: false,
+  timeZone: 'Asia/Kolkata',
+});
+
+function getIndianGreeting(): string {
+  const hour = parseInt(IST_HOUR_FMT.format(new Date()), 10);
+  if (Number.isNaN(hour)) return 'Welcome';
+  if (hour < 5) return 'Late night';
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  if (hour < 21) return 'Good evening';
+  return 'Good night';
+}
 
 export const revalidate = 15;
 
@@ -73,9 +91,16 @@ export default async function HomePage() {
         <section className="relative mb-9 overflow-hidden rounded-[2rem] border border-slate-950/[0.10] bg-white/75 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_30px_100px_-76px_rgba(139,127,240,0.55)] backdrop-blur-2xl md:px-10 md:py-10">
           <div className="animate-soft-float absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
           <div className="absolute -bottom-32 left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
+
+          <div className="hidden md:block absolute top-6 right-6 lg:top-8 lg:right-8 z-10">
+            <LiveClock variant="hero" />
+          </div>
+
           <div className="relative max-w-4xl">
             <p className="editorial-kicker mb-4">
-              AI-verified Indian news
+              <span className="text-accent">{getIndianGreeting()}</span>
+              <span className="mx-2 text-slate-400">·</span>
+              <span>AI-verified Indian news</span>
             </p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-normal text-slate-950 md:text-6xl lg:text-7xl">
               A calmer, smarter front page for India.
@@ -88,9 +113,10 @@ export default async function HomePage() {
                 <span className="relative inline-flex w-2 h-2 rounded-full bg-accent flex-shrink-0">
                   <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" aria-hidden="true" />
                 </span>
-                <span className="text-[12px] font-semibold text-slate-700 tabular-nums">
-                  {verifiedToday}
-                </span>
+                <AnimatedCounter
+                  value={verifiedToday}
+                  className="text-[12px] font-semibold text-slate-700 tabular-nums"
+                />
                 <span className="text-[12px] font-medium text-slate-500">
                   {verifiedToday === 1 ? 'story verified in the last 24 hours' : 'stories verified in the last 24 hours'}
                 </span>

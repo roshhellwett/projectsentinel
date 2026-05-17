@@ -12,8 +12,10 @@ import { LiveUpdateIsland } from './LiveUpdateIsland';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { subscribeToPosts } from '@/lib/supabase/client';
+import { markFresh } from '@/lib/utils/freshSignal';
 import {
   POLL_INTERVAL_MS,
+  BACKGROUND_POLL_INTERVAL_MS,
   QUEUE_THRESHOLD_PX,
   AUTO_FLUSH_AT_SCROLL_Y,
   DEFAULT_PAGE_SIZE,
@@ -68,6 +70,13 @@ export function InfiniteFeed({
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
 
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!lastOpenedId) return;
+    const t = window.setTimeout(() => setLastOpenedId(null), 1100);
+    return () => window.clearTimeout(t);
+  }, [lastOpenedId]);
 
 
 
@@ -328,7 +337,7 @@ export function InfiniteFeed({
     let cancelled = false;
 
     const FOREGROUND_MS = POLL_INTERVAL_MS;
-    const BACKGROUND_MS = 60_000;
+    const BACKGROUND_MS = BACKGROUND_POLL_INTERVAL_MS;
 
     const tick = async () => {
       if (cancelled) return;
@@ -340,6 +349,7 @@ export function InfiniteFeed({
         const data: { posts: Post[] } = await res.json();
         if (cancelled) return;
         processIncomingPosts(data.posts);
+        markFresh();
       } catch {
         /* silent */
       }
@@ -466,6 +476,7 @@ export function InfiniteFeed({
                 onClick={() => handleOpen(post)}
                 isNew={freshIds.has(post.id)}
                 isRead={readMap.has(post.id)}
+                wasRecentlyOpened={lastOpenedId === post.id}
               />
             </motion.div>
           ))}
@@ -496,7 +507,10 @@ export function InfiniteFeed({
 
       <NewsDrawer
         post={selectedPost}
-        onClose={() => setSelectedPost(null)}
+        onClose={() => {
+          if (selectedPost) setLastOpenedId(selectedPost.id);
+          setSelectedPost(null);
+        }}
         onSelectRelated={(next) => {
           markRead(next.id);
           setPosts((prev) => (prev.some((p) => p.id === next.id) ? prev : dedupe([next, ...prev])));

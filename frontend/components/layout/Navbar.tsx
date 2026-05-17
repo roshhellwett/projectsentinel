@@ -9,17 +9,23 @@ import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { LiveClock } from '@/components/layout/LiveClock';
+import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
+import { LastRefreshed } from '@/components/layout/LastRefreshed';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
+const SPY_SECTIONS: Array<{ id: string; label: string }> = [
+  { id: 'latest', label: 'Latest' },
+];
+
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/category/politics/', label: 'Politics' },
-  { href: '/category/business/', label: 'Business' },
-  { href: '/category/sports/', label: 'Sports' },
-  { href: '/category/tech/', label: 'Tech' },
-  { href: '/saved/', label: 'Saved' },
-  { href: '/how-it-works/', label: 'How It Works' },
+  { href: '/', label: 'Home', minWidth: 'lg' as const },
+  { href: '/category/politics/', label: 'Politics', minWidth: 'lg' as const },
+  { href: '/category/business/', label: 'Business', minWidth: 'lg' as const },
+  { href: '/category/sports/', label: 'Sports', minWidth: 'lg' as const },
+  { href: '/category/tech/', label: 'Tech', minWidth: 'lg' as const },
+  { href: '/saved/', label: 'Saved', minWidth: 'lg' as const },
+  { href: '/how-it-works/', label: 'How It Works', minWidth: 'lg' as const },
 ] as const;
 
 const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
@@ -29,9 +35,37 @@ export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 12));
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const targets = SPY_SECTIONS
+      .map((s) => ({ s, el: document.getElementById(s.id) }))
+      .filter((x): x is { s: { id: string; label: string }; el: HTMLElement } => x.el !== null);
+    if (targets.length === 0) {
+      setActiveSection(null);
+      return;
+    }
+
+    const labelById = new Map(targets.map(({ s }) => [s.id, s.label]));
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) visible.add(e.target.id);
+          else visible.delete(e.target.id);
+        }
+        const next = SPY_SECTIONS.find((s) => visible.has(s.id));
+        setActiveSection(next ? labelById.get(next.id) ?? null : null);
+      },
+      { rootMargin: '-30% 0px -55% 0px' },
+    );
+    for (const { el } of targets) observer.observe(el);
+    return () => observer.disconnect();
+  }, [pathname]);
 
 
 
@@ -114,12 +148,13 @@ export function Navbar() {
               >
                 {NAV_LINKS.map((link) => {
                   const active = isActive(link.href);
+                  const widthClass: string = (link.minWidth as string) === 'xl' ? 'hidden xl:inline-flex' : 'inline-flex';
                   return (
                     <Link
                       key={link.href}
                       href={link.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                      className={`${widthClass} relative items-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                         active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.035]'
                       }`}
                     >
@@ -138,15 +173,42 @@ export function Navbar() {
 
 
               <div className="flex items-center gap-2">
-                <LiveClock />
+                <AnimatePresence mode="popLayout">
+                  {activeSection && (
+                    <motion.span
+                      key={activeSection}
+                      initial={{ opacity: 0, y: -6, scale: 0.94 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                      transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+                      className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/70 border border-slate-950/[0.08] text-[10px] font-semibold tracking-normal text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      <span className="inline-flex w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true" />
+                      <span className="uppercase tracking-[0.16em] text-[9px] text-slate-500">In view</span>
+                      <span className="text-slate-800">{activeSection}</span>
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+
+                <LastRefreshed />
+                <ConnectionStatus />
 
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={openSearch}
-                  aria-label="Search articles"
-                  className="touch-polish p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  aria-label="Search articles (press /)"
+                  title="Search · press /"
+                  className="touch-polish group relative inline-flex items-center gap-1.5 p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <Search className="w-[18px] h-[18px]" strokeWidth={2} />
+                  <kbd
+                    aria-hidden="true"
+                    className="hidden lg:inline-flex items-center justify-center min-w-[1rem] h-4 px-1 rounded-md bg-slate-950/[0.05] border border-slate-950/[0.10] text-[9px] font-semibold text-slate-500 shadow-[inset_0_-1px_0_rgba(15,23,42,0.06)]"
+                  >
+                    /
+                  </kbd>
                 </motion.button>
 
                 <a

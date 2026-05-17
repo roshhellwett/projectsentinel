@@ -371,6 +371,41 @@ html { scrollbar-color: rgba(160, 140, 220, 0.4) transparent; scrollbar-width: t
   animation: flashBorder 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1;
 }
 
+.memory-ring {
+  animation: flashBorder 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1;
+}
+
+@keyframes topShimmer {
+  0%   { transform: translateX(-120%); opacity: 0; }
+  20%  { opacity: 0.85; }
+  100% { transform: translateX(220%); opacity: 0; }
+}
+.trending-top-shimmer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(139, 127, 240, 0.12) 38%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(139, 127, 240, 0.12) 62%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  animation: topShimmer 3.6s ease-in-out infinite;
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trending-top-shimmer::before,
+  .memory-ring,
+  .flash-new-post {
+    animation: none !important;
+  }
+}
+
 /* ═══════════════════════════════════════════════
    NEWS CARD — per-category pastel tint
    The colour comes from inline CSS custom properties set in NewsCard.tsx

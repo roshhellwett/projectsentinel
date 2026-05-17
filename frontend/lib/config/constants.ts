@@ -9,10 +9,11 @@ export const MAX_PAGE_SIZE = 50;
 export const DEFAULT_SEARCH_LIMIT = 20;
 export const MAX_SEARCH_LIMIT = 50;
 
-export const FEED_REVALIDATE_SECONDS = 30;
-export const POLL_INTERVAL_MS = 30_000;
-export const QUEUE_THRESHOLD_PX = 220;
-export const AUTO_FLUSH_AT_SCROLL_Y = 140;
+export const FEED_REVALIDATE_SECONDS = 15;
+export const POLL_INTERVAL_MS = 10_000;
+export const BACKGROUND_POLL_INTERVAL_MS = 30_000;
+export const QUEUE_THRESHOLD_PX = 200;
+export const AUTO_FLUSH_AT_SCROLL_Y = 160;
 
 export const STORAGE_KEYS = {
   READ_POSTS: 'iv:readPosts:v1',

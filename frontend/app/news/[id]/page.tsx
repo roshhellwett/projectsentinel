@@ -17,6 +17,8 @@ import { MarkReadOnMount } from '@/components/news/MarkReadOnMount';
 import { formatDate } from '@/lib/utils/formatDate';
 import { newsArticleJsonLd, breadcrumbJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { ArrowLeft, Clock, ShieldCheck, Database, Calendar } from 'lucide-react';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { NextStoryPrompt } from '@/components/news/NextStoryPrompt';
 
 export const revalidate = 300;
 
@@ -96,15 +98,23 @@ export default async function NewsPage({ params }: NewsPageProps) {
       <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(139,127,240,0.14),transparent_60%)] pointer-events-none -z-10" />
 
       <div className="container mx-auto px-4 pt-10 max-w-5xl">
-        <Link
-          href="/"
-          className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 mb-8 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
-        >
-          <div className="p-1.5 rounded-full bg-white/70 border border-slate-950/[0.10] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-          </div>
-          Back to all news
-        </Link>
+        <div className="flex items-center justify-between gap-3 mb-7 flex-wrap">
+          <Link
+            href="/"
+            className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
+          >
+            <div className="p-1.5 rounded-full bg-white/70 border border-slate-950/[0.10] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            Back to all news
+          </Link>
+          <Breadcrumb
+            items={[
+              { label: post.category.charAt(0).toUpperCase() + post.category.slice(1), href: `/category/${post.category}/` },
+              { label: post.headline },
+            ]}
+          />
+        </div>
 
         {isCorrected && (
           <div className="mb-6">
@@ -222,6 +232,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           <RelatedStories posts={relatedPosts.posts} currentPostId={post.id} />
         </div>
       </div>
+      <NextStoryPrompt posts={relatedPosts.posts} currentPostId={post.id} />
     </div>
   );
 }

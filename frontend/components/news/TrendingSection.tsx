@@ -72,7 +72,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ delay: index * 0.05, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="relative"
+              className={`relative ${isTop ? 'trending-top-shimmer overflow-hidden' : ''}`}
             >
               <Link
                 href={`/news/${post.id}/`}

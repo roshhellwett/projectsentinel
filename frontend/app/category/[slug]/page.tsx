@@ -7,6 +7,7 @@ import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { CategoryBar } from '@/components/layout/CategoryBar';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 
 export const revalidate = 15;
 export const dynamicParams = false;
@@ -81,6 +82,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           }),
         }}
       />
+
+      <Breadcrumb items={[{ label: categoryName }]} className="mb-5" />
 
       <div className="mb-10">
         <CategoryBar />

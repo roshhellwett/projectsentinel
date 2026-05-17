@@ -3,12 +3,13 @@
 // last edited 2026-05-17 by roshhellwett
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, Clock, Database, Flame, ShieldCheck } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Clock, Database, Flame, ShieldCheck, Radio } from 'lucide-react';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
 import { CategoryPlaceholder } from './CategoryPlaceholder';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
+import { getHostname } from '@/lib/utils/getHostname';
 import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
 
 interface HeroCardProps {
@@ -20,6 +21,15 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
   const clampedScore = Math.min(100, Math.max(0, Math.round(post.credibility_score ?? 0)));
   const scoreLabel = getScoreLabel(clampedScore);
   const scoreHex = getScoreHex(clampedScore);
+
+  const firstSource = (post.sources ?? [])[0];
+  const firstHost = firstSource ? getHostname(firstSource.url) : '';
+  const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
+
+  const { scrollY } = useScroll();
+  const orbY = useTransform(scrollY, [0, 600], [0, 60]);
+  const orbScale = useTransform(scrollY, [0, 600], [1, 1.08]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -38,6 +48,12 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
 
           <div className="relative lg:col-span-2 min-h-[180px] lg:min-h-full overflow-hidden">
             <CategoryPlaceholder category={post.category} />
+
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-12 -top-10 w-56 h-56 rounded-full bg-accent/25 blur-3xl"
+              style={{ y: orbY, scale: orbScale }}
+            />
 
             <div
               className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-white/80 pointer-events-none"
@@ -69,9 +85,23 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
               {post.headline}
             </h2>
 
-            <p className="text-base md:text-lg text-slate-600 leading-8 line-clamp-3 max-w-2xl mb-7">
+            <p className="text-base md:text-lg text-slate-600 leading-8 line-clamp-3 max-w-2xl mb-5">
               {post.summary}
             </p>
+
+            {firstHost && (
+              <div className="mb-5 inline-flex items-center gap-2 text-[11px] text-slate-500">
+                <Radio className="w-3 h-3 text-accent" aria-hidden="true" />
+                <span className="font-semibold uppercase tracking-[0.16em] text-slate-500">First by</span>
+                <span className="font-semibold text-slate-700 truncate max-w-[160px]">{firstHost}</span>
+                {otherSourceCount > 0 && (
+                  <span className="text-slate-500">
+                    · cross-verified by <span className="font-semibold text-slate-700 tabular-nums">{otherSourceCount}</span>{' '}
+                    {otherSourceCount === 1 ? 'more' : 'more publications'}
+                  </span>
+                )}
+              </div>
+            )}
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               <div className="inline-flex items-center gap-3.5 rounded-full border border-slate-950/[0.10] bg-white/80 px-4 py-2.5 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_18px_50px_-32px_rgba(139,127,240,0.45)]">
