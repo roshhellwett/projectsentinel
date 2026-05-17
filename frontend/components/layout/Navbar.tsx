@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
+import { LiveClock } from '@/components/layout/LiveClock';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
@@ -137,6 +138,8 @@ export function Navbar() {
 
 
               <div className="flex items-center gap-2">
+                <LiveClock />
+
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={openSearch}
@@ -247,7 +250,8 @@ export function Navbar() {
                   );
                 })}
               </nav>
-              <div className="p-5 border-t border-slate-950/[0.08]">
+              <div className="p-5 border-t border-slate-950/[0.08] flex flex-col gap-3">
+                <LiveClock variant="menu" />
                 <a
                   href={REPO_URL}
                   target="_blank"
