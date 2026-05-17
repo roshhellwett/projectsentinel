@@ -1,0 +1,48 @@
+// last edited 2026-05-17 by roshhellwett
+
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { fetchPosts } from '@/lib/supabase/server';
+import { dedupe } from '@/lib/utils/dedupe';
+import { SwipeStack } from '@/components/swipe/SwipeStack';
+import { DesktopRedirect } from '@/components/swipe/DesktopRedirect';
+
+export const metadata: Metadata = {
+  title: 'Swipe — India Verified',
+  description: 'Swipe through today’s verified Indian news, one story at a time.',
+  robots: { index: false, follow: true },
+};
+
+export const dynamic = 'force-dynamic';
+
+export default async function SwipePage() {
+  const { posts } = await fetchPosts(1, 20);
+  const deduped = dedupe(posts ?? []);
+
+  return (
+    <>
+      <DesktopRedirect />
+      <main className="md:hidden flex flex-col items-center pt-6 pb-24 min-h-[calc(100dvh-3.5rem)]">
+        <header className="w-full max-w-md px-4 mb-5">
+          <span className="block w-10 h-[2px] bg-accent mb-3" aria-hidden="true" />
+          <h1 className="font-display text-[22px] font-bold text-ink leading-tight">
+            Swipe
+            <span className="ml-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent align-middle">
+              Beta
+            </span>
+          </h1>
+          <p className="text-[13px] text-muted mt-1">One story at a time. Tap Home below to switch back.</p>
+        </header>
+        <SwipeStack initialPosts={deduped} />
+      </main>
+
+      <div className="hidden md:flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+        <h1 className="font-display text-3xl font-bold text-ink mb-3">Swipe is a mobile experience</h1>
+        <p className="text-muted max-w-md mb-6">Open this page on your phone to swipe through verified news, one story at a time.</p>
+        <Link href="/" className="inline-flex items-center px-4 py-2 border border-rule-strong text-sm font-semibold text-ink hover:bg-paper-2 transition-colors rounded">
+          Back to grid
+        </Link>
+      </div>
+    </>
+  );
+}

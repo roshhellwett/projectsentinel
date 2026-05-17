@@ -116,7 +116,6 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       initial={{ y: 8 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -3 }}
       whileTap={{ scale: 0.975, transition: { duration: 0.1 } }}
       data-read={isRead ? 'true' : 'false'}
       className={cn(

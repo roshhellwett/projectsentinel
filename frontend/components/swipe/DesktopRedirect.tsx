@@ -1,0 +1,28 @@
+'use client';
+
+// last edited 2026-05-17 by roshhellwett
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+const MOBILE_BREAKPOINT_PX = 768;
+
+export function DesktopRedirect() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia(`(min-width: ${MOBILE_BREAKPOINT_PX}px)`);
+    if (mq.matches) {
+      router.replace('/');
+      return;
+    }
+    const handler = (e: MediaQueryListEvent) => {
+      if (e.matches) router.replace('/');
+    };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [router]);
+
+  return null;
+}

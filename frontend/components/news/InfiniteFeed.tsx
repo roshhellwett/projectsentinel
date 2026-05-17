@@ -35,7 +35,7 @@ const gridVariants = {
 };
 
 const itemVariants = {
-  hidden: { y: 16 },
+  hidden: { opacity: 0, y: 16 },
   show: {
     opacity: 1,
     y: 0,
@@ -349,7 +349,6 @@ export function InfiniteFeed({
           {posts.map((post) => (
             <motion.div
               key={post.id}
-              layout="position"
               initial="hidden"
               animate="show"
               exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.18 } }}

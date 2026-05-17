@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
-import { Home, Search, LayoutGrid, Bookmark } from 'lucide-react';
+import { Home, Search, LayoutGrid, Bookmark, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
@@ -13,7 +13,7 @@ import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScroll
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
-
+  { id: 'swipe', href: '/swipe/', icon: Layers, label: 'Swipe' },
   { id: 'search', href: null, icon: Search, label: 'Search' },
   { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
   { id: 'saved', href: '/saved/', icon: Bookmark, label: 'Saved' },
@@ -121,7 +121,7 @@ export function MobileBottomNav() {
                 <motion.div
                   whileTap={{ scale: 0.84 }}
                   transition={{ type: 'spring', stiffness: 600, damping: 28 }}
-                  className="relative flex flex-col items-center gap-1 px-5 py-2 rounded-2xl min-w-[56px]"
+                  className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl min-w-[52px]"
                 >
                   {active && (
                     <motion.div
