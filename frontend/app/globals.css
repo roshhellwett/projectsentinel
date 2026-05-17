@@ -251,13 +251,29 @@ html {
 
 .editorial-kicker {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   color: rgba(15, 23, 42, 0.58);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+.editorial-kicker > span { white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE BOTTOM NAV CLEARANCE
+   Reserve safe space at the bottom of the page on mobile so the fixed
+   MobileBottomNav never covers content, footer, or floating prompts.
+═══════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  html {
+    scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* ═══════════════════════════════════════════════

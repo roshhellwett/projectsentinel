@@ -9,7 +9,7 @@ import { Home, Search, LayoutGrid, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
@@ -24,6 +24,7 @@ const TABS = [
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [topicsOpen, setTopicsOpen] = useState(false);
+  const [scrollLocked, setScrollLocked] = useState(false);
 
   const closeTopics = useCallback(() => setTopicsOpen(false), []);
   const toggleTopics = useCallback(() => setTopicsOpen((v) => !v), []);
@@ -35,6 +36,13 @@ export function MobileBottomNav() {
     lockBodyScroll();
     return () => unlockBodyScroll();
   }, [topicsOpen]);
+
+  useEffect(() => {
+    setScrollLocked(isBodyScrollLocked());
+    return subscribeBodyScrollLock(setScrollLocked);
+  }, []);
+
+  const hideForOverlay = scrollLocked && !topicsOpen;
 
   const isActive = (id: string, href: string | null) => {
     if (id === 'topics') return topicsOpen || pathname.startsWith('/category/');
@@ -97,7 +105,13 @@ export function MobileBottomNav() {
       </AnimatePresence>
 
 
-      <nav className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57]" aria-label="Mobile navigation">
+      <nav
+        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57] transition-[opacity,transform] duration-200 ${
+          hideForOverlay ? 'pointer-events-none opacity-0 translate-y-full' : 'opacity-100 translate-y-0'
+        }`}
+        aria-hidden={hideForOverlay ? 'true' : 'false'}
+        aria-label="Mobile navigation"
+      >
         <div
           className="relative border-t border-slate-950/[0.08] bg-white/82 backdrop-blur-2xl shadow-[0_-18px_55px_-42px_rgba(15,23,42,0.24)]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}

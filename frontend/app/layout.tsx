@@ -164,7 +164,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
 
-        <div className="h-20 md:hidden" aria-hidden="true" />
         <Footer />
         <MobileBottomNav />
         <ScrollToTop />

@@ -108,12 +108,14 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
             Back to all news
           </Link>
-          <Breadcrumb
-            items={[
-              { label: post.category.charAt(0).toUpperCase() + post.category.slice(1), href: `/category/${post.category}/` },
-              { label: post.headline },
-            ]}
-          />
+          <div className="hidden md:block">
+            <Breadcrumb
+              items={[
+                { label: post.category.charAt(0).toUpperCase() + post.category.slice(1), href: `/category/${post.category}/` },
+                { label: post.headline },
+              ]}
+            />
+          </div>
         </div>
 
         {isCorrected && (

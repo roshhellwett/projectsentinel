@@ -99,7 +99,7 @@ export default async function HomePage() {
           <div className="relative max-w-4xl">
             <p className="editorial-kicker mb-4">
               <span className="text-accent">{getIndianGreeting()}</span>
-              <span className="mx-2 text-slate-400">·</span>
+              <span aria-hidden="true" className="text-slate-400 hidden sm:inline">·</span>
               <span>AI-verified Indian news</span>
             </p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-normal text-slate-950 md:text-6xl lg:text-7xl">
