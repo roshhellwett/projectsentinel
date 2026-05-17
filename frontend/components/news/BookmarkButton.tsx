@@ -45,14 +45,13 @@ export function BookmarkButton({
         aria-pressed={saved}
         aria-label={saved ? 'Remove from saved' : 'Save for later'}
         className={cn(
-          'touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full',
-          'bg-white/70 backdrop-blur-md border text-sm font-medium',
-          'shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]',
-          'transition-all duration-200',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
+          'inline-flex items-center gap-2 px-3.5 py-2 rounded',
+          'bg-paper border text-sm font-medium',
+          'transition-colors duration-200',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           saved
-            ? 'border-accent/40 text-accent hover:bg-accent/5'
-            : 'border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30',
+            ? 'border-accent text-accent hover:bg-accent-soft'
+            : 'border-rule text-muted hover:text-ink hover:border-ink',
           className,
         )}
       >

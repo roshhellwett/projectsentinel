@@ -95,17 +95,15 @@ export default async function NewsPage({ params }: NewsPageProps) {
       />
 
 
-      <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(139,127,240,0.14),transparent_60%)] pointer-events-none -z-10" />
-
       <div className="container mx-auto px-4 pt-10 max-w-5xl">
         <div className="flex items-center justify-between gap-3 mb-7 flex-wrap">
           <Link
             href="/"
-            className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group"
           >
-            <div className="p-1.5 rounded-full bg-white/70 border border-slate-950/[0.10] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-            </div>
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded border border-rule bg-paper group-hover:border-ink transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </span>
             Back to all news
           </Link>
           <div className="hidden md:block">
@@ -130,81 +128,76 @@ export default async function NewsPage({ params }: NewsPageProps) {
         )}
 
 
-        <article id="article-body" className={`premium-card relative rounded-[2rem] overflow-hidden mb-10 md:mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+        <article id="article-body" className={`relative mb-10 md:mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
+          {/* Crimson rule above eyebrow */}
+          <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
 
-          <div className="p-5 sm:p-8 md:p-12">
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <CategoryTag category={post.category} />
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-white/70 border border-slate-950/[0.10] px-3 py-1.5 rounded-full">
-                <Calendar className="w-3.5 h-3.5" />
-                {formatDate(post.published_at)}
-              </span>
-              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-white/70 border border-slate-950/[0.10] px-3 py-1.5 rounded-full">
-                <Clock className="w-3.5 h-3.5" />
-                <ReadingTime text={post.summary} />
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
+            <CategoryTag category={post.category} />
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted">
+              <Calendar className="w-3.5 h-3.5" />
+              {formatDate(post.published_at)}
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-muted">
+              <Clock className="w-3.5 h-3.5" />
+              <ReadingTime text={post.summary} />
+            </span>
+          </div>
 
-            <h1 className={`text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-950 tracking-normal leading-[1.07] mb-7 ${isRetracted ? 'line-through text-slate-500' : ''}`}>
-              {post.headline}
-            </h1>
+          <h1 className={`font-display font-bold text-ink tracking-tight leading-[1.04] mb-8 text-[clamp(2rem,4.6vw,3.75rem)] ${isRetracted ? 'line-through text-muted' : ''}`}>
+            {post.headline}
+          </h1>
 
-
-            <div className="mb-8 rounded-2xl border border-slate-950/[0.10] bg-white/65 p-4 sm:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-              <CredibilityBar score={post.credibility_score} />
-              <div className="mt-4 flex flex-col gap-3 border-t border-slate-950/[0.07] pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-                  <Database className="w-3.5 h-3.5 text-accent" />
-                  {post.source_count} {post.source_count === 1 ? 'Source' : 'Sources'} Verified
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
-                  <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
-                </div>
+          <div className="mb-9 rounded-md border border-rule bg-paper-2 p-4 sm:p-5">
+            <CredibilityBar score={post.credibility_score} />
+            <div className="mt-4 flex flex-col gap-3 border-t border-rule pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-xs font-semibold text-ink">
+                <Database className="w-3.5 h-3.5 text-accent" />
+                <span className="tabular-nums">{post.source_count}</span>
+                <span className="text-muted uppercase tracking-[0.14em] text-[10px] font-bold">
+                  {post.source_count === 1 ? 'source verified' : 'sources verified'}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
+                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
               </div>
             </div>
+          </div>
 
-
-            <div className="max-w-none">
-              <p className="text-[17px] md:text-xl leading-9 text-slate-700 font-normal">
-                {post.summary}
-              </p>
-            </div>
+          {/* Article body — editorial measure (≈70ch) */}
+          <div className="max-w-[68ch]">
+            <p className="font-display text-[18px] md:text-[20px] leading-[1.7] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.4em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:text-accent">
+              {post.summary}
+            </p>
           </div>
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <aside className="md:col-span-2 relative rounded-md border border-rule bg-paper p-5 sm:p-8">
+            <span aria-hidden="true" className="absolute top-0 left-0 w-1 h-full bg-accent" />
+            <h2 className="font-display flex items-center gap-2 text-xl font-bold text-ink mb-4">
+              <ShieldCheck className="w-5 h-5 text-accent" strokeWidth={2.2} />
+              AI Credibility Analysis
+            </h2>
+            <p className="text-ink-soft leading-[1.7] text-base">
+              {post.credibility_reason}
+            </p>
+          </aside>
 
-          <div className="md:col-span-2 premium-card premium-card-hover relative rounded-3xl p-5 sm:p-8">
-            <div className="absolute -right-4 -top-4 text-accent/10">
-              <ShieldCheck className="w-32 h-32" />
-            </div>
-            <div className="relative z-10">
-              <h2 className="flex items-center gap-2 text-xl font-bold text-slate-950 mb-4">
-                <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(139,127,240,0.8)]" />
-                AI Credibility Analysis
-              </h2>
-              <p className="text-slate-600 leading-8 text-base">
-                {post.credibility_reason}
-              </p>
-            </div>
-          </div>
-
-
-          <div className="premium-card premium-card-hover rounded-3xl p-5 sm:p-8">
-            <h2 className="text-base font-bold text-slate-950 mb-5 flex items-center gap-2">
+          <aside className="rounded-md border border-rule bg-paper p-5 sm:p-8">
+            <h2 className="font-display text-base font-bold text-ink mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources
             </h2>
             <SourceLinks sources={post.sources} />
-          </div>
+          </aside>
         </div>
 
 
-        <div className="premium-card premium-card-hover rounded-3xl p-6 mb-12">
-          <h3 className="text-[11px] font-bold text-slate-500 mb-5 uppercase tracking-[0.18em] text-center">
-            How This Story Was Built
+        <div className="rounded-md border border-rule bg-paper-2 p-6 mb-12">
+          <h3 className="text-[11px] font-bold text-accent mb-5 uppercase tracking-[0.18em] text-center">
+            How this story was built
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -214,23 +207,20 @@ export default async function NewsPage({ params }: NewsPageProps) {
               { label: 'Auto-Published', icon: <span className="text-base">⚡</span> },
             ].map((item) => (
               <div key={item.label} className="flex flex-col items-center text-center p-2">
-                <div className="w-9 h-9 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent mb-2.5 shadow-[0_12px_30px_-18px_rgba(139,127,240,0.85)]">
+                <div className="w-9 h-9 rounded-full border border-rule-strong bg-paper text-accent flex items-center justify-center mb-2.5">
                   {item.icon}
                 </div>
-                <span className="text-[11px] font-semibold text-slate-600">{item.label}</span>
+                <span className="text-[11px] font-semibold text-ink">{item.label}</span>
               </div>
             ))}
           </div>
         </div>
 
 
-        <div id="related-news" className="mt-16 border-t border-slate-950/[0.08] pt-12">
-          <div className="flex items-center gap-3 mb-7">
-            <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
-            <h2 className="text-xl font-semibold text-slate-950 tracking-normal">
-              Related News
-            </h2>
-          </div>
+        <div id="related-news" className="mt-16 border-t border-rule pt-12">
+          <h2 className="section-rule mb-7">
+            Related stories
+          </h2>
           <RelatedStories posts={relatedPosts.posts} currentPostId={post.id} />
         </div>
       </div>

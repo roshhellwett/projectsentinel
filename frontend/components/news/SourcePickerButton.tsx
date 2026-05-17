@@ -31,7 +31,7 @@ function SourceIcon({ url }: { url: string }) {
 
   if (!host || errored) {
     return (
-      <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500" aria-hidden="true">
+      <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded bg-paper-2 border border-rule text-muted" aria-hidden="true">
         <Globe className="h-3.5 w-3.5" />
       </span>
     );
@@ -47,7 +47,7 @@ function SourceIcon({ url }: { url: string }) {
       loading="lazy"
       decoding="async"
       onError={() => setErrored(true)}
-      className="h-5 w-5 flex-shrink-0 rounded-md bg-white shadow-[0_1px_2px_rgba(15,23,42,0.12)]"
+      className="h-5 w-5 flex-shrink-0 rounded bg-paper border border-rule"
     />
   );
 }
@@ -106,8 +106,8 @@ export function SourcePickerButton({
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
-          'touch-polish inline-flex max-w-full items-center justify-center gap-2 rounded-full border border-slate-950/[0.10] bg-white/75 px-4 py-2 text-sm font-semibold text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition-all hover:border-accent/30 hover:bg-white hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 disabled:cursor-not-allowed disabled:opacity-55',
-          placement === 'sheet' && 'w-full rounded-2xl px-3 py-3',
+          'inline-flex max-w-full items-center justify-center gap-2 rounded border border-rule-strong bg-paper px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-paper focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-55',
+          placement === 'sheet' && 'w-full rounded px-3 py-3',
           buttonClassName,
         )}
       >
@@ -121,7 +121,7 @@ export function SourcePickerButton({
             ref={menuRef}
             role="menu"
             className={cn(
-              'z-[95] rounded-2xl border border-slate-950/[0.10] bg-white p-2.5 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.45)]',
+              'z-[95] rounded border border-rule-strong bg-paper p-2 shadow-paper-lift',
               placement === 'popover' && 'absolute bottom-full left-0 mb-2 w-[min(18rem,calc(100vw-2rem))]',
               placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(22rem,calc(100vw-2rem))]',
             )}
@@ -133,7 +133,7 @@ export function SourcePickerButton({
               if (stopPropagation) event.stopPropagation();
             }}
           >
-            <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+            <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
               Choose source
             </div>
             <div className="max-h-[45vh] overflow-y-auto pr-1">
@@ -148,15 +148,15 @@ export function SourcePickerButton({
                     rel="noopener noreferrer"
                     role="menuitem"
                     onClick={() => setOpen(false)}
-                    className="touch-polish flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-slate-700 transition-all hover:bg-slate-950/[0.045] hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                    className="flex min-w-0 items-center gap-3 rounded px-3 py-2.5 text-ink transition-colors hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     aria-label={`Open ${sourceLabel} in a new tab`}
                   >
                     <SourceIcon url={source.url} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-slate-700">{sourceLabel}</span>
-                      {host && <span className="block truncate text-[11px] font-medium text-slate-400">{host}</span>}
+                      <span className="block truncate text-sm font-semibold text-ink">{sourceLabel}</span>
+                      {host && <span className="block truncate text-[11px] font-medium text-subtle">{host}</span>}
                     </span>
-                    <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
+                    <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-subtle" />
                   </a>
                 );
               })}

@@ -104,7 +104,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
 
 
 
-            className="fixed inset-0 bg-slate-950/20 backdrop-blur-[3px] z-[60]"
+            className="fixed inset-0 bg-ink/35 backdrop-blur-[2px] z-[60]"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -135,7 +135,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 y.set(0);
               }
             }}
-            className="fixed z-[65] bg-white/96 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-[0_30px_120px_-52px_rgba(15,23,42,0.42)] lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-[28px] lg:rounded-none overflow-hidden flex flex-col"
+            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col"
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
@@ -149,27 +149,27 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
               className="lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none"
               onPointerDown={(e) => dragControls.start(e)}
             >
-              <div className="w-10 h-1 rounded-full bg-slate-950/20" />
+              <div className="w-10 h-1 rounded-full bg-rule-strong" />
             </div>
 
 
-            <div className="relative z-10 flex items-center justify-between gap-3 rounded-t-[28px] bg-white/90 px-5 py-3.5 border-b border-slate-950/[0.08] flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7">
+            <div className="relative z-10 flex items-center justify-between gap-3 rounded-t-xl bg-paper px-5 py-3.5 border-b border-rule flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7">
               <div className="flex items-center gap-3 min-w-0">
                 <CategoryTag category={post.category} />
-                <span className="text-xs text-zinc-500 truncate">{formatDate(post.published_at)}</span>
+                <span className="text-xs text-muted truncate">{formatDate(post.published_at)}</span>
               </div>
               <motion.button
                 whileTap={{ scale: 0.88 }}
                 onClick={onClose}
-                className="touch-polish p-2 hover:bg-slate-950/[0.06] active:bg-slate-950/[0.08] rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 flex-shrink-0"
+                className="p-2 hover:bg-paper-2 rounded transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
                 aria-label="Close article"
               >
-                <X className="w-5 h-5 text-slate-500" />
+                <X className="w-5 h-5 text-muted" />
               </motion.button>
             </div>
 
 
-            <div className={`article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain bg-white/95 px-5 pb-6 pt-5 sm:px-7 sm:pb-8 sm:pt-6 lg:px-8 ${post.status === 'retracted' ? 'opacity-50' : ''}`}>
+            <div className={`article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain bg-paper px-5 pb-6 pt-5 sm:px-7 sm:pb-8 sm:pt-6 lg:px-8 lg:pt-10 lg:pb-10 flex flex-col ${post.status === 'retracted' ? 'opacity-50' : ''}`}>
               {post.status === 'corrected' && (
                 <CorrectionsNotice type="corrected" note={post.correction_note} />
               )}
@@ -177,18 +177,18 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 <CorrectionsNotice type="retracted" note={post.correction_note} />
               )}
 
-              <h2 className="text-[26px] sm:text-3xl lg:text-[32px] 2xl:text-[34px] font-bold text-slate-950 tracking-normal mb-5 leading-tight">
+              <h2 className="font-display text-[26px] sm:text-3xl lg:text-[32px] 2xl:text-[34px] font-bold text-ink tracking-tight mb-5 leading-[1.12]">
                 {post.headline}
               </h2>
 
 
-              <div className="mb-6 rounded-2xl border border-slate-950/[0.10] bg-white/75 p-4 lg:p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+              <div className="mb-6 rounded border border-rule bg-paper-2 p-4 lg:p-3.5">
                 <CredibilityBar score={post.credibility_score} />
-                <div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-950/[0.06] pt-3">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                <div className="mt-3 flex items-center justify-between gap-3 border-t border-rule pt-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
                     Verified Sources
                   </span>
-                  <span className="text-sm font-semibold tabular-nums text-slate-600">
+                  <span className="text-sm font-semibold tabular-nums text-ink">
                     {post.source_count} {post.source_count === 1 ? 'source' : 'sources'}
                   </span>
                 </div>
@@ -196,29 +196,39 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
 
 
               <div className="mb-6">
-                <p className="text-[16px] leading-8 text-slate-600">
+                <p className="text-[16px] leading-8 text-ink-soft">
                   {post.summary}
                 </p>
               </div>
 
 
-              <div className="rounded-2xl border border-slate-950/[0.06] bg-slate-50/70 p-5 mb-6 shadow-[0_18px_60px_-48px_rgba(15,23,42,0.35)]">
-                <h3 className="text-sm font-bold text-slate-950 mb-3 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+              <div className="rounded border border-rule bg-paper-2 p-5 mb-6">
+                <h3 className="font-display text-sm font-bold text-ink mb-3 flex items-center gap-2">
+                  <span aria-hidden="true" className="w-1 h-4 bg-accent" />
                   Why this score?
                 </h3>
-                <p className="text-sm text-slate-600 leading-7">
+                <p className="text-sm text-ink-soft leading-7">
                   {post.credibility_reason}
                 </p>
               </div>
 
 
               <div>
-                <h3 className="text-sm font-bold text-slate-950 mb-3 flex items-center gap-2">
+                <h3 className="font-display text-sm font-bold text-ink mb-3 flex items-center gap-2">
                   <ExternalLink className="w-4 h-4 text-accent" />
                   Original Sources
                 </h3>
                 <SourceLinks sources={post.sources} />
+              </div>
+
+              {/* End-of-story mark: hairline + tiny editorial seal, pushed
+                  to the bottom of the scroll container by mt-auto so any
+                  unused vertical space sits ABOVE this seal (not below it). */}
+              <div className="mt-auto pt-10 flex flex-col items-center text-center">
+                <span aria-hidden="true" className="block w-10 h-px bg-rule-strong mb-3" />
+                <span className="font-display text-[11px] font-bold uppercase tracking-[0.22em] text-subtle">
+                  End of story
+                </span>
               </div>
 
               {onSelectRelated && (
@@ -227,26 +237,26 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
             </div>
 
 
-            <div className="relative z-20 flex-shrink-0 border-t border-slate-950/[0.08] bg-white/96 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-14px_44px_-38px_rgba(15,23,42,0.42)] backdrop-blur-xl sm:px-3.5 sm:pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pt-3.5 lg:px-4 lg:py-3 lg:shadow-[0_-10px_32px_-30px_rgba(15,23,42,0.36)]">
+            <div className="relative z-20 flex-shrink-0 border-t border-rule-strong bg-paper px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 sm:px-3.5 sm:pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pt-3.5 lg:px-4 lg:py-3">
               <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-2 lg:gap-2.5">
                 <BookmarkButton
                   postId={post.id}
                   variant="pill"
                   stopPropagation={false}
-                  className="w-full justify-center rounded-xl px-2.5 py-2.5 text-xs sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm lg:rounded-xl lg:py-2.5"
+                  className="w-full justify-center rounded px-2.5 py-2.5 text-xs sm:px-3 sm:py-3 sm:text-sm lg:py-2.5"
                 />
                 <ShareButtons
                   headline={post.headline}
                   url={`${siteUrl}/news/${post.id}/`}
                   placement="sheet"
-                  buttonClassName="rounded-xl px-2.5 py-2.5 text-xs sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm lg:rounded-xl lg:py-2.5"
+                  buttonClassName="rounded px-2.5 py-2.5 text-xs sm:px-3 sm:py-3 sm:text-sm lg:py-2.5"
                 />
                 <SourcePickerButton
                   sources={post.sources}
                   placement="sheet"
                   label="Read Full"
                   stopPropagation={false}
-                  buttonClassName="rounded-xl border-accent bg-accent px-2.5 py-2.5 text-xs text-white shadow-glow-accent hover:bg-accent-hover hover:text-white sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm lg:rounded-xl lg:py-2.5"
+                  buttonClassName="rounded border-accent bg-accent px-2.5 py-2.5 text-xs text-paper hover:bg-accent-hover hover:text-paper sm:px-3 sm:py-3 sm:text-sm lg:py-2.5"
                 />
               </div>
             </div>

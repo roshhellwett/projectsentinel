@@ -49,10 +49,10 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
   if (!loading && related.length === 0) return null;
 
   return (
-    <section className="mt-8 border-t border-slate-950/[0.07] pt-6">
+    <section className="mt-8 border-t border-rule pt-6">
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-1 h-4 rounded-full bg-accent shadow-[0_0_8px_rgba(139,127,240,0.7)]" />
-        <h3 className="text-sm font-bold text-slate-950 tracking-normal">Keep reading</h3>
+        <span aria-hidden="true" className="w-1 h-4 bg-accent" />
+        <h3 className="font-display text-sm font-bold text-ink tracking-tight">Keep reading</h3>
       </div>
 
       {loading ? (
@@ -60,7 +60,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-[68px] rounded-2xl bg-slate-100/80 animate-pulse"
+              className="h-[68px] rounded border border-rule bg-paper-2 animate-pulse"
             />
           ))}
         </div>
@@ -76,19 +76,19 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
               <button
                 type="button"
                 onClick={() => onSelect(post)}
-                className="touch-polish group flex w-full items-start gap-3 rounded-2xl border border-slate-950/[0.07] bg-white/70 px-3.5 py-3 text-left transition-all hover:border-accent/35 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                className="group flex w-full items-start gap-3 rounded border border-rule bg-paper px-3.5 py-3 text-left transition-colors hover:border-rule-strong hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <div className="flex-1 min-w-0">
                   <div className="mb-1.5 flex items-center gap-2">
                     <CategoryTag category={post.category} />
                     <CredibilityBadge score={post.credibility_score} compact />
                   </div>
-                  <p className="text-[13px] font-semibold text-slate-950 line-clamp-2 leading-snug group-hover:text-accent transition-colors">
+                  <p className="font-display text-[14px] font-semibold text-ink line-clamp-2 leading-snug group-hover:text-accent transition-colors">
                     {post.headline}
                   </p>
                 </div>
                 <ArrowUpRight
-                  className="mt-1 h-4 w-4 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                  className="mt-1 h-4 w-4 flex-shrink-0 text-subtle transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
                   aria-hidden="true"
                 />
               </button>

@@ -91,7 +91,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
           <div className="relative">
             <Link
               href={`/news/${next.id}/`}
-              className="touch-polish group relative flex items-center gap-3 rounded-2xl border border-slate-950/[0.10] bg-white/92 backdrop-blur-2xl pl-4 pr-12 py-3 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.45),inset_0_1px_0_rgba(255,255,255,0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="group relative flex items-center gap-3 rounded border border-rule-strong bg-paper pl-4 pr-12 py-3 shadow-paper-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span aria-hidden="true" className="absolute inset-x-3 top-[1px] h-px rounded-full bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
               <div className="flex-1 min-w-0">
@@ -99,7 +99,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
                   <CategoryTag category={next.category} />
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">Up next</span>
                 </div>
-                <p className="text-[13.5px] font-semibold text-slate-950 line-clamp-2 leading-snug group-hover:text-accent transition-colors">
+                <p className="font-display text-[14.5px] font-semibold text-ink line-clamp-2 leading-snug group-hover:text-accent transition-colors">
                   {next.headline}
                 </p>
               </div>
@@ -111,7 +111,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
               type="button"
               onClick={onDismiss}
               aria-label="Dismiss up next"
-              className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-white border border-slate-950/[0.12] text-slate-500 hover:text-slate-950 shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-paper border border-rule-strong text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <X className="w-3.5 h-3.5" />
             </button>

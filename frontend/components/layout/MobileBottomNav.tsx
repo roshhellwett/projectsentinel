@@ -64,19 +64,19 @@ export function MobileBottomNav() {
             transition={{ duration: 0.18 }}
             className="md:hidden fixed inset-0 z-[55]"
           >
-            <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-sm" onClick={closeTopics} />
+            <div className="absolute inset-0 bg-ink/35 backdrop-blur-[2px]" onClick={closeTopics} />
             <motion.div
               key="topics-sheet-inner"
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.85 }}
-              className="absolute left-3 right-3 rounded-3xl overflow-hidden bg-white/92 backdrop-blur-2xl border border-slate-950/[0.10] shadow-2xl"
+              className="absolute left-3 right-3 rounded-md overflow-hidden bg-paper border border-rule-strong shadow-paper-lift"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
             <div className="p-4 pb-5">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-3 px-1">
+              <p className="text-[10px] font-bold text-accent uppercase tracking-[0.18em] mb-3 px-1">
                 Browse Topics
               </p>
               <div className="grid grid-cols-3 gap-2">
@@ -87,10 +87,10 @@ export function MobileBottomNav() {
                       key={cat.slug}
                       href={`/category/${cat.slug}/`}
                       onClick={closeTopics}
-                      className={`touch-polish flex items-center justify-center px-3 py-3.5 rounded-2xl text-center text-[12px] font-semibold transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                      className={`flex items-center justify-center px-3 py-3 rounded text-center text-[12px] font-semibold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                         active
-                          ? 'bg-accent text-white shadow-glow-accent'
-                          : 'bg-white/70 text-slate-700 border border-slate-950/[0.08] hover:bg-white hover:text-slate-950'
+                          ? 'bg-ink text-paper border border-ink'
+                          : 'bg-paper text-ink border border-rule hover:border-ink'
                       }`}
                     >
                       {cat.label}
@@ -113,7 +113,7 @@ export function MobileBottomNav() {
         aria-label="Mobile navigation"
       >
         <div
-          className="relative border-t border-slate-950/[0.08] bg-white/82 backdrop-blur-2xl shadow-[0_-18px_55px_-42px_rgba(15,23,42,0.24)]"
+          className="relative border-t border-rule-strong bg-paper"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="flex items-center justify-around px-2 pt-1.5 pb-2">
@@ -131,19 +131,19 @@ export function MobileBottomNav() {
                   {active && (
                     <motion.div
                       layoutId="bottom-nav-pill"
-                      className="absolute inset-0 rounded-2xl bg-slate-950/[0.045] border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.82)]"
+                      className="absolute inset-x-2 bottom-1 top-1 rounded bg-paper-2 border border-rule"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
                   )}
                   <Icon
                     className={`w-[22px] h-[22px] relative z-10 transition-colors duration-200 ${
-                      active ? 'text-accent' : 'text-slate-500'
+                      active ? 'text-accent' : 'text-muted'
                     }`}
                     strokeWidth={active ? 2.2 : 1.8}
                   />
                   <span
                     className={`text-[10px] font-semibold relative z-10 transition-colors duration-200 leading-none ${
-                      active ? 'text-accent' : 'text-slate-500'
+                      active ? 'text-accent' : 'text-muted'
                     }`}
                   >
                     {tab.label}

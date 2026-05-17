@@ -124,7 +124,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className="fixed inset-0 z-[100] overflow-y-auto bg-background/94 backdrop-blur-2xl"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-paper"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -140,15 +140,15 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="editorial-kicker mb-2">India Verified</p>
-                <h2 className="text-3xl md:text-5xl font-semibold text-slate-950 tracking-normal">Search</h2>
+                <h2 className="font-display text-3xl md:text-5xl font-bold text-ink tracking-tight">Search</h2>
               </div>
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="touch-polish p-2 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:bg-slate-950/[0.08]"
+                className="p-2 hover:bg-paper-2 rounded transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Close search"
               >
-                <X className="w-6 h-6 text-slate-500" />
+                <X className="w-6 h-6 text-muted" />
               </motion.button>
             </div>
 
@@ -164,7 +164,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 router.push(`/search/?q=${encodeURIComponent(q)}`);
               }}
             >
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
               <input
                 ref={inputRef}
                 id="search-input"
@@ -172,7 +172,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
-                className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(139,127,240,0.45)]"
+                className="w-full pl-12 pr-4 py-3.5 bg-paper border border-rule-strong rounded text-ink placeholder-subtle focus:outline-none focus:border-accent transition-colors duration-200"
 
 
                 aria-label="Search verified stories"
@@ -183,7 +183,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               {isLoading && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-[190px] rounded-[1.65rem]" />
+                    <Skeleton key={i} className="h-[190px] rounded-md" />
                   ))}
                 </div>
               )}
@@ -191,10 +191,10 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 <p className="text-center text-red-500 py-8">{error}</p>
               )}
               {query.trim() && !isLoading && !error && (
-                <p className="text-sm text-slate-500 mb-4">
+                <p className="text-sm text-muted mb-4">
                   {resultCount === 0
-                    ? <>No matches for &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;. Press Enter to broaden.</>
-                    : <><span className="text-slate-700 font-medium tabular-nums">{resultCount}</span> {resultCount === 1 ? 'match' : 'matches'} for &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;{resultCount > results.length ? <> — showing top {results.length}</> : null}</>
+                    ? <>No matches for &quot;<span className="text-ink font-medium">{query}</span>&quot;. Press Enter to broaden.</>
+                    : <><span className="text-ink font-medium tabular-nums">{resultCount}</span> {resultCount === 1 ? 'match' : 'matches'} for &quot;<span className="text-ink font-medium">{query}</span>&quot;{resultCount > results.length ? <> — showing top {results.length}</> : null}</>
                   }
                 </p>
               )}

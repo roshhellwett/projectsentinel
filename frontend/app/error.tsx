@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -20,24 +20,23 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-      <div className="w-20 h-20 rounded-full bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mb-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-        <AlertTriangle className="w-10 h-10 text-red-500" />
-      </div>
-      <h1 className="text-4xl md:text-5xl font-bold tracking-normal text-slate-950 mb-3">Something went wrong</h1>
-      <p className="text-slate-600 max-w-md mb-8">
+      <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
+      <p className="editorial-kicker mb-3">Server error</p>
+      <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4 leading-[1.05]">Something went wrong</h1>
+      <p className="text-ink-soft max-w-md mb-8 text-base leading-relaxed">
         An unexpected error occurred. Try refreshing the page or go back to the homepage.
       </p>
       <div className="flex gap-3">
           <button
             onClick={reset}
-            className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-semibold hover:bg-accent-hover transition-all active:scale-95 shadow-glow-accent hover:shadow-glow-accent-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink-soft transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <RefreshCw className="w-4 h-4" />
           Try again
         </button>
         <Link
           href="/"
-          className="touch-polish inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-950/[0.12] text-slate-700 font-semibold hover:bg-slate-950/[0.06] transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-rule-strong text-ink text-sm font-semibold hover:border-ink hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           Go home
         </Link>

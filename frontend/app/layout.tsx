@@ -1,7 +1,7 @@
 // last edited 2026-05-17 by roshhellwett
 
 import type { Metadata, Viewport } from 'next';
-import { Inter, Newsreader, Geist_Mono } from 'next/font/google';
+import { Source_Sans_3, Source_Serif_4, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 
 import './globals.css';
@@ -11,23 +11,25 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 import { ScrollRestorer } from '@/components/ui/ScrollRestorer';
+import { CookieConsent } from '@/components/ui/CookieConsent';
 
-const inter = Inter({
-  variable: '--font-inter',
+const sourceSans = Source_Sans_3({
+  variable: '--font-sans',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  weight: ['300', '400', '500', '600', '700', '900'],
 });
 
-const newsreader = Newsreader({
-  variable: '--font-newsreader',
+const sourceSerif = Source_Serif_4({
+  variable: '--font-display',
   subsets: ['latin'],
   display: 'swap',
   weight: ['400', '500', '600', '700', '800'],
+  style: ['normal', 'italic'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -88,11 +90,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#fbfbfd',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FAFAF7' },
+    { media: '(prefers-color-scheme: dark)', color: '#0E0D0C' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  colorScheme: 'light',
+  colorScheme: 'light dark',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -114,6 +119,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Theme boot — synchronous to prevent light/dark flash. Reads
+            localStorage('iv-theme') first, then falls back to OS preference. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('iv-theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
         {supabaseOrigin && (
           <>
             <link rel="preconnect" href={supabaseOrigin} crossOrigin="" />
@@ -135,7 +147,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body
-        className={`${inter.variable} ${newsreader.variable} ${geistMono.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased bg-dot-grid`}
+        className={`${sourceSans.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased`}
       >
         {gtmId && (
           <noscript>
@@ -148,10 +160,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </noscript>
         )}
 
-        <div className="watermark-fixed" aria-hidden="true">
-          <span>Verified News</span>
-        </div>
-        <div className="watermark-spotlight" aria-hidden="true" />
 
         <a
           href="#main"
@@ -169,6 +177,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ScrollToTop />
         <KeyboardShortcuts />
         <ScrollRestorer />
+        <CookieConsent />
       </body>
     </html>
   );

@@ -28,11 +28,11 @@ async function SearchResults({ query }: { query: string }) {
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mb-5">
-          <SearchX className="w-7 h-7 text-slate-500" />
+        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5">
+          <SearchX className="w-7 h-7 text-muted" />
         </div>
-        <h2 className="text-lg font-semibold text-slate-950 mb-2">No results found</h2>
-        <p className="text-sm text-slate-500 max-w-sm">
+        <h2 className="font-display text-lg font-bold text-ink mb-2">No results found</h2>
+        <p className="text-sm text-muted max-w-sm">
           No verified stories matched &ldquo;{query}&rdquo;. Try different keywords.
         </p>
       </div>
@@ -41,9 +41,9 @@ async function SearchResults({ query }: { query: string }) {
 
   return (
     <>
-      <p className="text-sm text-slate-600 mb-6">
+      <p className="text-sm text-muted mb-6">
         {count} result{count !== 1 ? 's' : ''} for &ldquo;
-        <span className="font-semibold text-slate-950">{query}</span>&rdquo;
+        <span className="font-semibold text-ink">{query}</span>&rdquo;
       </p>
       <SearchResultsGrid posts={posts} />
     </>
@@ -56,24 +56,25 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14 max-w-6xl">
-      <div className="premium-card mb-8 rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
+      <header className="mb-10 pb-8 border-b border-rule">
+        <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
         <p className="editorial-kicker mb-3">
           {query ? 'Search Results' : 'Search'}
         </p>
-        <h1 className="text-4xl md:text-6xl font-bold text-slate-950 tracking-normal mb-3">
+        <h1 className="font-display text-4xl md:text-6xl font-bold text-ink tracking-tight mb-3 leading-[1.05]">
           {query ? query : 'Find verified news'}
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           Browse calm, verified coverage from the India Verified archive.
         </p>
-      </div>
+      </header>
 
       {query ? (
         <Suspense
           fallback={
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-[218px] rounded-[1.65rem]" />
+                <Skeleton key={i} className="h-[218px] rounded-md" />
               ))}
             </div>
           }
@@ -81,7 +82,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <SearchResults query={query} />
         </Suspense>
       ) : (
-        <p className="text-slate-600">
+        <p className="text-muted">
           Use the search button in the top navigation to find verified news.
         </p>
       )}

@@ -114,7 +114,7 @@ export function ShareButtons({
         whileTap={{ scale: 0.94 }}
         onClick={() => setShowMenu(!showMenu)}
         className={cn(
-          'touch-polish inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-950/[0.10] text-slate-600 hover:text-slate-950 hover:bg-white hover:border-accent/30 transition-all text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_14px_38px_-30px_rgba(139,127,240,0.58)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
+          'inline-flex items-center gap-2 px-3.5 py-2 rounded bg-paper border border-rule text-muted hover:text-ink hover:border-ink transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           (isInline || isSheet) && 'w-full justify-center',
           buttonClassName,
         )}
@@ -132,7 +132,7 @@ export function ShareButtons({
             key="share-menu"
             className={cn(
               'z-[90] w-[min(21rem,calc(100vw-2rem))]',
-              'rounded-2xl border border-slate-950/[0.10] bg-white/95 p-2.5 shadow-2xl backdrop-blur-2xl',
+              'rounded border border-rule-strong bg-paper p-2 shadow-paper-lift',
               placement === 'popover' && 'absolute right-0 top-full mt-2',
               placement === 'inline' && 'relative mt-3 w-full max-w-none shadow-[0_16px_42px_-30px_rgba(15,23,42,0.32)]',
               placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_22px_54px_-34px_rgba(15,23,42,0.42)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
@@ -142,7 +142,7 @@ export function ShareButtons({
             exit={{ opacity: 0, y: -4, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
           >
-            <div className="grid grid-cols-2 gap-1.5 mb-2 pb-2 border-b border-slate-950/[0.08]">
+            <div className="grid grid-cols-2 gap-1.5 mb-2 pb-2 border-b border-rule">
               {SHARE_PLATFORMS.map((platform) => (
                 <a
                   key={platform.name}
@@ -150,7 +150,7 @@ export function ShareButtons({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowMenu(false)}
-                  className="touch-polish flex min-w-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-[0.985] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="flex min-w-0 items-center gap-2.5 rounded px-3 py-2.5 text-ink hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   title={platform.name}
                 >
                   {platform.name === 'WhatsApp' ? (
@@ -171,10 +171,10 @@ export function ShareButtons({
 
             <button
               onClick={copyLink}
-              className="touch-polish flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-950 hover:bg-slate-950/[0.05] active:scale-[0.985] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="flex w-full items-center gap-2 rounded px-3 py-2.5 text-sm font-semibold text-ink hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-emerald-500" />
+                <Check className="w-4 h-4 text-cred-high" />
               ) : (
                 <LinkIcon className="w-4 h-4" />
               )}

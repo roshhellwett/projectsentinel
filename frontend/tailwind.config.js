@@ -10,50 +10,72 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Page surfaces — soft white
-        background: '#ffffff',
-        'background-2': '#f7f7fb',
-        foreground: '#1e1b4b',
-        surface: 'rgba(255, 255, 255, 0.55)',
-        'surface-hover': 'rgba(255, 255, 255, 0.72)',
+        // ── Editorial paper + ink palette (driven by CSS vars so dark mode
+        //    flips with a single class on <html>). Hex fallbacks live in
+        //    globals.css :root and .dark blocks.
+        paper:        'rgb(var(--c-paper) / <alpha-value>)',
+        'paper-2':    'rgb(var(--c-paper-2) / <alpha-value>)',
+        'paper-tint': 'rgb(var(--c-paper-tint) / <alpha-value>)',
+        ink:          'rgb(var(--c-ink) / <alpha-value>)',
+        'ink-soft':   'rgb(var(--c-ink-soft) / <alpha-value>)',
+        muted:        'rgb(var(--c-muted) / <alpha-value>)',
+        subtle:       'rgb(var(--c-subtle) / <alpha-value>)',
+        rule:         'rgb(var(--c-rule) / <alpha-value>)',
+        'rule-strong':'rgb(var(--c-rule-strong) / <alpha-value>)',
 
-        // Text
-        muted: '#4a5568',
-        subtle: '#94a3b8',
+        // Editorial crimson — the single accent. Used sparingly on category
+        // labels, links, active state, and the breaking-news bar.
+        accent:       'rgb(var(--c-accent) / <alpha-value>)',
+        'accent-hover':'rgb(var(--c-accent-hover) / <alpha-value>)',
+        'accent-soft': 'rgb(var(--c-accent-soft) / <alpha-value>)',
 
-        // Accent — soft lavender
-        accent: '#8b7ff0',
-        'accent-hover': '#a08cdc',
-        'accent-soft': 'rgba(160, 140, 220, 0.18)',
+        // Back-compat aliases so we don't have to touch every component yet.
+        background:    'rgb(var(--c-paper) / <alpha-value>)',
+        'background-2':'rgb(var(--c-paper-2) / <alpha-value>)',
+        foreground:    'rgb(var(--c-ink) / <alpha-value>)',
+        surface:       'rgb(var(--c-paper) / <alpha-value>)',
+        'surface-hover':'rgb(var(--c-paper-2) / <alpha-value>)',
 
-        // Credibility — pastel-coded per redesign spec
-        // 90-100 mint, 70-89 lavender, <70 peach.
-        'cred-high': '#10b981',
-        'cred-mid':  '#8b7ff0',
-        'cred-low':  '#f59e0b',
+        // Credibility tiers — re-tuned to editorial hues.
+        'cred-high': 'rgb(var(--c-cred-high) / <alpha-value>)',
+        'cred-mid':  'rgb(var(--c-cred-mid) / <alpha-value>)',
+        'cred-low':  'rgb(var(--c-cred-low) / <alpha-value>)',
 
-        // India tricolor — kept for subtle decorative accents only
+        // India tricolor — retained for decorative civic accents only.
         'india-saffron': '#ff9933',
-        'india-green': '#138808',
+        'india-green':   '#138808',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['var(--font-newsreader)', 'Newsreader', 'Georgia', 'serif'],
-        mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
+        sans:    ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+        serif:   ['var(--font-display)', 'Georgia', 'serif'],
+        mono:    ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        'glow-accent': '0 0 0 1px rgba(139, 127, 240, 0.2), 0 18px 54px -18px rgba(139, 127, 240, 0.52)',
-        'glow-accent-lg': '0 0 0 1px rgba(160, 140, 220, 0.28), 0 30px 76px -18px rgba(139, 127, 240, 0.6)',
+        // Quiet editorial shadows — paper-on-paper, never glowy.
+        'rule':         '0 0 0 1px rgb(var(--c-rule) / 1)',
+        'paper':        '0 1px 0 rgb(var(--c-rule) / 1)',
+        'paper-lift':   '0 1px 0 rgb(var(--c-rule) / 1), 0 12px 32px -22px rgb(var(--c-ink) / 0.18)',
+        'glow-accent':  '0 0 0 1px rgb(var(--c-accent) / 0.28)',
+      },
+      letterSpacing: {
+        'editorial': '-0.011em',
+        'kicker':    '0.18em',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
-        shimmer: 'shimmer 1.6s linear infinite',
+        shimmer:   'shimmer 1.6s linear infinite',
+        'ticker':  'ticker 38s linear infinite',
       },
       keyframes: {
         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
+        },
+        ticker: {
+          '0%':   { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
     },

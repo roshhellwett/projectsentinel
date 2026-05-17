@@ -87,42 +87,59 @@ export default async function HomePage() {
         }}
       />
 
-      <div className="container mx-auto px-4 lg:px-6 pt-8 lg:pt-10 pb-14">
-        <section className="relative mb-9 overflow-hidden rounded-[2rem] border border-slate-950/[0.10] bg-white/75 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_30px_100px_-76px_rgba(139,127,240,0.55)] backdrop-blur-2xl md:px-10 md:py-10">
-          <div className="animate-soft-float absolute -right-20 -top-28 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
-          <div className="absolute -bottom-32 left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
-
-          <div className="hidden md:block absolute top-6 right-6 lg:top-8 lg:right-8 z-10">
+      <div className="container mx-auto px-4 lg:px-6 pt-8 lg:pt-12 pb-16">
+        {/* ── Editorial masthead block — flat paper, generous type, hairline rule. */}
+        <section
+          aria-label="Today's masthead"
+          className="relative mb-10 pb-10 border-b border-rule"
+        >
+          <div className="hidden md:flex items-start justify-between gap-6">
+            <div className="max-w-3xl">
+              <p className="editorial-kicker mb-5">
+                <span>{getIndianGreeting()}</span>
+                <span aria-hidden="true" className="muted">·</span>
+                <span className="muted">AI-verified Indian news</span>
+              </p>
+              <h1 className="font-display font-bold text-ink leading-[1.04] tracking-tight text-[clamp(2.5rem,5vw,4.75rem)]">
+                A calmer, smarter front page for India.
+              </h1>
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+                Every story cross-referenced across multiple trusted Indian
+                publications, scored for credibility, and rewritten without
+                ads or noise.
+              </p>
+            </div>
             <LiveClock variant="hero" />
           </div>
 
-          <div className="relative max-w-4xl">
+          {/* Mobile masthead */}
+          <div className="md:hidden">
             <p className="editorial-kicker mb-4">
-              <span className="text-accent">{getIndianGreeting()}</span>
-              <span aria-hidden="true" className="text-slate-400 hidden sm:inline">·</span>
-              <span>AI-verified Indian news</span>
+              <span>{getIndianGreeting()}</span>
             </p>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-normal text-slate-950 md:text-6xl lg:text-7xl">
+            <h1 className="font-display font-bold text-ink leading-[1.06] tracking-tight text-[clamp(2.25rem,8vw,3rem)]">
               A calmer, smarter front page for India.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600 md:text-lg">
-              Stories are cross-referenced, scored, and written without ads or noise.
+            <p className="mt-4 text-[15px] leading-relaxed text-muted">
+              Every story cross-referenced, scored for credibility, and
+              rewritten without ads or noise.
             </p>
-            {verifiedToday > 0 && (
-              <div className="mt-6 inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-                <span className="relative inline-flex w-2 h-2 rounded-full bg-accent flex-shrink-0">
-                  <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" aria-hidden="true" />
-                </span>
-                <AnimatedCounter
-                  value={verifiedToday}
-                  className="text-[12px] font-semibold text-slate-700 tabular-nums"
-                />
-                <span className="text-[12px] font-medium text-slate-500">
-                  {verifiedToday === 1 ? 'story verified in the last 24 hours' : 'stories verified in the last 24 hours'}
-                </span>
-              </div>
-            )}
           </div>
+
+          {verifiedToday > 0 && (
+            <p className="mt-7 inline-flex items-center gap-2.5 text-xs">
+              <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0">
+                <span className="absolute inset-0 rounded-full bg-accent/60 animate-ping" aria-hidden="true" />
+              </span>
+              <AnimatedCounter
+                value={verifiedToday}
+                className="font-bold text-ink tabular-nums"
+              />
+              <span className="font-medium text-muted">
+                {verifiedToday === 1 ? 'story verified in the last 24 hours' : 'stories verified in the last 24 hours'}
+              </span>
+            </p>
+          )}
         </section>
 
 
@@ -142,11 +159,12 @@ export default async function HomePage() {
 
 
         <section aria-label="Latest verified news">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
-            <h2 className="text-xl font-semibold text-slate-950 tracking-normal">Latest News</h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-slate-950/10 to-transparent" />
-          </div>
+          <h2 className="section-rule mb-7">
+            <span>Latest News</span>
+            <span className="ml-auto editorial-kicker text-[10px]">
+              <span className="muted">Live updates</span>
+            </span>
+          </h2>
           <InfiniteFeed
             initialPosts={feedPosts}
             initialCount={Math.max(0, postsResult.count - trendingIdList.length - (heroPost ? 1 : 0))}

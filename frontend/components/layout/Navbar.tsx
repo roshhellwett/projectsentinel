@@ -6,26 +6,26 @@ import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { LiveClock } from '@/components/layout/LiveClock';
 import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
 import { LastRefreshed } from '@/components/layout/LastRefreshed';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { BreakingTicker } from '@/components/layout/BreakingTicker';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
-const SPY_SECTIONS: Array<{ id: string; label: string }> = [
-  { id: 'latest', label: 'Latest' },
-];
-
+// Editorial nav: Home omitted (the wordmark links there) so the row reads
+// as a topic taxonomy rather than a chrome strip.
 const NAV_LINKS = [
-  { href: '/', label: 'Home', minWidth: 'lg' as const },
-  { href: '/category/politics/', label: 'Politics', minWidth: 'lg' as const },
-  { href: '/category/business/', label: 'Business', minWidth: 'lg' as const },
-  { href: '/category/sports/', label: 'Sports', minWidth: 'lg' as const },
-  { href: '/category/tech/', label: 'Tech', minWidth: 'lg' as const },
-  { href: '/saved/', label: 'Saved', minWidth: 'lg' as const },
-  { href: '/how-it-works/', label: 'How It Works', minWidth: 'lg' as const },
+  { href: '/category/politics/',   label: 'Politics' },
+  { href: '/category/business/',   label: 'Business' },
+  { href: '/category/sports/',     label: 'Sports' },
+  { href: '/category/tech/',       label: 'Tech' },
+  { href: '/category/world/',      label: 'World' },
+  { href: '/saved/',               label: 'Saved' },
+  { href: '/how-it-works/',        label: 'How It Works' },
 ] as const;
 
 const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
@@ -34,50 +34,12 @@ export function Navbar() {
   const pathname = usePathname();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-
-  const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 12));
-
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return;
-    const targets = SPY_SECTIONS
-      .map((s) => ({ s, el: document.getElementById(s.id) }))
-      .filter((x): x is { s: { id: string; label: string }; el: HTMLElement } => x.el !== null);
-    if (targets.length === 0) {
-      setActiveSection(null);
-      return;
-    }
-
-    const labelById = new Map(targets.map(({ s }) => [s.id, s.label]));
-    const visible = new Set<string>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) visible.add(e.target.id);
-          else visible.delete(e.target.id);
-        }
-        const next = SPY_SECTIONS.find((s) => visible.has(s.id));
-        setActiveSection(next ? labelById.get(next.id) ?? null : null);
-      },
-      { rootMargin: '-30% 0px -55% 0px' },
-    );
-    for (const { el } of targets) observer.observe(el);
-    return () => observer.disconnect();
-  }, [pathname]);
-
-
-
 
   useEffect(() => {
     if (!isMobileOpen) return;
     lockBodyScroll();
-    return () => {
-      unlockBodyScroll();
-    };
+    return () => unlockBodyScroll();
   }, [isMobileOpen]);
-
 
   useEffect(() => {
     setIsMobileOpen(false);
@@ -94,8 +56,6 @@ export function Navbar() {
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
 
-
-
   useEffect(() => {
     const handler = () => setIsSearchOpen(true);
     window.addEventListener(OPEN_SEARCH_EVENT, handler);
@@ -104,146 +64,117 @@ export function Navbar() {
 
   return (
     <>
-      <motion.header
-        initial={false}
-        animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 inset-x-0 z-50"
+      <header
+        className="sticky top-0 inset-x-0 z-50 bg-paper border-b border-rule"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
-        <div
-          className={`w-full transition-all duration-500 ${
-            scrolled
-              ? 'bg-white/78 backdrop-blur-2xl border-b border-slate-950/[0.08] shadow-[0_18px_55px_-42px_rgba(15,23,42,0.28)]'
-              : 'bg-white/58 backdrop-blur-xl border-b border-slate-950/[0.04]'
-          }`}
-        >
-          <div className="container mx-auto px-4 lg:px-6">
-            <div className="flex items-center justify-between h-16 lg:h-[68px]">
-
-              <Link
-                href="/"
-                aria-label="India Verified — home"
-                className="touch-polish flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950/30 rounded-2xl"
+        {/* ── Masthead row */}
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="flex items-center justify-between gap-4 h-14 lg:h-16">
+            <Link
+              href="/"
+              aria-label="India Verified — home"
+              className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+            >
+              <span
+                aria-hidden="true"
+                className="flex items-center justify-center w-9 h-9 bg-ink text-paper font-display font-bold text-[15px] tracking-[0.06em]"
               >
-                <div
-                  className="relative w-9 h-9 rounded-xl flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(145deg, #111111, #0a0a0a)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px -8px rgba(0,0,0,0.35)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                  }}
-                >
-                  <span className="text-[12px] font-light text-white/90 tracking-[0.15em] leading-none" style={{ letterSpacing: '0.15em' }}>IV</span>
-                </div>
-                <span className="hidden sm:flex flex-col leading-none">
-                  <span className="text-[15px] font-semibold tracking-normal text-slate-950">India Verified</span>
+                IV
+              </span>
+              <span className="flex flex-col leading-none whitespace-nowrap">
+                <span className="font-display text-[17px] sm:text-[19px] font-bold text-ink tracking-tight">
+                  India Verified
                 </span>
-              </Link>
+                <span className="hidden md:inline text-[10px] font-semibold tracking-[0.18em] uppercase text-accent mt-0.5">
+                  AI-verified Indian news
+                </span>
+              </span>
+            </Link>
 
-
-              <nav
-                aria-label="Main navigation"
-                className="hidden lg:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2"
-              >
-                {NAV_LINKS.map((link) => {
-                  const active = isActive(link.href);
-                  const widthClass: string = (link.minWidth as string) === 'xl' ? 'hidden xl:inline-flex' : 'inline-flex';
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      aria-current={active ? 'page' : undefined}
-                      className={`${widthClass} relative items-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
-                        active ? 'text-slate-950' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.035]'
-                      }`}
-                    >
-                      {link.label}
-                      {active && (
-                        <motion.span
-                          layoutId="navbar-active-dot"
-                          className="absolute inset-0 -z-10 rounded-full bg-white/80 border border-slate-950/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_30px_-20px_rgba(139,127,240,0.55)]"
-                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                        />
-                      )}
-                    </Link>
-                  );
-                })}
-              </nav>
-
-
-              <div className="flex items-center gap-2">
-                <AnimatePresence mode="popLayout">
-                  {activeSection && (
-                    <motion.span
-                      key={activeSection}
-                      initial={{ opacity: 0, y: -6, scale: 0.94 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -4, scale: 0.96 }}
-                      transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-                      className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/70 border border-slate-950/[0.08] text-[10px] font-semibold tracking-normal text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
-                      role="status"
-                      aria-live="polite"
-                    >
-                      <span className="inline-flex w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true" />
-                      <span className="uppercase tracking-[0.16em] text-[9px] text-slate-500">In view</span>
-                      <span className="text-slate-800">{activeSection}</span>
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-
-                <LastRefreshed />
-                <ConnectionStatus />
-
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={openSearch}
-                  aria-label="Search articles (press /)"
-                  title="Search · press /"
-                  className="touch-polish group relative inline-flex items-center gap-1.5 p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-                >
-                  <Search className="w-[18px] h-[18px]" strokeWidth={2} />
-                  <kbd
-                    aria-hidden="true"
-                    className="hidden lg:inline-flex items-center justify-center min-w-[1rem] h-4 px-1 rounded-md bg-slate-950/[0.05] border border-slate-950/[0.10] text-[9px] font-semibold text-slate-500 shadow-[inset_0_-1px_0_rgba(15,23,42,0.06)]"
+            {/* Desktop nav — simple eyebrow links with crimson active underline. */}
+            <nav
+              aria-label="Main navigation"
+              className="hidden lg:flex items-center gap-1"
+            >
+              {NAV_LINKS.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={active ? 'page' : undefined}
+                    className={`relative inline-flex items-center px-3 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
+                      active ? 'text-ink' : 'text-muted hover:text-ink'
+                    }`}
                   >
-                    /
-                  </kbd>
-                </motion.button>
+                    {link.label === 'Saved' && (
+                      <Bookmark className="w-3.5 h-3.5 mr-1.5 -ml-0.5" strokeWidth={1.8} />
+                    )}
+                    {link.label}
+                    {active && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-3 right-3 -bottom-[1px] h-[2px] bg-accent"
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
 
-                <a
-                  href={REPO_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-polish hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-slate-950/[0.10] hover:border-slate-950/[0.18] text-[13px] font-medium text-slate-700 hover:text-slate-950 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_30px_-24px_rgba(139,127,240,0.55)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            {/* Action cluster */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              <LastRefreshed />
+              <ConnectionStatus />
+
+              <button
+                type="button"
+                onClick={openSearch}
+                aria-label="Search articles (press /)"
+                title="Search · press /"
+                className="tap-target inline-flex items-center gap-1.5 px-2 text-muted hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                <Search className="w-[18px] h-[18px]" strokeWidth={1.8} />
+                <kbd
+                  aria-hidden="true"
+                  className="hidden xl:inline-flex items-center justify-center min-w-[1rem] h-4 px-1 rounded-sm border border-rule-strong text-[9px] font-semibold text-muted"
                 >
-                  <Github className="w-3.5 h-3.5" />
-                  GitHub
-                </a>
+                  /
+                </kbd>
+              </button>
 
+              <ThemeToggle />
 
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsMobileOpen((v) => !v)}
-                  aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
-                  aria-expanded={isMobileOpen}
-                  className="touch-polish lg:hidden p-2 text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-                >
-                  {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
-                </motion.button>
-              </div>
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Source code on GitHub"
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-muted hover:text-ink rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                <Github className="w-3.5 h-3.5" />
+                GitHub
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen((v) => !v)}
+                aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isMobileOpen}
+                className="tap-target lg:hidden text-muted hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
+              </button>
             </div>
           </div>
         </div>
-      </motion.header>
 
+        {/* ── Breaking-news ticker rail (sticky beneath the masthead). */}
+        <BreakingTicker />
+      </header>
 
-      <div
-        className="h-16 lg:h-[68px] flex-shrink-0"
-        style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}
-        aria-hidden="true"
-      />
-
-
+      {/* Mobile drawer */}
       <AnimatePresence>
         {isMobileOpen && (
           <>
@@ -252,8 +183,8 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 z-[60] bg-slate-950/20 backdrop-blur-sm"
+              transition={{ duration: 0.18 }}
+              className="lg:hidden fixed inset-0 z-[60] bg-ink/40"
               onClick={() => setIsMobileOpen(false)}
             />
             <motion.aside
@@ -262,65 +193,56 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[78%] max-w-sm bg-white/92 backdrop-blur-2xl border-l border-slate-950/[0.10] shadow-2xl flex flex-col"
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[82%] max-w-sm bg-paper border-l border-rule shadow-paper-lift flex flex-col"
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               }}
             >
-              <div className="flex items-center justify-between h-16 px-5 border-b border-slate-950/[0.08]">
-                <span className="text-sm font-semibold text-slate-950">Menu</span>
+              <div className="flex items-center justify-between h-14 px-4 border-b border-rule">
+                <span className="editorial-kicker">
+                  <span>Sections</span>
+                </span>
                 <button
                   onClick={() => setIsMobileOpen(false)}
                   aria-label="Close menu"
-                  className="touch-polish p-2 text-slate-500 hover:text-slate-950 rounded-lg hover:bg-slate-950/[0.06] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="tap-target text-muted hover:text-ink rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
-                {NAV_LINKS.map((link, i) => {
+              <nav className="flex-1 overflow-y-auto px-2 py-2">
+                {NAV_LINKS.map((link) => {
                   const active = isActive(link.href);
                   return (
-                    <motion.div
+                    <Link
                       key={link.href}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 + i * 0.04 }}
+                      href={link.href}
+                      onClick={() => setIsMobileOpen(false)}
+                      aria-current={active ? 'page' : undefined}
+                      className={`flex items-center justify-between px-3 py-3.5 border-b border-rule font-display text-[17px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
+                        active ? 'text-accent' : 'text-ink hover:text-accent'
+                      }`}
                     >
-                      <Link
-                        href={link.href}
-                        onClick={() => setIsMobileOpen(false)}
-                        aria-current={active ? 'page' : undefined}
-                        className={`touch-polish block px-4 py-3 rounded-xl text-[15px] font-medium transition-all duration-200 active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
-                          active
-                            ? 'bg-slate-950/[0.055] text-slate-950 border border-slate-950/[0.10]'
-                            : 'text-slate-600 hover:bg-slate-950/[0.04] border border-transparent'
-                        }`}
-                      >
-                        {link.label === 'Saved' ? (
-                          <span className="inline-flex items-center gap-2">
-                            <Bookmark className="w-3.5 h-3.5" />
-                            {link.label}
-                          </span>
-                        ) : (
-                          link.label
-                        )}
-                      </Link>
-                    </motion.div>
+                      <span className="inline-flex items-center gap-2">
+                        {link.label === 'Saved' && <Bookmark className="w-4 h-4" strokeWidth={1.8} />}
+                        {link.label}
+                      </span>
+                      <span aria-hidden="true" className={`transition-transform ${active ? 'text-accent' : 'text-subtle'}`}>→</span>
+                    </Link>
                   );
                 })}
               </nav>
-              <div className="p-5 border-t border-slate-950/[0.08] flex flex-col gap-3">
+              <div className="p-4 border-t border-rule flex flex-col gap-3">
                 <LiveClock variant="menu" />
                 <a
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="touch-polish flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-slate-950/[0.055] hover:bg-slate-950/[0.08] border border-slate-950/[0.10] text-sm font-medium text-slate-800 transition-all active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-rule-strong text-sm font-medium text-ink hover:bg-paper-2 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   <Github className="w-4 h-4" />
-                  View on GitHub
+                  View source on GitHub
                 </a>
               </div>
             </motion.aside>

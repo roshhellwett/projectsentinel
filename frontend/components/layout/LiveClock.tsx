@@ -52,15 +52,15 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
 
   if (!now) {
     if (variant === 'hero') {
-      return <div aria-hidden="true" className={`h-[64px] w-[240px] rounded-2xl bg-slate-950/[0.04] ${className}`} />;
+      return <div aria-hidden="true" className={`h-[68px] w-[220px] bg-paper-2 border border-rule ${className}`} />;
     }
     return (
       <div
         aria-hidden="true"
         className={
           variant === 'menu'
-            ? `h-9 w-full rounded-xl bg-slate-950/[0.04] ${className}`
-            : `hidden 2xl:inline-flex h-8 w-[210px] rounded-full bg-slate-950/[0.04] ${className}`
+            ? `h-9 w-full bg-paper-2 border border-rule ${className}`
+            : `hidden 2xl:inline-flex h-7 w-[180px] bg-paper-2 border border-rule ${className}`
         }
       />
     );
@@ -72,21 +72,21 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
   if (variant === 'menu') {
     return (
       <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-950/[0.08] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] ${className}`}
+        className={`flex items-center gap-3 px-4 py-3 border border-rule bg-paper ${className}`}
         role="status"
         aria-label={`Current time ${time}, ${date}`}
       >
-        <span className="relative inline-flex w-2 h-2 rounded-full bg-accent flex-shrink-0" aria-hidden="true">
+        <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" aria-hidden="true">
           <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" />
         </span>
         <div className="flex flex-col leading-tight min-w-0">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">
             {date}
           </span>
           <time
             dateTime={isoLabel}
-            className="text-[13px] font-semibold tabular-nums text-slate-950"
-            style={{ fontFamily: 'var(--font-geist-mono)' }}
+            className="text-[13px] font-semibold tabular-nums text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             {time} IST
           </time>
@@ -98,28 +98,28 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
   if (variant === 'hero') {
     return (
       <div
-        className={`relative inline-flex flex-col items-end gap-1 rounded-2xl border border-slate-950/[0.10] bg-white/75 backdrop-blur-xl px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_18px_50px_-32px_rgba(139,127,240,0.45)] ${className}`}
+        className={`relative inline-flex flex-col items-end gap-1 border border-rule bg-paper px-5 py-3 ${className}`}
         role="status"
         aria-live="off"
         aria-label={`Current time ${time}, ${date}`}
       >
-        <span aria-hidden="true" className="pointer-events-none absolute inset-x-4 top-[1px] h-px rounded-full bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-accent" />
         <div className="flex items-center gap-2">
           <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" aria-hidden="true">
             <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" />
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+          <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted">
             Indian Standard Time
           </span>
         </div>
         <time
           dateTime={isoLabel}
-          className="text-[26px] font-black tabular-nums leading-none text-slate-950"
-          style={{ fontFamily: 'var(--font-geist-mono)' }}
+          className="text-[26px] font-bold tabular-nums leading-none text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           {time}
         </time>
-        <span className="text-[11px] font-semibold tracking-normal text-slate-600">
+        <span className="text-[11px] font-medium text-muted">
           {date}
         </span>
       </div>
@@ -128,7 +128,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
 
   return (
     <div
-      className={`hidden 2xl:inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-slate-950/[0.10] bg-white/72 backdrop-blur-md text-[12px] font-medium text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:bg-white hover:border-slate-950/[0.18] transition-colors duration-200 ${className}`}
+      className={`hidden 2xl:inline-flex items-center gap-2.5 px-3 py-1 border-l border-rule text-[12px] font-medium text-muted ${className}`}
       role="status"
       aria-live="off"
       aria-label={`Current time ${time}, ${date}`}
@@ -137,14 +137,14 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
       <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" aria-hidden="true">
         <span className="absolute inset-0 rounded-full bg-accent/55 animate-ping" />
       </span>
-      <span className="text-[11.5px] font-semibold tracking-normal text-slate-700">
+      <span className="text-[11.5px] font-medium text-muted">
         {date}
       </span>
-      <span className="h-3 w-px bg-slate-950/15" aria-hidden="true" />
+      <span className="h-3 w-px bg-rule" aria-hidden="true" />
       <time
         dateTime={isoLabel}
-        className="text-[12px] font-semibold tabular-nums text-slate-950"
-        style={{ fontFamily: 'var(--font-geist-mono)' }}
+        className="text-[12px] font-semibold tabular-nums text-ink"
+        style={{ fontFamily: 'var(--font-mono)' }}
       >
         {time}
       </time>
