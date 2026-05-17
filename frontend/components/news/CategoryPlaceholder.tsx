@@ -1,9 +1,4 @@
-/**
- * Decorative gradient placeholder shown when no image is available.
- * Used in featured / hero cards. Color is derived from category via the
- * unified theme so the hero card, badge, and trending bar all use the
- * same family of hues for a given category.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 

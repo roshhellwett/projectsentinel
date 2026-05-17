@@ -1,6 +1,4 @@
-/**
- * Loading skeleton component
- */
+// last edited 2026-05-17 by roshhellwett
 
 interface SkeletonProps {
   className?: string;

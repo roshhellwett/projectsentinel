@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
@@ -11,9 +13,9 @@ import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
-  // `search` has no href — it dispatches OPEN_SEARCH_EVENT so the proper
-  // SearchBar overlay (with auto-focused keyboard) appears instead of
-  // navigating to a near-empty /search page.
+
+
+
   { id: 'search', href: null, icon: Search, label: 'Search' },
   { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
   { id: 'saved', href: '/saved/', icon: Bookmark, label: 'Saved' },
@@ -26,8 +28,8 @@ export function MobileBottomNav() {
   const closeTopics = useCallback(() => setTopicsOpen(false), []);
   const toggleTopics = useCallback(() => setTopicsOpen((v) => !v), []);
 
-  // Lock body scroll when topics sheet is open so the user can't
-  // scroll the feed behind the translucent overlay.
+
+
   useEffect(() => {
     if (!topicsOpen) return;
     lockBodyScroll();
@@ -43,7 +45,7 @@ export function MobileBottomNav() {
 
   return (
     <>
-      {/* Topics sheet */}
+
       <AnimatePresence>
         {topicsOpen && (
           <motion.div
@@ -94,7 +96,7 @@ export function MobileBottomNav() {
         )}
       </AnimatePresence>
 
-      {/* Bottom navigation bar */}
+
       <nav className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57]" aria-label="Mobile navigation">
         <div
           className="relative border-t border-slate-950/[0.08] bg-white/82 backdrop-blur-2xl shadow-[0_-18px_55px_-42px_rgba(15,23,42,0.24)]"

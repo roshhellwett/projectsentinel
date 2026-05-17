@@ -1,13 +1,6 @@
 'use client';
 
-/**
- * /saved — reader's personal bookmark collection.
- *
- * Bookmark IDs live in localStorage (privacy-respecting, no auth) and are
- * hydrated into full Post records via the /api/posts/batch endpoint. We
- * refetch whenever the saved-ID set changes so removing a bookmark from
- * any tab is reflected immediately.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';

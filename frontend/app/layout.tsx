@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import type { Metadata, Viewport } from 'next';
 import { Inter, Newsreader, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
@@ -9,7 +11,6 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 import { ScrollRestorer } from '@/components/ui/ScrollRestorer';
-
 
 const inter = Inter({
   variable: '--font-inter',
@@ -81,8 +82,8 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
     apple: '/apple-touch-icon.svg',
   },
-  // Next.js automatically links app/manifest.ts at /manifest.webmanifest;
-  // we point at the correct file rather than the previous '/manifest' 404.
+
+
   manifest: '/manifest.webmanifest',
 };
 
@@ -96,9 +97,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
-  // Pre-warm DNS + TLS for the two third-party origins we hit most often:
-  // Supabase for the post API and Google for source favicons. Shaves
-  // ~100–200 ms off the first request on cold network paths.
+
+
+
   const supabaseOrigin = (() => {
     try {
       if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -146,7 +147,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </noscript>
         )}
-        {/* Fixed viewport-centered watermark — always behind content */}
+
         <div className="watermark-fixed" aria-hidden="true">
           <span>Verified News</span>
         </div>
@@ -162,7 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main" className="flex-1 w-full relative z-10 page-enter">
           {children}
         </main>
-        {/* Spacer so footer clears the fixed mobile bottom nav */}
+
         <div className="h-20 md:hidden" aria-hidden="true" />
         <Footer />
         <MobileBottomNav />

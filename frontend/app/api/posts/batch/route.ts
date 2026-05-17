@@ -1,11 +1,4 @@
-/**
- * POST /api/posts/batch
- *
- * Returns a list of posts matching the requested IDs. Used by the
- * client-side /saved page which keeps bookmark IDs in localStorage and
- * needs to hydrate them into full Post records. Capped at 100 IDs per
- * request to bound the worst-case query cost.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { NextResponse } from 'next/server';
 import { Post } from '@/types';
@@ -50,8 +43,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Preserve the order the client asked for so the UI shows newest-saved
-    // at the top without an extra client-side sort.
+
+
     const byId = new Map((data as Post[]).map((p) => [p.id, p]));
     const ordered = valid.map((id) => byId.get(id)).filter(Boolean) as Post[];
 

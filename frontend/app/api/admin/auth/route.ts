@@ -1,6 +1,4 @@
-/**
- * Admin authentication API
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
@@ -18,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     const { password } = await request.json();
-    
+
     if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { success: false, error: 'Invalid password' },
@@ -32,13 +30,13 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-    
-    // Create JWT token
+
+
     const token = await new SignJWT({ role: 'admin' })
       .setProtectedHeader({ alg: 'HS256' })
       .setExpirationTime('24h')
       .sign(new TextEncoder().encode(ADMIN_SECRET));
-    
+
     return NextResponse.json({ success: true, token });
   } catch {
     return NextResponse.json(

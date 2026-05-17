@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import type { MetadataRoute } from 'next';
 import { fetchPosts } from '@/lib/supabase/server';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
@@ -6,10 +8,10 @@ export const revalidate = 3600;
 
 async function fetchArticleUrls(): Promise<{ id: string; published_at: string }[]> {
   try {
-    // Paginate so the sitemap includes more than the latest page of articles.
-    // fetchPosts caps each page at 50 rows; we walk up to ~1000 most-recent
-    // posts which keeps the file well under Google's 50K-URL sitemap limit
-    // while no longer dropping the bulk of the archive from search engines.
+
+
+
+
     const PAGE_SIZE = 50;
     const MAX_PAGES = 20;
     const collected: { id: string; published_at: string }[] = [];

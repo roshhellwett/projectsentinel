@@ -1,6 +1,4 @@
-/**
- * Banner for corrected or retracted posts
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { AlertTriangle, XCircle } from 'lucide-react';
 
@@ -11,7 +9,7 @@ interface CorrectionsNoticeProps {
 
 export function CorrectionsNotice({ type, note }: CorrectionsNoticeProps) {
   const isRetracted = type === 'retracted';
-  
+
   return (
     <div className={`mb-6 p-4 rounded-lg ${isRetracted ? 'bg-red-500/10 border border-red-500/30' : 'bg-amber-500/10 border border-amber-500/30'}`}>
       <div className="flex items-start gap-3">

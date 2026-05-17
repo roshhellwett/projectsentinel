@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -24,13 +26,13 @@ const SHARE_PLATFORMS = [
   },
   {
     name: 'LinkedIn',
-    // LinkedIn's share dialog ignores text, so we only pass the URL. The
-    // `_text` arg keeps a uniform signature across all platforms.
+
+
     getUrl: (url: string, _text: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   },
   {
     name: 'Facebook',
-    // Facebook auto-fetches the OpenGraph title; the text arg is unused.
+
     getUrl: (url: string, _text: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
   },
   {

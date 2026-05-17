@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { Post } from '@/types';
 
 export function newsArticleJsonLd(post: Post): object {

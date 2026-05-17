@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ExternalLink, Globe, Newspaper } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -36,7 +38,7 @@ function SourceIcon({ url }: { url: string }) {
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
+
     <img
       src={`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`}
       alt=""

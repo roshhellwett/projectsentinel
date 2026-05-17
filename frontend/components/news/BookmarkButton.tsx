@@ -1,12 +1,6 @@
 'use client';
 
-/**
- * BookmarkButton — one-tap save/unsave with optimistic UI.
- *
- * Uses `useSavedPosts` (localStorage, cross-tab synced) so saves are
- * instant and survive reloads without an auth dependency. Renders a
- * subtle pill or a square icon-only button depending on `variant`.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { useCallback } from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
@@ -17,7 +11,7 @@ import { cn } from '@/lib/utils/cn';
 interface BookmarkButtonProps {
   postId: string;
   variant?: 'icon' | 'pill';
-  /** Stop event bubbling so the host card's onClick doesn't fire. */
+
   stopPropagation?: boolean;
   className?: string;
 }

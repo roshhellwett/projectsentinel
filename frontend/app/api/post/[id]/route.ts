@@ -1,7 +1,4 @@
-/**
- * API route for single post operations
- * Fixed: PATCH authentication, validation
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';

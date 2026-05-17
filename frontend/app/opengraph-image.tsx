@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { ImageResponse } from 'next/og';
 
 export const alt = 'India Verified';
@@ -20,7 +22,7 @@ export default async function Image() {
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
         }}
       >
-        {/* Subtle dot grid */}
+
         <div
           style={{
             position: 'absolute',
@@ -30,10 +32,10 @@ export default async function Image() {
           }}
         />
 
-        {/* Centered content */}
+
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10 }}>
 
-          {/* Logo Icon */}
+
           <div
             style={{
               width: 140,
@@ -61,7 +63,7 @@ export default async function Image() {
             </span>
           </div>
 
-          {/* Brand name */}
+
           <div
             style={{
               fontSize: 64,
@@ -75,7 +77,7 @@ export default async function Image() {
             India Verified
           </div>
 
-          {/* Tagline */}
+
           <div
             style={{
               fontSize: 28,
@@ -87,7 +89,7 @@ export default async function Image() {
             AI-Verified Indian News · No Ads · No Bias
           </div>
 
-          {/* Divider pill */}
+
           <div
             style={{
               width: 48,

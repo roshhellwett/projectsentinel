@@ -1,23 +1,6 @@
 'use client';
 
-/**
- * InfiniteFeed — silent auto-loading feed.
- *
- * Three simultaneous behaviors:
- *  1) Infinite scroll: an IntersectionObserver sentinel near the bottom triggers
- *     the next page request once it enters the viewport. New cards are appended
- *     with a soft fade/slide-in animation. No buttons. No reload.
- *  2) Live prepend (at top): when the user is at/near the top of the page,
- *     newly-arrived stories are prepended immediately with a brief accent flash.
- *  3) iOS Dynamic Island queue (when scrolled): if the user has scrolled past
- *     the queue threshold, new posts are held in a `pendingNew` queue and a
- *     compact island pill appears at the top of the viewport showing the
- *     count + latest headline. Tapping it flushes the queue and smooth-scrolls
- *     to the top — preserving the user's reading rhythm.
- *
- * All deduplication is by post.id. Reduced-motion is respected via the global
- * media query in globals.css (Framer Motion respects it automatically).
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,11 +24,16 @@ interface InfiniteFeedProps {
   initialCount: number;
   category?: string;
   pageSize?: number;
-  /** IDs to always exclude (e.g. hero + trending on homepage).
-   *  Passed as a plain array because Set is not serializable across
-   *  the Next.js Server→Client Component boundary. */
+
   excludeIds?: string[];
 }
+
+const gridVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.045, delayChildren: 0.02 },
+  },
+};
 
 const itemVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -63,14 +51,14 @@ export function InfiniteFeed({
   pageSize = DEFAULT_PAGE_SIZE,
   excludeIds,
 }: InfiniteFeedProps) {
-  // Convert the serialised array to a Set once for O(1) lookups.
+
+  const excludeKey = excludeIds ? excludeIds.join(',') : '';
   const excludeSet = useMemo(
-    () => (excludeIds && excludeIds.length > 0 ? new Set(excludeIds) : undefined),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [excludeIds?.join(',')],
+    () => (excludeKey ? new Set(excludeKey.split(',')) : undefined),
+    [excludeKey],
   );
 
-  // Dedupe initial just in case
+
   const dedupedInitial = dedupe(initialPosts);
 
   const [posts, setPosts] = useState<Post[]>(dedupedInitial);
@@ -81,9 +69,9 @@ export function InfiniteFeed({
 
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  // Persistent read/unread tracking via localStorage. We memo the membership
-  // test by post.id so individual NewsCard memo()s only re-render when their
-  // own read state changes — not on every poll tick.
+
+
+
   const { readIds, markRead } = useReadPosts();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -91,11 +79,11 @@ export function InfiniteFeed({
   const postsRef = useRef(posts);
   postsRef.current = posts;
 
-  // Keep a stable reference to excludeIds for callbacks
+
   const excludeIdsRef = useRef(excludeSet);
   excludeIdsRef.current = excludeSet;
 
-  // ── Infinite scroll: load next page when sentinel intersects ──
+
   const loadMore = useCallback(async () => {
     if (loadingRef.current || exhausted) return;
     loadingRef.current = true;
@@ -117,10 +105,10 @@ export function InfiniteFeed({
         return dedupe([...prev, ...incoming]);
       });
       setPage(next);
-      // Exhaust when the server returned fewer items than requested — that
-      // means we have reached the end of the dataset. Using `< pageSize`
-      // is reliable even on the home page where `excludeIds` causes
-      // `merged.length` to always stay below `data.count`.
+
+
+
+
       if (data.posts.length === 0 || data.posts.length < pageSize) {
         setExhausted(true);
       }
@@ -150,18 +138,18 @@ export function InfiniteFeed({
     return () => obs.disconnect();
   }, [loadMore]);
 
-  // ── Pending queue surfaced via the Dynamic Island ──
+
   const [pendingNew, setPendingNew] = useState<Post[]>([]);
   const pendingRef = useRef(pendingNew);
   pendingRef.current = pendingNew;
 
-  // Session-scoped set of post IDs the user has already been notified about
-  // via the LiveUpdateIsland. Without this set, the polling tick would keep
-  // re-detecting the same post as "fresh" every 30 s as soon as it left the
-  // pending queue (e.g. after auto-flush or after the user navigated away
-  // and back). Persisted to sessionStorage so it survives drawer opens,
-  // soft route changes, and accidental tab refreshes within the same
-  // session — but resets cleanly when the tab closes.
+
+
+
+
+
+
+
   const DISMISSED_KEY = 'iv:liveDismissedIds';
   const dismissedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -175,12 +163,12 @@ export function InfiniteFeed({
     } catch { /* corrupt JSON — start fresh */ }
   }, []);
 
-  /** Cap the dismissed set so it cannot grow unbounded across a long session. */
+
   const markDismissed = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
     const next = dismissedRef.current;
     for (const id of ids) next.add(id);
-    // FIFO trim — keep the last 200 dismissed IDs.
+
     if (next.size > 200) {
       const arr = Array.from(next);
       dismissedRef.current = new Set(arr.slice(arr.length - 200));
@@ -190,7 +178,7 @@ export function InfiniteFeed({
     } catch { /* quota/private-mode — non-fatal */ }
   }, []);
 
-  /** Flash a freshly-revealed batch of post IDs so the user can spot them. */
+
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
     setFreshIds((curr) => {
@@ -207,11 +195,7 @@ export function InfiniteFeed({
     }, 3200);
   }, []);
 
-  /**
-   * Tap-handler from <LiveUpdateIsland>: drop pending into the feed and rise.
-   * Also reused internally by the auto-flush scroll watcher so behaviour
-   * stays identical whether the user taps or scrolls.
-   */
+
   const flushPending = useCallback((opts: { scroll?: boolean } = { scroll: true }) => {
     const queued = pendingRef.current;
     if (queued.length === 0) return;
@@ -225,13 +209,7 @@ export function InfiniteFeed({
     }
   }, [flashFresh, markDismissed]);
 
-  /**
-   * Tap-handler from <LiveUpdateIsland>: open the newest queued post in the
-   * drawer (matching the iOS-Dynamic-Island "tap the notification → jump to
-   * the thing" mental model). All other queued posts are silently merged
-   * into the feed and every acknowledged ID is recorded as dismissed so
-   * the same story can never bubble back up on the next poll tick.
-   */
+
   const openFromIsland = useCallback((newest: Post) => {
     const queued = pendingRef.current;
     setPendingNew([]);
@@ -242,10 +220,10 @@ export function InfiniteFeed({
     setSelectedPost(newest);
   }, [flashFresh, markDismissed, markRead]);
 
-  // ── Auto-flush: when the user voluntarily scrolls back near the top,
-  // surface any queued posts silently instead of leaving them stuck behind
-  // the (now-hidden) Dynamic Island. This is the root-cause fix for the
-  // “had to hard refresh to see new news” bug.
+
+
+
+
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
@@ -262,10 +240,10 @@ export function InfiniteFeed({
     return () => window.removeEventListener('scroll', onScroll);
   }, [flushPending]);
 
-  // ── Shared incoming-post pipeline ──
-  // Both the realtime subscription and the 30s polling fallback feed
-  // through this single function so dedup, category-filter, and the
-  // "prepend vs queue" decision are identical regardless of source.
+
+
+
+
   const processIncomingPosts = useCallback((incoming: Post[]) => {
     if (incoming.length === 0) return;
     const existing = new Set(postsRef.current.map((p) => p.id));
@@ -278,16 +256,16 @@ export function InfiniteFeed({
         !queuedIds.has(p.id) &&
         !dismissed.has(p.id) &&
         !(excluded?.has(p.id)) &&
-        // Realtime pushes ALL published posts; the polling endpoint already
-        // filters by category server-side. Apply the same filter here so
-        // realtime events can't slip a wrong-category post into a category
-        // page's feed.
+
+
+
+
         (!category || p.category === category),
     );
     if (fresh.length === 0) return;
 
-    // Decide: prepend immediately (user near top) vs. queue behind the
-    // Dynamic Island (user reading further down).
+
+
     const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
     const userIsReading = scrollY > QUEUE_THRESHOLD_PX;
 
@@ -299,16 +277,16 @@ export function InfiniteFeed({
     }
   }, [category, flashFresh]);
 
-  // ── Realtime push + robust reconnection ──
-  // The Supabase realtime WebSocket frequently dies when the browser
-  // throttles a backgrounded tab (especially on mobile). We tear down
-  // and rebuild the channel every time the tab returns to the foreground
-  // to guarantee sub-second delivery resumes immediately.
+
+
+
+
+
   useEffect(() => {
     let sub: { unsubscribe: () => void } | null = null;
 
     const connect = () => {
-      // Tear down any lingering channel first
+
       if (sub) {
         try { sub.unsubscribe(); } catch { /* non-fatal */ }
         sub = null;
@@ -338,19 +316,19 @@ export function InfiniteFeed({
     };
   }, [processIncomingPosts]);
 
-  // ── Polling fallback: catches anything realtime missed (channel drops,
-  // events delivered while tab was hidden, etc.). ──
-  //
-  // CRITICAL: polling NEVER stops. When the tab is hidden we slow down to
-  // BACKGROUND_POLL_MS (60 s) instead of halting — this is the root fix
-  // for "I have to refresh 2-3 times to see new posts". Posts that arrive
-  // while the tab is backgrounded accumulate in the pending queue and are
-  // surfaced instantly via the LiveUpdateIsland the moment the user returns.
+
+
+
+
+
+
+
+
   useEffect(() => {
     let cancelled = false;
 
-    const FOREGROUND_MS = POLL_INTERVAL_MS;     // 30 s
-    const BACKGROUND_MS = 60_000;                // 60 s — gentler when hidden
+    const FOREGROUND_MS = POLL_INTERVAL_MS;
+    const BACKGROUND_MS = 60_000;
 
     const tick = async () => {
       if (cancelled) return;
@@ -369,13 +347,13 @@ export function InfiniteFeed({
 
     let timerId: ReturnType<typeof setTimeout> | null = null;
 
-    /** Schedule the next tick after `ms` milliseconds. */
+
     const scheduleNext = (ms: number) => {
       if (timerId !== null) clearTimeout(timerId);
       timerId = setTimeout(async () => {
         await tick();
         if (!cancelled) {
-          // Re-schedule with the interval appropriate for current visibility
+
           const interval = document.visibilityState === 'hidden' ? BACKGROUND_MS : FOREGROUND_MS;
           scheduleNext(interval);
         }
@@ -384,24 +362,24 @@ export function InfiniteFeed({
 
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        // Tab regained focus — fetch immediately and switch to fast cadence
+
         tick();
         scheduleNext(FOREGROUND_MS);
       } else {
-        // Tab hidden — switch to slow cadence but do NOT stop
+
         scheduleNext(BACKGROUND_MS);
       }
     };
 
-    // Refetch the moment the device comes back online.
+
     const onOnline = () => { tick(); scheduleNext(FOREGROUND_MS); };
 
-    // Refetch when the window regains focus (covers desktop-tab-switching
-    // where visibilitychange may not fire on every browser).
+
+
     const onFocus = () => { tick(); };
 
-    // Mobile: refetch when user taps into the PWA / switches back via
-    // the app-switcher. pageshow fires reliably on iOS Safari.
+
+
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) tick();
     };
@@ -411,7 +389,7 @@ export function InfiniteFeed({
     window.addEventListener('focus', onFocus);
     window.addEventListener('pageshow', onPageShow);
 
-    // Initial tick + schedule
+
     tick();
     scheduleNext(FOREGROUND_MS);
 
@@ -425,21 +403,21 @@ export function InfiniteFeed({
     };
   }, [category, processIncomingPosts]);
 
-  // Close drawer if the post no longer exists in current list
+
   useEffect(() => {
     if (selectedPost && !posts.find((p) => p.id === selectedPost.id)) {
       setSelectedPost(null);
     }
   }, [posts, selectedPost]);
 
-  /** Open a post (drawer) and mark it as read for this device. */
+
   const handleOpen = useCallback((post: Post) => {
     markRead(post.id);
     setSelectedPost(post);
   }, [markRead]);
 
-  // Pre-compute the read flag per post id so framer-motion doesn't have to
-  // re-create transition objects on every render.
+
+
   const readMap = useMemo(() => readIds, [readIds]);
 
   if (posts.length === 0) {
@@ -466,7 +444,12 @@ export function InfiniteFeed({
 
   return (
     <>
-      <div className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+      <motion.div
+        className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch"
+        variants={gridVariants}
+        initial="hidden"
+        animate="show"
+      >
         <AnimatePresence initial={false}>
           {posts.map((post) => (
             <motion.div
@@ -487,14 +470,13 @@ export function InfiniteFeed({
             </motion.div>
           ))}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
-      {/* Sentinel for infinite scroll */}
       {!exhausted && (
         <div ref={sentinelRef} className="h-12 w-full mt-8" aria-hidden="true" />
       )}
 
-      {/* Loading shimmer skeletons (subtle, no buttons) */}
+
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -512,11 +494,17 @@ export function InfiniteFeed({
         </p>
       )}
 
-      <NewsDrawer post={selectedPost} onClose={() => setSelectedPost(null)} />
+      <NewsDrawer
+        post={selectedPost}
+        onClose={() => setSelectedPost(null)}
+        onSelectRelated={(next) => {
+          markRead(next.id);
+          setPosts((prev) => (prev.some((p) => p.id === next.id) ? prev : dedupe([next, ...prev])));
+          setSelectedPost(next);
+        }}
+      />
 
-      {/* iOS Dynamic Island — surfaces queued live posts while the user is
-          reading further down the feed. The component renders nothing when
-          pendingNew is empty, so it has zero visual cost at rest. */}
+
       <LiveUpdateIsland pending={pendingNew} onTap={openFromIsland} />
     </>
   );

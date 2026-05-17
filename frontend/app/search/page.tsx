@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { Suspense } from 'react';
 import { searchPosts } from '@/lib/supabase/server';
 import { SearchResultsGrid } from '@/components/news/SearchResultsGrid';

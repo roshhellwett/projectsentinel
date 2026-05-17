@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ShieldCheck } from 'lucide-react';
@@ -15,24 +17,6 @@ import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Design system: ONE accent colour per category, used sparingly (small chip
-// + hover left-edge bar + score bar detail). The card body stays neutral
-// so the feed reads as a single cohesive surface, not a patchwork of pastels.
-// Premium aesthetic reference: linear.app, vercel.com, apple.com/newsroom.
-//
-// Colour is resolved through `lib/theme/categoryTheme` so this card, the
-// trending list, the badge pill, and the hero placeholder all share the
-// same hue for a given category. Score tier comes from `scoreColor.ts` so
-// every credibility bar agrees on borderline scores.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SourceChip — single tappable pill with favicon + name. This is the TRUST
-// MOAT: no other Indian news app shows sources inline on the card. Tap the
-// chip and you go straight to the original article without dismissing the
-// card itself (stopPropagation on the card-level onClick).
-// ─────────────────────────────────────────────────────────────────────────────
 function getSourceLabel(source: Source): string {
   if (source.title?.trim()) return source.title.trim();
   if (source.name?.trim())  return source.name.trim();
@@ -54,7 +38,7 @@ function SourceChip({ source }: { source: Source }) {
       aria-label={`Source: ${label} (opens in new tab)`}
     >
       {host && (
-        // eslint-disable-next-line @next/next/no-img-element
+
         <img
           src={`https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host)}`}
           alt=""
@@ -70,17 +54,11 @@ function SourceChip({ source }: { source: Source }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NewsCard — premium light-theme card.
-// Drop-in replacement for the previous pastel-tinted card: same props, same
-// export name, so InfiniteFeed, search results, related stories, etc. all
-// pick it up without any change at the call site.
-// ─────────────────────────────────────────────────────────────────────────────
 interface NewsCardProps {
   post: Post;
   onClick?: () => void;
   isNew?: boolean;
-  /** When true, dim the card and hide the unread dot — user has already opened this story. */
+
   isRead?: boolean;
 }
 
@@ -127,7 +105,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       )}
       style={{ contain: 'layout' }}
     >
-      {/* Left-edge accent bar — appears on hover, hue matches category */}
+
       <span
         aria-hidden="true"
         className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
@@ -135,7 +113,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       />
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
-        {/* ── Top row: category + breaking + timestamp + score ── */}
+
         <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-2 flex-wrap min-w-0">
             <span
@@ -182,7 +160,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           <CredibilityBar score={post.credibility_score} compact className="sm:w-32" />
         </div>
 
-        {/* ── Headline (serif, the visual anchor of the card) ── */}
+
         <h3
           className="text-[19px] md:text-[21px] font-bold leading-[1.25] tracking-normal text-slate-950 line-clamp-3 mb-2.5 transition-colors"
           style={{ fontFamily: 'var(--font-newsreader)' }}
@@ -190,12 +168,12 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           {post.headline}
         </h3>
 
-        {/* ── Summary ── */}
+
         <p className="text-[14px] text-slate-600 leading-relaxed line-clamp-2 mb-auto">
           {truncateWords(post.summary, 24)}
         </p>
 
-        {/* ── Source chips (trust moat) ── */}
+
         {topSources.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 mt-4">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
@@ -213,7 +191,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           </div>
         )}
 
-        {/* ── Bottom action row ── */}
+
         <div className="relative z-20 flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
           <SourcePickerButton
             sources={post.sources}

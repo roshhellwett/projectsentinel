@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -30,9 +32,9 @@ export function Navbar() {
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 12));
 
-  // Lock body scroll when mobile drawer open. Use the shared counter so we
-  // coexist with the SearchBar / NewsDrawer overlays without one's cleanup
-  // canceling another's lock.
+
+
+
   useEffect(() => {
     if (!isMobileOpen) return;
     lockBodyScroll();
@@ -41,7 +43,7 @@ export function Navbar() {
     };
   }, [isMobileOpen]);
 
-  // Close drawer on route change
+
   useEffect(() => {
     setIsMobileOpen(false);
   }, [pathname]);
@@ -57,8 +59,8 @@ export function Navbar() {
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
 
-  // Listen for the global "/" keyboard shortcut so the user can open
-  // search from anywhere without reaching for the mouse.
+
+
   useEffect(() => {
     const handler = () => setIsSearchOpen(true);
     window.addEventListener(OPEN_SEARCH_EVENT, handler);
@@ -83,7 +85,7 @@ export function Navbar() {
         >
           <div className="container mx-auto px-4 lg:px-6">
             <div className="flex items-center justify-between h-16 lg:h-[68px]">
-              {/* Logo */}
+
               <Link
                 href="/"
                 aria-label="India Verified — home"
@@ -104,7 +106,7 @@ export function Navbar() {
                 </span>
               </Link>
 
-              {/* Desktop Nav */}
+
               <nav
                 aria-label="Main navigation"
                 className="hidden lg:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2"
@@ -133,7 +135,7 @@ export function Navbar() {
                 })}
               </nav>
 
-              {/* Right actions */}
+
               <div className="flex items-center gap-2">
                 <motion.button
                   whileTap={{ scale: 0.9 }}
@@ -154,7 +156,7 @@ export function Navbar() {
                   GitHub
                 </a>
 
-                {/* Mobile hamburger */}
+
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsMobileOpen((v) => !v)}
@@ -170,10 +172,10 @@ export function Navbar() {
         </div>
       </motion.header>
 
-      {/* Spacer to offset fixed navbar */}
+
       <div className="h-16 lg:h-[68px] flex-shrink-0" aria-hidden="true" />
 
-      {/* Mobile sliding drawer */}
+
       <AnimatePresence>
         {isMobileOpen && (
           <>

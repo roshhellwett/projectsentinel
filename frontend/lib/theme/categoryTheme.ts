@@ -1,41 +1,15 @@
-/**
- * Single source of truth for category visual styling.
- *
- * Before this file existed, four separate components each had their own
- * Record<Category, color> map:
- *   - NewsCard.tsx (CATEGORY_META)
- *   - TrendingSection.tsx (CATEGORY_COLOR)
- *   - CategoryTag.tsx (CATEGORY_STYLE)
- *   - CategoryPlaceholder.tsx (CATEGORY_GRADIENT)
- *
- * They drifted apart over time, so a "Crime" story would render with a red
- * badge in the feed, a peach pill in trending, and an orange gradient on
- * the hero — all on the same page. This module unifies them: every visual
- * representation of a category derives from one entry below.
- *
- * Palette rationale (semantic mapping the eye can learn):
- *   politics   → violet  (institutional, regal)
- *   business   → emerald (money / growth)
- *   sports     → orange  (energy, action)
- *   crime      → red     (danger / alert)
- *   tech       → blue    (digital / trust)
- *   science    → cyan    (cool, analytical)
- *   health     → green   (wellness, vitality)
- *   world      → pink    (geo / human-interest)
- *   entertainment → yellow (spotlight, glamour)
- *   education  → purple  (knowledge, scholarship)
- */
+// last edited 2026-05-17 by roshhellwett
 
 import type { CSSProperties } from 'react';
 
 export interface CategoryTheme {
-  /** Solid accent colour for left bars, dots, and category tints. */
+
   hex: string;
-  /** Pre-built inline style for the badge pill (bg + border + text). */
+
   pill: CSSProperties;
-  /** Tailwind gradient classes for hero / placeholder backgrounds. */
+
   gradient: string;
-  /** Display label for the pill. */
+
   label: string;
 }
 
@@ -153,17 +127,12 @@ const DEFAULT_THEME: CategoryTheme = {
   label: 'News',
 };
 
-/**
- * Resolve the visual theme for a category string. Always returns a valid
- * theme — falls back to the slate "News" theme for unknown categories so
- * the UI never breaks on data drift from the worker.
- */
 export function getCategoryTheme(category: string | undefined | null): CategoryTheme {
   if (!category) return DEFAULT_THEME;
   return THEME[category.toLowerCase()] ?? {
     ...DEFAULT_THEME,
-    // Preserve original casing for unknown categories so editors can still
-    // see what the worker labelled it.
+
+
     label: category.charAt(0).toUpperCase() + category.slice(1),
   };
 }

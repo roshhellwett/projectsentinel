@@ -1,7 +1,4 @@
-/**
- * Date formatting utilities — all output in IST (Asia/Kolkata, UTC+5:30).
- * Supabase timestamps are stored as UTC; JS Date parses them correctly.
- */
+// last edited 2026-05-17 by roshhellwett
 
 const IST: Intl.DateTimeFormatOptions = { timeZone: 'Asia/Kolkata' };
 

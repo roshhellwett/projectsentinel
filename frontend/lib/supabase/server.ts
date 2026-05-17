@@ -1,7 +1,4 @@
-/**
- * Server Supabase client (uses service role key - private)
- * Only use in API routes, never in browser components
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types';
@@ -32,7 +29,6 @@ export function getSupabaseServer() {
   return supabaseServerInstance;
 }
 
-// Exponential-backoff retry wrapper (3 attempts: 0 ms, 500 ms, 1000 ms).
 async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < retries; attempt++) {
@@ -48,7 +44,6 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
   throw lastError;
 }
 
-// Fetch posts with pagination (retried up to 3 times on transient failures).
 export async function fetchPosts(
   page: number = 1,
   limit: number = 20,
@@ -76,8 +71,8 @@ export async function fetchPosts(
     const { data, error, count } = await query;
 
     if (error) {
-      // Handle "Requested range not satisfiable" gracefully
-      // This occurs when pagination range exceeds available rows
+
+
       if (error.message?.includes('Requested range not satisfiable')) {
         return { posts: [], count: 0 };
       }
@@ -90,7 +85,6 @@ export async function fetchPosts(
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-// Fetch single post by ID (retried up to 3 times on transient failures).
 export async function fetchPostById(id: string): Promise<Post | null> {
   if (!UUID_RE.test(id)) {
     return null;
@@ -104,8 +98,8 @@ export async function fetchPostById(id: string): Promise<Post | null> {
       .single();
 
     if (error) {
-      // .single() returns PGRST116 when no row matches — that's a real 404,
-      // so propagate null without burning further retries.
+
+
       if (error.code === 'PGRST116') return null;
       throw new Error(`fetchPostById error: ${error.message}`);
     }
@@ -114,7 +108,6 @@ export async function fetchPostById(id: string): Promise<Post | null> {
   }).catch(() => null);
 }
 
-// Fetch latest post
 export async function fetchLatestPost(): Promise<Post | null> {
   return withRetry(async () => {
     const { data, error } = await getSupabaseServer()
@@ -130,7 +123,6 @@ export async function fetchLatestPost(): Promise<Post | null> {
   }).catch(() => null);
 }
 
-// Update post status (admin only)
 export async function updatePostStatus(
   id: string,
   status: string,
@@ -158,7 +150,6 @@ export async function updatePostStatus(
   }
 }
 
-// Full-text search posts by query
 export async function searchPosts(
   query: string,
   limit: number = 20
@@ -168,17 +159,17 @@ export async function searchPosts(
 
   const safeLimit = Math.min(50, Math.max(1, limit));
 
-  // Search both headline AND summary so queries that only match the body
-  // still return results. PostgREST's `fts` operator requires a tsquery
-  // string (e.g. `cat & dog`), NOT raw text. Splitting on whitespace and
-  // joining with `&` turns "modi education" into a valid AND-tsquery.
-  // We also strip any tsquery-significant punctuation to keep user input
-  // literal and avoid breaking the filter syntax.
-  // Strip every character that has special meaning in either a tsquery or
-  // PostgREST's `.or()` filter grammar. Commas in particular act as predicate
-  // separators inside `.or(...)` — leaving them in would silently corrupt
-  // the filter and drop half the user's query. Periods are stripped to avoid
-  // collisions with the `column.operator.value` syntax PostgREST uses.
+
+
+
+
+
+
+
+
+
+
+
   const ftsTerm = safeQuery
     .replace(/[\\&|!():*'"<>,.;]/g, ' ')
     .split(/\s+/)
@@ -196,8 +187,8 @@ export async function searchPosts(
     .limit(safeLimit);
 
   if (error) {
-    // Fallback to ilike if textSearch fails (e.g. FTS index not yet created).
-    // Escape SQL LIKE metacharacters so user input is treated as a literal string.
+
+
     const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
     const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
       .from('posts')
@@ -214,20 +205,19 @@ export async function searchPosts(
   return { posts: (data || []) as Post[], count: count || 0 };
 }
 
-// Get all posts for admin (including non-published) — capped at 500 rows.
 export async function fetchAllPosts(): Promise<Post[]> {
   const { data, error } = await getSupabaseServer()
     .from('posts')
     .select('*')
     .order('published_at', { ascending: false })
     .limit(500);
-  
+
   if (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error(`fetchAllPosts error: ${error.message}`);
     }
     return [];
   }
-  
+
   return (data || []) as Post[];
 }

@@ -1,12 +1,4 @@
-/**
- * Reference-counted body-scroll lock.
- *
- * Multiple overlays can be open at once (NewsDrawer, SearchBar, Navbar mobile
- * drawer). Each was previously calling `document.body.style.overflow = ''`
- * unconditionally on close, which prematurely re-enabled scrolling when a
- * sibling overlay was still open. A shared counter makes the lock/unlock
- * symmetric and overlay-agnostic.
- */
+// last edited 2026-05-17 by roshhellwett
 
 let lockCount = 0;
 let previousOverflow: string | null = null;
@@ -47,11 +39,6 @@ export function unlockBodyScroll(): void {
   }
 }
 
-/**
- * Subscribe to lock state transitions. Returns an unsubscribe fn.
- * Useful for components like LiveUpdateIsland that should hide when any
- * modal/drawer is open so they don't float above it.
- */
 export function subscribeBodyScrollLock(fn: LockListener): () => void {
   listeners.add(fn);
   return () => {
@@ -59,7 +46,6 @@ export function subscribeBodyScrollLock(fn: LockListener): () => void {
   };
 }
 
-/** Synchronously read the current lock state (e.g. for initial render). */
 export function isBodyScrollLocked(): boolean {
   return lockCount > 0;
 }

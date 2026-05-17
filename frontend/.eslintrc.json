@@ -11,6 +11,20 @@
     "no-debugger": "error",
     "@next/next/no-img-element": "warn",
     "@next/next/no-html-link-for-pages": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["lib/utils/logger.ts"],
+      "rules": { "no-console": "off" }
+    },
+    {
+      "files": [
+        "components/news/NewsCard.tsx",
+        "components/news/SourceLinks.tsx",
+        "components/news/SourcePickerButton.tsx"
+      ],
+      "rules": { "@next/next/no-img-element": "off" }
+    }
+  ]
 }
 

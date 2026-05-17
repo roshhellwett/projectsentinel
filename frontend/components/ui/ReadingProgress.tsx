@@ -1,28 +1,11 @@
 'use client';
 
-/**
- * ReadingProgress — slim accent-coloured bar pinned to the top of the
- * viewport that fills as the user scrolls through an article.
- *
- * Implementation notes:
- *   • A single `transform: scaleX(...)` keeps this layer cheap — no layout
- *     reflows, just a GPU-composited transform on every rAF tick.
- *   • Listens with `{ passive: true }` and rAF-guards to stay buttery on
- *     low-end Android.
- *   • Hidden when `prefers-reduced-motion` to respect user prefs.
- *   • Only renders progress between 1% and 99% — at the absolute top the
- *     bar is invisible, and once you've finished scrolling it fades out so
- *     it doesn't draw attention while you read the closing paragraphs.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { useEffect, useRef, useState } from 'react';
 
 interface ReadingProgressProps {
-  /**
-   * Selector or ref for the article content. If omitted, progress is
-   * measured against the full document height which works fine for the
-   * news article layout.
-   */
+
   targetSelector?: string;
 }
 
@@ -74,7 +57,7 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
     };
   }, [targetSelector]);
 
-  // Hide entirely when not actively reading (top of page or finished).
+
   const visible = progress > 0.005 && progress < 0.995;
 
   return (

@@ -1,16 +1,10 @@
-/**
- * Deduplication utility for article arrays.
- *
- * Stable key priority: id → url → headline (slug).
- * In dev mode, logs a warning when duplicates are removed so they
- * are caught immediately during development.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { Post } from '@/types';
 
 function stableKey(article: Post): string {
-  // Post.id is the DB primary key and is always present; headline is a safe
-  // fallback if a malformed payload ever reaches this layer.
+
+
   return article.id ?? article.headline;
 }
 

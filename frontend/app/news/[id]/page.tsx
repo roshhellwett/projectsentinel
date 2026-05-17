@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -90,12 +92,12 @@ export default async function NewsPage({ params }: NewsPageProps) {
         }}
       />
 
-      {/* Decorative accent glow */}
+
       <div className="absolute top-0 inset-x-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(139,127,240,0.14),transparent_60%)] pointer-events-none -z-10" />
 
       <div className="container mx-auto px-4 pt-10 max-w-5xl">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="touch-polish inline-flex items-center gap-2 rounded-full text-sm font-medium text-slate-500 hover:text-slate-950 mb-8 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 group"
         >
           <div className="p-1.5 rounded-full bg-white/70 border border-slate-950/[0.10] group-hover:bg-accent/15 group-hover:border-accent/30 transition-colors">
@@ -115,10 +117,10 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         )}
 
-        {/* Article Header Card */}
+
         <article id="article-body" className={`premium-card relative rounded-[2rem] overflow-hidden mb-10 md:mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
-          
+
           <div className="p-5 sm:p-8 md:p-12">
             <div className="flex flex-wrap items-center gap-3 mb-6">
               <CategoryTag category={post.category} />
@@ -136,7 +138,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               {post.headline}
             </h1>
 
-            {/* Score + actions */}
+
             <div className="mb-8 rounded-2xl border border-slate-950/[0.10] bg-white/65 p-4 sm:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
               <CredibilityBar score={post.credibility_score} />
               <div className="mt-4 flex flex-col gap-3 border-t border-slate-950/[0.07] pt-4 sm:flex-row sm:items-center sm:justify-between">
@@ -151,7 +153,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               </div>
             </div>
 
-            {/* Summary / Body */}
+
             <div className="max-w-none">
               <p className="text-[17px] md:text-xl leading-9 text-slate-700 font-normal">
                 {post.summary}
@@ -161,7 +163,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {/* Reason Card */}
+
           <div className="md:col-span-2 premium-card premium-card-hover relative rounded-3xl p-5 sm:p-8">
             <div className="absolute -right-4 -top-4 text-accent/10">
               <ShieldCheck className="w-32 h-32" />
@@ -177,7 +179,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </div>
 
-          {/* Sources Card */}
+
           <div className="premium-card premium-card-hover rounded-3xl p-5 sm:p-8">
             <h2 className="text-base font-bold text-slate-950 mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
@@ -187,7 +189,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         </div>
 
-        {/* Transparency Banner */}
+
         <div className="premium-card premium-card-hover rounded-3xl p-6 mb-12">
           <h3 className="text-[11px] font-bold text-slate-500 mb-5 uppercase tracking-[0.18em] text-center">
             How This Story Was Built
@@ -209,7 +211,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         </div>
 
-        {/* Related Stories */}
+
         <div className="mt-16 border-t border-slate-950/[0.08] pt-12">
           <div className="flex items-center gap-3 mb-7">
             <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />

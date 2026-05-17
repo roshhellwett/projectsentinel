@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock, Database, Flame } from 'lucide-react';
@@ -26,19 +28,19 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
         href={`/news/${post.id}/`}
         className="touch-polish premium-card premium-card-hover hover-lift block relative overflow-hidden rounded-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        {/* Gradient accent bar */}
+
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
 
         <div className="relative grid grid-cols-1 lg:grid-cols-5 min-h-[340px] lg:min-h-[420px]">
-          {/* Visual side */}
+
           <div className="relative lg:col-span-2 min-h-[180px] lg:min-h-full overflow-hidden">
             <CategoryPlaceholder category={post.category} />
-            {/* Edge fade for desktop seam */}
+
             <div
               className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-white/80 pointer-events-none"
               aria-hidden="true"
             />
-            {/* Badge */}
+
             {badge && (
               <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/75 backdrop-blur-xl border border-slate-950/[0.10] text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_42px_-28px_rgba(139,127,240,0.75)]">
                 <Flame className="w-3 h-3 text-accent" />
@@ -47,7 +49,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             )}
           </div>
 
-          {/* Content side */}
+
           <div className="relative lg:col-span-3 p-7 md:p-10 lg:p-12 flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-5">
               <CategoryTag category={post.category} />

@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import Link from 'next/link';
 import { Github } from 'lucide-react';
 
@@ -26,7 +28,7 @@ export function Footer() {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
       <div className="container mx-auto px-4 lg:px-6 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 mb-12">
-          {/* Column 1 — Brand */}
+
           <div>
             <Link href="/" className="touch-polish inline-flex items-center gap-2.5 group mb-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
               <div
@@ -55,7 +57,7 @@ export function Footer() {
             </a>
           </div>
 
-          {/* Column 2 — Navigate */}
+
           <div>
             <h3 className="text-[11px] font-semibold text-slate-950 uppercase tracking-[0.18em] mb-5">
               Navigate
@@ -74,7 +76,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 3 — Transparency */}
+
           <div>
             <h3 className="text-[11px] font-semibold text-slate-950 uppercase tracking-[0.18em] mb-5">
               Transparency
@@ -90,10 +92,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Separator */}
+
         <div className="h-px w-full bg-slate-950/[0.08] mb-8" />
 
-        {/* Bottom bar */}
+
         <div className="flex flex-col items-center gap-2 text-center">
           <p className="text-xs text-slate-500">
             &copy; {new Date().getFullYear()} Zenith Open Source Projects. All rights reserved.

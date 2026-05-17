@@ -1,34 +1,16 @@
 'use client';
 
-/**
- * usePersistentIdSet — generic localStorage-backed Set<string> hook.
- *
- * Shared engine behind:
- *   • useReadPosts   (which posts the reader has opened)
- *   • useSavedPosts  (which posts the reader bookmarked)
- *
- * Features:
- *   • SSR-safe: initial value is empty on the server; hydrates after mount,
- *     so React's hydration pass never sees a mismatch.
- *   • FIFO eviction beyond `max` entries so localStorage doesn't grow
- *     unbounded as the user reads more stories.
- *   • Cross-tab sync via the `storage` event — bookmark in one tab,
- *     instant reflection in any other open tab.
- *   • Listener-safe: per-instance subscription to a tiny in-memory pub/sub
- *     so multiple components sharing the same key stay in sync without
- *     waiting for the next render tick.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Options {
-  /** localStorage key */
+
   key: string;
-  /** Maximum number of IDs to retain — older entries are evicted first */
+
   max?: number;
 }
 
-// Tiny in-process pub/sub so all hook consumers of the same key stay in lock-step.
 const subscribers = new Map<string, Set<() => void>>();
 
 function notify(key: string) {
@@ -74,7 +56,7 @@ function persistToStorage(key: string, ids: string[]) {
 export function usePersistentIdSet({ key, max = 500 }: Options) {
   const [ids, setIds] = useState<Set<string>>(() => new Set());
 
-  // Hydrate from storage + register cross-tab and in-process listeners.
+
   useEffect(() => {
     setIds(new Set(loadFromStorage(key)));
 

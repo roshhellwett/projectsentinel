@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { fetchLatestPost, fetchPosts } from '@/lib/supabase/server';
 import { CategoryBar } from '@/components/layout/CategoryBar';
 import { HeroCard } from '@/components/news/HeroCard';
@@ -6,7 +8,7 @@ import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { dedupe } from '@/lib/utils/dedupe';
 
-export const revalidate = 30;
+export const revalidate = 15;
 
 export default async function HomePage() {
   const [heroPost, postsResult] = await Promise.all([
@@ -14,20 +16,20 @@ export default async function HomePage() {
     fetchPosts(1, 20),
   ]);
 
-  // Dedupe at ingestion — remove hero post and any DB-level dupes
+
   const allPosts = dedupe(
     heroPost
       ? postsResult.posts.filter((post) => post.id !== heroPost.id)
       : postsResult.posts,
   );
 
-  // Trending: top 5 by credibility × freshness, computed ONCE on the server.
-  // Previously this composite ran twice — here for the exclusion set, and
-  // again inside <TrendingSection> on the client — using different
-  // `Date.now()` values, which let a story near the 12-hour freshness cliff
-  // appear in both Trending AND the Latest feed simultaneously. By computing
-  // the resolved post list here and passing it down as a prop, the two
-  // sections stay perfectly disjoint regardless of hydration timing.
+
+
+
+
+
+
+
   const NOW = Date.now();
   const trendingPosts = [...allPosts]
     .map((post) => {
@@ -41,21 +43,21 @@ export default async function HomePage() {
   const trendingIdList = trendingPosts.map((p) => p.id);
   const trendingIds = new Set(trendingIdList);
 
-  // Count of stories that landed in the last 24h — surfaced in the hero
-  // as social proof of how active the verification pipeline is.
+
+
   const DAY_AGO = NOW - 24 * 3_600_000;
   const verifiedToday = allPosts.filter(
     (p) => new Date(p.published_at).getTime() >= DAY_AGO,
   ).length + (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
 
-  // Feed posts: everything EXCEPT hero and trending, in PURE chronological
-  // order (newest first). The previous implementation re-ranked page 1 by a
-  // composite score, but subsequent pages from /api/posts come back in raw
-  // published_at-DESC order — creating a visible discontinuity at the
-  // page-1/page-2 boundary where an older composite-promoted story sat
-  // above newer chronologically-correct ones. A single ordering rule across
-  // every page also matches the "Latest News" section title and the user's
-  // mental model: top of the feed = most recent.
+
+
+
+
+
+
+
+
   const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
 
   return (
@@ -97,22 +99,22 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Category filter bar */}
+
         <div className="mb-8">
           <CategoryBar />
         </div>
 
-        {/* Featured story — always first */}
+
         {heroPost && (
           <div id="latest" className="mb-12 scroll-mt-24">
             <HeroCard post={heroPost} />
           </div>
         )}
 
-        {/* Trending — server-resolved, disjoint from feedPosts by construction */}
+
         {trendingPosts.length > 0 && <TrendingSection posts={trendingPosts} />}
 
-        {/* Latest verified news — auto-loading infinite feed */}
+
         <section aria-label="Latest verified news">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />

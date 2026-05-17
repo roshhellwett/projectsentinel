@@ -1,8 +1,6 @@
-/**
- * Admin post table with actions
- */
-
 'use client';
+
+// last edited 2026-05-17 by roshhellwett
 
 import { useState } from 'react';
 import { Post } from '@/types';
@@ -18,7 +16,7 @@ interface PostTableProps {
 export function PostTable({ posts }: PostTableProps) {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [correctionType, setCorrectionType] = useState<'corrected' | 'retracted'>('corrected');
-  
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -37,7 +35,7 @@ export function PostTable({ posts }: PostTableProps) {
             {posts.map((post) => (
               <tr key={post.id} className="border-b border-slate-950/[0.08]">
                 <td className="py-3 px-4">
-                  <a 
+                  <a
                     href={`/news/${post.id}/`}
                     className="text-slate-950 hover:text-accent transition-colors line-clamp-1"
                   >
@@ -89,7 +87,7 @@ export function PostTable({ posts }: PostTableProps) {
           </tbody>
         </table>
       </div>
-      
+
       {selectedPost && (
         <CorrectionForm
           post={selectedPost}

@@ -1,20 +1,6 @@
 'use client';
 
-/**
- * KeyboardShortcuts — global hotkey layer with a help overlay.
- *
- * Mounted once at the layout root. Listens on `keydown` and:
- *   • `/`           — open the in-app search (dispatches a custom event;
- *                     the Navbar listens and opens its SearchBar overlay).
- *   • `?`           — toggle this help modal.
- *   • `g h`         — go home.
- *   • `g s`         — go to /saved.
- *   • `Esc`         — close the help modal (other overlays handle Esc
- *                     themselves).
- *
- * The handler ignores keys when the user is typing in an input/textarea
- * or a contenteditable element. Live regions announce the modal opening.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,21 +16,20 @@ const SHORTCUTS: Array<{ keys: string[]; description: string }> = [
   { keys: ['Esc'], description: 'Close any open dialog' },
 ];
 
-/** Custom event the Navbar listens for to open the SearchBar overlay. */
 export const OPEN_SEARCH_EVENT = 'iv:open-search';
 
 export function KeyboardShortcuts() {
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  // Buffer for two-key sequences like `g h`. We reset it after 800 ms of
-  // inactivity so a stale `g` doesn't hijack a much later `h`.
+
+
   const bufferRef = useRef<string>('');
   const bufferTimerRef = useRef<number | null>(null);
 
   const closeHelp = useCallback(() => setHelpOpen(false), []);
 
-  // Lock body scroll while help is open.
+
   useEffect(() => {
     if (!helpOpen) {
       previousFocusRef.current?.focus();
@@ -75,12 +60,12 @@ export function KeyboardShortcuts() {
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
-      // Never hijack when the user is typing.
+
       if (isEditableTarget(e.target)) return;
-      // Never hijack when modifier keys are pressed (browser shortcuts).
+
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      // Escape — only close our help (other overlays own their own Esc).
+
       if (e.key === 'Escape') {
         if (helpOpen) {
           e.preventDefault();
@@ -89,7 +74,7 @@ export function KeyboardShortcuts() {
         return;
       }
 
-      // "/" focuses the search overlay.
+
       if (e.key === '/') {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
@@ -97,7 +82,7 @@ export function KeyboardShortcuts() {
         return;
       }
 
-      // "?" toggles help.
+
       if (e.key === '?') {
         e.preventDefault();
         setHelpOpen((v) => !v);
@@ -105,7 +90,7 @@ export function KeyboardShortcuts() {
         return;
       }
 
-      // Two-key sequences starting with `g`.
+
       if (bufferRef.current === 'g') {
         if (e.key === 'h') {
           e.preventDefault();

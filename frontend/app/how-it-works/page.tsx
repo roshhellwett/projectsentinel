@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { Metadata } from 'next';
 import {
   Newspaper,
@@ -130,7 +132,7 @@ export default function HowItWorksPage() {
         }}
       />
 
-      {/* Hero */}
+
       <div className="premium-card text-center mb-16 relative rounded-[2rem] px-6 py-12 md:px-10 md:py-16">
         <div className="absolute inset-0 -z-10 flex justify-center">
           <div className="w-72 h-72 bg-accent/[0.04] rounded-full blur-3xl" />
@@ -147,7 +149,7 @@ export default function HowItWorksPage() {
         </p>
       </div>
 
-      {/* Pipeline Steps */}
+
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
@@ -175,7 +177,7 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      {/* Trusted Sources */}
+
       <div className="premium-card rounded-3xl p-8 md:p-10 mb-12">
         <h2 className="text-2xl font-bold mb-3 text-slate-950">Trusted Sources</h2>
         <p className="text-slate-600 mb-6">
@@ -193,7 +195,7 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      {/* Credibility Scoring */}
+
       <div className="mb-12">
         <h2 className="text-2xl font-bold mb-6 text-slate-950">Credibility Scoring</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -221,7 +223,7 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      {/* Open Source CTA */}
+
       <div className="premium-card text-center rounded-3xl p-10">
         <div className="w-16 h-16 rounded-2xl bg-white/70 border border-slate-950/[0.10] flex items-center justify-center mx-auto mb-5">
           <Github className="w-8 h-8 text-slate-950" />

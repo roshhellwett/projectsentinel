@@ -1,3 +1,5 @@
+// last edited 2026-05-17 by roshhellwett
+
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { fetchPosts } from '@/lib/supabase/server';
@@ -6,7 +8,7 @@ import { CategoryBar } from '@/components/layout/CategoryBar';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
-export const revalidate = 30;
+export const revalidate = 15;
 export const dynamicParams = false;
 
 const VALID_CATEGORIES = CATEGORY_SLUGS;

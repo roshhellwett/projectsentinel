@@ -1,10 +1,4 @@
-/**
- * API route for fetching posts
- *
- * Must always return fresh data — the polling client hits this every 30s.
- * Explicit no-cache headers are set on every response as defense-in-depth
- * against CDN/edge caching layers that might ignore route-level config.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { NextResponse } from 'next/server';
 import { fetchPosts } from '@/lib/supabase/server';
@@ -13,7 +7,6 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-/** Shared response headers that guarantee fresh data on every call. */
 const FRESH_HEADERS = {
   'Cache-Control': 'no-cache, no-store, must-revalidate',
   'CDN-Cache-Control': 'no-store',

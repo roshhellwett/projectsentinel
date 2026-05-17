@@ -1,10 +1,6 @@
-/**
- * Renders list of source links.
- * Each row shows: favicon · human label · external-link affordance.
- * Always shows a human-readable label (title > name > hostname). Never raw URLs.
- */
-
 'use client';
+
+// last edited 2026-05-17 by roshhellwett
 
 import { useState } from 'react';
 import { ExternalLink, Globe } from 'lucide-react';
@@ -37,13 +33,13 @@ function SourceFavicon({ url }: { url: string }) {
     );
   }
 
-  // Google's public favicon endpoint — no auth, browser-cached, no rate limits
-  // in practice for typical traffic. `sz=64` gives a sharp 16px display.
-  // We use a plain <img> on purpose so we can attach onError to fall back to
-  // the generic Globe icon without a next.config remotePatterns entry per
-  // publisher domain. The next/image lint rule is silenced for that reason.
+
+
+
+
+
   return (
-    // eslint-disable-next-line @next/next/no-img-element
+
     <img
       src={`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`}
       alt=""

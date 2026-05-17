@@ -1,17 +1,4 @@
-/**
- * Per-post dynamic OpenGraph image.
- *
- * Renders a beautiful 1200×630 branded preview for every news post URL.
- * Next.js automatically wires this file to the `/news/[id]` route — any link
- * shared on WhatsApp, X, Telegram, Discord, Slack, Facebook, LinkedIn or
- * Instagram DMs will unfurl with this image as the preview, with zero extra
- * UI changes on the site itself.
- *
- * Design intent: read the headline + score + sources in <2 seconds without
- * opening the link. Conversion happens before the user even taps.
- *
- * Runs on the Vercel edge runtime via `next/og`, cached at the edge per URL.
- */
+// last edited 2026-05-17 by roshhellwett
 
 import { ImageResponse } from 'next/og';
 import { fetchPostById } from '@/lib/supabase/server';
@@ -23,22 +10,14 @@ export const alt = 'India Verified — AI-verified news story';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Visual system — mirrors the canonical theme tokens (categoryTheme.ts,
-// scoreColor.ts, getHostname.ts) so social unfurls match the live UI.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
 export default async function PostOgImage(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const post = await fetchPostById(id).catch(() => null);
 
-  // Fallback: post not found / fetch failed → render the generic brand card
-  // so the share never breaks with a blank image.
+
+
   if (!post) {
     return new ImageResponse(
       (
@@ -85,7 +64,7 @@ export default async function PostOgImage(
           padding: '56px 64px',
         }}
       >
-        {/* ── Subtle dot grid, used for texture without distraction ── */}
+
         <div
           style={{
             position: 'absolute',
@@ -96,7 +75,7 @@ export default async function PostOgImage(
           }}
         />
 
-        {/* ── Category-tinted accent bar across the top ── */}
+
         <div
           style={{
             position: 'absolute',
@@ -108,7 +87,7 @@ export default async function PostOgImage(
           }}
         />
 
-        {/* ── Top row: category pill + brand wordmark ── */}
+
         <div
           style={{
             display: 'flex',
@@ -194,7 +173,7 @@ export default async function PostOgImage(
           </div>
         </div>
 
-        {/* ── Headline: the visual anchor of the whole image ── */}
+
         <div
           style={{
             display: 'flex',
@@ -211,7 +190,7 @@ export default async function PostOgImage(
               lineHeight: 1.1,
               letterSpacing: '0',
               margin: 0,
-              // Hard-clamp visually to 4 lines worth at the chosen size.
+
               display: '-webkit-box',
               WebkitLineClamp: 4,
               WebkitBoxOrient: 'vertical',
@@ -222,7 +201,7 @@ export default async function PostOgImage(
           </h1>
         </div>
 
-        {/* ── Credibility score: top-right horizontal module ── */}
+
         <div
           style={{
             position: 'absolute',
@@ -304,7 +283,7 @@ export default async function PostOgImage(
           </div>
         </div>
 
-        {/* ── Bottom bar: sources + URL footer ── */}
+
         <div
           style={{
             display: 'flex',
@@ -315,7 +294,7 @@ export default async function PostOgImage(
             borderTop: '1px solid #e2e8f0',
           }}
         >
-          {/* Sources */}
+
           <div
             style={{
               display: 'flex',
@@ -391,7 +370,7 @@ export default async function PostOgImage(
             )}
           </div>
 
-          {/* URL footer */}
+
           <span
             style={{
               fontSize: 16,

@@ -1,8 +1,6 @@
-/**
- * Form to add correction note and change status
- */
-
 'use client';
+
+// last edited 2026-05-17 by roshhellwett
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
@@ -20,13 +18,13 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lock body scroll while modal is open
+
   useEffect(() => {
     lockBodyScroll();
     return () => unlockBodyScroll();
   }, []);
 
-  // Close on Escape
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -34,12 +32,12 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
       const token = document.cookie
         .split('; ')
@@ -57,7 +55,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
           correction_note: note
         })
       });
-      
+
       if (response.ok) {
         window.location.reload();
       } else {
@@ -70,7 +68,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white/95 border border-slate-950/[0.10] rounded-xl p-6 w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -82,11 +80,11 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <p className="text-slate-600 mb-4">
           Article: {post.headline}
         </p>
-        
+
         <form onSubmit={handleSubmit}>
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
@@ -99,14 +97,14 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder={type === 'corrected' 
-              ? 'Explain what was corrected...' 
+            placeholder={type === 'corrected'
+              ? 'Explain what was corrected...'
               : 'Explain why this article is being retracted...'
             }
             className="w-full px-4 py-3 bg-white/70 border border-slate-950/[0.10] rounded-lg text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent mb-4 min-h-[100px]"
             required
           />
-          
+
           <div className="flex gap-3">
             <button
               type="button"
@@ -119,8 +117,8 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
               type="submit"
               disabled={loading}
               className={`flex-1 py-3 text-white rounded-lg transition-colors disabled:opacity-50 ${
-                type === 'corrected' 
-                  ? 'bg-amber-500 hover:bg-amber-600' 
+                type === 'corrected'
+                  ? 'bg-amber-500 hover:bg-amber-600'
                   : 'bg-red-500 hover:bg-red-600'
               }`}
             >

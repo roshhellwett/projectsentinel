@@ -1,9 +1,6 @@
-/**
- * Full-screen search overlay
- * Optimized: fetches limited posts, loading/error states, animations, router navigation
- */
-
 'use client';
+
+// last edited 2026-05-17 by roshhellwett
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -29,12 +26,12 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // Live full-text search against the whole archive. Previously this
-  // overlay loaded the 50 most-recent posts and ran an in-memory substring
-  // filter — which silently hid every match older than ~a day and made
-  // the "N results" line a lie. We now debounce 200 ms, hit the proper
-  // /api/search FTS endpoint, and abort any in-flight request when the
-  // user keeps typing or closes the overlay.
+
+
+
+
+
+
   useEffect(() => {
     if (!isOpen) return;
     const q = query.trim();
@@ -103,9 +100,9 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     return () => window.clearTimeout(id);
   }, [isOpen]);
 
-  // Reset the query + results when the overlay closes so reopening starts on a
-  // clean slate — previously the user briefly saw their last search flash
-  // back into place before they began typing.
+
+
+
   useEffect(() => {
     if (isOpen) return;
     setQuery('');
@@ -161,8 +158,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 e.preventDefault();
                 const q = query.trim();
                 if (!q) return;
-                // Enter escapes the in-memory quick filter and hits the proper
-                // /search page (server-side FTS over the whole archive).
+
+
                 onClose();
                 router.push(`/search/?q=${encodeURIComponent(q)}`);
               }}
@@ -176,8 +173,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
                 className="w-full pl-12 pr-4 py-4 bg-white/82 backdrop-blur-2xl border border-slate-950/[0.12] rounded-2xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent/70 focus:ring-4 focus:ring-accent/10 transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_22px_70px_-54px_rgba(139,127,240,0.45)]"
-                // Focus is handled imperatively via the ref + setTimeout above
-                // to avoid React's autoFocus + ref double-focus warning.
+
+
                 aria-label="Search verified stories"
               />
             </form>

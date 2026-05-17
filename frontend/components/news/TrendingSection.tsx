@@ -1,5 +1,7 @@
 'use client';
 
+// last edited 2026-05-17 by roshhellwett
+
 import Link from 'next/link';
 import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -15,9 +17,9 @@ interface TrendingSectionProps {
 }
 
 export function TrendingSection({ posts }: TrendingSectionProps) {
-  // Trending is now resolved server-side and passed in already in the
-  // correct order. We only dedupe + cap defensively so this component
-  // remains safe if a caller passes a raw list.
+
+
+
   const trending = useMemo(() => {
     if (!posts || posts.length === 0) return [];
     const seen = new Set<string>();
@@ -31,9 +33,9 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     return out;
   }, [posts]);
 
-  // Persistent localStorage read state — also rendered as dimming in the
-  // home feed. Showing it here too means the user can scan trending and
-  // immediately see which stories they've already opened.
+
+
+
   const { isRead } = useReadPosts();
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
@@ -70,14 +72,14 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
               className={`touch-polish group relative z-10 flex items-center border-b border-slate-950/[0.07] last:border-b-0 hover:bg-slate-950/[0.035] active:bg-slate-950/[0.05] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset ${read ? 'opacity-60' : ''}`}
               aria-label={read ? `${post.headline} (already read)` : post.headline}
             >
-              {/* Category colour left bar */}
+
               <div
                 className="w-[3px] self-stretch flex-shrink-0 opacity-60"
                 style={{ backgroundColor: getCategoryTheme(post.category).hex }}
                 aria-hidden="true"
               />
               <div className="flex items-center gap-4 flex-1 min-w-0 px-4 sm:px-5 py-4">
-                {/* Rank number */}
+
                 <span
                   className="text-[28px] sm:text-[32px] font-black tracking-normal text-slate-300 group-hover:text-accent transition-colors duration-200 leading-none w-10 sm:w-12 flex-shrink-0 tabular-nums"
                   aria-hidden="true"

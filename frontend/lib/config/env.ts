@@ -1,7 +1,4 @@
-/**
- * Environment variable validation & configuration
- * Ensures all required env vars are present and properly typed at runtime
- */
+// last edited 2026-05-17 by roshhellwett
 
 type EnvMode = 'development' | 'production' | 'test';
 
@@ -31,7 +28,7 @@ function createEnvConfig(): EnvConfig {
   const isDev = mode === 'development';
   const isProd = mode === 'production';
 
-  // Required for browser client
+
   const supabaseUrl = validateRequiredEnv(
     'NEXT_PUBLIC_SUPABASE_URL',
     process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -41,7 +38,7 @@ function createEnvConfig(): EnvConfig {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 
-  // Validate Supabase URL format
+
   try {
     new URL(supabaseUrl);
   } catch {
@@ -71,13 +68,9 @@ export function getEnvConfig(): EnvConfig {
   return cachedConfig;
 }
 
-/**
- * Validate that all critical environment variables are set
- * Call this during app initialization (in layout or root component)
- */
 export function validateEnv(): void {
   if (typeof window === 'undefined') {
-    // Server-side: validate at build/start time
+
     try {
       getEnvConfig();
     } catch (error) {

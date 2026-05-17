@@ -1,9 +1,6 @@
-/**
- * Floating scroll-to-top button
- * Optimized: throttled scroll listener, smooth appearance transition
- */
-
 'use client';
+
+// last edited 2026-05-17 by roshhellwett
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';

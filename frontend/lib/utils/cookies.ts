@@ -1,10 +1,8 @@
-/**
- * Safe cookie utilities
- */
+// last edited 2026-05-17 by roshhellwett
 
 export function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;
-  
+
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
     const [key, value] = cookie.trim().split('=');
@@ -27,16 +25,16 @@ export function setCookie(
   if (typeof document === 'undefined') return;
 
   let cookie = `${name}=${encodeURIComponent(value)}`;
-  
+
   if (options?.path) cookie += `; path=${options.path}`;
   if (options?.maxAge) cookie += `; max-age=${options.maxAge}`;
   if (options?.sameSite) cookie += `; SameSite=${options.sameSite}`;
-  
+
   const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
   if (options?.secure !== false && isSecure) {
     cookie += '; Secure';
   }
-  
+
   document.cookie = cookie;
 }
 

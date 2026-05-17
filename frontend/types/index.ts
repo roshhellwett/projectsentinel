@@ -1,6 +1,4 @@
-/**
- * TypeScript types for India Verified frontend
- */
+// last edited 2026-05-17 by roshhellwett
 
 export interface Source {
   title?: string;
@@ -27,5 +25,4 @@ export interface Post {
   published_at: string;
   updated_at: string;
 }
-
 
