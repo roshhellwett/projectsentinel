@@ -264,11 +264,11 @@ html {
    PAGE ENTRY ANIMATION
 ═══════════════════════════════════════════════ */
 @keyframes pageEnter {
-  0% { opacity: 0; transform: translateY(8px); filter: blur(6px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 .page-enter {
-  animation: pageEnter 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: pageEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ═══════════════════════════════════════════════

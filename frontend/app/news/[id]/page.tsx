@@ -222,7 +222,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </div>
 
 
-        <div className="mt-16 border-t border-slate-950/[0.08] pt-12">
+        <div id="related-news" className="mt-16 border-t border-slate-950/[0.08] pt-12">
           <div className="flex items-center gap-3 mb-7">
             <div className="w-1 h-5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,127,240,0.75)]" />
             <h2 className="text-xl font-semibold text-slate-950 tracking-normal">

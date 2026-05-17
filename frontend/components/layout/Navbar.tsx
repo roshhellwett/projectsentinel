@@ -105,9 +105,8 @@ export function Navbar() {
   return (
     <>
       <motion.header
-        initial={{ y: -80, opacity: 0 }}
+        initial={false}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
         className="fixed top-0 inset-x-0 z-50"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >

@@ -5,44 +5,76 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
 
 interface NextStoryPromptProps {
   posts: Post[];
   currentPostId: string;
-  triggerSelector?: string;
+  hideNearSelector?: string;
 }
 
-export function NextStoryPrompt({ posts, currentPostId, triggerSelector = '#article-body' }: NextStoryPromptProps) {
+export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#related-news' }: NextStoryPromptProps) {
   const next = posts.find((p) => p.id !== currentPostId);
   const [visible, setVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (!next) return;
-    const trigger = document.querySelector(triggerSelector);
-    if (!trigger) return;
+    if (typeof window === 'undefined') return;
+    try {
+      if (sessionStorage.getItem(`iv:nextPrompt:dismissed:${currentPostId}`) === '1') {
+        setDismissed(true);
+      }
+    } catch {}
+  }, [currentPostId]);
+
+  useEffect(() => {
+    if (!next || dismissed) return;
 
     let ticking = false;
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       window.requestAnimationFrame(() => {
-        const rect = (trigger as HTMLElement).getBoundingClientRect();
         const viewport = window.innerHeight || document.documentElement.clientHeight;
-        const passed = rect.bottom < viewport * 0.85;
-        setVisible(passed);
+        const docHeight = document.documentElement.scrollHeight;
+        const scrolled = window.scrollY + viewport;
+        const remaining = docHeight - scrolled;
+
+        const hideNear = document.querySelector(hideNearSelector) as HTMLElement | null;
+        let blockedByRelated = false;
+        if (hideNear) {
+          const rect = hideNear.getBoundingClientRect();
+          blockedByRelated = rect.top < viewport - 80;
+        }
+
+        const reachedReadingEnd = scrolled > docHeight * 0.55;
+        const nearBottom = remaining < 240;
+        setVisible(reachedReadingEnd && !blockedByRelated && !nearBottom);
         ticking = false;
       });
     };
 
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [next, triggerSelector]);
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [next, hideNearSelector, dismissed]);
 
-  if (!next) return null;
+  const onDismiss = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDismissed(true);
+    try {
+      sessionStorage.setItem(`iv:nextPrompt:dismissed:${currentPostId}`, '1');
+    } catch {}
+  };
+
+  if (!next || dismissed) return null;
 
   return (
     <AnimatePresence>
@@ -56,24 +88,34 @@ export function NextStoryPrompt({ posts, currentPostId, triggerSelector = '#arti
           className="fixed left-1/2 -translate-x-1/2 z-[58] w-[min(94vw,32rem)]"
           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}
         >
-          <Link
-            href={`/news/${next.id}/`}
-            className="touch-polish group relative flex items-center gap-3 rounded-2xl border border-slate-950/[0.10] bg-white/92 backdrop-blur-2xl px-4 py-3 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.45),inset_0_1px_0_rgba(255,255,255,0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-          >
-            <span aria-hidden="true" className="absolute inset-x-3 top-[1px] h-px rounded-full bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <CategoryTag category={next.category} />
-                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">Up next</span>
+          <div className="relative">
+            <Link
+              href={`/news/${next.id}/`}
+              className="touch-polish group relative flex items-center gap-3 rounded-2xl border border-slate-950/[0.10] bg-white/92 backdrop-blur-2xl pl-4 pr-12 py-3 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.45),inset_0_1px_0_rgba(255,255,255,0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            >
+              <span aria-hidden="true" className="absolute inset-x-3 top-[1px] h-px rounded-full bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <CategoryTag category={next.category} />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">Up next</span>
+                </div>
+                <p className="text-[13.5px] font-semibold text-slate-950 line-clamp-2 leading-snug group-hover:text-accent transition-colors">
+                  {next.headline}
+                </p>
               </div>
-              <p className="text-[13.5px] font-semibold text-slate-950 line-clamp-2 leading-snug group-hover:text-accent transition-colors">
-                {next.headline}
-              </p>
-            </div>
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-accent/12 border border-accent/30 text-accent flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:bg-accent group-hover:text-white">
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </Link>
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-accent/12 border border-accent/30 text-accent flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:bg-accent group-hover:text-white">
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+            <button
+              type="button"
+              onClick={onDismiss}
+              aria-label="Dismiss up next"
+              className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-white border border-slate-950/[0.12] text-slate-500 hover:text-slate-950 shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
