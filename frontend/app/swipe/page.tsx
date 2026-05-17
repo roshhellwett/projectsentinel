@@ -27,9 +27,6 @@ export default async function SwipePage() {
           <span className="block w-10 h-[2px] bg-accent mb-3" aria-hidden="true" />
           <h1 className="font-display text-[22px] font-bold text-ink leading-tight">
             Swipe
-            <span className="ml-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent align-middle">
-              Beta
-            </span>
           </h1>
           <p className="text-[13px] text-muted mt-1">One story at a time. Tap Home below to switch back.</p>
         </header>
