@@ -2,17 +2,34 @@
 
 import { Post } from '@/types';
 
+function normalizeHeadline(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u2018\u2019\u201C\u201D]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function stableKey(article: Post): string {
-
-
-  return article.id ?? article.headline;
+  const head = article.headline ? normalizeHeadline(article.headline) : '';
+  return head || article.id;
 }
 
 export function dedupe(articles: Post[]): Post[] {
   const before = articles.length;
-  const result = Array.from(
-    new Map(articles.map((a) => [stableKey(a), a])).values()
-  );
+  const seenIds = new Set<string>();
+  const seenHeads = new Map<string, Post>();
+  const result: Post[] = [];
+  for (const a of articles) {
+    if (a.id && seenIds.has(a.id)) continue;
+    const key = stableKey(a);
+    if (seenHeads.has(key)) continue;
+    seenIds.add(a.id);
+    seenHeads.set(key, a);
+    result.push(a);
+  }
   const removed = before - result.length;
 
   if (removed > 0 && process.env.NODE_ENV === 'development') {

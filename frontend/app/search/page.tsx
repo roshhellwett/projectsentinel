@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { searchPosts } from '@/lib/supabase/server';
 import { SearchResultsGrid } from '@/components/news/SearchResultsGrid';
+import { dedupe } from '@/lib/utils/dedupe';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { SearchX } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -21,7 +22,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
 }
 
 async function SearchResults({ query }: { query: string }) {
-  const { posts, count } = await searchPosts(query, 30);
+  const { posts: raw, count } = await searchPosts(query, 30);
+  const posts = dedupe(raw);
 
   if (posts.length === 0) {
     return (
