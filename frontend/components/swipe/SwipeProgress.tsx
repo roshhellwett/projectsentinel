@@ -14,7 +14,7 @@ interface SwipeProgressProps {
 
 export function SwipeProgress({ consumedToday, remaining, streak, canRewind, onRewind }: SwipeProgressProps) {
   return (
-    <div className="w-full max-w-md mx-auto px-4 mb-3">
+    <div className="w-full max-w-md mx-auto px-4 mb-2">
       <div className="flex items-center justify-between gap-3 text-[11px]">
         <div className="flex items-center gap-3 text-muted">
           <span className="inline-flex items-center gap-1 font-medium">

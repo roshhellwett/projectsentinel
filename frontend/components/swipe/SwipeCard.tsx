@@ -1,6 +1,14 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
+// last edited 2026-05-18 by roshhellwett
+//
+// Compact swipe card designed for daily mobile use. Key differences from
+// the feed NewsCard:
+// - Max-height constrained so the card + progress + hints always fit
+//   within a mobile viewport without scrolling the page.
+// - 2 summary bullets max (vs 3) to keep it tight.
+// - Haptic feedback (vibration) on swipe completion for tactile feel.
+// - Drag-to-swipe with spring snap-back on failed gestures.
 
 import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, useReducedMotion, type PanInfo } from 'framer-motion';
@@ -16,8 +24,8 @@ import { BookmarkButton } from '@/components/news/BookmarkButton';
 
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 
-const SWIPE_DIST = 110;
-const SWIPE_VEL = 700;
+const SWIPE_DIST = 100;
+const SWIPE_VEL = 600;
 
 function decideDirection(info: PanInfo): SwipeDirection | null {
   const { offset, velocity } = info;
@@ -34,6 +42,15 @@ function decideDirection(info: PanInfo): SwipeDirection | null {
   if (offset.y < -SWIPE_DIST || velocity.y < -SWIPE_VEL) return 'up';
   if (offset.y >  SWIPE_DIST || velocity.y >  SWIPE_VEL) return 'down';
   return null;
+}
+
+/** Trigger a short haptic pulse on mobile devices. */
+function haptic(pattern: number | number[] = 12) {
+  try {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(pattern);
+    }
+  } catch { /* non-fatal — some browsers block vibrate */ }
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
@@ -68,7 +85,7 @@ function SourceChip({ source }: { source: Source }) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-[11px] font-medium text-muted hover:border-ink hover:text-ink transition-colors max-w-[140px] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-paper-2 border border-rule text-[10px] font-medium text-muted hover:border-ink hover:text-ink transition-colors max-w-[120px] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
       aria-label={`Source: ${label} (opens in new tab)`}
     >
       {host && !faviconErrored ? (
@@ -107,8 +124,8 @@ interface SwipeCardProps {
 
 const DEPTH_STYLES: Record<0 | 1 | 2, { scale: number; translateY: number; opacity: number; z: number }> = {
   0: { scale: 1,    translateY: 0,  opacity: 1,    z: 30 },
-  1: { scale: 0.96, translateY: 14, opacity: 0.85, z: 20 },
-  2: { scale: 0.92, translateY: 28, opacity: 0.55, z: 10 },
+  1: { scale: 0.96, translateY: 10, opacity: 0.7,  z: 20 },
+  2: { scale: 0.92, translateY: 20, opacity: 0.4,  z: 10 },
 };
 
 export function SwipeCard({
@@ -121,7 +138,8 @@ export function SwipeCard({
   onDragProgress,
 }: SwipeCardProps) {
   const theme = getCategoryTheme(post.category);
-  const bullets = summaryToBullets(post.summary, 3);
+  // Keep bullets to 2 for compactness on mobile
+  const bullets = summaryToBullets(post.summary, 2);
   const topSources = (post.sources ?? []).slice(0, 3);
   const sourcesTotal = post.source_count ?? topSources.length;
   const extraSources = Math.max(0, sourcesTotal - topSources.length);
@@ -154,21 +172,23 @@ export function SwipeCard({
 
   const handleDragEnd = async (_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
     let dir = decideDirection(info);
-    // Down-direction commits to a rewind. If there's no history, treat
-    // it as a no-op so the card snaps back instead of disappearing.
     if (dir === 'down' && !canSwipeDown) dir = null;
     if (!dir || !interactive) {
       controls.start({ x: 0, y: 0, transition: { type: 'spring', stiffness: 360, damping: 32 } });
       onDragProgress?.({ x: 0, y: 0 });
       return;
     }
+
+    // Haptic feedback on successful swipe
+    haptic(dir === 'right' ? [8, 40, 8] : 10);
+
     setExiting(true);
     const target =
       dir === 'up'    ? { y: -window.innerHeight, opacity: 0 } :
       dir === 'down'  ? { y:  window.innerHeight, opacity: 0 } :
       dir === 'left'  ? { x: -window.innerWidth,  opacity: 0, rotate: -18 } :
                         { x:  window.innerWidth,  opacity: 0, rotate:  18 };
-    await controls.start(target, { duration: reducedMotion ? 0 : 0.32, ease: [0.4, 0, 1, 1] });
+    await controls.start(target, { duration: reducedMotion ? 0 : 0.28, ease: [0.4, 0, 1, 1] });
     onSwipe?.(dir, post);
   };
 
@@ -204,16 +224,15 @@ export function SwipeCard({
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
         <div
-          className={`p-6 pt-6 ${interactive ? 'cursor-pointer' : ''}`}
+          className={`p-5 ${interactive ? 'cursor-pointer' : ''}`}
           role={interactive ? 'button' : undefined}
           tabIndex={interactive ? 0 : undefined}
           aria-label={interactive ? `Read article: ${post.headline}` : undefined}
           onClick={(e) => {
             if (!interactive) return;
-            // Don't trigger when click came from the action row.
             if ((e.target as HTMLElement).closest('[data-swipe-actions]')) return;
-            // Don't trigger if user actually dragged.
             if (Math.abs(x.get()) > 6 || Math.abs(y.get()) > 6) return;
+            haptic(6);
             onTap?.(post);
           }}
           onKeyDown={(e) => {
@@ -224,7 +243,8 @@ export function SwipeCard({
             }
           }}
         >
-          <div className="flex items-center gap-2.5 flex-wrap mb-4">
+          {/* Meta row — compact */}
+          <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
               {theme.label}
             </span>
@@ -239,7 +259,7 @@ export function SwipeCard({
               </span>
             )}
 
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-muted font-medium">
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted font-medium">
               <span
                 className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${ageDot}`}
                 aria-hidden="true"
@@ -248,27 +268,29 @@ export function SwipeCard({
               <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
             </span>
 
-            <span className="inline-flex items-center gap-1 text-[11px] text-muted font-medium">
+            <span className="inline-flex items-center gap-1 text-[10px] text-muted font-medium">
               <BookOpen className="w-2.5 h-2.5" aria-hidden="true" />
               <span className="tabular-nums">{readMinutes}</span>
               <span>min</span>
             </span>
           </div>
 
+          {/* Headline — slightly smaller for compactness */}
           <h2
             id={`swipe-card-headline-${post.id}`}
-            className="font-display text-[26px] sm:text-[28px] font-bold leading-[1.14] tracking-tight text-ink mb-5"
+            className="font-display text-[22px] sm:text-[24px] font-bold leading-[1.18] tracking-tight text-ink mb-4"
           >
             {post.headline}
           </h2>
 
+          {/* Summary bullets — max 2 */}
           {bullets.length > 0 && (
-            <ul className="space-y-2.5 mb-5">
+            <ul className="space-y-2 mb-4">
               {bullets.map((b, i) => (
-                <li key={i} className="flex gap-3 text-[14.5px] leading-[1.55] text-ink/90">
+                <li key={i} className="flex gap-2.5 text-[13.5px] leading-[1.5] text-ink/90">
                   <span
                     aria-hidden="true"
-                    className="mt-[9px] inline-block w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0"
+                    className="mt-[7px] inline-block w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0"
                   />
                   <span>{b}</span>
                 </li>
@@ -276,18 +298,20 @@ export function SwipeCard({
             </ul>
           )}
 
+          {/* Fact-check flags */}
           {flagsCount > 0 && (
-            <div className="mb-4 inline-flex items-start gap-2 px-3 py-2 bg-paper-2 border border-rule rounded text-[11.5px] text-muted">
-              <AlertTriangle className="w-3.5 h-3.5 text-accent mt-[1px] flex-shrink-0" aria-hidden="true" />
+            <div className="mb-3 inline-flex items-start gap-2 px-2.5 py-1.5 bg-paper-2 border border-rule rounded text-[11px] text-muted">
+              <AlertTriangle className="w-3 h-3 text-accent mt-[1px] flex-shrink-0" aria-hidden="true" />
               <span>
                 <span className="font-semibold text-ink">{flagsCount}</span>{' '}
-                fact-check {flagsCount === 1 ? 'flag' : 'flags'} reviewed
+                fact-check {flagsCount === 1 ? 'flag' : 'flags'}
               </span>
             </div>
           )}
 
+          {/* Source chips — compact */}
           {topSources.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mb-5">
+            <div className="flex flex-wrap items-center gap-1 mb-4">
               {topSources.map((src, i) => (
                 <SourceChip key={src.url || i} source={src} />
               ))}
@@ -299,14 +323,15 @@ export function SwipeCard({
             </div>
           )}
 
-          <div className="pt-4 border-t border-rule">
-            <div className="flex items-center gap-3 mb-3">
+          {/* Footer: credibility + actions */}
+          <div className="pt-3 border-t border-rule">
+            <div className="flex items-center gap-2.5 mb-2.5">
               <div className="flex-1 min-w-0">
                 <CredibilityBar score={post.credibility_score} compact />
               </div>
               {sourcesTotal > 0 && (
                 <span
-                  className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-muted flex-shrink-0"
+                  className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-muted flex-shrink-0"
                   aria-label={`Verified by ${sourcesTotal} ${sourcesNoun}`}
                   title={`Verified by ${sourcesTotal} ${sourcesNoun}`}
                 >

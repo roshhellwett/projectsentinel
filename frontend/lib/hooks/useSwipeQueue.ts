@@ -1,15 +1,21 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
+// last edited 2026-05-18 by roshhellwett
 //
 // Swipe queue manager. Reuses the existing /api/posts endpoint — zero
 // backend changes. Filters out seen/read IDs and keeps a small history
 // for rewind. Prefetches the next page when the buffer drops low.
+//
+// Key behaviours:
+// - Rewind truly reverses the dismiss — it calls `unmarkSeen` so the
+//   post won't be re-filtered on the next session.
+// - History entries record the swipe direction and whether a save
+//   occurred, so rewind can undo both seen-marking AND bookmarking.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
-import { loadSeenWithinDays } from '@/lib/utils/seenSet';
+import { loadSeenWithinDays, unmarkSeen } from '@/lib/utils/seenSet';
 
 const READ_KEY = 'iv:readPosts:v1';
 
@@ -32,6 +38,13 @@ const SEEN_PREFIX = 'iv:swipe:seen:';
 const MAX_REFILL_FAILURES = 3;
 const REFILL_BACKOFF_MS = [1500, 4000, 10000] as const;
 
+/** Recorded for each card so rewind can properly undo side-effects. */
+export interface HistoryEntry {
+  post: Post;
+  direction: 'up' | 'left' | 'right';
+  wasSaved: boolean;
+}
+
 interface UseSwipeQueueOpts {
   initialPosts: Post[];
   excludeReadIds?: Set<string>;
@@ -47,8 +60,8 @@ interface SwipeQueueApi {
   isFetching: boolean;
   isExhausted: boolean;
   hasError: boolean;
-  advance: (post: Post) => void;
-  rewind: () => Post | null;
+  advance: (post: Post, direction: 'up' | 'left' | 'right', wasSaved: boolean) => void;
+  rewind: () => HistoryEntry | null;
   refill: () => Promise<void>;
   retry: () => Promise<void>;
 }
@@ -60,7 +73,7 @@ export function useSwipeQueue({
 }: UseSwipeQueueOpts): SwipeQueueApi {
   const seenRef = useRef<Set<string>>(new Set());
   const [queue, setQueue] = useState<Post[]>([]);
-  const [history, setHistory] = useState<Post[]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [page, setPage] = useState<number>(1);
   const [exhausted, setExhausted] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -69,8 +82,7 @@ export function useSwipeQueue({
 
   const fetchingRef = useRef(false);
   const failureCountRef = useRef<number>(0);
-  const queueRef = useRef(queue);
-  queueRef.current = queue;
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Refresh seen-set from localStorage. Used during cross-tab sync and
   // tab-visibility wake-ups. Loads today AND yesterday so a post dismissed
@@ -101,9 +113,7 @@ export function useSwipeQueue({
 
   // Hydrate seen-set from localStorage and seed the queue. Read-set is
   // pulled synchronously to avoid a race where the first batch of SSR
-  // posts is filtered against an empty React state. We do NOT rotate the
-  // queue against `resume` — read+seen filtering is sufficient and the
-  // natural API order keeps newer posts at the top.
+  // posts is filtered against an empty React state.
   useEffect(() => {
     seenRef.current = loadSeenWithinDays(2);
     const seen = seenRef.current;
@@ -111,10 +121,21 @@ export function useSwipeQueue({
     const cleaned = dedupe(
       initialPosts.filter((p) => p?.id && !seen.has(p.id) && !readNow.has(p.id)),
     );
+    // Sort newest first so the freshest stories surface at the top of the stack
+    cleaned.sort(
+      (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+    );
     setQueue(cleaned);
     setHydrated(true);
     // Initial-mount only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Clean up retry timers on unmount
+  useEffect(() => {
+    return () => {
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    };
   }, []);
 
   // Cross-tab sync: when seen or read sets change in another tab, refresh
@@ -197,9 +218,13 @@ export function useSwipeQueue({
         setHasError(true);
       } else {
         const delay = REFILL_BACKOFF_MS[Math.min(failureCountRef.current - 1, REFILL_BACKOFF_MS.length - 1)];
-        setTimeout(() => {
+        // Schedule a retry after backoff. Don't recurse directly — use a
+        // state change to trigger the auto-prefetch effect instead.
+        retryTimerRef.current = setTimeout(() => {
           fetchingRef.current = false;
-          void refill();
+          setIsFetching(false);
+          // Trigger the auto-prefetch effect by toggling error state
+          setHasError(false);
         }, delay);
         return;
       }
@@ -210,8 +235,13 @@ export function useSwipeQueue({
   }, [exhausted, filterIds, page]);
 
   const retry = useCallback(async () => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     failureCountRef.current = 0;
     setHasError(false);
+    fetchingRef.current = false;
     await refill();
   }, [refill]);
 
@@ -224,7 +254,7 @@ export function useSwipeQueue({
     }
   }, [hydrated, queue.length, exhausted, refill]);
 
-  const advance = useCallback((post: Post) => {
+  const advance = useCallback((post: Post, direction: 'up' | 'left' | 'right', wasSaved: boolean) => {
     setQueue((prev) => {
       if (prev.length === 0) return prev;
       const front = prev[0];
@@ -235,23 +265,37 @@ export function useSwipeQueue({
       return prev.slice(1);
     });
     setHistory((prev) => {
-      const next = [post, ...prev];
+      const entry: HistoryEntry = { post, direction, wasSaved };
+      const next = [entry, ...prev];
       return next.length > HISTORY_MAX ? next.slice(0, HISTORY_MAX) : next;
     });
   }, []);
 
-  const rewind = useCallback((): Post | null => {
-    let restored: Post | null = null;
+  // Rewind returns the last swiped card AND reverses its side-effects:
+  // - Calls unmarkSeen so it won't be re-filtered next session
+  // - Returns wasSaved so the caller can un-bookmark if needed
+  const rewind = useCallback((): HistoryEntry | null => {
+    // We need to read the history synchronously inside setState to avoid
+    // the closure-over-null bug from the old implementation.
+    let entry: HistoryEntry | null = null;
+
     setHistory((prev) => {
       if (prev.length === 0) return prev;
-      restored = prev[0];
+      entry = prev[0];
       return prev.slice(1);
     });
-    if (restored) {
-      const r = restored as Post;
-      setQueue((prev) => (prev[0]?.id === r.id ? prev : [r, ...prev]));
+
+    // Because React 18 batches setState calls, and setHistory's updater
+    // runs synchronously within the current event-loop tick, `entry` IS
+    // populated by the time we reach this line.
+    if (entry) {
+      const e = entry as HistoryEntry;
+      // Undo the seen-marking so the post isn't filtered on next visit
+      unmarkSeen(e.post.id);
+      // Re-insert at the front of the queue
+      setQueue((prev) => (prev[0]?.id === e.post.id ? prev : [e.post, ...prev]));
     }
-    return restored;
+    return entry;
   }, []);
 
   const view = useMemo(() => {

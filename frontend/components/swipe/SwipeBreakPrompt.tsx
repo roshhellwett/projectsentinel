@@ -20,7 +20,12 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
       aria-modal="true"
       aria-labelledby="swipe-break-title"
     >
-      <div className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]" />
+      <button
+        type="button"
+        onClick={onContinue}
+        className="absolute inset-0 bg-ink/55 backdrop-blur-[2px] cursor-pointer"
+        aria-label="Dismiss break prompt"
+      />
       <div className="relative w-full max-w-sm bg-paper border border-rule-strong rounded-md shadow-paper-lift overflow-hidden">
         <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
         <div className="p-6">

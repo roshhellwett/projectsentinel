@@ -3,7 +3,7 @@
 // last edited 2026-05-17 by roshhellwett
 
 import { useEffect, useState } from 'react';
-import { ChevronUp, ChevronDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowUp, Undo2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { isHintDismissed, dismissHint } from '@/lib/utils/swipeStats';
 
 export function SwipeHint() {
@@ -45,14 +45,14 @@ export function SwipeHint() {
           </h2>
 
           <ul className="space-y-3 mb-5">
-            <Item icon={<ChevronUp className="w-4 h-4" />} title="Swipe up" desc="Next story" />
-            <Item icon={<ChevronDown className="w-4 h-4" />} title="Swipe down" desc="Previous story" />
+            <Item icon={<ArrowUp className="w-4 h-4" />} title="Swipe up" desc="Skip to next story" />
+            <Item icon={<Undo2 className="w-4 h-4" />} title="Swipe down" desc="Go back one story" />
             <Item icon={<ArrowRight className="w-4 h-4" />} title="Swipe right" desc="Save for later" tone="cred" />
             <Item icon={<ArrowLeft className="w-4 h-4" />} title="Swipe left" desc="Dismiss for today" />
           </ul>
 
           <p className="text-[12px] text-muted mb-5 leading-relaxed">
-            Tap a card to read the full article. Tap <span className="font-semibold text-ink">Home</span> in the bottom bar to switch back to the grid view anytime.
+            <span className="font-semibold text-ink">Made a mistake?</span> Tap the undo button that appears after each swipe, or swipe down to go back. Tap a card to read the full article.
           </p>
 
           <button

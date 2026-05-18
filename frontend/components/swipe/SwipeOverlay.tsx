@@ -6,7 +6,7 @@
 // drag offset and fades in directional badges (Save / Dismiss / Next /
 // Previous) as the user drags past meaningful thresholds.
 
-import { Bookmark, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Bookmark, X, ArrowUp, Undo2 } from 'lucide-react';
 
 interface SwipeOverlayProps {
   drag: { x: number; y: number };
@@ -48,15 +48,15 @@ export function SwipeOverlay({ drag }: SwipeOverlayProps) {
         accent="border-rule-strong text-muted bg-paper"
       />
       <Badge
-        label="Next"
-        icon={<ChevronUp className="w-4 h-4" />}
+        label="Skip"
+        icon={<ArrowUp className="w-4 h-4" />}
         opacity={opaNext}
         position="bottom"
         accent="border-accent text-accent bg-paper"
       />
       <Badge
-        label="Previous"
-        icon={<ChevronDown className="w-4 h-4" />}
+        label="Go back"
+        icon={<Undo2 className="w-4 h-4" />}
         opacity={opaPrev}
         position="top"
         accent="border-rule-strong text-ink bg-paper"

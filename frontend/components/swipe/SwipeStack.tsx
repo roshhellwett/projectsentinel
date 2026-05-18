@@ -1,8 +1,9 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
+// last edited 2026-05-18 by roshhellwett
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { Post } from '@/types';
 import { SwipeCard, type SwipeDirection } from './SwipeCard';
 import { SwipeOverlay } from './SwipeOverlay';
@@ -11,9 +12,9 @@ import { SwipeHint } from './SwipeHint';
 import { SwipeBreakPrompt } from './SwipeBreakPrompt';
 import { SwipeEmptyState } from './SwipeEmptyState';
 import { NewsDrawer } from '@/components/news/NewsDrawer';
-import { useSwipeQueue } from '@/lib/hooks/useSwipeQueue';
+import { useSwipeQueue, type HistoryEntry } from '@/lib/hooks/useSwipeQueue';
 import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
-import { markSeen, pruneStaleSeenKeys } from '@/lib/utils/seenSet';
+import { markSeen } from '@/lib/utils/seenSet';
 import {
   bumpStreak,
   getCardsToday,
@@ -26,8 +27,10 @@ import {
   snoozeBreakToday,
 } from '@/lib/utils/swipeStats';
 import { getHostname } from '@/lib/utils/getHostname';
+import { Undo2 } from 'lucide-react';
 
 const BREAK_PROMPT_AT = 25;
+const UNDO_TOAST_MS = 3500;
 
 interface SwipeStackProps {
   initialPosts: Post[];
@@ -35,7 +38,7 @@ interface SwipeStackProps {
 
 export function SwipeStack({ initialPosts }: SwipeStackProps) {
   const { readIds, markRead } = useReadPosts();
-  const { save: saveBookmark } = useSavedPosts();
+  const { save: saveBookmark, unsave: unsaveBookmark } = useSavedPosts();
 
   const queue = useSwipeQueue({
     initialPosts,
@@ -47,6 +50,14 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
   const [showBreak, setShowBreak] = useState(false);
 
+  // Undo toast state — shows briefly after each swipe so the user has a
+  // visible, tappable escape hatch in case of accidental dismiss.
+  const [undoToast, setUndoToast] = useState<{
+    entry: HistoryEntry;
+    label: string;
+  } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [stats, setStats] = useState({
     cardsToday: 0,
     uniqueHostsToday: 0,
@@ -57,7 +68,6 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
   // One-time housekeeping + streak bump on first mount.
   useEffect(() => {
-    pruneStaleSeenKeys();
     pruneStaleStatsKeys();
     bumpStreak();
     setStats({
@@ -65,6 +75,13 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       uniqueHostsToday: getUniqueHostsToday(),
       streak: getStreak(),
     });
+  }, []);
+
+  // Clean up undo toast timer
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    };
   }, []);
 
   const refreshStats = useCallback(() => {
@@ -82,33 +99,61 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
     if (hosts.length > 0) recordHostsToday(hosts);
   }, []);
 
+  /** Show a transient undo toast that auto-hides after UNDO_TOAST_MS. */
+  const showUndoToast = useCallback((entry: HistoryEntry) => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    const label =
+      entry.direction === 'right' ? 'Saved' :
+      entry.direction === 'left'  ? 'Dismissed' :
+                                     'Skipped';
+    setUndoToast({ entry, label });
+    undoTimerRef.current = setTimeout(() => {
+      setUndoToast(null);
+    }, UNDO_TOAST_MS);
+  }, []);
+
+  /** Perform the undo: rewind queue + reverse side effects. */
+  const performUndo = useCallback(() => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    const entry = queue.rewind();
+    if (entry && entry.wasSaved) {
+      // Reverse the bookmark that was set on right-swipe
+      unsaveBookmark(entry.post.id);
+    }
+    setUndoToast(null);
+    setDrag({ x: 0, y: 0 });
+  }, [queue, unsaveBookmark]);
+
   const handleSwipe = useCallback(
     (direction: SwipeDirection, post: Post) => {
       if (direction === 'down') {
-        const restored = queue.rewind();
-        if (!restored) {
-          // Nothing to rewind — snap-back is handled by the card.
-          setDrag({ x: 0, y: 0 });
-          return;
+        // Swipe down = rewind (go back to previous card).
+        const entry = queue.rewind();
+        if (entry && entry.wasSaved) {
+          unsaveBookmark(entry.post.id);
         }
         setDrag({ x: 0, y: 0 });
+        setUndoToast(null); // Clear any undo toast since we just went back
         return;
       }
 
       // Up / Left / Right all advance the queue.
-      if (direction === 'right') {
+      const didSave = direction === 'right';
+      if (didSave) {
         saveBookmark(post.id);
       }
-      if (direction === 'left' || direction === 'up' || direction === 'right') {
-        markSeen(post.id);
-      }
+      // All forward swipes mark the post as seen for today
+      markSeen(post.id);
 
       incrementCardsToday();
       recordSourceHosts(post);
       sessionCardsRef.current += 1;
-      queue.advance(post);
+      queue.advance(post, direction as 'up' | 'left' | 'right', didSave);
       refreshStats();
       setDrag({ x: 0, y: 0 });
+
+      // Show undo toast for every forward swipe
+      showUndoToast({ post, direction: direction as 'up' | 'left' | 'right', wasSaved: didSave });
 
       if (
         !breakShownRef.current &&
@@ -119,7 +164,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
         setShowBreak(true);
       }
     },
-    [queue, saveBookmark, recordSourceHosts, refreshStats],
+    [queue, saveBookmark, unsaveBookmark, recordSourceHosts, refreshStats, showUndoToast],
   );
 
   const handleTap = useCallback(
@@ -131,8 +176,12 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   );
 
   const handleRewindButton = useCallback(() => {
-    queue.rewind();
-  }, [queue]);
+    const entry = queue.rewind();
+    if (entry && entry.wasSaved) {
+      unsaveBookmark(entry.post.id);
+    }
+    setUndoToast(null);
+  }, [queue, unsaveBookmark]);
 
   const { current, next, upcoming } = queue;
   const visible = useMemo(
@@ -216,9 +265,35 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
         </div>
       </div>
 
-      <p className="mt-5 px-4 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-subtle">
-        Swipe • up next • left dismiss • right save • down back
+      <p className="mt-3 px-4 text-center text-[9px] font-semibold uppercase tracking-[0.16em] text-subtle">
+        ↑ skip • ← dismiss • → save • ↓ go back
       </p>
+
+      {/* Undo toast — floating pill that appears after each swipe */}
+      <AnimatePresence>
+        {undoToast && (
+          <motion.div
+            key="undo-toast"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[60]"
+          >
+            <button
+              type="button"
+              onClick={performUndo}
+              className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper text-[12px] font-semibold rounded-full shadow-paper-lift hover:bg-ink/90 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              aria-label={`Undo: ${undoToast.label}`}
+            >
+              <Undo2 className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{undoToast.label}</span>
+              <span className="text-paper/60">·</span>
+              <span className="text-paper/80">Undo</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <SwipeHint />
 
