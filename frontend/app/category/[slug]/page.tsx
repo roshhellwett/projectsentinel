@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 
-export const revalidate = 15;
+export const revalidate = 60;
 export const dynamicParams = false;
 
 const VALID_CATEGORIES = CATEGORY_SLUGS;

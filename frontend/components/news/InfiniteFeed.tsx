@@ -1,6 +1,6 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
+// last edited 2026-05-18 by roshhellwett
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +17,9 @@ import {
   BACKGROUND_POLL_INTERVAL_MS,
   DEFAULT_PAGE_SIZE,
 } from '@/lib/config/constants';
+
+/** Minimum ms between two successive poll ticks (prevents overlap from focus+online+visibility events). */
+const TICK_THROTTLE_MS = 4_000;
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
@@ -65,6 +68,16 @@ export function InfiniteFeed({
   const [exhausted, setExhausted] = useState(initialPosts.length >= initialCount);
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
 
+  /** Tracks whether the initial mount animation has completed so we can
+   *  switch off `initial` on the grid and prevent re-playing entrance
+   *  animations when polling adds new cards to state. */
+  const [hasAnimated, setHasAnimated] = useState(false);
+  useEffect(() => {
+    // Allow the first stagger animation to play, then lock it off.
+    const t = window.setTimeout(() => setHasAnimated(true), 900);
+    return () => window.clearTimeout(t);
+  }, []);
+
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
 
@@ -79,6 +92,9 @@ export function InfiniteFeed({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const postsRef = useRef(posts);
+
+  /** Timestamp of the last completed poll tick — used to throttle overlapping ticks. */
+  const lastTickRef = useRef(0);
   postsRef.current = posts;
 
   const excludeIdsRef = useRef(excludeSet);
@@ -175,11 +191,25 @@ export function InfiniteFeed({
         for (const id of ids) next.delete(id);
         return next;
       });
-    }, 3200);
+    }, 5000); // increased from 3200ms to reduce re-render churn
   }, []);
 
-  const processIncomingPosts = useCallback((incoming: Post[]) => {
+  /**
+   * Buffer for incoming posts from the Supabase realtime subscription.
+   * Multiple INSERT / UPDATE events can arrive within a few hundred ms
+   * of each other (e.g. a post is created then immediately updated).
+   * We batch them and flush once per 800ms to avoid multiple rapid
+   * state-updates → re-renders → "popping" animations.
+   */
+  const incomingBufferRef = useRef<Post[]>([]);
+  const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const flushIncoming = useCallback(() => {
+    flushTimerRef.current = null;
+    const incoming = incomingBufferRef.current;
+    incomingBufferRef.current = [];
     if (incoming.length === 0) return;
+
     const existing = new Set(postsRef.current.map((p) => p.id));
     const dismissed = dismissedRef.current;
     const excluded = excludeIdsRef.current;
@@ -194,6 +224,26 @@ export function InfiniteFeed({
     flashFresh(fresh.map((p) => p.id));
     setPosts((prev) => dedupe([...fresh, ...prev]));
   }, [category, flashFresh]);
+
+  const processIncomingPosts = useCallback((incoming: Post[]) => {
+    if (incoming.length === 0) return;
+    // Dedupe against the buffer itself so rapid INSERT+UPDATE for the
+    // same post doesn't slip through.
+    const bufIds = new Set(incomingBufferRef.current.map((p) => p.id));
+    for (const p of incoming) {
+      if (bufIds.has(p.id)) {
+        // Replace the buffered version with the newer payload.
+        incomingBufferRef.current = incomingBufferRef.current.map((b) => (b.id === p.id ? p : b));
+      } else {
+        incomingBufferRef.current.push(p);
+        bufIds.add(p.id);
+      }
+    }
+    // Schedule a single flush if one isn't pending.
+    if (flushTimerRef.current === null) {
+      flushTimerRef.current = setTimeout(flushIncoming, 800);
+    }
+  }, [flushIncoming]);
 
   useEffect(() => {
     let sub: { unsubscribe: () => void } | null = null;
@@ -235,10 +285,19 @@ export function InfiniteFeed({
     const FOREGROUND_MS = POLL_INTERVAL_MS;
     const BACKGROUND_MS = BACKGROUND_POLL_INTERVAL_MS;
 
+    /**
+     * Throttled tick — prevents cascading polls when focus + online +
+     * visibilitychange events fire within a tight window (which is common
+     * when the user switches tabs back).  The very first tick is also
+     * skipped on mount because the server-rendered data is already fresh.
+     */
     const tick = async () => {
       if (cancelled) return;
+      const now = Date.now();
+      if (now - lastTickRef.current < TICK_THROTTLE_MS) return; // throttle
+      lastTickRef.current = now;
       try {
-        const params = new URLSearchParams({ page: '1', limit: '10', _t: String(Date.now()) });
+        const params = new URLSearchParams({ page: '1', limit: '10', _t: String(now) });
         if (category) params.set('category', category);
         const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
         if (!res.ok || cancelled) return;
@@ -258,7 +317,6 @@ export function InfiniteFeed({
       timerId = setTimeout(async () => {
         await tick();
         if (!cancelled) {
-
           const interval = document.visibilityState === 'hidden' ? BACKGROUND_MS : FOREGROUND_MS;
           scheduleNext(interval);
         }
@@ -267,18 +325,17 @@ export function InfiniteFeed({
 
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-
-        tick();
+        tick(); // throttle guard inside prevents rapid-fire
         scheduleNext(FOREGROUND_MS);
       } else {
-
         scheduleNext(BACKGROUND_MS);
       }
     };
 
     const onOnline = () => { tick(); scheduleNext(FOREGROUND_MS); };
 
-    const onFocus = () => { tick(); };
+    // Removed separate onFocus handler — visibilitychange already covers
+    // tab-switch scenarios and the two were overlapping, causing double ticks.
 
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) tick();
@@ -286,18 +343,18 @@ export function InfiniteFeed({
 
     document.addEventListener('visibilitychange', onVisibilityChange);
     window.addEventListener('online', onOnline);
-    window.addEventListener('focus', onFocus);
     window.addEventListener('pageshow', onPageShow);
 
-    tick();
+    // Skip the immediate tick on mount — server-rendered data is already
+    // present. The first real poll fires after FOREGROUND_MS.
     scheduleNext(FOREGROUND_MS);
 
     return () => {
       cancelled = true;
       if (timerId !== null) clearTimeout(timerId);
+      if (flushTimerRef.current !== null) clearTimeout(flushTimerRef.current);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('online', onOnline);
-      window.removeEventListener('focus', onFocus);
       window.removeEventListener('pageshow', onPageShow);
     };
   }, [category, processIncomingPosts]);
@@ -342,17 +399,18 @@ export function InfiniteFeed({
       <motion.div
         className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch"
         variants={gridVariants}
-        initial="hidden"
+        initial={hasAnimated ? false : 'hidden'}
         animate="show"
       >
         <AnimatePresence initial={false}>
           {posts.map((post) => (
             <motion.div
               key={post.id}
-              initial="hidden"
+              initial={freshIds.has(post.id) ? 'hidden' : false}
               animate="show"
               exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.18 } }}
               variants={itemVariants}
+              layout={false}
               className="feed-card-shell h-full"
             >
               <NewsCard

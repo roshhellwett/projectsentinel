@@ -26,7 +26,7 @@ function getIndianGreeting(): string {
   return 'Good night';
 }
 
-export const revalidate = 15;
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [heroPost, postsResult] = await Promise.all([
