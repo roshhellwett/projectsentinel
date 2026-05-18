@@ -78,7 +78,7 @@ export function BookmarkButton({
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
         saved
           ? 'text-accent'
-          : 'text-slate-500 hover:text-accent',
+          : 'text-subtle hover:text-accent',
         className,
       )}
     >

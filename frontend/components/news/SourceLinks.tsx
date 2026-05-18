@@ -26,7 +26,7 @@ function SourceFavicon({ url }: { url: string }) {
     return (
       <span
         aria-hidden="true"
-        className="flex-shrink-0 inline-flex items-center justify-center w-4 h-4 rounded-sm bg-slate-100 text-slate-500"
+        className="flex-shrink-0 inline-flex items-center justify-center w-4 h-4 rounded-sm bg-paper-2 text-muted"
       >
         <Globe className="w-3 h-3" />
       </span>
@@ -43,14 +43,14 @@ function SourceFavicon({ url }: { url: string }) {
       loading="lazy"
       decoding="async"
       onError={() => setErrored(true)}
-      className="flex-shrink-0 w-4 h-4 rounded-sm bg-white shadow-[0_1px_2px_rgba(15,23,42,0.10)]"
+      className="flex-shrink-0 w-4 h-4 rounded-sm bg-paper shadow-[0_1px_2px_rgba(15,23,42,0.10)]"
     />
   );
 }
 
 export function SourceLinks({ sources }: SourceLinksProps) {
   if (!sources || sources.length === 0) {
-    return <p className="text-sm text-slate-500">No sources available.</p>;
+    return <p className="text-sm text-muted">No sources available.</p>;
   }
 
   return (
@@ -63,7 +63,7 @@ export function SourceLinks({ sources }: SourceLinksProps) {
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-polish flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm text-slate-700 hover:border-slate-950/[0.08] hover:bg-slate-50 hover:text-slate-950 active:scale-[0.99] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="touch-polish flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm text-ink-soft hover:border-rule hover:bg-paper-2 hover:text-ink active:scale-[0.99] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               aria-label={`Read full article on ${label} (opens in new tab)`}
             >
               <SourceFavicon url={source.url} />

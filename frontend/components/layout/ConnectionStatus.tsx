@@ -31,13 +31,13 @@ export function ConnectionStatus() {
           transition={{ type: 'spring', stiffness: 360, damping: 28 }}
           role="status"
           aria-live="polite"
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-300/60 bg-amber-50/85 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_12px_28px_-20px_rgba(245,158,11,0.55)]"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cred-mid/40 bg-paper backdrop-blur-md shadow-paper-lift"
         >
-          <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0">
-            <span className="absolute inset-0 rounded-full bg-amber-500/55 animate-ping" aria-hidden="true" />
+          <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-cred-mid flex-shrink-0">
+            <span className="absolute inset-0 rounded-full bg-cred-mid/55 animate-ping" aria-hidden="true" />
           </span>
-          <WifiOff className="w-3 h-3 text-amber-700" aria-hidden="true" />
-          <span className="text-[11px] font-semibold tracking-normal text-amber-800">
+          <WifiOff className="w-3 h-3 text-cred-mid" aria-hidden="true" />
+          <span className="text-[11px] font-semibold tracking-normal text-cred-mid">
             Offline — reconnecting
           </span>
         </motion.div>

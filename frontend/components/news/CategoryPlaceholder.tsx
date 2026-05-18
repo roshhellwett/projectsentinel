@@ -19,7 +19,7 @@ export function CategoryPlaceholder({
 
   return (
     <div
-      className={`relative w-full h-full overflow-hidden bg-white ${className}`}
+      className={`relative w-full h-full overflow-hidden bg-paper ${className}`}
       aria-hidden="true"
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
@@ -34,7 +34,7 @@ export function CategoryPlaceholder({
       />
       {showLabel && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-3xl md:text-5xl font-black tracking-normal text-slate-950/[0.10] uppercase select-none">
+          <span className="text-3xl md:text-5xl font-black tracking-normal text-ink/[0.10] uppercase select-none">
             {label}
           </span>
         </div>

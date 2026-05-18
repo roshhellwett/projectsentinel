@@ -123,7 +123,7 @@ export function KeyboardShortcuts() {
         <>
           <motion.div
             key="kb-backdrop"
-            className="fixed inset-0 z-[110] bg-slate-950/30 backdrop-blur-md"
+            className="fixed inset-0 z-[110] bg-ink/30 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -148,7 +148,7 @@ export function KeyboardShortcuts() {
                   <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
                     <Keyboard className="w-4 h-4 text-accent" />
                   </div>
-                  <h2 className="text-base font-semibold text-slate-950 tracking-normal">
+                  <h2 className="text-base font-semibold text-ink tracking-normal">
                     Keyboard shortcuts
                   </h2>
                 </div>
@@ -156,7 +156,7 @@ export function KeyboardShortcuts() {
                   type="button"
                   onClick={closeHelp}
                   aria-label="Close shortcuts"
-                  className="touch-polish p-1.5 rounded-lg text-slate-500 hover:text-slate-950 hover:bg-slate-950/[0.06] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="touch-polish p-1.5 rounded-lg text-subtle hover:text-ink hover:bg-ink/[0.06] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -167,12 +167,12 @@ export function KeyboardShortcuts() {
                     key={description}
                     className="flex items-center justify-between gap-4 text-sm"
                   >
-                    <span className="text-slate-600">{description}</span>
+                    <span className="text-muted">{description}</span>
                     <span className="inline-flex items-center gap-1.5">
                       {keys.map((k) => (
                         <kbd
                           key={k}
-                          className="inline-flex items-center justify-center min-w-[1.65rem] h-7 px-2 rounded-md bg-white border border-slate-950/[0.12] text-[11px] font-semibold text-slate-700 shadow-[inset_0_-1px_0_rgba(15,23,42,0.08)]"
+                          className="inline-flex items-center justify-center min-w-[1.65rem] h-7 px-2 rounded-md bg-paper border border-rule text-[11px] font-semibold text-ink shadow-[inset_0_-1px_0_rgba(15,23,42,0.08)]"
                         >
                           {k}
                         </kbd>
@@ -181,7 +181,7 @@ export function KeyboardShortcuts() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 text-[11px] text-slate-500 leading-relaxed">
+              <p className="mt-5 text-[11px] text-subtle leading-relaxed">
                 Shortcuts are disabled while you&apos;re typing in a search or text
                 field.
               </p>

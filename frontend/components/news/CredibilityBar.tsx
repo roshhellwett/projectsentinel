@@ -27,27 +27,27 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
       aria-label={`Credibility score: ${clamped} out of 100, ${label}`}
     >
       <div className={cn('flex items-center justify-between gap-3', compact ? 'mb-1' : 'mb-1.5')}>
-        <span className={cn('truncate font-semibold text-slate-500', compact ? 'text-[9px]' : 'text-[10px]')}>
+        <span className={cn('truncate font-semibold text-muted', compact ? 'text-[9px]' : 'text-[10px]')}>
           {compact ? label : 'Credibility score'}
         </span>
-        <span className={cn('flex-shrink-0 font-bold tabular-nums text-slate-800', compact ? 'text-[10px]' : 'text-[11px]')}>
+        <span className={cn('flex-shrink-0 font-bold tabular-nums text-ink', compact ? 'text-[10px]' : 'text-[11px]')}>
           {clamped}
-          {!compact && <span className="font-semibold text-slate-400"> / 100</span>}
+          {!compact && <span className="font-semibold text-subtle"> / 100</span>}
         </span>
       </div>
 
       <div
-        className={cn('relative w-full rounded-full bg-slate-950/[0.08]', compact ? 'h-1.5' : 'h-2')}
+        className={cn('relative w-full rounded-full bg-ink/[0.08]', compact ? 'h-1.5' : 'h-2')}
         style={{ background: 'linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)' }}
       >
         <div
-          className="absolute inset-0 rounded-full bg-white/45"
+          className="absolute inset-0 rounded-full bg-paper/45"
           style={{ clipPath: `inset(0 0 0 ${clamped}%)` }}
           aria-hidden="true"
         />
         <div
           className={cn(
-            'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-white shadow-[0_1px_6px_rgba(15,23,42,0.20)]',
+            'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-paper bg-paper shadow-[0_1px_6px_rgba(15,23,42,0.20)]',
             compact ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5',
           )}
           style={{ left: `${clamped}%`, boxShadow: `0 0 0 1px ${scoreColor}, 0 4px 12px -6px ${scoreColor}` }}
@@ -55,7 +55,7 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
       </div>
 
       {!compact && (
-        <div className="mt-1 flex items-center justify-between text-[9px] font-semibold text-slate-400">
+        <div className="mt-1 flex items-center justify-between text-[9px] font-semibold text-subtle">
           <span>Low</span>
           <span>Moderate</span>
           <span>High</span>
