@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS posts (
     status             TEXT        NOT NULL DEFAULT 'published'
                            CHECK (status IN ('published','corrected','retracted')),
     correction_note    TEXT,
-    published_at       TIMESTAMPTZ DEFAULT NOW(),
+    published_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at         TIMESTAMPTZ DEFAULT NOW()
 );
 
