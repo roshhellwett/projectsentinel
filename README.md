@@ -1,4 +1,3 @@
-![Repo Size](https://img.shields.io/github/repo-size/roshhellwett/projectsentinel?style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/roshhellwett/projectsentinel?style=for-the-badge)
 ![Forks](https://img.shields.io/github/forks/roshhellwett/projectsentinel?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)
