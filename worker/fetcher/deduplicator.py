@@ -1,7 +1,4 @@
-"""
-Deduplication logic - SHA256 URL hashing and database checks.
-Optimized: batch DB operations, upsert, minimal memory.
-"""
+
 
 from datetime import UTC, datetime, timedelta
 
@@ -9,9 +6,7 @@ from database.client import get_supabase
 from fetcher.url_tools import compute_url_hash, is_duplicate_title
 from logger.pipeline_logger import PipelineLogger
 
-
 class Deduplicator:
-    """Handles article deduplication using URL hashing."""
 
     def __init__(self):
         self.logger = PipelineLogger()
@@ -21,22 +16,15 @@ class Deduplicator:
         self._init_supabase()
 
     def _init_supabase(self):
-        """Initialize Supabase client."""
+
         self.supabase = get_supabase()
 
-    # Supabase REST API caps a single SELECT at 1000 rows by default. We
-    # paginate explicitly so the dedup set stays correct on busy days.
     _HASH_PAGE_SIZE = 1000
     _HASH_LOOKBACK_DAYS = 21
-    _HASH_MAX_PAGES = 50  # hard ceiling: 50k hashes is plenty for a 21-day window
+    _HASH_MAX_PAGES = 50
 
     def _load_known_hashes(self) -> set[str]:
-        """Load all known URL hashes from raw_articles (cached per pipeline run).
 
-        Paginates the query so the Supabase 1000-row default doesn't silently
-        truncate the dedup set. Window shortened from 45→21 days because dedup
-        only needs to cover plausible source-republish horizons.
-        """
         if self._known_hashes is not None:
             return self._known_hashes
 
@@ -66,7 +54,7 @@ class Deduplicator:
                     if h:
                         hashes.add(h)
                 if len(rows) < self._HASH_PAGE_SIZE:
-                    break  # last page
+                    break
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
 
@@ -74,7 +62,7 @@ class Deduplicator:
         return self._known_hashes
 
     def _load_recent_post_headlines(self) -> list[str]:
-        """Load headlines from posts published in the last 6 hours (cached per run)."""
+
         if self._recent_post_headlines is not None:
             return self._recent_post_headlines
 
@@ -93,21 +81,12 @@ class Deduplicator:
         return self._recent_post_headlines
 
     def is_duplicate_by_title(self, headline: str) -> bool:
-        """Return True if headline is >80% similar to a post published in the last 6 hours."""
+
         recent = self._load_recent_post_headlines()
         return is_duplicate_title(headline, recent, threshold=0.80)
 
     def is_new(self, article: dict) -> bool:
-        """
-        Check if article is new using in-memory hash cache.
-        Batch-inserts new articles at end of pipeline via mark_group_processed.
 
-        Args:
-            article: Article dict with url_hash
-
-        Returns:
-            True if article is new, False if duplicate
-        """
         if not self.supabase:
             return True
 
@@ -123,16 +102,7 @@ class Deduplicator:
         return True
 
     def batch_insert_new_articles(self, articles: list[dict]) -> int:
-        """
-        Batch insert all new articles into raw_articles.
-        Call this once at end of fetch step for all new articles.
 
-        Args:
-            articles: List of article dicts that passed is_new()
-
-        Returns:
-            Number of articles inserted
-        """
         if not self.supabase:
             return 0
 
@@ -146,7 +116,6 @@ class Deduplicator:
                 url_hash = a.get("url_hash")
                 url = a.get("url")
                 headline = a.get("headline")
-                # Skip malformed entries so one bad article doesn't kill the whole batch.
                 if not url_hash or not url or not headline:
                     continue
                 insert_data.append(
@@ -181,7 +150,7 @@ class Deduplicator:
             return 0
 
     def log_discarded(self, article: dict, reason: str, score: int | None = None):
-        """Log a discarded article to discarded_articles table."""
+
         if not self.supabase:
             return
 
@@ -201,7 +170,7 @@ class Deduplicator:
             self.logger.log("DEDUP_ERROR", f"Failed to log discarded: {str(e)}")
 
     def log_discarded_group(self, group: list[dict], reason: str, score: int | None = None):
-        """Batch log all articles in a group as discarded."""
+
         if not self.supabase:
             return
 
@@ -224,7 +193,7 @@ class Deduplicator:
             self.logger.log("DEDUP_ERROR", f"Failed to batch log discarded: {str(e)}")
 
     def mark_group_processed(self, group: list[dict]):
-        """Batch mark all articles in a group as processed."""
+
         if not self.supabase:
             return
 
@@ -238,29 +207,7 @@ class Deduplicator:
             self.logger.log("DEDUP_ERROR", f"Failed to mark processed: {str(e)}")
 
     def sweep_stale_unprocessed(self, hours: int = 4) -> int:
-        """Mark all `processed=False` raw_articles older than `hours` as processed.
 
-        The pipeline used to mark every single-source article as processed at
-        the end of each tick — but that prevented breaking news from ever
-        being verified, because a story published by source A at 10:00 was
-        already "processed" by the time source B picked it up at 10:08.
-
-        The new model lets singletons live for `hours` so a second source
-        has time to pair with them. This sweep is the upper bound on how
-        long they linger: after `hours` we accept the story is genuinely
-        single-source and remove it from the cross-source grouping buffer.
-
-        Run this at the start of each pipeline tick. Idempotent and cheap
-        (single UPDATE statement on an indexed column).
-
-        Args:
-            hours: Age threshold in hours. Articles fetched before
-                `now - hours` and still unprocessed will be marked.
-
-        Returns:
-            Number of articles marked. Best-effort — may return 0 if the
-            Supabase client fails or the response payload is suppressed.
-        """
         if not self.supabase or hours <= 0:
             return 0
 
@@ -279,5 +226,5 @@ class Deduplicator:
             return 0
 
     def compute_url_hash(self, url: str) -> str:
-        """Compute SHA256 hash of URL."""
+
         return compute_url_hash(url)

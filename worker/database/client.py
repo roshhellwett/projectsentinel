@@ -1,6 +1,4 @@
-"""
-Shared Supabase client singleton to prevent excessive connections.
-"""
+
 
 import os
 import threading
@@ -12,9 +10,8 @@ from logger.pipeline_logger import PipelineLogger
 _client_instance: Client | None = None
 _client_lock = threading.Lock()
 
-
 def get_supabase() -> Client | None:
-    """Get or create the shared Supabase client."""
+
     global _client_instance
     if _client_instance is not None:
         return _client_instance
@@ -38,16 +35,12 @@ def get_supabase() -> Client | None:
 
         return None
 
-
 def reset_client() -> None:
-    """Reset the singleton so the next get_supabase() creates a fresh client.
-    Useful for tests or recovery after connection failures."""
+
     global _client_instance
     with _client_lock:
         old = _client_instance
         _client_instance = None
-        # Best-effort cleanup of the previous client's underlying HTTP sessions
-        # so connections don't leak on repeated resets.
         if old is not None:
             for attr in ("postgrest", "storage", "auth", "realtime"):
                 inner = getattr(old, attr, None)
@@ -55,7 +48,6 @@ def reset_client() -> None:
                 if callable(close):
                     try:
                         result = close()
-                        # If it returned a coroutine, just discard it — we can't await here.
                         if hasattr(result, "close"):
                             try:
                                 result.close()

@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Radio } from 'lucide-react';
@@ -51,7 +49,6 @@ export function BreakingTicker() {
 
     return <div aria-hidden="true" className="h-7 border-b border-rule bg-paper" />;
   }
-
 
   const loop = [...items, ...items];
 

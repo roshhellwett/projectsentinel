@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useEffect, useState, useCallback } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
@@ -35,7 +33,6 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     applyTheme(next);
     setMounted(true);
 
-
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = (e: MediaQueryListEvent) => {
       if (readStored()) return;
@@ -59,7 +56,6 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       return next;
     });
   }, []);
-
 
   const Icon = mounted ? (theme === 'dark' ? Sun : Moon) : Moon;
   const label = mounted

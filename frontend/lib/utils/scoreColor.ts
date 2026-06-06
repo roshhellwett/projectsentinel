@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 export function getScoreTier(score: number): 'high' | 'mid' | 'low' {
   const c = Math.max(0, Math.min(100, score));

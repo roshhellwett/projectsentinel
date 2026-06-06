@@ -8,22 +8,17 @@ from utils.key_pool import AllKeysExhaustedError
 from verifier.groq_verifier import GroqVerifier
 from writer.groq_writer import GroqWriter
 
-
-# Reset shared write-pool before/after every test so env-var patches don't
-# bleed across tests.
 @pytest.fixture(autouse=True)
 def reset_write_pool():
     GroqWriter._reset_pool()
     yield
     GroqWriter._reset_pool()
 
-
 def test_writer_init_defaults():
-    """Default model is the cheap-fast 8b-instant tier."""
+
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY_1": "test_key"}, clear=True):
         w = GroqWriter()
         assert w.write_model == "llama-3.1-8b-instant"
-
 
 def test_writer_init_custom_model():
     env = {"GROQ_API_KEY_VERIFY_1": "test_key", "GROQ_WRITE_MODEL": "llama3-8b-8192"}
@@ -31,13 +26,11 @@ def test_writer_init_custom_model():
         w = GroqWriter()
         assert w.write_model == "llama3-8b-8192"
 
-
 def test_writer_no_api_key():
     with patch.dict(os.environ, {}, clear=True):
         w = GroqWriter()
         with pytest.raises(Exception, match="Groq API key not configured"):
             w.write(["fact1"], "politics")
-
 
 def test_writer_no_facts():
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY_1": "test_key"}, clear=True):
@@ -45,26 +38,22 @@ def test_writer_no_facts():
         with pytest.raises(Exception, match="No key facts provided"):
             w.write([], "politics")
 
-
 def test_writer_legacy_single_key_fallback():
-    """Falls back to GROQ_API_KEY_* when no GROQ_API_KEY_VERIFY_* is set."""
+
     with patch.dict(os.environ, {"GROQ_API_KEY_1": "legacy_key"}, clear=True):
         w = GroqWriter()
         pool = w._ensure_pool()
         assert pool is not None
         assert pool.size() == 1
 
-
 def test_writer_loads_nine_keys_with_three_tiers():
-    """3-tier × 3-key support: keys 1-3 → tier 1, 4-6 → tier 2, 7-9 → tier 3."""
-    env = {f"GROQ_API_KEY_VERIFY_{i}": f"k{i}" for i in range(1, 10)}
+    v = {f"GROQ_API_KEY_VERIFY_{i}": f"k{i}" for i in range(1, 10)}
     with patch.dict(os.environ, env, clear=True):
         w = GroqWriter()
         pool = w._ensure_pool()
         stats = pool.get_stats()
         assert len(stats) == 9
         assert [s["tier"] for s in stats] == [1, 1, 1, 2, 2, 2, 3, 3, 3]
-
 
 def test_parse_response_valid():
     w = GroqWriter()
@@ -74,11 +63,9 @@ def test_parse_response_valid():
     assert result["headline"] == "Test Headline"
     assert len(result["summary"]) > 0
 
-
 def test_parse_response_json_decode_error():
     w = GroqWriter()
     assert w._parse_response("not json") is None
-
 
 def test_parse_response_missing_fields():
     w = GroqWriter()
@@ -86,14 +73,12 @@ def test_parse_response_missing_fields():
     assert w._parse_response(json.dumps({"summary": "Only summary"})) is None
     assert w._parse_response(json.dumps({"headline": "", "summary": ""})) is None
 
-
 def test_parse_response_headline_too_long():
     w = GroqWriter()
     long_headline = "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen"
     result = w._parse_response(json.dumps({"headline": long_headline, "summary": "Short summary."}))
     words = result["headline"].split()
     assert len(words) <= 15
-
 
 def test_build_prompt():
     w = GroqWriter()
@@ -103,7 +88,6 @@ def test_build_prompt():
     assert "Fact one" in prompt
     assert "Fact two" in prompt
     assert "Fact three" in prompt
-
 
 @patch("writer.groq_writer.requests.post")
 def test_write_success(mock_post):
@@ -129,11 +113,10 @@ def test_write_success(mock_post):
         result = w.write(["Verified fact one", "Verified fact two"], "politics")
         assert result["headline"] == "Test Headline"
 
-
 @patch("writer.groq_writer.time.sleep", return_value=None)
 @patch("writer.groq_writer.requests.post")
 def test_write_rotates_on_429(mock_post, mock_sleep):
-    """First key 429s, second key succeeds."""
+
     good = json.dumps(
         {"headline": "Test", "summary": "First sentence. Second sentence. Third sentence."}
     )
@@ -160,11 +143,10 @@ def test_write_rotates_on_429(mock_post, mock_sleep):
     assert result["headline"] == "Test"
     assert mock_post.call_count == 2
 
-
 @patch("writer.groq_writer.time.sleep", return_value=None)
 @patch("writer.groq_writer.requests.post")
 def test_write_falls_through_to_tier_three_after_tiers_one_two_429(mock_post, mock_sleep):
-    """All tier-1 and tier-2 keys 429; writer must reach tier-3 (keys 7-9)."""
+
     good = json.dumps(
         {"headline": "Tier3", "summary": "First sentence. Second sentence. Third sentence."}
     )
@@ -181,7 +163,6 @@ def test_write_falls_through_to_tier_three_after_tiers_one_two_429(mock_post, mo
         "usage": {"total_tokens": 250},
     }
 
-    # 6 × 429 (tiers 1+2), then a 200 on the first tier-3 key.
     mock_post.side_effect = [resp_429] * 6 + [resp_ok]
 
     env = {f"GROQ_API_KEY_VERIFY_{i}": f"k{i}" for i in range(1, 10)}
@@ -194,13 +175,10 @@ def test_write_falls_through_to_tier_three_after_tiers_one_two_429(mock_post, mo
     last_auth = mock_post.call_args_list[-1].kwargs["headers"]["Authorization"]
     assert last_auth in ("Bearer k7", "Bearer k8", "Bearer k9")
 
-
 @patch("writer.groq_writer.requests.post")
 @patch("verifier.groq_verifier.requests.post")
 def test_verifier_and_writer_share_the_same_pool(mock_v_post, mock_w_post):
-    """Verifier and writer must use the SAME shared pool so per-key load is
-    visible across both subsystems (the equal-pressure pick logic relies on
-    this to balance verify vs write traffic across the same 9 keys)."""
+
     GroqVerifier._reset_pool()
     GroqWriter._reset_pool()
 
@@ -212,17 +190,13 @@ def test_verifier_and_writer_share_the_same_pool(mock_v_post, mock_w_post):
         v_pool = v._ensure_pool()
         w_pool = w._ensure_pool()
 
-        # Same physical pool object.
         assert v_pool is w_pool, "verifier and writer must share one pool"
-        # Same set of keys.
         v_keys = [s["key"] for s in v_pool._slots]
         w_keys = [s["key"] for s in w_pool._slots]
         assert v_keys == w_keys == ["shared_k1", "shared_k2"]
 
-
 def test_writer_cascades_to_next_model_when_keys_exhaust():
-    """When 8b-instant exhausts on every key, writer must cascade to the
-    next model in WRITE_MODEL_CHAIN (allam-2-7b) and succeed."""
+
     good = json.dumps({"headline": "Fallback Headline", "summary": "S1. S2. S3."})
     resp_ok = MagicMock()
     resp_ok.status_code = 200

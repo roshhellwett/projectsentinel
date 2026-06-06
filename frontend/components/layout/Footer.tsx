@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import Link from 'next/link';
 import { Github, Rss, ExternalLink } from 'lucide-react';
@@ -100,7 +100,6 @@ export function Footer() {
           </div>
         </div>
 
-
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-12">
           <div>
             <ColumnHeading>News</ColumnHeading>
@@ -162,7 +161,6 @@ export function Footer() {
             </ul>
           </div>
         </div>
-
 
         <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-rule">
           <p className="text-xs text-subtle">

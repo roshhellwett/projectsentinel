@@ -1,15 +1,5 @@
 'use client';
 
-// last edited 2026-05-18 by roshhellwett
-//
-// Compact swipe card designed for daily mobile use. Key differences from
-// the feed NewsCard:
-// - Max-height constrained so the card + progress + hints always fit
-//   within a mobile viewport without scrolling the page.
-// - 2 summary bullets max (vs 3) to keep it tight.
-// - Haptic feedback (vibration) on swipe completion for tactile feel.
-// - Drag-to-swipe with spring snap-back on failed gestures.
-
 import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
@@ -44,7 +34,6 @@ function decideDirection(info: PanInfo): SwipeDirection | null {
   return null;
 }
 
-/** Trigger a short haptic pulse on mobile devices. */
 function haptic(pattern: number | number[] = 12) {
   try {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -138,7 +127,7 @@ export function SwipeCard({
   onDragProgress,
 }: SwipeCardProps) {
   const theme = getCategoryTheme(post.category);
-  // Keep bullets to 2 for compactness on mobile
+
   const bullets = summaryToBullets(post.summary, 2);
   const topSources = (post.sources ?? []).slice(0, 3);
   const sourcesTotal = post.source_count ?? topSources.length;
@@ -179,7 +168,7 @@ export function SwipeCard({
       return;
     }
 
-    // Haptic feedback on successful swipe
+
     haptic(dir === 'right' ? [8, 40, 8] : 10);
 
     setExiting(true);
@@ -243,7 +232,7 @@ export function SwipeCard({
             }
           }}
         >
-          {/* Meta row — compact */}
+
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
               {theme.label}
@@ -275,7 +264,7 @@ export function SwipeCard({
             </span>
           </div>
 
-          {/* Headline — slightly smaller for compactness */}
+
           <h2
             id={`swipe-card-headline-${post.id}`}
             className="font-display text-[22px] sm:text-[24px] font-bold leading-[1.18] tracking-tight text-ink mb-4"
@@ -283,7 +272,7 @@ export function SwipeCard({
             {post.headline}
           </h2>
 
-          {/* Summary bullets — max 2 */}
+
           {bullets.length > 0 && (
             <ul className="space-y-2 mb-4">
               {bullets.map((b, i) => (
@@ -298,7 +287,7 @@ export function SwipeCard({
             </ul>
           )}
 
-          {/* Fact-check flags */}
+
           {flagsCount > 0 && (
             <div className="mb-3 inline-flex items-start gap-2 px-2.5 py-1.5 bg-paper-2 border border-rule rounded text-[11px] text-muted">
               <AlertTriangle className="w-3 h-3 text-accent mt-[1px] flex-shrink-0" aria-hidden="true" />
@@ -309,7 +298,7 @@ export function SwipeCard({
             </div>
           )}
 
-          {/* Source chips — compact */}
+
           {topSources.length > 0 && (
             <div className="flex flex-wrap items-center gap-1 mb-4">
               {topSources.map((src, i) => (
@@ -323,7 +312,7 @@ export function SwipeCard({
             </div>
           )}
 
-          {/* Footer: credibility + actions */}
+
           <div className="pt-3 border-t border-rule">
             <div className="flex items-center gap-2.5 mb-2.5">
               <div className="flex-1 min-w-0">

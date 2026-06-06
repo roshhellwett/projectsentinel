@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Post } from '@/types';

@@ -1,6 +1,4 @@
-"""
-Supabase publisher - inserts verified posts into the database.
-"""
+
 
 import hashlib
 import re
@@ -11,14 +9,11 @@ from logger.pipeline_logger import PipelineLogger
 
 _NORMALIZE_RE = re.compile(r"[^\w\s]")
 
-
 def _normalize_headline(text: str) -> str:
-    """Normalize headline for duplicate comparison."""
+
     return _NORMALIZE_RE.sub("", text.lower()).replace(" ", "")
 
-
 class SupabasePublisher:
-    """Publishes posts to Supabase database."""
 
     def __init__(self):
         self.logger = PipelineLogger()
@@ -27,31 +22,21 @@ class SupabasePublisher:
         self._init_supabase()
 
     def _init_supabase(self):
-        """Initialize Supabase client."""
+
         self.supabase = get_supabase()
 
     def publish(self, post: dict) -> bool:
-        """
-        Insert post into posts table.
 
-        Args:
-            post: Post dict from post_builder
-
-        Returns:
-            True if successful, False otherwise
-        """
         if not self.supabase:
             self.logger.log("PUBLISHER_ERROR", "Supabase not initialized")
             return False
 
         try:
-            # Remove updated_at (handled by trigger) and add a stable story key when possible.
             post_data = {k: v for k, v in post.items() if k != "updated_at"}
             source_urls = sorted(source.get("url", "") for source in post_data.get("sources", []) if source.get("url"))
             if source_urls:
                 post_data["story_fingerprint"] = hashlib.sha256("|".join(source_urls).encode()).hexdigest()
 
-            # Prevent duplicate headlines (cached per pipeline run)
             headline = post_data.get("headline", "")
             if headline:
                 norm_headline = _normalize_headline(headline)
@@ -74,7 +59,6 @@ class SupabasePublisher:
 
             if result.data:
                 self.logger.log("PUBLISH", f"Published: {post.get('headline', '')[:50]}")
-                # Update local cache so subsequent publishes in same run see this headline
                 if headline and self._recent_headlines is not None:
                     self._recent_headlines.append(headline)
                 return True
@@ -87,7 +71,7 @@ class SupabasePublisher:
             return False
 
     def _get_recent_headlines(self) -> list[str]:
-        """Load recent headlines once per pipeline run, then cache."""
+
         if self._recent_headlines is not None:
             return self._recent_headlines
 

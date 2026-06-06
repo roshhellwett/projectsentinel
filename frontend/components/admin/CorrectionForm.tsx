@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Post } from '@/types';

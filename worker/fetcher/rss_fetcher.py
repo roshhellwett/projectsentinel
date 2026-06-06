@@ -1,16 +1,4 @@
-"""
-RSS feed fetcher - parallel fetching with session reuse.
 
-Optimisations:
-  * Concurrent feed fetching via a thread pool.
-  * Per-thread `requests.Session` reuse (HTTPS keep-alive).
-  * **Auto-disable** of broken feeds: any feed that fails 3 fetches in a row
-    is parked for 24 hours and skipped until then. On the next attempt after
-    the park window, the feed is retried — if it recovers, the failure
-    counter resets to zero. State is kept in process memory (not persisted)
-    because a worker restart simply retries everything once and re-parks any
-    feed that's still broken, which is the same outcome at trivial cost.
-"""
 
 import threading
 import time
@@ -26,21 +14,13 @@ from fetcher.url_tools import compute_url_hash, normalize_url
 from logger.pipeline_logger import PipelineLogger
 from sources.rss_sources import get_rss_sources
 
-
 class RSSFetcher:
-    """Fetches and parses RSS feeds from configured sources."""
 
     _USER_AGENT = "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"
 
-    # ── Auto-disable tuning ──
-    # Three consecutive failures before parking. One success anywhere in
-    # between resets the streak. Tuned to absorb transient blips (publisher
-    # restarts, DNS flaps) without prematurely parking healthy feeds.
     _FAIL_THRESHOLD = 3
-    _PARK_DURATION_SECONDS = 24 * 60 * 60  # 24h
+    _PARK_DURATION_SECONDS = 24 * 60 * 60
 
-    # url → {"fails": int, "parked_until": float (epoch seconds)}
-    # Shared across all RSSFetcher instances and threads, guarded by lock.
     _feed_health: dict[str, dict] = {}
     _feed_health_lock = threading.Lock()
 
@@ -49,13 +29,9 @@ class RSSFetcher:
         self.max_workers = max_workers
         self._local = threading.local()
 
-    # ------------------------------------------------------------------
-    # Auto-disable state machine
-    # ------------------------------------------------------------------
-
     @classmethod
     def _is_parked(cls, url: str) -> bool:
-        """True if this feed is currently in the 24h park window."""
+
         now = time.time()
         with cls._feed_health_lock:
             state = cls._feed_health.get(url)
@@ -63,23 +39,19 @@ class RSSFetcher:
 
     @classmethod
     def _record_failure(cls, url: str) -> bool:
-        """
-        Bump the failure counter. Returns True iff this failure just tripped
-        the threshold and parked the feed, so the caller can log the event
-        exactly once instead of on every subsequent fail.
-        """
+
         with cls._feed_health_lock:
             state = cls._feed_health.setdefault(url, {"fails": 0, "parked_until": 0.0})
             state["fails"] += 1
             if state["fails"] >= cls._FAIL_THRESHOLD:
                 state["parked_until"] = time.time() + cls._PARK_DURATION_SECONDS
-                state["fails"] = 0  # reset; next failure starts a fresh streak
+                state["fails"] = 0
                 return True
         return False
 
     @classmethod
     def _record_success(cls, url: str) -> None:
-        """Reset the failure streak and lift any active park for this feed."""
+
         with cls._feed_health_lock:
             state = cls._feed_health.get(url)
             if state and (state["fails"] or state["parked_until"]):
@@ -88,12 +60,12 @@ class RSSFetcher:
 
     @classmethod
     def _reset_health(cls) -> None:
-        """Test-only hook to clear all per-feed health state."""
+
         with cls._feed_health_lock:
             cls._feed_health.clear()
 
     def _get_session(self) -> requests.Session:
-        """Return a thread-local session (requests.Session is NOT thread-safe)."""
+
         session = getattr(self._local, "session", None)
         if session is None:
             session = requests.Session()
@@ -102,21 +74,10 @@ class RSSFetcher:
         return session
 
     def fetch_all(self) -> list[dict]:
-        """
-        Fetch all RSS feeds concurrently and return list of raw articles.
 
-        Feeds currently in the 24h park window are skipped before they ever
-        reach the thread pool, so they don't consume a worker slot or HTTP
-        timeout budget.
-
-        Returns:
-            List of article dicts with headline, url, excerpt, source info
-        """
         articles = []
         all_sources = get_rss_sources()
 
-        # Partition parked vs. active sources up-front so we can log the
-        # skip count once instead of one line per parked feed.
         active_sources = []
         parked_count = 0
         for source in all_sources:
@@ -146,15 +107,7 @@ class RSSFetcher:
         return articles
 
     def _fetch_feed(self, source: dict) -> list[dict]:
-        """
-        Fetch and parse a single RSS feed.
 
-        Args:
-            source: Dict with name, url, category_hint
-
-        Returns:
-            List of article dicts
-        """
         articles = []
         url = source["url"]
         name = source.get("name", url)
@@ -186,13 +139,6 @@ class RSSFetcher:
                 self.logger.log("RSS_PARSE", f"Failed to parse entry: {str(e)}")
                 continue
 
-        # Treat "200 OK but zero usable articles" as a failure. Publishers
-        # who silently break their RSS (HTML wall, empty feed shell, schema
-        # we can't parse) return HTTP success but contribute nothing to the
-        # pipeline. Without this branch, such feeds never trip the park
-        # threshold and waste a thread-pool slot on every run forever — the
-        # exact failure mode observed for HT, The Wire, Quint, WION, Zee
-        # News, Jansatta, NDTV Business, etc. in production logs.
         if not articles:
             just_parked = self._record_failure(url)
             if just_parked:
@@ -202,22 +148,11 @@ class RSSFetcher:
                 )
             return []
 
-        # At least one usable article — count the run as healthy and lift
-        # any prior failure streak / park.
         self._record_success(url)
         return articles
 
     def _parse_entry(self, entry, source: dict) -> dict | None:
-        """
-        Parse a single RSS entry into article format.
 
-        Args:
-            entry: feedparser entry
-            source: Source config dict
-
-        Returns:
-            Article dict or None if invalid
-        """
         url = normalize_url(entry.get("link", ""))
         if not url:
             return None
@@ -240,15 +175,7 @@ class RSSFetcher:
         }
 
     def _extract_excerpt(self, entry) -> str:
-        """
-        Extract first 150 words from entry description/summary.
 
-        Args:
-            entry: feedparser entry
-
-        Returns:
-            Excerpt text (max 150 words)
-        """
         text = entry.get("description", "") or entry.get("summary", "")
 
         if text:
@@ -262,7 +189,7 @@ class RSSFetcher:
         return text
 
     def _get_base_url(self, url: str) -> str:
-        """Extract base URL from full URL."""
+
         try:
             parsed = urlparse(url)
             return f"{parsed.scheme}://{parsed.netloc}"

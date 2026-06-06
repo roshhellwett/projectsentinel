@@ -1,13 +1,12 @@
-// last edited 2026-05-17 by roshhellwett
+
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 import ts from 'typescript';
 
-const HEADER = '// last edited 2026-05-17 by roshhellwett';
 const ROOTS = process.argv.slice(2);
 if (ROOTS.length === 0) ROOTS.push('.');
-const TARGET_EXTS = new Set(['.ts', '.tsx']);
-const SKIP_DIRS = new Set(['node_modules', '.next', 'scripts', 'types-build']);
+const TARGET_EXTS = new Set(['.ts', '.tsx', '.js', '.mjs']);
+const SKIP_DIRS = new Set(['node_modules', '.next', 'types-build']);
 
 function walk(dir) {
   const out = [];
@@ -25,13 +24,16 @@ function walk(dir) {
   return out;
 }
 
-function collectCommentRanges(src, isTsx) {
+function collectCommentRanges(src, scriptKind) {
+  const fileName =
+    scriptKind === ts.ScriptKind.TSX ? 'x.tsx' :
+    scriptKind === ts.ScriptKind.JS ? 'x.js' : 'x.ts';
   const sf = ts.createSourceFile(
-    isTsx ? 'x.tsx' : 'x.ts',
+    fileName,
     src,
     ts.ScriptTarget.Latest,
-    /*setParentNodes*/ true,
-    isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+     true,
+    scriptKind,
   );
   const ranges = [];
   const seen = new Set();
@@ -61,8 +63,8 @@ function collectCommentRanges(src, isTsx) {
   return ranges;
 }
 
-function stripComments(src, isTsx) {
-  const ranges = collectCommentRanges(src, isTsx);
+function stripComments(src, scriptKind) {
+  const ranges = collectCommentRanges(src, scriptKind);
   if (ranges.length === 0) return src;
   ranges.sort((a, b) => a[0] - b[0]);
   const merged = [];
@@ -88,30 +90,20 @@ function collapseBlankLines(s) {
   return s.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n');
 }
 
-function addHeader(src) {
-  const lines = src.split('\n');
-  let i = 0;
-  while (i < lines.length && lines[i].trim() === '') i++;
-  const directiveRe = /^\s*['"]use (client|server|strict)['"]\s*;?\s*$/;
-  const inserts = [];
-  while (i < lines.length && directiveRe.test(lines[i])) {
-    inserts.push(lines[i]);
-    i++;
-  }
-  while (i < lines.length && lines[i].trim() === '') i++;
-  const body = lines.slice(i).join('\n').replace(/^\n+/, '');
-  const head = inserts.length > 0 ? inserts.join('\n') + '\n\n' : '';
-  return head + HEADER + '\n\n' + body;
-}
+const scriptKindMap = {
+  '.tsx': ts.ScriptKind.TSX,
+  '.ts':  ts.ScriptKind.TS,
+  '.js':  ts.ScriptKind.JS,
+  '.mjs': ts.ScriptKind.JS,
+};
 
 const files = ROOTS.flatMap((r) => walk(r));
 let changed = 0;
 for (const f of files) {
+  const ext = extname(f);
   const orig = readFileSync(f, 'utf8');
-  const isTsx = f.endsWith('.tsx');
-  let next = stripComments(orig, isTsx);
+  let next = stripComments(orig, scriptKindMap[ext] || ts.ScriptKind.TS);
   next = collapseBlankLines(next).replace(/[ \t]+$/gm, '');
-  next = addHeader(next);
   if (!next.endsWith('\n')) next += '\n';
   if (next !== orig) {
     writeFileSync(f, next, 'utf8');

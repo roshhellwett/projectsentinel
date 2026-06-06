@@ -1,21 +1,7 @@
--- =============================================================================
--- India Verified — Master Schema
--- Combines migrations 001–004 into one clean, idempotent script.
--- Safe to run on a completely fresh Supabase project.
--- =============================================================================
 
--- ---------------------------------------------------------------------------
--- 0. Extensions
--- ---------------------------------------------------------------------------
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-
--- ---------------------------------------------------------------------------
--- 1. Tables
--- ---------------------------------------------------------------------------
-
--- Staging table: raw articles fetched from RSS / APIs before AI processing.
 CREATE TABLE IF NOT EXISTS raw_articles (
     id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     url_hash      TEXT        UNIQUE NOT NULL,
@@ -29,7 +15,6 @@ CREATE TABLE IF NOT EXISTS raw_articles (
     processed     BOOLEAN     DEFAULT FALSE
 );
 
--- Published posts — only AI-verified stories reach this table.
 CREATE TABLE IF NOT EXISTS posts (
     id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     headline           TEXT        NOT NULL CHECK (length(trim(headline)) > 0),
@@ -53,7 +38,6 @@ CREATE TABLE IF NOT EXISTS posts (
     updated_at         TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Audit log: articles that failed verification or were filtered out.
 CREATE TABLE IF NOT EXISTS discarded_articles (
     id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     url              TEXT,
@@ -64,7 +48,6 @@ CREATE TABLE IF NOT EXISTS discarded_articles (
     discarded_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Known false claims sourced from fact-checkers (e.g. AltNews, BOOM).
 CREATE TABLE IF NOT EXISTS known_false_claims (
     id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     claim_summary  TEXT        NOT NULL,
@@ -74,15 +57,12 @@ CREATE TABLE IF NOT EXISTS known_false_claims (
     added_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Groq API key daily usage — one row per calendar date, upserted after every run.
--- Allows the worker to survive Railway redeploys without losing daily call counts.
 CREATE TABLE IF NOT EXISTS groq_usage (
     usage_date  DATE        PRIMARY KEY,
     key_stats   JSONB       NOT NULL DEFAULT '[]'::jsonb,
     updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Pipeline monitoring: one row per pipeline execution.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     started_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -92,64 +72,40 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
     stats            JSONB
 );
 
-
--- ---------------------------------------------------------------------------
--- 2. Indexes
--- ---------------------------------------------------------------------------
-
--- raw_articles
--- url_hash is already indexed via the UNIQUE constraint.
--- Composite covers the cross-source checker's query: processed=false, fetched within 12 h.
 CREATE INDEX IF NOT EXISTS idx_raw_articles_processed_fetched
     ON raw_articles (processed, fetched_at DESC);
--- Needed by _load_known_hashes: range scan on fetched_at alone.
 CREATE INDEX IF NOT EXISTS idx_raw_articles_fetched_at
     ON raw_articles (fetched_at DESC);
 
--- posts
--- Primary feed query: WHERE status='published' ORDER BY published_at DESC
 CREATE INDEX IF NOT EXISTS idx_posts_status_published_at
     ON posts (status, published_at DESC);
--- Category page query: WHERE status='published' AND category=? ORDER BY published_at DESC
 CREATE INDEX IF NOT EXISTS idx_posts_category_status_published_at
     ON posts (category, status, published_at DESC);
--- Trending query: ORDER BY credibility_score DESC
 CREATE INDEX IF NOT EXISTS idx_posts_credibility_score
     ON posts (credibility_score DESC);
--- Publisher dedup: unique story fingerprint (partial — only non-null rows).
 CREATE UNIQUE INDEX IF NOT EXISTS idx_posts_story_fingerprint
     ON posts (story_fingerprint)
     WHERE story_fingerprint IS NOT NULL;
--- Full-text search on headline + summary.
 CREATE INDEX IF NOT EXISTS idx_posts_fts
     ON posts USING GIN (to_tsvector('english', headline || ' ' || coalesce(summary, '')));
 
--- discarded_articles
 CREATE INDEX IF NOT EXISTS idx_discarded_at
     ON discarded_articles (discarded_at DESC);
 CREATE INDEX IF NOT EXISTS idx_discarded_reason_at
     ON discarded_articles (discard_reason, discarded_at DESC);
 
--- known_false_claims
--- GIN for fast keyword-array lookups by the fact-check matcher.
 CREATE INDEX IF NOT EXISTS idx_known_false_keywords
     ON known_false_claims USING GIN (keywords);
 
--- pipeline_runs
 CREATE INDEX IF NOT EXISTS idx_pipeline_runs_started_at
     ON pipeline_runs (started_at DESC);
 
-
--- ---------------------------------------------------------------------------
--- 3. Row Level Security
--- ---------------------------------------------------------------------------
 ALTER TABLE raw_articles       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE discarded_articles  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE known_false_claims  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pipeline_runs       ENABLE ROW LEVEL SECURITY;
 
--- posts: public SELECT (anon key can read), all writes restricted to service role.
 DO $$ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_policies
@@ -179,7 +135,6 @@ DO $$ BEGIN
     END IF;
 END $$;
 
--- All other tables: service role only (no public access).
 DO $$ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_policies
@@ -218,12 +173,6 @@ DO $$ BEGIN
     END IF;
 END $$;
 
-
--- ---------------------------------------------------------------------------
--- 4. Functions & Triggers
--- ---------------------------------------------------------------------------
-
--- Auto-update posts.updated_at on every UPDATE.
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -238,12 +187,6 @@ CREATE TRIGGER update_posts_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-
--- ---------------------------------------------------------------------------
--- 5. Grants
--- ---------------------------------------------------------------------------
--- When tables are created via raw SQL (not Supabase dashboard migrations),
--- the service_role must be granted access explicitly.
 GRANT USAGE ON SCHEMA public TO service_role, anon, authenticated;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON raw_articles      TO service_role;
@@ -253,15 +196,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON known_false_claims TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON pipeline_runs     TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON groq_usage        TO service_role;
 
--- anon key: public read on posts only (mirrors RLS policy).
 GRANT SELECT ON posts TO anon, authenticated;
 
-
--- ---------------------------------------------------------------------------
--- 6. Realtime
--- ---------------------------------------------------------------------------
--- Add the posts table to Supabase's realtime publication so the frontend
--- receives live INSERT events via the browser Supabase client.
 DO $$ BEGIN
     IF EXISTS (
         SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime'

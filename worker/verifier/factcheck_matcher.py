@@ -1,7 +1,4 @@
-"""
-Matches article headlines against known false claims database.
-Fixed: word boundary matching, adaptive thresholds.
-"""
+
 
 import re
 from datetime import UTC, datetime
@@ -9,9 +6,7 @@ from datetime import UTC, datetime
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
-
 class FactCheckMatcher:
-    """Checks if article matches known false claims from fact-checkers."""
 
     def __init__(self):
         self.logger = PipelineLogger()
@@ -21,11 +16,11 @@ class FactCheckMatcher:
         self._init_supabase()
 
     def _init_supabase(self):
-        """Initialize Supabase client."""
+
         self.supabase = get_supabase()
 
     def _load_known_claims(self):
-        """Lazy-load known false claims with 1-hour cache."""
+
         now = datetime.now(UTC)
         if (now - self._last_load).total_seconds() < 3600 and self.known_claims:
             return
@@ -48,15 +43,7 @@ class FactCheckMatcher:
             self.logger.log("FACTCHECK_MATCHER_ERROR", f"Failed to load claims: {str(e)}")
 
     def is_false_claim(self, headline: str) -> bool:
-        """
-        Check if headline matches any known false claim using word boundaries.
 
-        Args:
-            headline: Article headline to check
-
-        Returns:
-            True if headline matches a known false claim
-        """
         if not headline:
             return False
 

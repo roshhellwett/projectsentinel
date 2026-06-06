@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 export function summaryToBullets(summary: string | null | undefined, max: number = 3): string[] {
   if (!summary) return [];

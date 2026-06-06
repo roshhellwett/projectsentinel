@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import type { Metadata, Viewport } from 'next';
 import { Source_Sans_3, Source_Serif_4, JetBrains_Mono } from 'next/font/google';

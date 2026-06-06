@@ -1,7 +1,4 @@
-"""
-Blocked domains list - satire, spam, and unreliable sources.
-Optimized: set-based lookups, proper domain suffix matching.
-"""
+
 
 from urllib.parse import urlparse
 
@@ -36,18 +33,8 @@ BLOCKED_DOMAINS: frozenset[str] = frozenset(
     }
 )
 
-
 def is_blocked_domain(url: str) -> bool:
-    """
-    Check if a URL is from a blocked domain.
-    Uses set-based lookups and proper suffix matching.
 
-    Args:
-        url: Article URL to check
-
-    Returns:
-        True if domain is blocked, False otherwise
-    """
     if not url:
         return False
 
@@ -58,11 +45,9 @@ def is_blocked_domain(url: str) -> bool:
         if not domain:
             return False
 
-        # Exact match first (fast path)
         if domain in BLOCKED_DOMAINS:
             return True
 
-        # Suffix match: e.g. "sub.reddit.com" should match "reddit.com"
         domain_parts = domain.split(".")
         for blocked in BLOCKED_DOMAINS:
             blocked_parts = blocked.split(".")

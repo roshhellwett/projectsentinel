@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 import { chromium, devices } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
@@ -74,7 +74,7 @@ async function runOn(label, contextOpts) {
     }
   }
 
-  // Open the first news card on homepage and assert drawer.
+
   try {
     await page.goto(BASE + '/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(500);
@@ -84,7 +84,7 @@ async function runOn(label, contextOpts) {
       const drawer = page.locator('[role="dialog"][aria-label^="Article"]');
       await drawer.waitFor({ state: 'visible', timeout: 5000 });
       await page.screenshot({ path: `${OUT}/${label}_drawer_open.png`, fullPage: false });
-      // Wait for related list to hydrate (skeleton -> list)
+
       const relatedItem = drawer.locator('ul li button').first();
       await relatedItem.waitFor({ state: 'visible', timeout: 6000 }).catch(() => {});
       if (await relatedItem.count()) {
@@ -94,7 +94,7 @@ async function runOn(label, contextOpts) {
       } else {
         findings.push(`[${label}] No related items inside drawer`);
       }
-      // Close drawer
+
       const closeBtn = drawer.locator('button[aria-label="Close article"]');
       await closeBtn.click().catch(() => {});
     } else {
@@ -104,7 +104,7 @@ async function runOn(label, contextOpts) {
     findings.push(`[${label}] DRAWER-FAIL :: ${e.message}`);
   }
 
-  // Classify console messages
+
   for (const m of consoleMsgs) {
     if (FATAL_PATTERNS.some((r) => r.test(m))) findings.push('FATAL ' + m);
     else findings.push('warn  ' + m);

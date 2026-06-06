@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import { Category } from '@/types';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';

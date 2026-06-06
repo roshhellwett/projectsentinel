@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -90,7 +88,6 @@ export function Navbar() {
               </span>
             </Link>
 
-
             <nav
               aria-label="Main navigation"
               className="hidden lg:flex items-center gap-1"
@@ -120,7 +117,6 @@ export function Navbar() {
                 );
               })}
             </nav>
-
 
             <div className="flex items-center gap-1 sm:gap-2">
               <LastRefreshed />
@@ -168,10 +164,8 @@ export function Navbar() {
           </div>
         </div>
 
-
         <BreakingTicker />
       </header>
-
 
       <AnimatePresence>
         {isMobileOpen && (

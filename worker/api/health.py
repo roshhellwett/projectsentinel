@@ -1,6 +1,4 @@
-"""
-Health check and status endpoints for keep-alive pings and monitoring.
-"""
+
 
 from datetime import UTC, datetime, timedelta
 
@@ -11,38 +9,26 @@ from database.client import get_supabase
 
 router = APIRouter()
 
-
 class HealthResponse(BaseModel):
-    """Health check response model."""
 
     status: str
     timestamp: str
 
-
 class StatusResponse(BaseModel):
-    """Pipeline status response model."""
 
     last_run_at: str | None
     stories_today: int
     pipeline_healthy: bool
     checked_at: str
 
-
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    """
-    Returns 200 OK with timestamp.
-    Used by cron-job.org and GitHub Actions to keep the backend awake.
-    """
-    return HealthResponse(status="ok", timestamp=datetime.now(UTC).isoformat())
 
+    return HealthResponse(status="ok", timestamp=datetime.now(UTC).isoformat())
 
 @router.get("/status", response_model=StatusResponse)
 async def pipeline_status():
-    """
-    Returns pipeline health: last run timestamp, stories today, and healthy flag.
-    healthy=False if last run was >45 minutes ago.
-    """
+
     now = datetime.now(UTC)
 
     last_run_at: str | None = None

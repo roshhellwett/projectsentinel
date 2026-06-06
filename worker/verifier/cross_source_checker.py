@@ -1,7 +1,4 @@
-"""
-Cross-source verification - groups articles by topic using Union-Find for O(n log n).
-Requires 2+ independent sources for verification.
-"""
+
 
 import re
 from collections import defaultdict
@@ -10,17 +7,13 @@ from datetime import UTC, datetime, timedelta
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
-
 class UnionFind:
-    """Efficient Union-Find data structure for grouping articles."""
 
     def __init__(self, n: int):
         self.parent = list(range(n))
         self.rank = [0] * n
 
     def find(self, x: int) -> int:
-        # Iterative find with path compression (avoids recursion-depth crashes
-        # on long parent chains).
         root = x
         while self.parent[root] != root:
             root = self.parent[root]
@@ -38,7 +31,6 @@ class UnionFind:
         if self.rank[px] == self.rank[py]:
             self.rank[px] += 1
         return True
-
 
 STOP_WORDS: frozenset[str] = frozenset(
     {
@@ -144,9 +136,7 @@ STOP_WORDS: frozenset[str] = frozenset(
     }
 )
 
-
 class CrossSourceChecker:
-    """Checks if articles are confirmed by multiple trusted sources."""
 
     MIN_SHARED_KEYWORDS = 2
     MIN_SIMILARITY = 0.24
@@ -160,11 +150,11 @@ class CrossSourceChecker:
         self._init_supabase()
 
     def _init_supabase(self):
-        """Initialize Supabase client."""
+
         self.supabase = get_supabase()
 
     def _get_recent_raw_articles(self) -> list[dict]:
-        """Get recent unprocessed articles with 5-minute cache."""
+
         now = datetime.now(UTC)
         if (now - self._cache_time).total_seconds() < 300:
             return self._recent_cache
@@ -193,18 +183,7 @@ class CrossSourceChecker:
             return []
 
     def get_verified_groups(self, articles: list[dict]) -> list[list[dict]]:
-        """
-        Group articles by topic using Union-Find and return only groups with 2+ sources.
 
-        Time complexity: O(n * k) where k = avg keywords per article
-        Space complexity: O(n)
-
-        Args:
-            articles: List of article dicts
-
-        Returns:
-            List of article groups (each group has 2+ different sources)
-        """
         recent_articles = self._get_recent_raw_articles()
         all_articles = self._unique_articles(articles + recent_articles)
 
@@ -224,15 +203,7 @@ class CrossSourceChecker:
         return verified_groups
 
     def _group_by_topic(self, articles: list[dict]) -> list[list[dict]]:
-        """
-        Group articles by similar topics using Union-Find for O(n log n) grouping.
 
-        Args:
-            articles: List of articles
-
-        Returns:
-            List of article groups
-        """
         articles = articles[: self.MAX_ARTICLES_TO_COMPARE]
         article_keywords = []
         for article in articles:
@@ -276,7 +247,7 @@ class CrossSourceChecker:
         return groups
 
     def _are_same_story(self, left: set[str], right: set[str]) -> bool:
-        """Require more than one shared meaningful term before grouping."""
+
         if not left or not right:
             return False
 
@@ -288,7 +259,7 @@ class CrossSourceChecker:
         return similarity >= self.MIN_SIMILARITY
 
     def _same_source(self, left: dict, right: dict) -> bool:
-        """Treat matching source names or domains as the same source."""
+
         left_name = (left.get("source_name") or "").strip().lower()
         right_name = (right.get("source_name") or "").strip().lower()
         left_url = (left.get("source_url") or "").strip().lower()
@@ -296,7 +267,7 @@ class CrossSourceChecker:
         return bool((left_name and left_name == right_name) or (left_url and left_url == right_url))
 
     def _unique_articles(self, articles: list[dict]) -> list[dict]:
-        """Deduplicate merged live and recent article lists by URL hash."""
+
         unique = []
         seen = set()
         for article in articles:
@@ -308,15 +279,7 @@ class CrossSourceChecker:
         return unique
 
     def _extract_significant_words(self, headline: str) -> set[str]:
-        """
-        Extract significant words from headline for matching.
 
-        Args:
-            headline: Article headline
-
-        Returns:
-            Set of significant words
-        """
         if not headline:
             return set()
 
@@ -324,9 +287,6 @@ class CrossSourceChecker:
         headline = re.sub(r"[^\w\s]", " ", headline)
 
         words = headline.split()
-        # Keep 3-character words too — they include critical Indian-news acronyms
-        # (BJP, INC, AAP, CPI, ICC, RBI, SBI, IIT, IIM, CBI, NIA, etc.) that the
-        # previous len > 3 filter silently discarded, breaking story clustering.
         significant = {w for w in words if len(w) >= 3 and w not in STOP_WORDS}
 
         return significant

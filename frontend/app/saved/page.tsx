@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Bookmark, ArrowLeft, Trash2 } from 'lucide-react';

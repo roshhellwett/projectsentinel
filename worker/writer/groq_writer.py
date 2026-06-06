@@ -1,16 +1,4 @@
-"""
-Groq AI writer - writes neutral headlines and summaries from verified facts.
 
-Uses the SHARED 9-key, 3-tier write pool from `utils.groq_pool` so writer
-calls are spread across the same accounts as the verifier (Groq enforces
-quotas per-(account, model), so verify and write each get their own RPD
-budget on the same account).
-
-Default model is `llama-3.1-8b-instant` whose free-tier RPD (≈14400) is
-~14× higher than `llama-3.3-70b-versatile`. The writer's task (3-sentence
-summary from given facts) does not benefit meaningfully from 70B, so 8B
-is the right tradeoff to keep the worker delivering news non-stop.
-"""
 
 import json
 import os
@@ -25,15 +13,12 @@ from logger.pipeline_logger import PipelineLogger
 from utils.groq_pool import get_groq_pool, get_write_model_chain, reset_pool
 from utils.key_pool import AllKeysExhaustedError, KeyPool
 
-
 class GroqWriter:
-    """Writes news posts using Groq API with multi-key tier rotation."""
 
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
     RETRY_DELAY = 10
 
-    # Tight estimate: ~120 input + ~150 output tokens per write call.
     EST_TOKENS_PER_CALL = 320
 
     _key_pool: Optional[KeyPool] = None
@@ -50,18 +35,11 @@ class GroqWriter:
 
     def __init__(self):
         self.logger = PipelineLogger()
-        # 8B-instant is the right tradeoff for headline+summary writing —
-        # massively higher RPD vs. 70B, and the verifier already extracts
-        # the key facts so the writer just rewords them.
         self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama-3.1-8b-instant")
-
-    # ------------------------------------------------------------------
-    # Pool management
-    # ------------------------------------------------------------------
 
     @classmethod
     def _ensure_pool(cls) -> Optional[KeyPool]:
-        """Return the shared Groq pool (same one verifier uses). Lazy singleton."""
+
         with cls._key_pool_lock:
             if cls._key_pool is None:
                 cls._key_pool = get_groq_pool()
@@ -69,20 +47,13 @@ class GroqWriter:
 
     @classmethod
     def _reset_pool(cls) -> None:
-        """Reset the shared Groq pool. Tests only."""
+
         with cls._key_pool_lock:
             cls._key_pool = None
         reset_pool()
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def write(self, key_facts: list[str], category: str) -> dict:
-        """
-        Write neutral headline and summary from verified facts, cascading
-        through the write-model chain when keys exhaust on the current model.
-        """
+
         pool = self._ensure_pool()
         if pool is None:
             raise Exception("Groq API key not configured")
@@ -123,9 +94,9 @@ class GroqWriter:
     def _write_with_model(
         self, model: str, pool: KeyPool, user_content: str
     ) -> dict:
-        """Run the write loop bound to a single model."""
-        retries_used = 0   # genuine failures (parse / 5xx / network)
-        rotations = 0      # 429-driven key rotations
+
+        retries_used = 0
+        rotations = 0
         max_rotations = max(pool.size(), 1) + 1
 
         while retries_used < self.MAX_RETRIES and rotations <= max_rotations:
@@ -134,7 +105,6 @@ class GroqWriter:
                     estimated_tokens=self.EST_TOKENS_PER_CALL, model=model,
                 )
             except AllKeysExhaustedError:
-                # Surface to outer cascade loop.
                 raise
 
             stats = pool.get_stats(model=model)
@@ -170,7 +140,6 @@ class GroqWriter:
                     )
                     continue
 
-                # 401/403 = revoked / invalid / billing-suspended key.
                 if response.status_code in (401, 403):
                     pool.mark_invalid(slot_idx)
                     rotations += 1
@@ -245,19 +214,14 @@ class GroqWriter:
                 self.logger.log("GROQ_WRITE_ERROR", f"Unexpected error: {str(e)}")
                 raise
 
-        # If every attempt was consumed by 429s, surface the more specific error.
         try:
             pool.pick(estimated_tokens=self.EST_TOKENS_PER_CALL, model=model)
         except AllKeysExhaustedError:
             raise
         raise Exception("Max retries exceeded for Groq writer")
 
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
-
     def _extract_429_wait(self, response: requests.Response) -> int:
-        """Extract wait seconds from a 429 response."""
+
         retry_after = response.headers.get("Retry-After", "").strip()
         if retry_after.isdigit():
             return int(retry_after) + 1
@@ -270,19 +234,19 @@ class GroqWriter:
         return 0
 
     def _extract_retry_delay(self, error_str: str) -> int:
-        """Extract retry delay from error message."""
+
         match = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.IGNORECASE)
         if match:
             return int(float(match.group(1))) + 2
         return self.RETRY_DELAY
 
     def _build_prompt(self, key_facts: list[str], category: str) -> str:
-        """Build token-efficient writing prompt."""
+
         facts_text = "\n".join(f"{i + 1}. {fact}" for i, fact in enumerate(key_facts))
         return f"Category: {category}\n\nVerified facts:\n{facts_text}"
 
     def _parse_response(self, text: str) -> dict | None:
-        """Parse Groq JSON response. Returns None on failure."""
+
         text = text.strip()
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text).strip()
 

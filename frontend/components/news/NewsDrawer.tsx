@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { X, ExternalLink } from 'lucide-react';
 import { AnimatePresence, motion, useDragControls, useMotionValue } from 'framer-motion';
@@ -210,7 +208,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 </h3>
                 <SourceLinks sources={post.sources} />
               </div>
-
 
               <div className="mt-auto pt-10 flex flex-col items-center text-center">
                 <span aria-hidden="true" className="block w-10 h-px bg-rule-strong mb-3" />

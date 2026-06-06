@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';

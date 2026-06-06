@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { Flame, Layers } from 'lucide-react';
 
 interface SwipeProgressProps {

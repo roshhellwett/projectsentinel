@@ -1,14 +1,10 @@
--- Database hardening for India Verified
--- Safe to run after the initial schema.
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Keep duplicate fact-check feed entries out of the database.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_known_false_claims_url
     ON known_false_claims(fact_check_url);
 
--- Query shapes used by the frontend and worker.
 CREATE INDEX IF NOT EXISTS idx_posts_status_published_at
     ON posts(status, published_at DESC);
 
@@ -21,7 +17,6 @@ CREATE INDEX IF NOT EXISTS idx_raw_articles_processed_fetched_at
 CREATE INDEX IF NOT EXISTS idx_discarded_reason_at
     ON discarded_articles(discard_reason, discarded_at DESC);
 
--- Guard rails for user-facing data.
 ALTER TABLE posts
     ALTER COLUMN credibility_reason SET DEFAULT '',
     ALTER COLUMN fact_check_flags SET DEFAULT '[]'::jsonb;
@@ -61,7 +56,6 @@ BEGIN
     END IF;
 END $$;
 
--- Realtime: add posts to the existing Supabase publication without dropping it.
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')

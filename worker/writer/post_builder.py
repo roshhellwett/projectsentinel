@@ -1,7 +1,4 @@
-"""
-Post builder - assembles final post object before database insertion.
-Fixed: single timestamp capture, validation, standardized source format.
-"""
+
 
 from datetime import UTC, datetime
 from urllib.parse import urlparse
@@ -45,15 +42,13 @@ DOMAIN_TO_NAME: dict[str, str] = {
     "filmfare.com": "Filmfare",
 }
 
-
 def _derive_source_title(source_name: str, url: str) -> str:
-    """Return a human-readable source title from the domain or fallback name."""
+
     if url:
         try:
             hostname = urlparse(url).netloc.lower().replace("www.", "")
             if hostname in DOMAIN_TO_NAME:
                 return DOMAIN_TO_NAME[hostname]
-            # Capitalise first segment of domain as fallback
             parts = hostname.split(".")
             if parts:
                 return parts[0].replace("-", " ").title()
@@ -61,9 +56,7 @@ def _derive_source_title(source_name: str, url: str) -> str:
             pass
     return source_name or "Unknown"
 
-
 class PostBuilder:
-    """Builds the final post object from verified data."""
 
     def build(
         self,
@@ -74,20 +67,7 @@ class PostBuilder:
         credibility_reason: str,
         source_articles: list[dict],
     ) -> dict:
-        """
-        Assemble final post object.
 
-        Args:
-            headline: AI-written headline
-            summary: AI-written summary
-            category: Article category
-            credibility_score: Verification score
-            credibility_reason: Why the score was given
-            source_articles: List of confirming source articles
-
-        Returns:
-            Post dict ready for database insertion
-        """
         if not headline or not headline.strip():
             raise ValueError("Headline cannot be empty")
         if not summary or not summary.strip():

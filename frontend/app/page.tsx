@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import { fetchLatestPost, fetchPosts } from '@/lib/supabase/server';
 import { CategoryBar } from '@/components/layout/CategoryBar';
@@ -93,7 +93,6 @@ export default async function HomePage() {
             </div>
             <LiveClock variant="hero" />
           </div>
-
 
           <div className="md:hidden">
             <p className="editorial-kicker mb-4">

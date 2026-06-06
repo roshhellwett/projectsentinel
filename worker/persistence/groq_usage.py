@@ -1,10 +1,4 @@
-"""
-Persist and restore Groq API key daily usage counters to Supabase.
 
-Counters are stored in the `groq_usage` table as a JSONB array keyed by
-slot index. On worker startup (first pool init) the persisted counts for
-today are restored so the daily quotas survive Railway redeploys.
-"""
 
 from datetime import date
 
@@ -13,9 +7,8 @@ from logger.pipeline_logger import PipelineLogger
 
 _logger = PipelineLogger()
 
-
 def save_key_stats(stats: list[dict]) -> None:
-    """Upsert today's key usage stats to Supabase. Non-fatal on error."""
+
     try:
         supabase = get_supabase()
         if not supabase:
@@ -32,9 +25,8 @@ def save_key_stats(stats: list[dict]) -> None:
     except Exception as exc:
         _logger.log("GROQ_USAGE_WARN", f"Failed to save key stats: {str(exc)[:100]}")
 
-
 def load_key_stats() -> list[dict]:
-    """Load today's key usage stats from Supabase. Returns [] on miss or error."""
+
     try:
         supabase = get_supabase()
         if not supabase:

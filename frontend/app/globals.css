@@ -2,63 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════
-   DESIGN TOKENS — Editorial paper & ink
-   Inspired by Reuters / Guardian / Hindu typesetting:
-   warm off-white paper, deep ink, single editorial-crimson accent.
-   Every value is a space-separated RGB triple so Tailwind utilities
-   like `bg-paper/80` and `text-ink/70` work via <alpha-value>.
-═══════════════════════════════════════════════ */
 :root {
-  /* Fonts (next/font injects the actual stacks via these vars) */
+
   --font-sans:    'Source Sans 3', system-ui, sans-serif;
   --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
-  /* ── Paper surfaces (warm off-white) */
-  --c-paper:        250 250 247;   /* #FAFAF7 — primary canvas */
-  --c-paper-2:      244 242 236;   /* #F4F2EC — slightly toned strip / inset */
-  --c-paper-tint:   240 235 224;   /* #F0EBE0 — warm callout */
+  --c-paper:        250 250 247;
+  --c-paper-2:      244 242 236;
+  --c-paper-tint:   240 235 224;
 
-  /* ── Ink (deep, near-black but never #000) */
-  --c-ink:          13 13 13;       /* #0D0D0D — headlines */
-  --c-ink-soft:     38 38 38;       /* #262626 — body */
-  --c-muted:        82 82 82;       /* #525252 — meta, byline */
-  --c-subtle:       138 138 138;    /* #8A8A8A — captions, timestamps */
+  --c-ink:          13 13 13;
+  --c-ink-soft:     38 38 38;
+  --c-muted:        82 82 82;
+  --c-subtle:       138 138 138;
 
-  /* ── Hairline rules */
-  --c-rule:         225 222 215;    /* #E1DED7 — every divider */
-  --c-rule-strong:  198 192 180;    /* #C6C0B4 — emphasized rule */
+  --c-rule:         225 222 215;
+  --c-rule-strong:  198 192 180;
 
-  /* ── Accent: editorial crimson */
-  --c-accent:       140 28 19;      /* #8C1C13 — primary accent */
-  --c-accent-hover: 168 38 28;      /* #A8261C — hover/active */
-  --c-accent-soft:  240 220 218;    /* #F0DCDA — accent wash */
+  --c-accent:       140 28 19;
+  --c-accent-hover: 168 38 28;
+  --c-accent-soft:  240 220 218;
 
-  /* ── Credibility tiers (re-tuned, no purple) */
-  --c-cred-high: 22 101 52;         /* #166534 — verified deep green */
-  --c-cred-mid:  146 64 14;         /* #92400E — caution amber-brown */
-  --c-cred-low:  153 27 27;         /* #991B1B — low-trust crimson */
+  --c-cred-high: 22 101 52;
+  --c-cred-mid:  146 64 14;
+  --c-cred-low:  153 27 27;
 
   color-scheme: light;
 }
 
 .dark {
-  /* Dark mode: deep paper-ink inversion. Crimson lifts slightly so
-     it stays legible against near-black. */
-  --c-paper:        14 13 12;       /* #0E0D0C */
-  --c-paper-2:      24 23 21;       /* #181715 */
-  --c-paper-tint:   34 31 28;       /* #221F1C */
 
-  --c-ink:          244 237 225;    /* #F4EDE1 — paper-ink */
+  --c-paper:        14 13 12;
+  --c-paper-2:      24 23 21;
+  --c-paper-tint:   34 31 28;
+
+  --c-ink:          244 237 225;
   --c-ink-soft:     220 213 199;
   --c-muted:        168 162 152;
   --c-subtle:       128 122 112;
 
-  --c-rule:         48 45 41;       /* #302D29 */
+  --c-rule:         48 45 41;
   --c-rule-strong:  72 67 60;
 
-  --c-accent:       196 76 68;      /* #C44C44 — lifted crimson */
+  --c-accent:       196 76 68;
   --c-accent-hover: 222 102 92;
   --c-accent-soft:  60 28 24;
 
@@ -73,21 +60,14 @@ html {
   scroll-behavior: smooth;
   background-color: rgb(var(--c-paper));
   text-rendering: optimizeLegibility;
-  /* Reserve the vertical scrollbar gutter at all times so the layout
-     does not shift horizontally when the body scroll-lock removes the
-     scrollbar (e.g. when the NewsDrawer or search overlay opens). */
+
   scrollbar-gutter: stable;
 }
 
-/* ═══════════════════════════════════════════════
-   BASE LAYER
-═══════════════════════════════════════════════ */
 @layer base {
   body {
     @apply leading-normal antialiased;
-    /* Warm paper canvas with a single hairline grain (FIRST in the stack
-       so it sits behind every card). No coloured washes — the editorial
-       look needs paper, not gradients. */
+
     background-image:
       url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.025 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     background-color: rgb(var(--c-paper));
@@ -128,12 +108,6 @@ html {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   PAPER CARD — flat editorial surface
-   The legacy `.glass` and `.premium-card` class names are kept so the
-   existing component tree still styles correctly, but they now render
-   as a flat paper surface with a hairline rule and a single ink shadow.
-═══════════════════════════════════════════════ */
 .glass,
 .premium-card {
   position: relative;
@@ -164,9 +138,6 @@ html {
   transform: translateY(0);
 }
 
-/* ═══════════════════════════════════════════════
-   FIXED WATERMARK — "Verified News" viewport-centered bg
-═══════════════════════════════════════════════ */
 .watermark-fixed {
   position: fixed;
   inset: 0;
@@ -200,14 +171,9 @@ html {
     max-width: 90vw;
   }
 }
-/* The lavender-mint spotlight is gone — the editorial canvas is paper,
-   not gradient. We keep an empty rule so existing JSX referencing the
-   class is harmless. */
+
 .watermark-spotlight { display: none; }
 
-/* ═══════════════════════════════════════════════
-   SUBTLE BACKGROUND TEXTURE
-═══════════════════════════════════════════════ */
 .bg-dot-grid {
   background-image:
     radial-gradient(rgb(var(--c-ink) / 0.05) 1px, transparent 1px);
@@ -215,8 +181,7 @@ html {
 }
 
 .premium-orb {
-  /* Used only as the AI-verification disc on /how-it-works.
-     Reduced to a quiet ink-wash medallion. */
+
   background:
     radial-gradient(circle at 32% 22%, rgb(var(--c-paper)) 0%, rgb(var(--c-paper-2)) 36%, rgb(var(--c-paper-tint)) 100%);
   filter: none;
@@ -238,11 +203,6 @@ html {
 .editorial-kicker > span { white-space: nowrap; }
 .editorial-kicker > span.muted { color: rgb(var(--c-muted)); }
 
-/* ═══════════════════════════════════════════════
-   MOBILE BOTTOM NAV CLEARANCE
-   Reserve safe space at the bottom of the page on mobile so the fixed
-   MobileBottomNav never covers content, footer, or floating prompts.
-═══════════════════════════════════════════════ */
 @media (max-width: 767px) {
   body {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
@@ -252,9 +212,6 @@ html {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   PAGE ENTRY ANIMATION
-═══════════════════════════════════════════════ */
 @keyframes pageEnter {
   0% { opacity: 0; transform: translateY(6px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -263,9 +220,6 @@ html {
   animation: pageEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ═══════════════════════════════════════════════
-   SCROLLBAR — slim premium
-═══════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -298,18 +252,12 @@ html {
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* ═══════════════════════════════════════════════
-   FOCUS RING
-═══════════════════════════════════════════════ */
 *:focus-visible {
   outline: 2px solid rgb(var(--c-accent));
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ═══════════════════════════════════════════════
-   ANIMATIONS
-═══════════════════════════════════════════════ */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -400,13 +348,6 @@ html {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   NEWS CARD — per-category pastel tint
-   The colour comes from inline CSS custom properties set in NewsCard.tsx
-   (--tint-bg-hover, --tint-shadow, --tint-accent). Keeping the hover
-   declarative here means React doesn't have to swap inline styles on
-   every pointer enter/leave, which keeps a long feed buttery.
-═══════════════════════════════════════════════ */
 @media (hover: hover) {
   .news-card-tinted:hover {
     border-color: rgb(var(--c-rule-strong)) !important;
@@ -419,12 +360,6 @@ html {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   READ / UNREAD STATE
-   Visually distinguish stories the reader has already opened so
-   they can scan the feed and instantly see what's new — without
-   hiding anything. Subtle, not punishing.
-═══════════════════════════════════════════════ */
 .news-card-read {
   opacity: 0.72;
   filter: saturate(0.86);
@@ -439,12 +374,6 @@ html {
   font-weight: 600;
 }
 
-/* ═══════════════════════════════════════════════
-   SCROLL & PAINT PERFORMANCE
-   Keep the long news feed buttery on lower-end devices. These
-   are conservative — they only enable GPU-friendly compositing and
-   tell the browser it can defer painting offscreen cards.
-═══════════════════════════════════════════════ */
 @supports (content-visibility: auto) {
   .feed-grid > .feed-card-shell {
     content-visibility: auto;
@@ -468,12 +397,6 @@ body.article-overlay-open .scroll-to-top {
 
 img, video { max-width: 100%; height: auto; }
 
-/* ═══════════════════════════════════════════════
-   EDITORIAL VOCABULARY — purpose-built classes used by news components.
-═══════════════════════════════════════════════ */
-
-/* Section header with crimson left rule + flex-balanced "View all →".
-   Use as: <h2 class="section-rule"><span>World</span></h2> */
 .section-rule {
   display: flex;
   align-items: baseline;
@@ -495,8 +418,6 @@ img, video { max-width: 100%; height: auto; }
   align-self: center;
 }
 
-/* Editorial card — flat paper with hairline rule. Use this directly
-   on news cards so they render as paper, not glass. */
 .editorial-card {
   background: rgb(var(--c-paper));
   border: 1px solid rgb(var(--c-rule));
@@ -510,7 +431,6 @@ img, video { max-width: 100%; height: auto; }
   }
 }
 
-/* Drop cap — for the first paragraph of long-form articles. */
 .drop-cap::first-letter {
   font-family: var(--font-display);
   float: left;
@@ -521,7 +441,6 @@ img, video { max-width: 100%; height: auto; }
   color: rgb(var(--c-accent));
 }
 
-/* Legal / long-form prose container used by privacy, terms, etc. */
 .legal-prose { font-size: 16px; line-height: 1.75; }
 .legal-prose h2 {
   font-family: var(--font-display);
@@ -564,7 +483,6 @@ img, video { max-width: 100%; height: auto; }
   border: 1px solid rgb(var(--c-rule));
 }
 
-/* Pull quote — large italic block with crimson left rule. */
 .pull-quote {
   font-family: var(--font-display);
   font-style: italic;
@@ -588,7 +506,6 @@ img, video { max-width: 100%; height: auto; }
   margin-top: 0.625rem;
 }
 
-/* Breaking-news ticker rail — sits beneath the navbar. */
 .breaking-rail {
   background: rgb(var(--c-ink));
   color: rgb(var(--c-paper));
@@ -631,7 +548,6 @@ img, video { max-width: 100%; height: auto; }
   .breaking-rail__track { animation: none; }
 }
 
-/* Byline block — author avatar + name + date + read time. */
 .byline {
   display: flex;
   align-items: center;
@@ -663,7 +579,6 @@ img, video { max-width: 100%; height: auto; }
   color: rgb(var(--c-muted));
 }
 
-/* Inline labels: "Sponsored", "Advertisement", "Update", "Correction". */
 .label-tag {
   display: inline-flex;
   align-items: center;
@@ -690,7 +605,6 @@ img, video { max-width: 100%; height: auto; }
   border-color: rgb(var(--c-accent) / 0.35);
 }
 
-/* Source attribution at the bottom of articles. */
 .source-attribution {
   font-size: 0.8125rem;
   color: rgb(var(--c-muted));
@@ -703,11 +617,6 @@ img, video { max-width: 100%; height: auto; }
   font-weight: 600;
 }
 
-/* Tap targets: every interactive element is ≥ 44×44 (WCAG 2.5.5).
-   Wrapped in :where() so Tailwind's `hidden` / `lg:hidden` can still
-   take this element out of layout when needed. The container must
-   already set display to inline-flex/flex/etc — Tailwind utilities
-   handle that explicitly at the call site. */
 :where(.tap-target) {
   min-width: 44px;
   min-height: 44px;
@@ -716,11 +625,6 @@ img, video { max-width: 100%; height: auto; }
   justify-content: center;
 }
 
-/* ═══════════════════════════════════════════════
-   ENHANCED SMOOTHNESS UTILITIES
-═══════════════════════════════════════════════ */
-
-/* Fade in + slide up for section / card reveals */
 @keyframes fadeInUp {
   0% { opacity: 0; transform: translateY(16px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -729,7 +633,6 @@ img, video { max-width: 100%; height: auto; }
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Scale + fade for overlay / modal content */
 @keyframes scaleFadeIn {
   0% { opacity: 0; transform: scale(0.96); }
   100% { opacity: 1; transform: scale(1); }
@@ -738,7 +641,6 @@ img, video { max-width: 100%; height: auto; }
   animation: scaleFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Image fade in on load */
 @keyframes imgFadeIn {
   0% { opacity: 0; filter: blur(4px); }
   100% { opacity: 1; filter: blur(0); }
@@ -747,12 +649,10 @@ img, video { max-width: 100%; height: auto; }
   animation: imgFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Smooth shadow transition for cards */
 .smooth-shadow {
   transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
 }
 
-/* Consistent hover lift for interactive cards */
 .hover-lift {
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
@@ -765,7 +665,6 @@ img, video { max-width: 100%; height: auto; }
   }
 }
 
-/* Subtle press feedback for buttons */
 .press-scale {
   transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -773,7 +672,6 @@ img, video { max-width: 100%; height: auto; }
   transform: scale(0.96);
 }
 
-/* Blur transition for navbar backdrop */
 .blur-transition {
   transition: background 350ms cubic-bezier(0.16, 1, 0.3, 1),
               backdrop-filter 350ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -781,9 +679,6 @@ img, video { max-width: 100%; height: auto; }
               box-shadow 350ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ═══════════════════════════════════════════════
-   REDUCED MOTION
-═══════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -801,7 +696,7 @@ img, video { max-width: 100%; height: auto; }
   .animate-soft-float {
     animation: none !important;
   }
-  /* Keep opacity transitions for readability toggles */
+
   .opacity-transition-safe {
     transition: opacity 0.01ms !important;
   }

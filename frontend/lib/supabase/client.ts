@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import { createBrowserClient } from '@supabase/ssr';
 import { Post } from '@/types';

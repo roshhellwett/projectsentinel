@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { RefreshCw } from 'lucide-react';

@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 export function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;

@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import type { Metadata } from 'next';
 import Link from 'next/link';

@@ -1,7 +1,4 @@
-"""
-Main entry point for India Verified worker.
-Starts FastAPI server and APScheduler for the news pipeline.
-"""
+
 
 import os
 from contextlib import asynccontextmanager
@@ -23,12 +20,9 @@ scheduler = BackgroundScheduler(
     timezone="UTC",
 )
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage scheduler lifecycle."""
-    # next_run_time=now ensures the main pipeline runs immediately on startup
-    # instead of waiting a full 10-minute interval.
+
     scheduler.add_job(
         run_pipeline,
         "interval",
@@ -78,7 +72,6 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
-
 app = FastAPI(
     title="India Verified Worker",
     description="AI-powered news verification and publishing pipeline",
@@ -99,7 +92,6 @@ app.add_middleware(
 
 app.include_router(health_router, tags=["health"])
 app.include_router(trigger_router, tags=["trigger"])
-
 
 if __name__ == "__main__":
     import uvicorn

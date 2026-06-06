@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -162,7 +162,6 @@ export default async function NewsPage({ params }: NewsPageProps) {
               </div>
             </div>
           </div>
-
 
           <div className="max-w-[68ch]">
             <p className="font-display text-[18px] md:text-[20px] leading-[1.7] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.4em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:text-accent">

@@ -1,7 +1,4 @@
-"""
-APScheduler job configuration and pipeline orchestration.
-Optimized: batch operations, parallel fetching, singletons, proper timezone.
-"""
+
 
 import os
 import traceback
@@ -27,38 +24,17 @@ from verifier.score_evaluator import ScoreEvaluator
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
 
-
 def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
-    """
-    Clamp groups-per-run to evenly spread remaining daily Groq budget until
-    the next 00:00 UTC reset.
 
-    Reads `PIPELINE_INTERVAL_SECONDS` from env (default 600 = 10 min, matching
-    `main.py`'s APScheduler). Override locally for `loop_runner.py` (60s) via
-    that env var.
-
-    This is what makes the worker "never exhaust" across the day: as budget
-    drains, we slow down automatically; when only tier 3 is left, we crawl
-    just fast enough to coast to the reset.
-
-    Returns max(1, min(hard_cap, allowed)) so the worker always processes
-    at least one group per run if any budget exists.
-    """
     pool = get_groq_pool()
     if pool is None:
         return hard_cap
 
-    # Sum remaining daily budget across the WHOLE verify-model cascade.
-    # If the primary model is exhausted but the cascade has 50K calls left
-    # on the 8B safety net, we should still let the worker run flat-out.
     chain = get_verify_model_chain()
     total_budget = sum(pool.remaining_daily_budget(model=m) for m in chain)
     if total_budget <= 0:
         return hard_cap
 
-    # The "active" model for rate-shaping is the first one in the chain
-    # that still has budget — that's where the next pipeline tick will
-    # spend its calls.
     active_model = next(
         (m for m in chain if pool.remaining_daily_budget(model=m) > 0),
         chain[0],
@@ -72,7 +48,6 @@ def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
     except (ValueError, TypeError):
         interval_seconds = 600
 
-    # Allowed verify-calls between this run and the next scheduled run.
     allowed = max(1, int(rate_per_min * (interval_seconds / 60.0)))
     clamped = min(hard_cap, allowed)
 
@@ -91,9 +66,8 @@ def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
         )
     return clamped
 
-
 def _record_run_start(logger: PipelineLogger, start_time: datetime, mode: str) -> str | None:
-    """Record pipeline run start in database. Returns run_id or None."""
+
     try:
         from database.client import get_supabase as _get_sb
 
@@ -106,9 +80,8 @@ def _record_run_start(logger: PipelineLogger, start_time: datetime, mode: str) -
         logger.log("PIPELINE", f"Could not record pipeline run start: {_e}")
     return None
 
-
 def _record_run_end(logger: PipelineLogger, run_id: str | None, duration: float, stats: dict) -> None:
-    """Record pipeline run completion in database."""
+
     if not run_id:
         return
     try:
@@ -126,15 +99,8 @@ def _record_run_end(logger: PipelineLogger, run_id: str | None, duration: float,
     except Exception as _e:
         logger.log("PIPELINE", f"Could not record pipeline run completion: {_e}")
 
-
 def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -> None:
-    """
-    Main pipeline function that orchestrates all steps.
 
-    Args:
-        supplementary_only: Only fetch from GNews/NewsAPI (every 4 hours)
-        archive_only: Only run archive job (monthly)
-    """
     logger = PipelineLogger()
     mode = "supplementary" if supplementary_only else ("archive" if archive_only else "full")
     logger.log("PIPELINE", "Starting pipeline run", {"mode": mode})
@@ -176,11 +142,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         post_builder = PostBuilder()
         publisher = SupabasePublisher()
 
-        # Sweep stale unprocessed singletons before grouping. Articles fetched
-        # more than `STALE_SINGLETON_HOURS` ago that still haven't found a
-        # cross-source partner are accepted as genuinely single-source and
-        # removed from the grouping buffer. Without this sweep, the new
-        # buffering logic below would let the unprocessed pool grow unbounded.
         try:
             stale_hours = max(1, int(os.getenv("STALE_SINGLETON_HOURS", "4")))
         except (ValueError, TypeError):
@@ -198,12 +159,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             all_articles.extend(rss_articles)
             logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
 
-        # Supplementary fetch decision:
-        #   - Always run when explicitly requested (the every-2h job).
-        #   - On the main pipeline, only fall back when RSS returned nothing
-        #     AND at least one supplementary pool still has quota for today.
-        #     This prevents a transient RSS hiccup from burning the whole
-        #     daily quota across the 144 ten-minute ticks per day.
         should_supplement = supplementary_only or (
             len(rss_articles) == 0
             and (GNewsFetcher.has_quota() or NewsAPIFetcher.has_quota())
@@ -236,8 +191,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             else:
                 logger.log("FETCH", "Supplementary requested but all keys exhausted, skipping API calls")
 
-        # Only refresh known-false-claims for the full pipeline; supplementary
-        # fetch just stores raw articles for the next main run.
         if not supplementary_only:
             factcheck_fetcher = FactCheckFetcher()
             new_fact_checks = factcheck_fetcher.update_known_false_claims()
@@ -309,17 +262,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
 
-        # NOTE: We deliberately do NOT mark current-run single-source articles
-        # as processed. They need to stay in the unprocessed pool so the next
-        # ~`STALE_SINGLETON_HOURS` of pipeline ticks can pair them with later
-        # arrivals from other sources. The previous "mark singletons every
-        # run" logic killed every unverified story before its second source
-        # had a chance to publish, which is why "0 verified groups" appeared
-        # in ~67% of runs in production. Stale singletons are swept at the
-        # start of each pipeline tick — see `sweep_stale_unprocessed` above.
-
-        # Pre-AI dedup: drop groups whose representative headline is a paraphrase
-        # of an already-queued group (catches cases SequenceMatcher would miss at 0.80).
         unique_groups: list[list[dict]] = []
         seen_rep_headlines: list[str] = []
         for grp in verified_groups:
@@ -332,9 +274,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 seen_rep_headlines.append(rep)
         verified_groups = unique_groups
 
-        # Adaptive shaping: clamp groups for this run to whatever the daily
-        # budget can support, so we coast smoothly to 00:00 UTC reset instead
-        # of burning all 3 tiers in the first few hours.
         effective_cap = _budgeted_groups_per_run(logger, max_ai_groups)
         groups_to_process = verified_groups[:effective_cap]
         deferred_groups = verified_groups[effective_cap:]
@@ -346,10 +285,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run "
                 f"(effective_cap={effective_cap}, hard_cap={max_ai_groups})",
             )
-            # Only drop overflow above the user-configured hard cap. Groups
-            # deferred purely by the budget shaper are kept un-marked so the
-            # next pipeline tick can pick them up — otherwise tight-budget
-            # days would silently discard real news.
             if len(verified_groups) > max_ai_groups:
                 hard_overflow = verified_groups[max_ai_groups:]
                 for grp in hard_overflow:
@@ -402,7 +337,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                             "AI_BUDGET",
                             f"Groq writer budget exhausted — stopping AI processing: {budget_err}",
                         )
-                        # Don't mark this group as processed — next run can retry.
                         break
                     except Exception as write_err:
                         logger.log(
@@ -450,7 +384,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         _record_run_end(logger, run_id, duration, {**stats, "error": str(e)})
         raise
     finally:
-        # Always persist key usage stats, even on failure
         try:
             GroqVerifier.save_pool_stats()
         except Exception:

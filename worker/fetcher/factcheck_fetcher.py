@@ -1,7 +1,4 @@
-"""
-Fact-check feed fetcher - updates known_false_claims table from AltNews and AFP.
-Optimized: batch insert instead of N+1 queries.
-"""
+
 
 import re
 
@@ -9,7 +6,6 @@ import feedparser
 import requests
 
 from logger.pipeline_logger import PipelineLogger
-
 
 _STOP_WORDS: frozenset[str] = frozenset(
     {
@@ -28,9 +24,7 @@ _STOP_WORDS: frozenset[str] = frozenset(
     }
 )
 
-
 class FactCheckFetcher:
-    """Fetches fact-check feeds and updates known false claims database."""
 
     FACTCHECK_FEEDS = [
         {"name": "AltNews", "url": "https://www.altnews.in/feed/"},
@@ -41,13 +35,7 @@ class FactCheckFetcher:
         self.logger = PipelineLogger()
 
     def update_known_false_claims(self) -> int:
-        """
-        Fetch fact-check feeds and return count of new entries.
-        Uses batch insert to avoid N+1 queries.
 
-        Returns:
-            Number of new fact-checks added
-        """
         from database.client import get_supabase
 
         supabase = get_supabase()
@@ -59,8 +47,6 @@ class FactCheckFetcher:
         existing_urls = set()
 
         try:
-            # Bound the query — fact-check feeds only republish recent items,
-            # so the latest 2000 URLs are sufficient for dedup.
             existing = (
                 supabase.table("known_false_claims")
                 .select("fact_check_url")
@@ -74,8 +60,6 @@ class FactCheckFetcher:
 
         for feed_config in self.FACTCHECK_FEEDS:
             try:
-                # Use requests for the network call so we have a timeout
-                # (feedparser.parse(url) has no timeout and can hang the pipeline).
                 resp = requests.get(
                     feed_config["url"],
                     timeout=20,
@@ -109,7 +93,7 @@ class FactCheckFetcher:
         return len(new_claims)
 
     def _parse_factcheck(self, entry, source: str) -> dict | None:
-        """Parse a fact-check entry into claim format."""
+
         url = entry.get("link", "")
         if not url:
             return None
@@ -123,7 +107,7 @@ class FactCheckFetcher:
         return {"claim_summary": title, "source": source, "fact_check_url": url, "keywords": keywords}
 
     def _extract_keywords(self, title: str) -> list[str]:
-        """Extract relevant keywords from a fact-check title."""
+
         words = re.findall(r"\b\w+\b", title.lower())
         keywords = [w for w in words if len(w) > 3 and w not in _STOP_WORDS]
 

@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useState, useCallback } from 'react';
 import { Post } from '@/types';
 import { NewsCard } from './NewsCard';

@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ShieldCheck, Globe, BookOpen } from 'lucide-react';

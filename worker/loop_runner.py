@@ -1,7 +1,4 @@
-"""
-Loop runner - runs the pipeline continuously until news is published.
-Optimized: reuses Supabase singleton, handles errors gracefully.
-"""
+
 
 import sys
 import time
@@ -15,24 +12,20 @@ from scheduler.jobs import run_pipeline
 
 load_dotenv()
 
-
 MAX_RUNS = 50
 BASE_WAIT = 60
 MAX_WAIT = 600
 
-
 def get_post_count() -> int:
-    """Get current number of published posts."""
+
     supabase = get_supabase()
     if not supabase:
         return 0
     try:
-        # head=True returns only the count, without dragging every id into memory.
         result = supabase.table("posts").select("id", count="exact", head=True).execute()
         return result.count if result.count is not None else 0
     except Exception:
         return 0
-
 
 def main():
     print("=" * 60)
@@ -83,11 +76,9 @@ def main():
             print(f"\nError during pipeline run: {e}")
             print(traceback.format_exc())
 
-            # Reset Supabase client on repeated failures (connection may be stale)
             if consecutive_errors >= 3:
                 print("Resetting Supabase client due to repeated failures...")
                 reset_client()
-                # Restart backoff/reset cycle so we don't reset on every subsequent loop.
                 consecutive_errors = 0
 
             print(f"Retrying in {wait}s (consecutive errors: {consecutive_errors})...")
@@ -98,7 +89,6 @@ def main():
     print(f"\n{'=' * 60}")
     print("Pipeline completed.")
     print(f"{'=' * 60}")
-
 
 if __name__ == "__main__":
     main()

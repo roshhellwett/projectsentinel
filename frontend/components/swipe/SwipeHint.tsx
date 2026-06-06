@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useEffect, useState } from 'react';
 import { ArrowUp, Undo2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { isHintDismissed, dismissHint } from '@/lib/utils/swipeStats';

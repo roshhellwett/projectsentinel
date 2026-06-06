@@ -1,11 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-//
-// Visual feedback rendered on top of the active swipe card. Reads the live
-// drag offset and fades in directional badges (Save / Dismiss / Next /
-// Previous) as the user drags past meaningful thresholds.
-
 import { Bookmark, X, ArrowUp, Undo2 } from 'lucide-react';
 
 interface SwipeOverlayProps {

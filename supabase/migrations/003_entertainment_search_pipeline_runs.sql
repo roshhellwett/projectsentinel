@@ -1,10 +1,6 @@
--- Migration 003: entertainment category, FTS indexes, pipeline_runs table,
--- source normalisation, and missing performance indexes.
 
--- 1. Add entertainment to the posts category constraint (TEXT check)
 DO $$
 BEGIN
-    -- Drop old check constraint and recreate with entertainment included
     ALTER TABLE posts DROP CONSTRAINT IF EXISTS posts_category_check;
     ALTER TABLE posts ADD CONSTRAINT posts_category_check
         CHECK (category IN (
@@ -12,10 +8,9 @@ BEGIN
             'science', 'health', 'tech', 'world', 'entertainment'
         ));
 EXCEPTION WHEN OTHERS THEN
-    NULL; -- Constraint may have a different name; handled below
+    NULL;
 END $$;
 
--- Fallback: if the constraint name differs, try the unnamed version
 DO $$
 DECLARE
     con_name TEXT;
@@ -36,7 +31,6 @@ BEGIN
     END IF;
 END $$;
 
--- 2. Performance indexes (issue #23)
 CREATE INDEX IF NOT EXISTS posts_category_published_idx
     ON posts(category, published_at DESC);
 
@@ -46,11 +40,9 @@ CREATE INDEX IF NOT EXISTS posts_published_idx
 CREATE INDEX IF NOT EXISTS posts_credibility_idx
     ON posts(credibility_score DESC);
 
--- 3. Full-text search GIN index (issue #17, #23)
 CREATE INDEX IF NOT EXISTS posts_fts_idx
     ON posts USING GIN(to_tsvector('english', headline || ' ' || coalesce(summary, '')));
 
--- 4. pipeline_runs table (issue #6)
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     started_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -78,19 +70,13 @@ BEGIN
     END IF;
 END $$;
 
--- 5. One-time migration: normalise malformed source records
---    Convert bare URL strings → {"title": "<domain>", "url": "<url>"}
---    and {name, url} → {title, url}
 UPDATE posts
 SET sources = (
     SELECT jsonb_agg(
         CASE
-            -- Already has "title" key — leave it alone
             WHEN (elem->>'title') IS NOT NULL THEN elem
-            -- Has "name" key (old format) — rename to "title"
             WHEN (elem->>'name') IS NOT NULL THEN
                 jsonb_build_object('title', elem->>'name', 'url', coalesce(elem->>'url', ''))
-            -- Bare string URL in the "url" field, no name
             WHEN (elem->>'url') IS NOT NULL THEN
                 jsonb_build_object(
                     'title',
@@ -109,7 +95,6 @@ WHERE sources IS NOT NULL
   AND jsonb_array_length(sources) > 0
   AND sources::text NOT LIKE '%"title"%';
 
--- 6. Re-classify obvious entertainment miscategorisations (films, OTT, music, celebrity)
 UPDATE posts
 SET category = 'entertainment'
 WHERE category IN ('business', 'world', 'politics')

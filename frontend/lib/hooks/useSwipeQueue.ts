@@ -1,17 +1,5 @@
 'use client';
 
-// last edited 2026-05-18 by roshhellwett
-//
-// Swipe queue manager. Reuses the existing /api/posts endpoint — zero
-// backend changes. Filters out seen/read IDs and keeps a small history
-// for rewind. Prefetches the next page when the buffer drops low.
-//
-// Key behaviours:
-// - Rewind truly reverses the dismiss — it calls `unmarkSeen` so the
-//   post won't be re-filtered on the next session.
-// - History entries record the swipe direction and whether a save
-//   occurred, so rewind can undo both seen-marking AND bookmarking.
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
@@ -38,7 +26,6 @@ const SEEN_PREFIX = 'iv:swipe:seen:';
 const MAX_REFILL_FAILURES = 3;
 const REFILL_BACKOFF_MS = [1500, 4000, 10000] as const;
 
-/** Recorded for each card so rewind can properly undo side-effects. */
 export interface HistoryEntry {
   post: Post;
   direction: 'up' | 'left' | 'right';
@@ -84,16 +71,16 @@ export function useSwipeQueue({
   const failureCountRef = useRef<number>(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Refresh seen-set from localStorage. Used during cross-tab sync and
-  // tab-visibility wake-ups. Loads today AND yesterday so a post dismissed
-  // shortly before midnight does not reappear minutes later.
+
+
+
   const refreshSeenFromDisk = useCallback(() => {
     seenRef.current = loadSeenWithinDays(2);
     setQueue((prev) => prev.filter((p) => !seenRef.current.has(p.id)));
   }, []);
 
-  // Always read the latest read-set from disk so cross-tab dismissals are
-  // honored on the next prefetch even before React state catches up.
+
+
   const filterIds = useCallback(
     (posts: Post[]): Post[] => {
       const seen = seenRef.current;
@@ -111,9 +98,9 @@ export function useSwipeQueue({
     [hideRead, excludeReadIds],
   );
 
-  // Hydrate seen-set from localStorage and seed the queue. Read-set is
-  // pulled synchronously to avoid a race where the first batch of SSR
-  // posts is filtered against an empty React state.
+
+
+
   useEffect(() => {
     seenRef.current = loadSeenWithinDays(2);
     const seen = seenRef.current;
@@ -121,7 +108,7 @@ export function useSwipeQueue({
     const cleaned = dedupe(
       initialPosts.filter((p) => p?.id && !seen.has(p.id) && !readNow.has(p.id)),
     );
-    // Sort newest first so the freshest stories surface at the top of the stack
+
     cleaned.sort(
       (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
     );
@@ -131,15 +118,15 @@ export function useSwipeQueue({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Clean up retry timers on unmount
+
   useEffect(() => {
     return () => {
       if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
     };
   }, []);
 
-  // Cross-tab sync: when seen or read sets change in another tab, refresh
-  // ours and prune the queue accordingly.
+
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const onStorage = (e: StorageEvent) => {
@@ -157,8 +144,8 @@ export function useSwipeQueue({
     return () => window.removeEventListener('storage', onStorage);
   }, [refreshSeenFromDisk, hideRead]);
 
-  // Tab visibility: when the user comes back, the localStorage state may
-  // have changed in another tab. Refresh and reconcile.
+
+
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const onVisible = () => {
@@ -173,8 +160,8 @@ export function useSwipeQueue({
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [refreshSeenFromDisk, hideRead]);
 
-  // Refill with bounded retry. Surfaces an error state after
-  // MAX_REFILL_FAILURES consecutive failures so the UI can recover.
+
+
   const refill = useCallback(async () => {
     if (fetchingRef.current || exhausted) return;
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -218,12 +205,12 @@ export function useSwipeQueue({
         setHasError(true);
       } else {
         const delay = REFILL_BACKOFF_MS[Math.min(failureCountRef.current - 1, REFILL_BACKOFF_MS.length - 1)];
-        // Schedule a retry after backoff. Don't recurse directly — use a
-        // state change to trigger the auto-prefetch effect instead.
+
+
         retryTimerRef.current = setTimeout(() => {
           fetchingRef.current = false;
           setIsFetching(false);
-          // Trigger the auto-prefetch effect by toggling error state
+
           setHasError(false);
         }, delay);
         return;
@@ -245,7 +232,7 @@ export function useSwipeQueue({
     await refill();
   }, [refill]);
 
-  // Auto-prefetch when the buffer is low.
+
   useEffect(() => {
     if (!hydrated) return;
     if (exhausted) return;
@@ -259,7 +246,7 @@ export function useSwipeQueue({
       if (prev.length === 0) return prev;
       const front = prev[0];
       if (front.id !== post.id) {
-        // Defensive: only consume if it's actually the front card.
+
         return prev;
       }
       return prev.slice(1);
@@ -271,12 +258,12 @@ export function useSwipeQueue({
     });
   }, []);
 
-  // Rewind returns the last swiped card AND reverses its side-effects:
-  // - Calls unmarkSeen so it won't be re-filtered next session
-  // - Returns wasSaved so the caller can un-bookmark if needed
+
+
+
   const rewind = useCallback((): HistoryEntry | null => {
-    // We need to read the history synchronously inside setState to avoid
-    // the closure-over-null bug from the old implementation.
+
+
     let entry: HistoryEntry | null = null;
 
     setHistory((prev) => {
@@ -285,14 +272,14 @@ export function useSwipeQueue({
       return prev.slice(1);
     });
 
-    // Because React 18 batches setState calls, and setHistory's updater
-    // runs synchronously within the current event-loop tick, `entry` IS
-    // populated by the time we reach this line.
+
+
+
     if (entry) {
       const e = entry as HistoryEntry;
-      // Undo the seen-marking so the post isn't filtered on next visit
+
       unmarkSeen(e.post.id);
-      // Re-insert at the front of the queue
+
       setQueue((prev) => (prev[0]?.id === e.post.id ? prev : [e.post, ...prev]));
     }
     return entry;

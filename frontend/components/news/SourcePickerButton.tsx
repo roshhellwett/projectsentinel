@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ExternalLink, Globe, Newspaper } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';

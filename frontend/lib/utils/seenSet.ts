@@ -1,13 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-//
-// Per-day "dismissed in swipe" set. Keys are bucketed by local date so a story
-// the user dismissed today will reappear tomorrow if it's still relevant.
-// We retain the last 7 day-buckets to support "diversity" stats and to handle
-// timezone / date-rollover races. All storage is localStorage — zero server
-// cost.
-
 const PREFIX = 'iv:swipe:seen:';
 const KEEP_DAYS = 7;
 const MAX_PER_DAY = 1000;

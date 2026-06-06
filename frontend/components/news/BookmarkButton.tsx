@@ -1,7 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-
 import { useCallback } from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { motion } from 'framer-motion';

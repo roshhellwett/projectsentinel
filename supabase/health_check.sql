@@ -1,19 +1,6 @@
--- =============================================================================
--- India Verified — Database Health Check
---
--- Run this in the Supabase SQL editor (Dashboard → SQL Editor → New query).
--- Returns ONE result set with ~30 rows, one row per check.
--- Every row should show status='OK' and a green checkmark.
--- Any row showing 'FAIL' points at a missing/broken piece of the schema.
---
--- Read-only — this script makes no changes to the database.
--- =============================================================================
 
 WITH
 
--- ---------------------------------------------------------------------------
--- 1. Extensions
--- ---------------------------------------------------------------------------
 ext_check AS (
     SELECT
         'extension: ' || ext AS check_name,
@@ -26,9 +13,6 @@ ext_check AS (
     FROM (VALUES ('uuid-ossp'), ('pgcrypto')) AS e(ext)
 ),
 
--- ---------------------------------------------------------------------------
--- 2. Tables exist
--- ---------------------------------------------------------------------------
 table_check AS (
     SELECT
         'table: ' || tbl AS check_name,
@@ -50,9 +34,6 @@ table_check AS (
     ) AS t(tbl)
 ),
 
--- ---------------------------------------------------------------------------
--- 3. Required columns on `posts` (most schema-critical table)
--- ---------------------------------------------------------------------------
 posts_cols_check AS (
     SELECT
         'posts.' || col AS check_name,
@@ -76,9 +57,6 @@ posts_cols_check AS (
     ) AS c(col)
 ),
 
--- ---------------------------------------------------------------------------
--- 4. Critical indexes
--- ---------------------------------------------------------------------------
 index_check AS (
     SELECT
         'index: ' || idx AS check_name,
@@ -107,9 +85,6 @@ index_check AS (
     ) AS i(idx)
 ),
 
--- ---------------------------------------------------------------------------
--- 5. RLS enabled on all 5 protected tables
--- ---------------------------------------------------------------------------
 rls_check AS (
     SELECT
         'RLS enabled on ' || c.relname AS check_name,
@@ -124,9 +99,6 @@ rls_check AS (
       AND c.relname IN ('raw_articles','posts','discarded_articles','known_false_claims','pipeline_runs')
 ),
 
--- ---------------------------------------------------------------------------
--- 6. Expected RLS policies
--- ---------------------------------------------------------------------------
 policy_check AS (
     SELECT
         'policy: ' || polname || ' on ' || tbl AS check_name,
@@ -149,9 +121,6 @@ policy_check AS (
     ) AS p(tbl, polname)
 ),
 
--- ---------------------------------------------------------------------------
--- 7. Trigger for posts.updated_at
--- ---------------------------------------------------------------------------
 trigger_check AS (
     SELECT
         'trigger: update_posts_updated_at' AS check_name,
@@ -167,9 +136,6 @@ trigger_check AS (
         END AS detail
 ),
 
--- ---------------------------------------------------------------------------
--- 8. Realtime publication contains posts
--- ---------------------------------------------------------------------------
 realtime_check AS (
     SELECT
         'realtime: posts in supabase_realtime publication' AS check_name,
@@ -185,9 +151,6 @@ realtime_check AS (
         END AS detail
 ),
 
--- ---------------------------------------------------------------------------
--- 9. Service role has full CRUD on every table
--- ---------------------------------------------------------------------------
 service_grant_check AS (
     SELECT
         'service_role can write to ' || tbl AS check_name,
@@ -207,9 +170,6 @@ service_grant_check AS (
     ) AS t(tbl)
 ),
 
--- ---------------------------------------------------------------------------
--- 10. Anon role can ONLY read posts (and nothing else)
--- ---------------------------------------------------------------------------
 anon_grant_check AS (
     SELECT
         'anon can read posts' AS check_name,
@@ -239,9 +199,6 @@ anon_grant_check AS (
     ) AS t(tbl)
 ),
 
--- ---------------------------------------------------------------------------
--- 11. Data sanity — invalid categories, score bounds, fingerprint dupes
--- ---------------------------------------------------------------------------
 data_sanity_check AS (
     SELECT
         'no posts with invalid category' AS check_name,
@@ -300,9 +257,6 @@ data_sanity_check AS (
         ) d) AS detail
 ),
 
--- ---------------------------------------------------------------------------
--- 12. Pipeline activity — is the worker actually running?
--- ---------------------------------------------------------------------------
 activity_check AS (
     SELECT
         'last pipeline run < 45 min ago' AS check_name,
@@ -356,9 +310,6 @@ activity_check AS (
         END AS detail
 ),
 
--- ---------------------------------------------------------------------------
--- 13. Storage hygiene — am I about to hit the 500MB free-tier cap?
--- ---------------------------------------------------------------------------
 storage_check AS (
     SELECT
         'database size' AS check_name,
@@ -381,9 +332,6 @@ storage_check AS (
         ) AS detail
 )
 
--- ---------------------------------------------------------------------------
--- Final result set
--- ---------------------------------------------------------------------------
 SELECT
     CASE status
         WHEN 'OK'   THEN '✅'

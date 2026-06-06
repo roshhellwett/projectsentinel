@@ -1,15 +1,12 @@
-"""Shared rate limiter for external API calls."""
+
 
 import time
 from threading import Lock
 
-
 class RateLimitExceededError(Exception):
     """Raised when a rate limiter's daily call budget is exhausted."""
 
-
 class RateLimiter:
-    """Manages process-wide rate limiting for API calls."""
 
     _instances: dict[str, "RateLimiter"] = {}
     _instances_lock = Lock()
@@ -21,7 +18,7 @@ class RateLimiter:
         min_delay_seconds: float,
         max_calls_per_day: int | None = None,
     ) -> "RateLimiter":
-        """Return a named singleton limiter shared across modules."""
+
         with cls._instances_lock:
             if name not in cls._instances:
                 cls._instances[name] = cls(min_delay_seconds, max_calls_per_day)
@@ -40,7 +37,7 @@ class RateLimiter:
         self._lock = Lock()
 
     def wait_if_needed(self):
-        """Wait if needed to respect rate limits."""
+
         sleep_duration = 0.0
         with self._lock:
             current_time = time.time()
@@ -56,7 +53,6 @@ class RateLimiter:
             if time_since_last < self.min_delay:
                 sleep_duration = self.min_delay - time_since_last
 
-            # Reserve the slot now; sleep happens outside the lock.
             self.last_call_time = current_time + sleep_duration
             self.calls_today += 1
 
@@ -64,7 +60,7 @@ class RateLimiter:
             time.sleep(sleep_duration)
 
     def get_calls_remaining(self) -> int | None:
-        """Get remaining calls for today."""
+
         if not self.max_calls_per_day:
             return None
         return max(0, self.max_calls_per_day - self.calls_today)

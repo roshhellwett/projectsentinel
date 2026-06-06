@@ -1,10 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-//
-// Lightweight client-side stats for Swipe mode. Tracks daily card-advance
-// counts, source diversity, and a daily streak. All localStorage — no server.
-
 const COUNT_PREFIX  = 'iv:swipe:count:';
 const HOSTS_PREFIX  = 'iv:swipe:hosts:';
 const STREAK_KEY    = 'iv:swipe:streak:v1';
@@ -93,7 +88,7 @@ export function getUniqueHostsToday(): number {
 
 interface StreakState {
   count: number;
-  lastDay: string; // YYYY-MM-DD
+  lastDay: string;
 }
 
 export function bumpStreak(): StreakState {

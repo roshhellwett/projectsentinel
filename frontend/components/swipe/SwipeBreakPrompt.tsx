@@ -1,11 +1,5 @@
 'use client';
 
-// last edited 2026-05-17 by roshhellwett
-//
-// Anti-doomscroll prompt. Surfaces once after the user has consumed a
-// configurable number of cards in a single session. Snooze persists for
-// the rest of the day in localStorage.
-
 interface SwipeBreakPromptProps {
   cardsThisSession: number;
   onSnooze: () => void;

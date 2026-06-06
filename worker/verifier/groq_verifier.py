@@ -1,20 +1,4 @@
-"""
-Groq AI verification - uses Llama 3.3 70B for news verification.
 
-Multi-key tiering: keys 1-3 form tier 1, 4-6 form tier 2 (configured via
-GROQ_API_KEY_VERIFY_1..6, with GROQ_API_KEY_1..6 as fallback). The shared
-`utils.groq_pool.get_verify_pool` enforces per-key RPM/TPM/RPD windows so
-we pre-emptively avoid 429s instead of just reacting to them.
-
-429 handling: each rate-limit response sets `cooldown_until` on the offending
-slot using the server's Retry-After hint, and `pick()` skips slots in
-cooldown. Tier 2 activates as soon as every tier-1 slot is cooldowned, dead,
-or window-saturated.
-
-Token-optimized prompts. Estimated tokens are passed to the pool's
-admission control; actual `usage.total_tokens` is recorded after each
-successful response.
-"""
 
 import json
 import os
@@ -34,24 +18,17 @@ from utils.groq_pool import (
 )
 from utils.key_pool import AllKeysExhaustedError, KeyPool
 
-# Re-exports preserved for backwards compatibility with existing call sites
-# and tests that import `_KeyPool` / `AllKeysExhaustedError` from this module.
 _KeyPool = KeyPool
 __all__ = ["AllKeysExhaustedError", "GroqVerifier", "_KeyPool"]
 
-
 class GroqVerifier:
-    """Verifies news articles using Groq API (Llama 3.3 70B)."""
 
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
     RETRY_DELAY = 10
 
-    # Conservative token estimate per verify call (input ~600 + output ~250).
-    # Used by the pool to pre-emptively avoid TPM blowups.
     EST_TOKENS_PER_CALL = 850
 
-    # Class-level singleton lock for legacy reset/_ensure_pool API.
     _key_pool: Optional[KeyPool] = None
     _key_pool_lock = threading.Lock()
 
@@ -90,13 +67,9 @@ class GroqVerifier:
         self.logger = PipelineLogger()
         self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
 
-    # ------------------------------------------------------------------
-    # Pool management (legacy class-level API kept for tests)
-    # ------------------------------------------------------------------
-
     @classmethod
     def _ensure_pool(cls) -> Optional[KeyPool]:
-        """Return the shared Groq pool. Legacy entrypoint for existing tests."""
+
         with cls._key_pool_lock:
             if cls._key_pool is None:
                 cls._key_pool = get_groq_pool()
@@ -104,33 +77,18 @@ class GroqVerifier:
 
     @classmethod
     def save_pool_stats(cls) -> None:
-        """Persist current key counters to Supabase. Called at end of each pipeline run."""
+
         save_verify_pool_stats()
 
     @classmethod
     def _reset_pool(cls) -> None:
-        """Reset the shared key pool. Intended for use in tests only."""
+
         with cls._key_pool_lock:
             cls._key_pool = None
         reset_pool()
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def verify(self, article_group: list[dict]) -> dict:
-        """
-        Verify an article group using Groq, cascading across the model chain
-        when keys exhaust on a given model.
 
-        Returns:
-            Dict with score, reason, key_facts, category, headline, summary
-
-        Raises:
-            AllKeysExhaustedError when every (model, key) combination in
-            the chain is exhausted for the day.
-            Exception on non-recoverable network/parse failures.
-        """
         pool = self._ensure_pool()
         if pool is None:
             raise Exception("Groq verification API key not configured")
@@ -162,7 +120,6 @@ class GroqVerifier:
                 )
                 raise
 
-        # Defensive: chain was empty.
         if last_exhaustion is not None:
             raise last_exhaustion
         raise Exception("Groq verify model chain is empty")
@@ -170,15 +127,9 @@ class GroqVerifier:
     def _verify_with_model(
         self, model: str, pool: KeyPool, user_content: str
     ) -> dict:
-        """Run the verify loop bound to a single model. Raises
-        AllKeysExhaustedError when every key is exhausted for this model."""
 
-        # 429-driven key rotations don't consume the retry budget — only
-        # genuine errors do. This lets a single call walk through tier 1,
-        # hit 429s on every key, then seamlessly fall through to tier 2
-        # without surfacing "Max retries exceeded".
-        retries_used = 0   # counts only network / parse / 5xx failures
-        rotations = 0      # counts 429-driven key rotations
+        retries_used = 0
+        rotations = 0
         max_rotations = max(pool.size(), 1) + 1
 
         while retries_used < self.MAX_RETRIES and rotations <= max_rotations:
@@ -188,8 +139,6 @@ class GroqVerifier:
                     model=model,
                 )
             except AllKeysExhaustedError:
-                # Surface to the outer chain loop — it decides whether to
-                # cascade to the next model.
                 raise
 
             stats = pool.get_stats(model=model)
@@ -217,7 +166,6 @@ class GroqVerifier:
             try:
                 response = requests.post(self.API_URL, headers=headers, json=data, timeout=30)
 
-                # Handle 429 before raise_for_status to enable immediate key rotation.
                 if response.status_code == 429:
                     retry_after = self._extract_429_wait(response)
                     pool.record_429(slot_idx, retry_after, model=model)
@@ -230,9 +178,6 @@ class GroqVerifier:
                     )
                     continue
 
-                # 401/403 = revoked / invalid / billing-suspended key. Don't
-                # waste retries on it — disable the slot and rotate. Counts as
-                # a rotation, not a retry, so other slots get full retry budget.
                 if response.status_code in (401, 403):
                     pool.mark_invalid(slot_idx)
                     rotations += 1
@@ -245,7 +190,6 @@ class GroqVerifier:
 
                 response.raise_for_status()
 
-                # Record actual token usage (Groq returns it in `usage`).
                 try:
                     payload = response.json()
                     usage = payload.get("usage", {}) or {}
@@ -312,19 +256,14 @@ class GroqVerifier:
                 self.logger.log("GROQ_VERIFY_ERROR", f"Verification failed: {str(e)}")
                 raise
 
-        # If every attempt was consumed by 429s, surface the more specific error.
         try:
             pool.pick(estimated_tokens=self.EST_TOKENS_PER_CALL, model=model)
         except AllKeysExhaustedError:
             raise
         raise Exception("Max retries exceeded for Groq verification")
 
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
-
     def _extract_429_wait(self, response: requests.Response) -> int:
-        """Extract wait seconds from a 429 response (Retry-After header or body text)."""
+
         retry_after = response.headers.get("Retry-After", "").strip()
         if retry_after.isdigit():
             return int(retry_after) + 1
@@ -332,13 +271,12 @@ class GroqVerifier:
         match = re.search(r"retry in (\d+(?:\.\d+)?)s", body, re.IGNORECASE)
         if match:
             return int(float(match.group(1))) + 2
-        # Daily-quota wording from Groq → very long cooldown
         if re.search(r"per\s*day|daily\s*limit", body, re.IGNORECASE):
             return 6 * 3600
         return 0
 
     def _extract_retry_delay(self, error_str: str, attempt: int) -> int:
-        """Extract retry delay from error message or compute exponential backoff."""
+
         if "429" in error_str:
             match = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.IGNORECASE)
             if match:
@@ -348,7 +286,7 @@ class GroqVerifier:
         return self.RETRY_DELAY * (attempt + 1)
 
     def _build_prompt(self, article_group: list[dict]) -> str:
-        """Build minimal token-efficient verification prompt."""
+
         headline = self._trim_words(article_group[0].get("headline", ""), 18)
 
         excerpts = []
@@ -363,14 +301,14 @@ class GroqVerifier:
         return f"Headline: {headline}\n\nSource excerpts:\n{excerpts_text}"
 
     def _trim_words(self, text: str, limit: int) -> str:
-        """Trim prompt content by words to keep token use predictable."""
+
         words = str(text or "").split()
         if len(words) <= limit:
             return " ".join(words)
         return " ".join(words[:limit])
 
     def _parse_response(self, text: str) -> dict | None:
-        """Parse Groq JSON response. Returns None on failure."""
+
         text = text.strip()
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text).strip()
 

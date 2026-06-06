@@ -1,4 +1,4 @@
-// last edited 2026-05-17 by roshhellwett
+
 
 export function truncateWords(text: string, maxWords: number): string {
   if (!text) return '';
