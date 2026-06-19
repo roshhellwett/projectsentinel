@@ -3,7 +3,6 @@
 import os
 import threading
 from datetime import UTC, datetime, timedelta
-from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -12,13 +11,14 @@ from fetcher.url_tools import compute_url_hash, normalize_url
 from logger.pipeline_logger import PipelineLogger
 from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
 
+
 class GNewsFetcher:
 
     API_URL = "https://gnews.io/api/v4/search"
     PAGE_SIZE = 100
     MAX_429_ROTATIONS = 6
 
-    _key_pool: Optional[KeyPool] = None
+    _key_pool: KeyPool | None = None
     _key_pool_lock = threading.Lock()
 
     def __init__(self):
@@ -26,7 +26,7 @@ class GNewsFetcher:
         self.session = requests.Session()
 
     @classmethod
-    def _ensure_pool(cls) -> Optional[KeyPool]:
+    def _ensure_pool(cls) -> KeyPool | None:
         with cls._key_pool_lock:
             if cls._key_pool is None:
                 keys = load_numbered_keys(os.getenv, "GNEWS_API_KEY", max_keys=6)

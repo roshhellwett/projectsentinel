@@ -5,13 +5,13 @@ import os
 import re
 import threading
 import time
-from typing import Optional
 
 import requests
 
 from logger.pipeline_logger import PipelineLogger
 from utils.groq_pool import get_groq_pool, get_write_model_chain, reset_pool
 from utils.key_pool import AllKeysExhaustedError, KeyPool
+
 
 class GroqWriter:
 
@@ -21,7 +21,7 @@ class GroqWriter:
 
     EST_TOKENS_PER_CALL = 320
 
-    _key_pool: Optional[KeyPool] = None
+    _key_pool: KeyPool | None = None
     _key_pool_lock = threading.Lock()
 
     SYSTEM_PROMPT = (
@@ -38,7 +38,7 @@ class GroqWriter:
         self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama-3.1-8b-instant")
 
     @classmethod
-    def _ensure_pool(cls) -> Optional[KeyPool]:
+    def _ensure_pool(cls) -> KeyPool | None:
 
         with cls._key_pool_lock:
             if cls._key_pool is None:
@@ -64,7 +64,7 @@ class GroqWriter:
         user_content = self._build_prompt(key_facts, category)
         chain = get_write_model_chain()
 
-        last_exhaustion: Optional[AllKeysExhaustedError] = None
+        last_exhaustion: AllKeysExhaustedError | None = None
         for model_idx, model in enumerate(chain):
             if model_idx > 0:
                 self.logger.log(

@@ -3,7 +3,6 @@
 import os
 import threading
 from datetime import UTC, datetime, timedelta
-from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -11,6 +10,7 @@ import requests
 from fetcher.url_tools import compute_url_hash, normalize_url
 from logger.pipeline_logger import PipelineLogger
 from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
+
 
 class NewsAPIFetcher:
 
@@ -22,7 +22,7 @@ class NewsAPIFetcher:
 
     _INVALID_KEY_CODES = {"apiKeyInvalid", "apiKeyDisabled"}
 
-    _key_pool: Optional[KeyPool] = None
+    _key_pool: KeyPool | None = None
     _key_pool_lock = threading.Lock()
 
     def __init__(self):
@@ -30,7 +30,7 @@ class NewsAPIFetcher:
         self.session = requests.Session()
 
     @classmethod
-    def _ensure_pool(cls) -> Optional[KeyPool]:
+    def _ensure_pool(cls) -> KeyPool | None:
         with cls._key_pool_lock:
             if cls._key_pool is None:
                 keys = load_numbered_keys(os.getenv, "NEWSAPI_KEY", max_keys=6)

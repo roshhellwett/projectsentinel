@@ -3,6 +3,7 @@
 import time
 from threading import Lock
 
+
 class RateLimitExceededError(Exception):
     """Raised when a rate limiter's daily call budget is exhausted."""
 

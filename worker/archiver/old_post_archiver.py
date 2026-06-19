@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
+
 class OldPostArchiver:
 
     def __init__(self):

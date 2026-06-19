@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from fetcher.deduplicator import Deduplicator
 
+
 def _make_dedup_with_mock_supabase() -> tuple[Deduplicator, MagicMock]:
     with patch("fetcher.deduplicator.get_supabase") as mock_get:
         mock_sb = MagicMock()

@@ -5,7 +5,6 @@ import os
 import re
 import threading
 import time
-from typing import Optional
 
 import requests
 
@@ -29,7 +28,7 @@ class GroqVerifier:
 
     EST_TOKENS_PER_CALL = 850
 
-    _key_pool: Optional[KeyPool] = None
+    _key_pool: KeyPool | None = None
     _key_pool_lock = threading.Lock()
 
     SYSTEM_PROMPT = (
@@ -68,7 +67,7 @@ class GroqVerifier:
         self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
 
     @classmethod
-    def _ensure_pool(cls) -> Optional[KeyPool]:
+    def _ensure_pool(cls) -> KeyPool | None:
 
         with cls._key_pool_lock:
             if cls._key_pool is None:
@@ -96,7 +95,7 @@ class GroqVerifier:
         user_content = self._build_prompt(article_group)
         chain = get_verify_model_chain()
 
-        last_exhaustion: Optional[AllKeysExhaustedError] = None
+        last_exhaustion: AllKeysExhaustedError | None = None
         for model_idx, model in enumerate(chain):
             if model_idx > 0:
                 self.logger.log(

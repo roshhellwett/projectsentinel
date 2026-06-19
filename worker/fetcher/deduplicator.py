@@ -6,6 +6,7 @@ from database.client import get_supabase
 from fetcher.url_tools import compute_url_hash, is_duplicate_title
 from logger.pipeline_logger import PipelineLogger
 
+
 class Deduplicator:
 
     def __init__(self):

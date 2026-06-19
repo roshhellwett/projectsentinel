@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from utils.key_pool import AllKeysExhaustedError
 from verifier.groq_verifier import GroqVerifier
 from writer.groq_writer import GroqWriter
+
 
 @pytest.fixture(autouse=True)
 def reset_write_pool():
@@ -47,7 +47,7 @@ def test_writer_legacy_single_key_fallback():
         assert pool.size() == 1
 
 def test_writer_loads_nine_keys_with_three_tiers():
-    v = {f"GROQ_API_KEY_VERIFY_{i}": f"k{i}" for i in range(1, 10)}
+    env = {f"GROQ_API_KEY_VERIFY_{i}": f"k{i}" for i in range(1, 10)}
     with patch.dict(os.environ, env, clear=True):
         w = GroqWriter()
         pool = w._ensure_pool()

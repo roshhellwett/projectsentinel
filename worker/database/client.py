@@ -1,5 +1,6 @@
 
 
+import contextlib
 import os
 import threading
 
@@ -49,9 +50,7 @@ def reset_client() -> None:
                     try:
                         result = close()
                         if hasattr(result, "close"):
-                            try:
+                            with contextlib.suppress(Exception):
                                 result.close()
-                            except Exception:
-                                pass
                     except Exception:
                         pass

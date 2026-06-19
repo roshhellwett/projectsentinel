@@ -4,7 +4,7 @@ from __future__ import annotations
 import threading
 import time
 from collections import deque
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 _DEFAULT_MODEL = "_default"
 
@@ -138,9 +138,7 @@ class KeyPool:
             used = sum(t for _, t in ms["tpm_window"])
             if used + max(0, est_tokens) > tpm:
                 return False
-        if self._min_delay and (now - slot["last_used_at"]) < self._min_delay:
-            return False
-        return True
+        return not (self._min_delay and now - slot["last_used_at"] < self._min_delay)
 
     def _slot_wait_seconds(
         self, slot: dict, ms: dict, now: float, est_tokens: int,
@@ -317,7 +315,7 @@ class KeyPool:
     @staticmethod
     def seconds_until_utc_reset() -> float:
         from datetime import timedelta
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0)
         return (tomorrow + timedelta(days=1) - now).total_seconds()
 

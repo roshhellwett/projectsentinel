@@ -6,6 +6,7 @@ import pytest
 
 from fetcher.rss_fetcher import RSSFetcher
 
+
 @pytest.fixture(autouse=True)
 def _isolate_health_state():
 

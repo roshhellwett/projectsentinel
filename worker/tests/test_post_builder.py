@@ -1,5 +1,6 @@
 from writer.post_builder import PostBuilder
 
+
 def test_build_valid_post():
     pb = PostBuilder()
     post = pb.build(

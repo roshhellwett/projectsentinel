@@ -14,6 +14,7 @@ from fetcher.url_tools import compute_url_hash, normalize_url
 from logger.pipeline_logger import PipelineLogger
 from sources.rss_sources import get_rss_sources
 
+
 class RSSFetcher:
 
     _USER_AGENT = "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"

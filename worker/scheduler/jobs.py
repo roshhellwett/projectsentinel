@@ -1,5 +1,6 @@
 
 
+import contextlib
 import os
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -7,22 +8,23 @@ from datetime import UTC, datetime
 
 from archiver.old_post_archiver import OldPostArchiver
 from fetcher.deduplicator import Deduplicator
-from fetcher.url_tools import title_similarity
 from fetcher.factcheck_fetcher import FactCheckFetcher
 from fetcher.gnews_fetcher import GNewsFetcher
 from fetcher.newsapi_fetcher import NewsAPIFetcher
 from fetcher.rss_fetcher import RSSFetcher
+from fetcher.url_tools import title_similarity
 from logger.pipeline_logger import PipelineLogger
 from publisher.supabase_publisher import SupabasePublisher
 from rate_limiter.limiter import RateLimitExceededError
 from sources.blocked_domains import is_blocked_domain
-from utils.groq_pool import VERIFY_MODEL_CHAIN, get_groq_pool, get_verify_model_chain
+from utils.groq_pool import get_groq_pool, get_verify_model_chain
 from verifier.cross_source_checker import CrossSourceChecker
 from verifier.factcheck_matcher import FactCheckMatcher
 from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
 from verifier.score_evaluator import ScoreEvaluator
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
+
 
 def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
 
@@ -384,7 +386,5 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         _record_run_end(logger, run_id, duration, {**stats, "error": str(e)})
         raise
     finally:
-        try:
+        with contextlib.suppress(Exception):
             GroqVerifier.save_pool_stats()
-        except Exception:
-            pass

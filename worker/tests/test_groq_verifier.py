@@ -6,6 +6,7 @@ import pytest
 
 from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier, _KeyPool
 
+
 @pytest.fixture(autouse=True)
 def reset_key_pool():
     GroqVerifier._reset_pool()

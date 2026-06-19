@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
+
 class FactCheckMatcher:
 
     def __init__(self):

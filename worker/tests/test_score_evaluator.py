@@ -1,5 +1,6 @@
 from verifier.score_evaluator import ScoreEvaluator
 
+
 def make_articles(n):
     return [{"source_name": f"Src{i}", "url": f"https://example{i}.com"} for i in range(n)]
 

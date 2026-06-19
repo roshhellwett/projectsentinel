@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import os
 import threading
-from typing import Optional
 
 from utils.key_pool import KeyPool, load_numbered_keys
 
-_pool: Optional[KeyPool] = None
+_pool: KeyPool | None = None
 _lock = threading.Lock()
 
 MAX_GROQ_KEYS = 9
@@ -98,7 +97,7 @@ def _env_chain(chain_var: str, head_var: str, default: list[str]) -> list[str]:
             out.append(m)
     return out
 
-def get_groq_pool() -> Optional[KeyPool]:
+def get_groq_pool() -> KeyPool | None:
 
     global _pool
     with _lock:
@@ -124,10 +123,10 @@ def reset_pool() -> None:
     with _lock:
         _pool = None
 
-def get_verify_pool() -> Optional[KeyPool]:
+def get_verify_pool() -> KeyPool | None:
        return get_groq_pool()
 
-def get_write_pool() -> Optional[KeyPool]:
+def get_write_pool() -> KeyPool | None:
        return get_groq_pool()
 
 def reset_pools() -> None:

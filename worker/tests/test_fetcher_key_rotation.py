@@ -8,6 +8,7 @@ from fetcher.gnews_fetcher import GNewsFetcher
 from fetcher.newsapi_fetcher import NewsAPIFetcher
 from utils.key_pool import KeyPool
 
+
 @pytest.fixture(autouse=True)
 def reset_pools():
     GNewsFetcher._reset_pool()
