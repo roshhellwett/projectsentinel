@@ -46,7 +46,7 @@ export function CategoryBar() {
       <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-paper to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-paper to-transparent z-10 pointer-events-none" />
 
-      <div ref={scrollRef} className="overflow-x-auto scrollbar-hide">
+      <div ref={scrollRef} className="overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-p-4">
         <div className="flex items-stretch min-w-max">
           {ALL_CATEGORIES.map((cat) => {
             const isActive = currentCategory === cat.slug;
@@ -57,8 +57,8 @@ export function CategoryBar() {
                 ref={isActive ? activeRef : undefined}
                 role="tab"
                 aria-selected={isActive}
-                className={`relative inline-flex items-center px-4 py-3 text-[13px] font-semibold tracking-wide whitespace-nowrap transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
-                  isActive ? 'text-ink' : 'text-muted hover:text-ink'
+                className={`relative flex items-center px-4 py-3.5 text-[13px] font-semibold tracking-wide whitespace-nowrap transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent snap-start touch-polish rounded-sm ${
+                  isActive ? 'text-ink' : 'text-muted hover:text-ink hover:bg-paper-2'
                 }`}
               >
                 {cat.label}

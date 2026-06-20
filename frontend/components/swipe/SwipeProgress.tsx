@@ -1,6 +1,6 @@
 'use client';
 
-import { Flame, Layers } from 'lucide-react';
+import { Flame, Layers, Undo2 } from 'lucide-react';
 
 interface SwipeProgressProps {
   consumedToday: number;
@@ -16,13 +16,13 @@ export function SwipeProgress({ consumedToday, remaining, streak, canRewind, onR
       <div className="flex items-center justify-between gap-3 text-[11px]">
         <div className="flex items-center gap-3 text-muted">
           <span className="inline-flex items-center gap-1 font-medium">
-            <Layers className="w-3 h-3" aria-hidden="true" />
+            <Layers className="w-3 h-3" strokeWidth={1.5} aria-hidden="true" />
             <span className="tabular-nums text-ink">{consumedToday}</span>
             <span>read today</span>
           </span>
           {streak > 1 && (
             <span className="inline-flex items-center gap-1 font-medium" title={`${streak}-day streak`}>
-              <Flame className="w-3 h-3 text-accent" aria-hidden="true" />
+              <Flame className="w-3 h-3 text-accent" strokeWidth={1.5} aria-hidden="true" />
               <span className="tabular-nums text-ink">{streak}</span>
               <span>day streak</span>
             </span>
@@ -36,10 +36,11 @@ export function SwipeProgress({ consumedToday, remaining, streak, canRewind, onR
             type="button"
             onClick={onRewind}
             disabled={!canRewind}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-ink disabled:text-subtle disabled:cursor-not-allowed hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded px-1"
+            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-ink disabled:text-subtle disabled:cursor-not-allowed hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded px-1"
             aria-label="Go back one card"
           >
-            ← Back
+            <Undo2 className="w-3 h-3" strokeWidth={1.5} aria-hidden="true" />
+            Back
           </button>
         </div>
       </div>

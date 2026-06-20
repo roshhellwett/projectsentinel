@@ -56,7 +56,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           setError('Search failed');
           setIsLoading(false);
         });
-    }, 200);
+    }, 350);
 
     return () => {
       controller.abort();
@@ -74,7 +74,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     previousFocusRef.current = document.activeElement as HTMLElement;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !e.defaultPrevented) onClose();
     };
 
     document.addEventListener('keydown', handleEscape);
@@ -152,7 +152,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 router.push(`/search/?q=${encodeURIComponent(q)}`);
               }}
             >
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted pointer-events-none" />
               <input
                 ref={inputRef}
                 id="search-input"
@@ -160,10 +160,28 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
-                className="w-full pl-12 pr-4 py-3.5 bg-paper/50 border-2 border-rule-strong rounded-xl text-ink placeholder-subtle focus:outline-none focus:border-accent focus:bg-paper transition-all duration-300 shadow-sm"
-
+                className="w-full pl-12 pr-12 py-3.5 bg-paper/50 border-2 border-rule-strong rounded-xl text-ink placeholder-subtle focus:outline-none focus:border-accent focus:bg-paper transition-all duration-300 shadow-sm"
                 aria-label="Search verified stories"
               />
+              <AnimatePresence>
+                {query.length > 0 && (
+                  <motion.button
+                    type="button"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.15 }}
+                    onClick={() => {
+                      setQuery('');
+                      inputRef.current?.focus();
+                    }}
+                    aria-label="Clear search"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-ink hover:bg-paper-2 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    <X className="w-4 h-4" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </form>
 
             <div className="max-w-4xl mx-auto">

@@ -61,7 +61,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className="sticky top-0 inset-x-0 z-50 bg-paper/80 backdrop-blur-md border-b border-rule"
+        className="sticky top-0 inset-x-0 z-50 bg-paper/90 supports-[backdrop-filter]:bg-paper/75 backdrop-blur-xl border-b border-rule transition-colors"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
 
@@ -176,7 +176,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="lg:hidden fixed inset-0 z-[60] bg-ink/40"
+              className="lg:hidden fixed inset-0 z-[60] bg-ink/40 backdrop-blur-[2px]"
               onClick={() => setIsMobileOpen(false)}
             />
             <motion.aside

@@ -140,7 +140,7 @@ export function InfiniteFeed({
           }
         }
       },
-      { rootMargin: '600px 0px' }, // fire well before bottom for seamless feel
+      { rootMargin: '800px 0px' }, // fire well before bottom for extremely seamless feel
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -382,10 +382,6 @@ export function InfiniteFeed({
         </AnimatePresence>
       </motion.div>
 
-      {!exhausted && (
-        <div ref={sentinelRef} className="h-12 w-full mt-8" aria-hidden="true" />
-      )}
-
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -395,6 +391,10 @@ export function InfiniteFeed({
             />
           ))}
         </div>
+      )}
+
+      {!exhausted && (
+        <div ref={sentinelRef} className="h-12 w-full mt-8" aria-hidden="true" />
       )}
 
       {exhausted && posts.length > pageSize && (

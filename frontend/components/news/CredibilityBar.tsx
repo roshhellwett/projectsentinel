@@ -35,20 +35,24 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
       </div>
 
       <div
-        className={cn('relative w-full rounded-full bg-ink/[0.08]', compact ? 'h-1.5' : 'h-2')}
-        style={{ background: 'linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)' }}
+        className={cn('relative w-full rounded-full overflow-hidden bg-ink/[0.08]', compact ? 'h-1.5' : 'h-2')}
+        style={{ background: 'linear-gradient(to right, #ef4444 0%, #ea580c 25%, #eab308 50%, #84cc16 75%, #22c55e 100%)' }}
       >
         <div
-          className="absolute inset-0 rounded-full bg-paper/45"
+          className="absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{ clipPath: `inset(0 0 0 ${clamped}%)` }}
           aria-hidden="true"
         />
         <div
           className={cn(
-            'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-paper bg-paper shadow-[0_1px_6px_rgba(15,23,42,0.20)]',
+            'absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]',
             compact ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5',
           )}
-          style={{ left: `${clamped}%`, boxShadow: `0 0 0 1px ${scoreColor}, 0 4px 12px -6px ${scoreColor}` }}
+          style={{ 
+            left: `${clamped}%`, 
+            transform: 'translate(-50%, -50%)',
+            boxShadow: `0 0 0 1px ${scoreColor}, 0 2px 6px -1px ${scoreColor}80` 
+          }}
         />
       </div>
 

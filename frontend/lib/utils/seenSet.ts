@@ -56,8 +56,15 @@ export function pruneStaleSeenKeys(): void {
   }
 }
 
+let hasPruned = false;
+
 export function loadSeenWithinDays(days: number = 1): Set<string> {
   if (typeof window === 'undefined') return new Set();
+  
+  if (!hasPruned) {
+    pruneStaleSeenKeys();
+    hasPruned = true;
+  }
   const out = new Set<string>();
   const today = new Date();
   for (let i = 0; i < days; i++) {

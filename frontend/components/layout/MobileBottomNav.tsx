@@ -124,7 +124,7 @@ export function MobileBottomNav() {
                   {active && (
                     <motion.div
                       layoutId="bottom-nav-pill"
-                      className="absolute inset-x-2 bottom-1 top-1 rounded bg-paper-2 border border-rule"
+                      className="absolute inset-x-1.5 bottom-1 top-1 rounded-xl bg-paper shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] border border-rule/50"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
                   )}

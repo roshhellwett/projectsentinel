@@ -77,11 +77,11 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
                 className="group flex w-full items-start gap-3 rounded border border-rule bg-paper px-3.5 py-3 text-left transition-all hover-lift hover:border-rule-strong hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="mb-1.5 flex items-center gap-2">
+                  <div className="mb-1.5 flex flex-wrap items-center gap-2">
                     <CategoryTag category={post.category} />
                     <CredibilityBadge score={post.credibility_score} compact />
                   </div>
-                  <p className="font-display text-[14px] font-semibold text-ink line-clamp-2 leading-snug group-hover:text-accent transition-colors">
+                  <p className="font-display text-[14px] font-semibold text-ink line-clamp-2 text-balance break-words leading-snug group-hover:text-accent transition-colors">
                     {post.headline}
                   </p>
                 </div>

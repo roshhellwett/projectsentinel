@@ -57,7 +57,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
     const focusTimer = window.setTimeout(() => drawerRef.current?.focus(), 0);
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCloseRef.current();
+      if (e.key === 'Escape' && !e.defaultPrevented) onCloseRef.current();
     };
     document.addEventListener('keydown', handleEscape);
 
@@ -100,7 +100,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
 
           <motion.div
 
-            className="fixed inset-0 bg-ink/35 backdrop-blur-[2px] z-[60]"
+            className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-[60]"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}

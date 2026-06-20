@@ -262,28 +262,17 @@ export function useSwipeQueue({
 
 
   const rewind = useCallback((): HistoryEntry | null => {
+    if (history.length === 0) return null;
 
+    const entry = history[0];
 
-    let entry: HistoryEntry | null = null;
+    setHistory((prev) => prev.slice(1));
 
-    setHistory((prev) => {
-      if (prev.length === 0) return prev;
-      entry = prev[0];
-      return prev.slice(1);
-    });
+    unmarkSeen(entry.post.id);
+    setQueue((prev) => (prev[0]?.id === entry.post.id ? prev : [entry.post, ...prev]));
 
-
-
-
-    if (entry) {
-      const e = entry as HistoryEntry;
-
-      unmarkSeen(e.post.id);
-
-      setQueue((prev) => (prev[0]?.id === e.post.id ? prev : [e.post, ...prev]));
-    }
     return entry;
-  }, []);
+  }, [history]);
 
   const view = useMemo(() => {
     const [c = null, n = null, u = null] = queue;

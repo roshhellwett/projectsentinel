@@ -2,13 +2,27 @@
 
 const IST: Intl.DateTimeFormatOptions = { timeZone: 'Asia/Kolkata' };
 
+/**
+ * Normalizes Postgres timestamps (e.g. "2026-06-20 14:30:00") to valid ISO strings
+ * by replacing space with 'T' and appending 'Z' if no timezone is specified.
+ * This prevents Safari from throwing Invalid Date, and ensures UTC parsing.
+ */
+function parseSafeDate(dateString: string): Date {
+  if (!dateString) return new Date(NaN);
+  let safeString = dateString.trim().replace(' ', 'T');
+  if (!safeString.endsWith('Z') && !safeString.includes('+') && !safeString.match(/-\d{2}:\d{2}$/)) {
+    safeString += 'Z';
+  }
+  return new Date(safeString);
+}
+
 export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseSafeDate(dateString);
   if (isNaN(date.getTime())) return 'Unknown date';
   return date.toLocaleDateString('en-IN', {
     ...IST,
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
@@ -17,7 +31,7 @@ export function formatDate(dateString: string): string {
 }
 
 export function formatTimeAgo(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseSafeDate(dateString);
   if (isNaN(date.getTime())) return '';
   const now = new Date();
   const diffInSeconds = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000));
@@ -28,17 +42,17 @@ export function formatTimeAgo(dateString: string): string {
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} min ago`;
+    return `${diffInMinutes}m ago`;
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    return `${diffInHours}h ago`;
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 7) {
-    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    return `${diffInDays}d ago`;
   }
 
   return date.toLocaleDateString('en-IN', {

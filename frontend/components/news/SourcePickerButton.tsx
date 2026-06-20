@@ -123,10 +123,11 @@ export function SourcePickerButton({
               placement === 'popover' && 'absolute bottom-full left-0 mb-2 w-[min(18rem,calc(100vw-2rem))]',
               placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(22rem,calc(100vw-2rem))]',
             )}
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            style={{ transformOrigin: placement === 'popover' ? 'bottom left' : 'bottom center' }}
+            initial={{ opacity: 0, y: 12, scale: 0.94 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.8 }}
             onClick={(event) => {
               if (stopPropagation) event.stopPropagation();
             }}

@@ -41,10 +41,10 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
 
         <span aria-hidden="true" className="absolute top-0 left-0 right-0 h-[2px] bg-accent" />
 
-        <div className="relative grid grid-cols-1 lg:grid-cols-5 min-h-[320px] lg:min-h-[420px]">
+        <div className="relative grid grid-cols-1 lg:grid-cols-5 2xl:grid-cols-12 min-h-[320px] lg:min-h-[420px] 2xl:min-h-[460px]">
 
           <motion.div
-            className="relative lg:col-span-2 min-h-[200px] lg:min-h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-rule"
+            className="relative lg:col-span-2 2xl:col-span-5 min-h-[200px] lg:min-h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-rule"
             style={{ y: imgY }}
           >
             <CategoryPlaceholder category={post.category} />
@@ -57,7 +57,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             )}
           </motion.div>
 
-          <div className="relative lg:col-span-3 p-7 md:p-10 lg:p-12 flex flex-col justify-center">
+          <div className="relative lg:col-span-3 2xl:col-span-7 p-7 md:p-10 lg:p-12 2xl:p-14 flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <CategoryTag category={post.category} />
               <span

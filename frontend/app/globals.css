@@ -28,6 +28,9 @@
   --c-cred-mid:  146 64 14;
   --c-cred-low:  153 27 27;
 
+  --cred-s: 85%;
+  --cred-l: 48%;
+
   color-scheme: light;
 }
 
@@ -52,6 +55,9 @@
   --c-cred-high: 52 168 96;
   --c-cred-mid:  198 132 64;
   --c-cred-low:  228 96 96;
+
+  --cred-s: 80%;
+  --cred-l: 58%;
 
   color-scheme: dark;
 }

@@ -126,11 +126,11 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         )}
 
-        <article id="article-body" className={`relative mb-10 md:mb-12 ${isRetracted ? 'opacity-60' : ''}`}>
+        <article id="article-body" className={`relative max-w-3xl mx-auto mb-10 md:mb-14 ${isRetracted ? 'opacity-60' : ''}`}>
 
-          <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
+          <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-6" />
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
             <CategoryTag category={post.category} />
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted">
               <Calendar className="w-3.5 h-3.5" />
@@ -146,11 +146,11 @@ export default async function NewsPage({ params }: NewsPageProps) {
             {post.headline}
           </h1>
 
-          <div className="mb-9 rounded-md border border-rule bg-paper-2 p-4 sm:p-5">
+          <div className="mb-10 rounded-md border border-rule bg-paper-2 p-5 sm:p-6">
             <CredibilityBar score={post.credibility_score} />
-            <div className="mt-4 flex flex-col gap-3 border-t border-rule pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-5 flex flex-col gap-4 border-t border-rule pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
-                <Database className="w-3.5 h-3.5 text-accent" />
+                <Database className="w-4 h-4 text-accent" />
                 <span className="tabular-nums">{post.source_count}</span>
                 <span className="text-muted uppercase tracking-[0.14em] text-[10px] font-bold">
                   {post.source_count === 1 ? 'source verified' : 'sources verified'}
@@ -163,11 +163,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </div>
 
-          <div className="max-w-[68ch]">
-            <p className="font-display text-[18px] md:text-[20px] leading-[1.7] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.4em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:text-accent">
-              {post.summary}
-            </p>
-          </div>
+          <p className="font-display text-[19px] md:text-[21px] leading-[1.7] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.4em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2.5 first-letter:mt-1 first-letter:text-accent">
+            {post.summary}
+          </p>
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">

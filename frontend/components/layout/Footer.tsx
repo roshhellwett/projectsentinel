@@ -100,10 +100,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 mb-12">
           <div>
             <ColumnHeading>News</ColumnHeading>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {NEWS_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -119,7 +119,7 @@ export function Footer() {
 
           <div>
             <ColumnHeading>About</ColumnHeading>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -135,7 +135,7 @@ export function Footer() {
 
           <div>
             <ColumnHeading>Legal</ColumnHeading>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -151,19 +151,19 @@ export function Footer() {
 
           <div>
             <ColumnHeading>Transparency</ColumnHeading>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {TRANSPARENCY.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-muted">
-                  <span className="mt-2 w-1 h-1 rounded-full bg-accent flex-shrink-0" aria-hidden="true" />
-                  <span>{item}</span>
+                <li key={item} className="flex items-start gap-2.5 text-muted">
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" aria-hidden="true" />
+                  <span className="leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-rule">
-          <p className="text-xs text-subtle">
+        <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6 sm:gap-3 pt-8 md:pt-6 border-t border-rule">
+          <p className="text-xs text-subtle leading-relaxed max-w-[54ch]">
             &copy; {year} Zenith Open Source Projects. Reporting cross-verified by AI;
             stories may be republished under the MIT licence with attribution.
           </p>

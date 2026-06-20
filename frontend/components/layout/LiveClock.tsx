@@ -43,9 +43,17 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    setNow(new Date());
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
+    let timeoutId: number;
+
+    const tick = () => {
+      const date = new Date();
+      setNow(date);
+      const msUntilNextSecond = 1000 - date.getMilliseconds();
+      timeoutId = window.setTimeout(tick, msUntilNextSecond);
+    };
+
+    tick();
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   if (!now) {

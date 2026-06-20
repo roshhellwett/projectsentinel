@@ -54,10 +54,10 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           return (
             <motion.li
               key={post.id}
-              initial={{ x: -8 }}
-              whileInView={{ x: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: index * 0.04, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, x: -12 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-20px' }}
+              transition={{ delay: index * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className={`relative border-b last:border-b-0 border-rule ${isTop ? 'trending-top-shimmer overflow-hidden' : ''}`}
             >
               <Link

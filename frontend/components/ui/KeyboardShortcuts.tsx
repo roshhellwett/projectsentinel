@@ -134,10 +134,10 @@ export function KeyboardShortcuts() {
             role="dialog"
             aria-modal="true"
             aria-label="Keyboard shortcuts"
-            className="fixed left-1/2 top-1/2 z-[111] w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2"
-            initial={{ opacity: 0, scale: 0.94, y: 8 }}
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[111] w-[min(calc(100vw-2rem),22rem)]"
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 6 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           >
             <div className="premium-card rounded-2xl p-6 shadow-[0_30px_90px_-40px_rgba(15,23,42,0.45)]">

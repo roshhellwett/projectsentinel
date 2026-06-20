@@ -51,11 +51,17 @@ export function pruneStaleStatsKeys(): void {
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
       if (!k) continue;
-      const isDated = k.startsWith(COUNT_PREFIX) || k.startsWith(HOSTS_PREFIX) || k.startsWith(BREAK_PREFIX);
-      if (!isDated) continue;
-      const datePart = k.split(':').pop() || '';
+      const isSwipeKey = k.startsWith('iv:swipe:');
+      if (!isSwipeKey) continue;
+      
+      const dateMatch = k.match(/(\d{4}-\d{2}-\d{2})$/);
+      if (!dateMatch) continue;
+      
+      const datePart = dateMatch[1];
       const parsed = new Date(`${datePart}T00:00:00`);
-      if (Number.isFinite(parsed.getTime()) && parsed < cutoff) toDelete.push(k);
+      if (Number.isFinite(parsed.getTime()) && parsed < cutoff) {
+        toDelete.push(k);
+      }
     }
     toDelete.forEach((k) => window.localStorage.removeItem(k));
   } catch {

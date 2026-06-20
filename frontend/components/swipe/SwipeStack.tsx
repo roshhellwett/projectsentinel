@@ -196,7 +196,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
                   post={post}
                   depth={depth}
                   interactive={isFront}
-                  canSwipeDown={isFront ? queue.canRewind : false}
+                  canRewind={isFront ? queue.canRewind : false}
                   onSwipe={isFront ? handleSwipe : undefined}
                   onTap={isFront ? handleTap : undefined}
                   onDragProgress={isFront ? setDrag : undefined}

@@ -24,14 +24,19 @@ function writeMap(map: Record<string, number>) {
   try {
     const keys = Object.keys(map);
     if (keys.length > MAX_ENTRIES) {
-
       const trimmed: Record<string, number> = {};
       for (const k of keys.slice(keys.length - MAX_ENTRIES)) trimmed[k] = map[k];
       map = trimmed;
     }
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-  } catch {
-    /* quota or private-mode — non-fatal */
+  } catch (err: unknown) {
+    if (err instanceof DOMException && (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+      try {
+        sessionStorage.removeItem(STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+    }
   }
 }
 
@@ -104,18 +109,28 @@ export function ScrollRestorer() {
     const stored = map[key];
 
     if (typeof stored === 'number') {
-
       window.requestAnimationFrame(() => {
-        window.scrollTo({ top: stored, behavior: 'auto' });
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        window.scrollTo({ top: Math.min(stored, maxScroll), behavior: 'auto' });
       });
 
-      const retry = window.setTimeout(() => {
-        if (Math.abs(window.scrollY - stored) > 4) {
-          window.scrollTo({ top: stored, behavior: 'auto' });
+      const retry = window.setInterval(() => {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const target = Math.min(stored, maxScroll);
+        if (Math.abs(window.scrollY - target) > 4) {
+          window.scrollTo({ top: target, behavior: 'auto' });
         }
-      }, 180);
+      }, 150);
+
+      const timeout = window.setTimeout(() => {
+        window.clearInterval(retry);
+      }, 1500);
+
       previousKeyRef.current = key;
-      return () => window.clearTimeout(retry);
+      return () => {
+        window.clearInterval(retry);
+        window.clearTimeout(timeout);
+      };
     }
 
     previousKeyRef.current = key;

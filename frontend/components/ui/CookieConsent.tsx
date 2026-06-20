@@ -51,10 +51,15 @@ export function CookieConsent() {
           role="dialog"
           aria-label="Cookie preferences"
           aria-modal="false"
-          initial={{ y: 24, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 24, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+          initial={{ y: 24, opacity: 0, scale: 0.96 }}
+          animate={{ 
+            y: 0, opacity: 1, scale: 1,
+            transition: { type: 'spring', stiffness: 360, damping: 32, mass: 0.8 }
+          }}
+          exit={{ 
+            opacity: 0, scale: 0.96, y: 16,
+            transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] }
+          }}
           className="fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md z-[58]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >

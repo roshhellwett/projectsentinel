@@ -14,7 +14,12 @@ function normalizeHeadline(s: string): string {
 
 function stableKey(article: Post): string {
   const head = article.headline ? normalizeHeadline(article.headline) : '';
-  return head || article.id;
+  // Only dedupe by headline if it's substantive enough to avoid generic collisions
+  if (head.length > 15) {
+    return `${head}::${article.category || 'general'}`;
+  }
+  // Fallback to strict ID check for short generic headlines
+  return `id::${article.id}`;
 }
 
 export function dedupe(articles: Post[]): Post[] {
