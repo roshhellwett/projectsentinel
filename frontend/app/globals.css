@@ -63,6 +63,7 @@
 }
 
 html {
+  color-scheme: light;
   scroll-behavior: smooth;
   background-color: rgb(var(--c-paper));
   text-rendering: optimizeLegibility;
@@ -70,7 +71,15 @@ html {
   scrollbar-gutter: stable;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 @layer base {
+  *, *::before, *::after {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
   body {
     @apply leading-normal antialiased;
 
@@ -83,7 +92,6 @@ html {
     color: rgb(var(--c-ink-soft));
     font-family: var(--font-sans);
     font-feature-settings: 'kern', 'liga', 'calt';
-    -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
@@ -646,6 +654,15 @@ img, video { max-width: 100%; height: auto; }
 }
 .animate-fade-in-up {
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes progressIndeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.animate-progress-indeterminate {
+  width: 50%;
+  animation: progressIndeterminate 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes scaleFadeIn {

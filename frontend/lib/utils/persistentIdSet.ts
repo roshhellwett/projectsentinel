@@ -42,14 +42,7 @@ function loadFromStorage(key: string): string[] {
   }
 }
 
-function persistToStorage(key: string, ids: string[]) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(key, JSON.stringify(ids));
-  } catch {
-    /* quota exceeded — silently drop */
-  }
-}
+import { safeWrite as persistToStorage } from './safeStorage';
 
 export function usePersistentIdSet({ key, max = 500 }: Options) {
   const [ids, setIds] = useState<Set<string>>(() => new Set());

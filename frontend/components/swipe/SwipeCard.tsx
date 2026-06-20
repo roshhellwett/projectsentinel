@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { motion, useMotionValue, useTransform, useAnimation, useReducedMotion, type PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useAnimation, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
 import type { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
@@ -15,8 +15,8 @@ import { BookmarkButton } from '@/components/news/BookmarkButton';
 
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 
-const SWIPE_DIST = 100;
-const SWIPE_VEL = 600;
+const SWIPE_DIST = 90;
+const SWIPE_VEL = 800;
 
 function decideDirection(info: PanInfo): SwipeDirection | null {
   const { offset, velocity } = info;
@@ -68,6 +68,7 @@ function SourceChip({ source }: { source: Source }) {
   const host = getHostname(source.url);
   const label = getSourceLabel(source);
   const [faviconErrored, setFaviconErrored] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <a
@@ -79,16 +80,24 @@ function SourceChip({ source }: { source: Source }) {
       aria-label={`Source: ${label} (opens in new tab)`}
     >
       {host && !faviconErrored ? (
-        <Image
-          src={`https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host)}`}
-          alt=""
-          width={12}
-          height={12}
-          loading="lazy"
-          decoding="async"
-          onError={() => setFaviconErrored(true)}
-          className="w-3 h-3 flex-shrink-0"
-        />
+        <div className="relative w-3 h-3 flex-shrink-0">
+          {!isLoaded && (
+            <div className="absolute inset-0 bg-rule/50 animate-pulse rounded-sm" />
+          )}
+          <Image
+            src={`https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host)}`}
+            alt=""
+            width={12}
+            height={12}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setIsLoaded(true)}
+            onError={() => setFaviconErrored(true)}
+            className={`w-3 h-3 object-contain transition-opacity duration-300 ${
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        </div>
       ) : host ? (
         <Globe className="w-3 h-3 text-subtle flex-shrink-0" aria-hidden="true" />
       ) : null}
@@ -152,6 +161,10 @@ export function SwipeCard({
   const rotate = useTransform(x, [-220, 0, 220], [-12, 0, 12]);
   const controls = useAnimation();
   const [exiting, setExiting] = useState(false);
+  const [showDoubleTap, setShowDoubleTap] = useState(false);
+
+  const lastTapRef = useRef(0);
+  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!interactive) {
@@ -220,7 +233,7 @@ export function SwipeCard({
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
         <div
-          className={`p-5 ${interactive ? 'cursor-pointer' : ''}`}
+          className={`p-5 ${interactive ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset' : ''}`}
           role={interactive ? 'button' : undefined}
           tabIndex={interactive ? 0 : undefined}
           aria-label={interactive ? `Read article: ${post.headline}` : undefined}
@@ -228,8 +241,26 @@ export function SwipeCard({
             if (!interactive) return;
             if ((e.target as HTMLElement).closest('[data-swipe-actions]')) return;
             if (Math.abs(x.get()) > 6 || Math.abs(y.get()) > 6) return;
-            haptic(6);
-            onTap?.(post);
+            
+            const now = Date.now();
+            const timeSinceLastTap = now - lastTapRef.current;
+            
+            if (timeSinceLastTap < 250) {
+              // Double Tap
+              if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+              haptic([10, 40, 10]);
+              setShowDoubleTap(true);
+              setTimeout(() => setShowDoubleTap(false), 900);
+              // We pass direction 'right' as the virtual action for save
+              onSwipe?.('right', post);
+            } else {
+              // Single Tap Wait
+              haptic(6);
+              singleTapTimerRef.current = setTimeout(() => {
+                onTap?.(post);
+              }, 250);
+            }
+            lastTapRef.current = now;
           }}
           onKeyDown={(e) => {
             if (!interactive) return;
@@ -239,6 +270,22 @@ export function SwipeCard({
             }
           }}
         >
+          <AnimatePresence>
+            {showDoubleTap && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, rotate: -15 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.2 } }}
+                className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+              >
+                <div className="bg-ink/80 backdrop-blur-sm p-6 rounded-full shadow-2xl text-paper">
+                  <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent">

@@ -28,8 +28,8 @@ async function SearchResults({ query }: { query: string }) {
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5">
-          <SearchX className="w-7 h-7 text-muted" />
+        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float">
+            <SearchX className="w-7 h-7 text-muted" />
         </div>
         <h2 className="font-display text-lg font-bold text-ink mb-2">No results found</h2>
         <p className="text-sm text-muted max-w-sm">

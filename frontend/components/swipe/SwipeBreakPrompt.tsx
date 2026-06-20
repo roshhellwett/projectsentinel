@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 interface SwipeBreakPromptProps {
   cardsThisSession: number;
   onSnooze: () => void;
@@ -7,6 +9,16 @@ interface SwipeBreakPromptProps {
 }
 
 export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: SwipeBreakPromptProps) {
+  useEffect(() => {
+    // If the user naturally puts the phone down and goes idle for 60 seconds,
+    // they are effectively taking a break. We auto-snooze so the app is ready
+    // when they return.
+    const timer = setTimeout(() => {
+      onSnooze();
+    }, 60000);
+    return () => clearTimeout(timer);
+  }, [onSnooze]);
+
   return (
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center px-4"

@@ -19,8 +19,8 @@ function loadReadIdsSync(): Set<string> {
   }
 }
 
-const SWIPE_PAGE_SIZE = 20;
-const PREFETCH_THRESHOLD = 5;
+const SWIPE_PAGE_SIZE = 25;
+const PREFETCH_THRESHOLD = 10;
 const HISTORY_MAX = 25;
 const SEEN_PREFIX = 'iv:swipe:seen:';
 const MAX_REFILL_FAILURES = 3;

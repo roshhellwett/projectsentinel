@@ -21,6 +21,11 @@ function readStored(): Theme | null {
 function applyTheme(theme: Theme) {
   if (typeof document === 'undefined') return;
   document.documentElement.classList.toggle('dark', theme === 'dark');
+  const tags = document.querySelectorAll('meta[name="theme-color"]');
+  tags.forEach((t) => {
+    t.setAttribute('content', theme === 'dark' ? '#0E0D0C' : '#FAFAF7');
+    t.removeAttribute('media');
+  });
 }
 
 export function ThemeToggle({ className = '' }: { className?: string }) {

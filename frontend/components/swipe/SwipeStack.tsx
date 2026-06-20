@@ -6,10 +6,12 @@ import type { Post } from '@/types';
 import { SwipeCard, type SwipeDirection } from './SwipeCard';
 import { SwipeOverlay } from './SwipeOverlay';
 import { SwipeProgress } from './SwipeProgress';
+import dynamic from 'next/dynamic';
 import { SwipeHint } from './SwipeHint';
-import { SwipeBreakPrompt } from './SwipeBreakPrompt';
 import { SwipeEmptyState } from './SwipeEmptyState';
-import { NewsDrawer } from '@/components/news/NewsDrawer';
+
+const NewsDrawer = dynamic(() => import('@/components/news/NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
+const SwipeBreakPrompt = dynamic(() => import('./SwipeBreakPrompt').then(m => m.SwipeBreakPrompt), { ssr: false });
 import { useSwipeQueue, type HistoryEntry } from '@/lib/hooks/useSwipeQueue';
 import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
 import { markSeen } from '@/lib/utils/seenSet';

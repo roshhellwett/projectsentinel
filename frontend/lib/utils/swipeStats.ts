@@ -33,14 +33,7 @@ function safeRead<T>(key: string, fallback: T): T {
   }
 }
 
-function safeWrite(key: string, value: unknown): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    /* quota — non-fatal */
-  }
-}
+import { safeWrite } from './safeStorage';
 
 export function pruneStaleStatsKeys(): void {
   if (typeof window === 'undefined') return;

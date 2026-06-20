@@ -28,14 +28,7 @@ function safeRead(key: string): string[] {
   }
 }
 
-function safeWrite(key: string, ids: string[]): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(key, JSON.stringify(ids));
-  } catch {
-    /* quota exceeded — silently drop */
-  }
-}
+import { safeWrite } from './safeStorage';
 
 export function pruneStaleSeenKeys(): void {
   if (typeof window === 'undefined') return;

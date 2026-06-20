@@ -5,6 +5,7 @@ import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSavedPosts } from '@/lib/utils/readPosts';
 import { cn } from '@/lib/utils/cn';
+import { showToast } from '@/lib/utils/toast';
 
 interface BookmarkButtonProps {
   postId: string;
@@ -30,8 +31,9 @@ export function BookmarkButton({
         e.preventDefault();
       }
       toggleSaved(postId);
+      showToast(saved ? 'Removed from reading list' : 'Saved to reading list', saved ? 'bookmark-off' : 'bookmark');
     },
-    [postId, toggleSaved, stopPropagation],
+    [postId, toggleSaved, stopPropagation, saved],
   );
 
   if (variant === 'pill') {

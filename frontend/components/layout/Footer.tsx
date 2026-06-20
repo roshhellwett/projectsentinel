@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Github, Rss, ExternalLink } from 'lucide-react';
+import { InstallAppButton } from './InstallAppButton';
 
 const NEWS_LINKS = [
   { href: '/category/politics/',     label: 'Politics' },
@@ -80,6 +81,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <InstallAppButton />
             <a
               href={RSS_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"

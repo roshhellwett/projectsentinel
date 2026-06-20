@@ -9,6 +9,7 @@ import { NewsCard } from '@/components/news/NewsCard';
 import { NewsDrawer } from '@/components/news/NewsDrawer';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
+import { showToast } from '@/lib/utils/toast';
 
 export default function SavedPage() {
   const { savedIds, clearSaved } = useSavedPosts();
@@ -93,7 +94,10 @@ export default function SavedPage() {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              if (window.confirm('Clear all saved stories?')) clearSaved();
+              if (window.confirm('Clear all saved stories?')) {
+                clearSaved();
+                showToast('All saved stories cleared', 'success');
+              }
             }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-label="Clear all saved stories"
@@ -118,7 +122,7 @@ export default function SavedPage() {
 
       {!loading && !error && posts.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-          <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5">
+          <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float">
             <Bookmark className="w-7 h-7 text-muted" />
           </div>
           <h2 className="font-display text-lg font-bold text-ink mb-1.5">

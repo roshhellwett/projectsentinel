@@ -6,17 +6,16 @@ import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
 export const revalidate = 3600;
 
-async function fetchArticleUrls(): Promise<{ id: string; published_at: string }[]> {
+async function fetchArticleUrls(): Promise<{ id: string; published_at: string; category: string }[]> {
   try {
-
     const PAGE_SIZE = 50;
     const MAX_PAGES = 20;
-    const collected: { id: string; published_at: string }[] = [];
+    const collected: { id: string; published_at: string; category: string }[] = [];
     for (let page = 1; page <= MAX_PAGES; page++) {
       const { posts, count } = await fetchPosts(page, PAGE_SIZE);
       if (!posts.length) break;
       for (const p of posts) {
-        collected.push({ id: p.id, published_at: p.published_at });
+        collected.push({ id: p.id, published_at: p.published_at, category: p.category });
       }
       if (collected.length >= count) break;
     }
@@ -35,14 +34,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/search/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
   ];
 
-  const categoryRoutes: MetadataRoute.Sitemap = CATEGORY_SLUGS.map((category) => ({
+  const articles = await fetchArticleUrls();
+  
+  const dynamicCategorySet = new Set(CATEGORY_SLUGS);
+  articles.forEach(a => {
+    if (a.category) dynamicCategorySet.add(a.category as any);
+  });
+  
+  const categoryRoutes: MetadataRoute.Sitemap = Array.from(dynamicCategorySet).map((category) => ({
     url: `${siteUrl}/category/${category}/`,
     lastModified: new Date(),
     changeFrequency: 'hourly' as const,
     priority: 0.8,
   }));
 
-  const articles = await fetchArticleUrls();
   const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
     url: `${siteUrl}/news/${article.id}/`,
     lastModified: new Date(article.published_at),

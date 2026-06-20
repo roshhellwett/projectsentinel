@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { Share2, Link as LinkIcon, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
+import { showToast } from '@/lib/utils/toast';
 
 interface ShareButtonsProps {
   headline: string;
@@ -82,6 +83,7 @@ export function ShareButtons({
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      showToast('Link copied to clipboard', 'success');
       if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
       copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -95,6 +97,7 @@ export function ShareButtons({
         textArea.select();
         document.execCommand('copy');
         setCopied(true);
+        showToast('Link copied to clipboard', 'success');
         if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
         copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
       } finally {

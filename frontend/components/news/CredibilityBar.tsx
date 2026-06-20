@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
 
@@ -17,6 +18,15 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
   const clamped = clampScore(score);
   const label = getScoreLabel(clamped);
   const scoreColor = getScoreHex(clamped);
+
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setAnimatedScore(clamped);
+    }, 150);
+    return () => clearTimeout(t);
+  }, [clamped]);
 
   return (
     <div
@@ -39,17 +49,17 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
         style={{ background: 'linear-gradient(to right, #ef4444 0%, #ea580c 25%, #eab308 50%, #84cc16 75%, #22c55e 100%)' }}
       >
         <div
-          className="absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]"
-          style={{ clipPath: `inset(0 0 0 ${clamped}%)` }}
+          className="absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+          style={{ clipPath: `inset(0 0 0 ${animatedScore}%)` }}
           aria-hidden="true"
         />
         <div
           className={cn(
-            'absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]',
+            'absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
             compact ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5',
           )}
           style={{ 
-            left: `${clamped}%`, 
+            left: `${animatedScore}%`, 
             transform: 'translate(-50%, -50%)',
             boxShadow: `0 0 0 1px ${scoreColor}, 0 2px 6px -1px ${scoreColor}80` 
           }}

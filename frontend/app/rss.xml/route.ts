@@ -2,6 +2,8 @@
 
 import { fetchPosts } from '@/lib/supabase/server';
 
+export const revalidate = 900; // 15 minutes
+
 export async function GET() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
   const { posts } = await fetchPosts(1, 50);

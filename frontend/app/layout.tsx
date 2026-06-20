@@ -12,6 +12,8 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 import { ScrollRestorer } from '@/components/ui/ScrollRestorer';
 import { CookieConsent } from '@/components/ui/CookieConsent';
+import { OfflineBanner } from '@/components/layout/OfflineBanner';
+import { ToastProvider } from '@/components/ui/ToastProvider';
 
 const sourceSans = Source_Sans_3({
   variable: '--font-sans',
@@ -95,7 +97,8 @@ export const viewport: Viewport = {
   ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
   colorScheme: 'light dark',
 };
 
@@ -119,7 +122,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem('iv-theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem('iv-theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');var tags=document.querySelectorAll('meta[name="theme-color"]');tags.forEach(function(t){t.setAttribute('content',d?'#0E0D0C':'#FAFAF7');t.removeAttribute('media');});}catch(e){}})();`,
           }}
         />
         {supabaseOrigin && (
@@ -162,6 +165,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
+        <OfflineBanner />
         <Navbar />
         <main id="main" className="flex-1 w-full relative z-10 page-enter">
           {children}
@@ -173,6 +177,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <KeyboardShortcuts />
         <ScrollRestorer />
         <CookieConsent />
+        <ToastProvider />
       </body>
     </html>
   );

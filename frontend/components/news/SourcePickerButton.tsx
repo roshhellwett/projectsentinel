@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ExternalLink, Globe, Newspaper } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Source } from '@/types';
@@ -36,7 +37,6 @@ function SourceIcon({ url }: { url: string }) {
   }
 
   return (
-
     <img
       src={`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`}
       alt=""
@@ -59,13 +59,36 @@ export function SourcePickerButton({
   stopPropagation = true,
 }: SourcePickerButtonProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, bottom: 0, width: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  
   const validSources = (sources ?? []).filter((source) => source.url);
   const disabled = validSources.length === 0;
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const updateCoords = useCallback(() => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.left,
+        bottom: window.innerHeight - rect.top,
+        width: rect.width,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
+    
+    updateCoords();
+    window.addEventListener('resize', updateCoords);
+    window.addEventListener('scroll', updateCoords, true);
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
@@ -80,10 +103,12 @@ export function SourcePickerButton({
     window.addEventListener('keydown', handleEscape);
     window.addEventListener('pointerdown', handlePointerDown);
     return () => {
+      window.removeEventListener('resize', updateCoords);
+      window.removeEventListener('scroll', updateCoords, true);
       window.removeEventListener('keydown', handleEscape);
       window.removeEventListener('pointerdown', handlePointerDown);
     };
-  }, [open]);
+  }, [open, updateCoords]);
 
   const toggle = useCallback((event: React.MouseEvent) => {
     if (stopPropagation) {
@@ -92,6 +117,84 @@ export function SourcePickerButton({
     }
     if (!disabled) setOpen((value) => !value);
   }, [disabled, stopPropagation]);
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const isSheet = placement === 'sheet';
+
+  // For popover placement, we align the bottom of the popover with the top of the button, minus a small margin.
+  // We align the left edge of the popover with the left edge of the button.
+  const popoverStyle = {
+    position: 'fixed' as const,
+    bottom: coords.bottom + 8,
+    left: coords.left,
+    width: 'min(18rem, calc(100vw - 2rem))',
+  };
+
+  // For sheet placement, on mobile it's a bottom sheet. On desktop, we anchor it to the button.
+  const sheetStyle = isMobile ? {
+    position: 'fixed' as const,
+    bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+    left: '0.75rem',
+    right: '0.75rem',
+    width: 'auto',
+  } : {
+    position: 'fixed' as const,
+    bottom: coords.bottom + 12,
+    right: (typeof window !== 'undefined' ? window.innerWidth : 0) - (coords.left + coords.width),
+    width: 'min(22rem, calc(100vw - 2rem))',
+  };
+
+  const portalContent = (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          ref={menuRef}
+          role="menu"
+          className="z-[100] rounded border border-rule-strong bg-paper p-2 shadow-paper-lift"
+          style={{
+            ...((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties),
+            transformOrigin: isSheet && isMobile ? 'bottom center' : (isSheet ? 'bottom right' : 'bottom left')
+          }}
+          initial={{ opacity: 0, y: 12, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.8 }}
+          onClick={(event) => {
+            if (stopPropagation) event.stopPropagation();
+          }}
+        >
+          <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
+            Choose source
+          </div>
+          <div className="max-h-[45vh] overflow-y-auto pr-1">
+            {validSources.map((source, index) => {
+              const sourceLabel = getSourceLabel(source);
+              const host = getHostname(source.url);
+              return (
+                <a
+                  key={source.url || index}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  role="menuitem"
+                  onClick={() => setOpen(false)}
+                  className="flex min-w-0 items-center gap-3 rounded px-3 py-2.5 text-ink transition-colors hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  aria-label={`Open ${sourceLabel} in a new tab`}
+                >
+                  <SourceIcon url={source.url} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-ink">{sourceLabel}</span>
+                    {host && <span className="block truncate text-[11px] font-medium text-subtle">{host}</span>}
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-subtle" />
+                </a>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <div className={cn('relative min-w-0', placement === 'sheet' && 'w-full', className)}>
@@ -112,57 +215,8 @@ export function SourcePickerButton({
         <Newspaper className="h-4 w-4" />
         <span className="truncate">{label}</span>
       </motion.button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            ref={menuRef}
-            role="menu"
-            className={cn(
-              'z-[95] rounded border border-rule-strong bg-paper p-2 shadow-paper-lift',
-              placement === 'popover' && 'absolute bottom-full left-0 mb-2 w-[min(18rem,calc(100vw-2rem))]',
-              placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(22rem,calc(100vw-2rem))]',
-            )}
-            style={{ transformOrigin: placement === 'popover' ? 'bottom left' : 'bottom center' }}
-            initial={{ opacity: 0, y: 12, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.8 }}
-            onClick={(event) => {
-              if (stopPropagation) event.stopPropagation();
-            }}
-          >
-            <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
-              Choose source
-            </div>
-            <div className="max-h-[45vh] overflow-y-auto pr-1">
-              {validSources.map((source, index) => {
-                const sourceLabel = getSourceLabel(source);
-                const host = getHostname(source.url);
-                return (
-                  <a
-                    key={source.url || index}
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    role="menuitem"
-                    onClick={() => setOpen(false)}
-                    className="flex min-w-0 items-center gap-3 rounded px-3 py-2.5 text-ink transition-colors hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                    aria-label={`Open ${sourceLabel} in a new tab`}
-                  >
-                    <SourceIcon url={source.url} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-ink">{sourceLabel}</span>
-                      {host && <span className="block truncate text-[11px] font-medium text-subtle">{host}</span>}
-                    </span>
-                    <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-subtle" />
-                  </a>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      
+      {mounted && typeof document !== 'undefined' ? createPortal(portalContent, document.body) : null}
     </div>
   );
 }
