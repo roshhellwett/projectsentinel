@@ -23,7 +23,7 @@ export default async function SwipePage() {
     <>
       <DesktopRedirect />
       <main className="md:hidden flex flex-col items-center pt-4 pb-24 min-h-[calc(100dvh-3.5rem)]">
-        <header className="w-full max-w-md px-4 mb-3">
+        <header className="w-full max-w-md px-4 mb-3 animate-fade-in-up">
           <span className="block w-8 h-[2px] bg-accent mb-2" aria-hidden="true" />
           <h1 className="font-display text-lg font-bold text-ink leading-tight">
             Swipe
@@ -33,10 +33,10 @@ export default async function SwipePage() {
         <SwipeStack initialPosts={deduped} />
       </main>
 
-      <div className="hidden md:flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+      <div className="hidden md:flex flex-col items-center justify-center min-h-[60vh] text-center px-6 animate-fade-in-up">
         <h1 className="font-display text-3xl font-bold text-ink mb-3">Swipe is a mobile experience</h1>
         <p className="text-muted max-w-md mb-6">Open this page on your phone to swipe through verified news, one story at a time.</p>
-        <Link href="/" className="inline-flex items-center px-4 py-2 border border-rule-strong text-sm font-semibold text-ink hover:bg-paper-2 transition-colors rounded">
+        <Link href="/" className="inline-flex items-center px-4 py-2 border border-rule-strong text-sm font-semibold text-ink hover:bg-paper-2 hover-lift transition-all rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
           Back to grid
         </Link>
       </div>

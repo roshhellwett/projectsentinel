@@ -171,7 +171,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <aside className="md:col-span-2 relative rounded-md border border-rule bg-paper p-5 sm:p-8">
+          <aside className="md:col-span-2 relative premium-card p-5 sm:p-8">
             <span aria-hidden="true" className="absolute top-0 left-0 w-1 h-full bg-accent" />
             <h2 className="font-display flex items-center gap-2 text-xl font-bold text-ink mb-4">
               <ShieldCheck className="w-5 h-5 text-accent" strokeWidth={2.2} />
@@ -182,7 +182,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </p>
           </aside>
 
-          <aside className="rounded-md border border-rule bg-paper p-5 sm:p-8">
+          <aside className="premium-card p-5 sm:p-8">
             <h2 className="font-display text-base font-bold text-ink mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources
@@ -191,7 +191,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
         </div>
 
-        <div className="rounded-md border border-rule bg-paper-2 p-6 mb-12">
+        <div className="premium-card bg-paper-2 p-6 mb-12">
           <h3 className="text-[11px] font-bold text-accent mb-5 uppercase tracking-[0.18em] text-center">
             How this story was built
           </h3>

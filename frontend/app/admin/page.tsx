@@ -31,11 +31,11 @@ export default async function AdminPage() {
   const posts = await fetchAllPosts();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-slate-950 mb-8 tracking-normal">Admin Dashboard</h1>
+    <div className="container mx-auto px-4 py-8 animate-fade-in-up">
+      <h1 className="text-3xl font-bold text-ink mb-8 tracking-normal">Admin Dashboard</h1>
 
-      <div className="premium-card rounded-2xl p-6">
-        <h2 className="text-xl font-semibold text-slate-950 mb-4">All Posts</h2>
+      <div className="premium-card p-6">
+        <h2 className="text-xl font-semibold text-ink mb-4">All Posts</h2>
         <PostTable posts={posts} />
       </div>
     </div>

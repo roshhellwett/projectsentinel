@@ -47,7 +47,7 @@ export function BreakingTicker() {
 
   if (items.length === 0) {
 
-    return <div aria-hidden="true" className="h-7 border-b border-rule bg-paper" />;
+    return <div aria-hidden="true" className="h-7 border-b border-rule bg-transparent" />;
   }
 
   const loop = [...items, ...items];

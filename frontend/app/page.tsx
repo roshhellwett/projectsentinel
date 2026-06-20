@@ -82,10 +82,10 @@ export default async function HomePage() {
                 <span aria-hidden="true" className="muted">·</span>
                 <span className="muted">AI-verified Indian news</span>
               </p>
-              <h1 className="font-display font-bold text-ink leading-[1.04] tracking-tight text-[clamp(2.5rem,5vw,4.75rem)]">
+              <h1 className="font-display font-bold text-ink leading-[1.04] tracking-tight text-[clamp(2.5rem,5vw,4.75rem)] animate-fade-in-up">
                 A calmer, smarter front page for India.
               </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
                 Every story cross-referenced across multiple trusted Indian
                 publications, scored for credibility, and rewritten without
                 ads or noise.
@@ -98,10 +98,10 @@ export default async function HomePage() {
             <p className="editorial-kicker mb-4">
               <span>{getIndianGreeting()}</span>
             </p>
-            <h1 className="font-display font-bold text-ink leading-[1.06] tracking-tight text-[clamp(2.25rem,8vw,3rem)]">
+            <h1 className="font-display font-bold text-ink leading-[1.06] tracking-tight text-[clamp(2.25rem,8vw,3rem)] animate-fade-in-up">
               A calmer, smarter front page for India.
             </h1>
-            <p className="mt-4 text-[15px] leading-relaxed text-muted">
+            <p className="mt-4 text-[15px] leading-relaxed text-muted animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
               Every story cross-referenced, scored for credibility, and
               rewritten without ads or noise.
             </p>

@@ -5,7 +5,7 @@ import { ArrowLeft, SearchX } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
+    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center animate-fade-in-up">
       <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
       <p className="editorial-kicker mb-3">Error 404</p>
       <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4 leading-[1.05]">
@@ -17,7 +17,7 @@ export default function NotFound() {
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink-soft transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink-soft hover-lift transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home

@@ -55,7 +55,7 @@ export function Footer() {
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2.5 group rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-2.5 group rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all hover-lift"
             >
               <span
                 aria-hidden="true"
@@ -82,7 +82,7 @@ export function Footer() {
           <div className="flex flex-wrap items-center gap-2">
             <a
               href={RSS_URL}
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Rss className="w-3.5 h-3.5" />
               RSS Feed
@@ -91,7 +91,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Github className="w-3.5 h-3.5" />
               View source

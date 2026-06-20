@@ -15,7 +15,7 @@ interface LegalPageProps {
 export function LegalPage({ kicker, title, lastUpdated, intro, children }: LegalPageProps) {
   return (
     <div className="relative min-h-screen pb-16">
-      <div className="container mx-auto px-4 pt-10 max-w-3xl">
+      <div className="container mx-auto px-4 pt-10 max-w-3xl animate-fade-in-up">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group mb-8"

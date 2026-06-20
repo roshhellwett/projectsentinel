@@ -44,17 +44,17 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 animate-fade-in-up">
       <div className="w-full max-w-md">
-        <div className="premium-card rounded-2xl p-8">
+        <div className="premium-card p-8">
           <div className="flex items-center justify-center mb-6">
             <div className="w-12 h-12 bg-accent/15 border border-accent/30 rounded-xl flex items-center justify-center">
               <Lock className="w-6 h-6 text-accent" />
             </div>
           </div>
 
-          <h1 className="text-2xl font-semibold text-center text-slate-950 mb-2">Admin Login</h1>
-          <p className="text-slate-600 text-center mb-6 text-sm">
+          <h1 className="text-2xl font-semibold text-center text-ink mb-2">Admin Login</h1>
+          <p className="text-muted text-center mb-6 text-sm">
             Enter your password to access the admin panel
           </p>
 
@@ -70,14 +70,14 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full px-4 py-3 bg-white/70 border border-slate-950/[0.10] rounded-xl text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 mb-4 transition-all"
+              className="w-full px-4 py-3 bg-paper-2 border border-rule rounded text-ink placeholder-muted focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 mb-4 transition-all"
               required
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-all disabled:opacity-50 shadow-glow-accent hover:shadow-glow-accent-lg"
+              className="w-full py-3 bg-accent hover:bg-accent-hover text-paper font-semibold rounded transition-all disabled:opacity-50 hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>

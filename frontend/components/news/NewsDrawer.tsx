@@ -154,7 +154,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
               <motion.button
                 whileTap={{ scale: 0.88 }}
                 onClick={onClose}
-                className="p-2 hover:bg-paper-2 rounded transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
+                className="p-2 hover:bg-paper-2 rounded transition-all hover-lift duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
                 aria-label="Close article"
               >
                 <X className="w-5 h-5 text-muted" />

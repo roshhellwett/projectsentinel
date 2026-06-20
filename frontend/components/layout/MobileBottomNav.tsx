@@ -106,7 +106,7 @@ export function MobileBottomNav() {
         aria-label="Mobile navigation"
       >
         <div
-          className="relative border-t border-rule-strong bg-paper"
+          className="relative border-t border-rule-strong bg-paper/85 backdrop-blur-lg"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="flex items-center justify-around px-2 pt-1.5 pb-2">

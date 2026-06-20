@@ -113,7 +113,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className="fixed inset-0 z-[100] overflow-y-auto bg-paper"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-paper/80 backdrop-blur-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -134,7 +134,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="p-2 hover:bg-paper-2 rounded transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="p-2 hover:bg-paper-2 rounded transition-all hover-lift duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Close search"
               >
                 <X className="w-6 h-6 text-muted" />
@@ -160,7 +160,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search verified stories... (press Enter for full search)"
-                className="w-full pl-12 pr-4 py-3.5 bg-paper border border-rule-strong rounded text-ink placeholder-subtle focus:outline-none focus:border-accent transition-colors duration-200"
+                className="w-full pl-12 pr-4 py-3.5 bg-paper/50 border-2 border-rule-strong rounded-xl text-ink placeholder-subtle focus:outline-none focus:border-accent focus:bg-paper transition-all duration-300 shadow-sm"
 
                 aria-label="Search verified stories"
               />

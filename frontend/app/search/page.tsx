@@ -56,7 +56,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14 max-w-6xl">
-      <header className="mb-10 pb-8 border-b border-rule">
+      <header className="mb-10 pb-8 border-b border-rule animate-fade-in-up">
         <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
         <p className="editorial-kicker mb-3">
           {query ? 'Search Results' : 'Search'}

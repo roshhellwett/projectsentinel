@@ -132,7 +132,7 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <div className="text-center mb-16 pb-10 border-b border-rule">
+      <div className="text-center mb-16 pb-10 border-b border-rule animate-fade-in-up">
         <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5 mx-auto" />
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 text-accent text-sm font-semibold rounded-full mb-6 border border-accent/20">
           <Zap className="w-4 h-4" />
@@ -149,7 +149,7 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="editorial-card group flex gap-5 p-6 rounded-md transition-colors duration-200">
+            <div className="premium-card premium-card-hover group flex gap-5 p-6 rounded-md transition-all duration-300">
               <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
                 <step.icon className="w-6 h-6 text-accent" />
               </div>
@@ -173,7 +173,7 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="editorial-card rounded-md p-8 md:p-10 mb-12">
+      <div className="premium-card rounded-md p-8 md:p-10 mb-12 animate-fade-in-up">
         <h2 className="font-display text-2xl font-bold mb-3 text-ink tracking-tight">Trusted sources</h2>
         <p className="text-muted mb-6">
           We only pull from established Indian news organizations with editorial standards.
@@ -217,7 +217,7 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="editorial-card text-center rounded-md p-10">
+      <div className="premium-card text-center rounded-md p-10 animate-fade-in-up">
         <div className="w-16 h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-5">
           <Github className="w-8 h-8 text-ink" />
         </div>
@@ -229,7 +229,7 @@ export default function HowItWorksPage() {
           href="https://github.com/roshhellwett/projectsentinel"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink hover:bg-ink-soft text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink hover:bg-ink/90 text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
         >
           <Github className="w-5 h-5" />
           View on GitHub
@@ -253,7 +253,7 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`editorial-card rounded-md p-6 ${borderColor}`}>
+    <div className={`premium-card p-6 ${borderColor}`}>
       <div className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}>
         {range}
       </div>

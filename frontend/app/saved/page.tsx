@@ -69,15 +69,15 @@ export default function SavedPage() {
     <div className="container mx-auto px-4 lg:px-6 pt-10 pb-14 max-w-6xl">
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink mb-6 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group"
+        className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink mb-6 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group"
       >
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded border border-rule bg-paper group-hover:border-ink transition-colors">
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded border border-rule bg-paper group-hover:border-ink transition-all hover-lift">
           <ArrowLeft className="w-3.5 h-3.5" />
         </span>
         Back to all news
       </Link>
 
-      <header className="mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
+      <header className="mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4 animate-fade-in-up">
         <div>
           <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
           <p className="editorial-kicker mb-3">Your reading list</p>
@@ -95,7 +95,7 @@ export default function SavedPage() {
             onClick={() => {
               if (window.confirm('Clear all saved stories?')) clearSaved();
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-label="Clear all saved stories"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -130,7 +130,7 @@ export default function SavedPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink-soft transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             Browse latest news
           </Link>

@@ -36,7 +36,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
     >
       <Link
         href={`/news/${post.id}/`}
-        className="block relative overflow-hidden rounded-md bg-paper border border-rule transition-[border-color,box-shadow] duration-200 hover:border-rule-strong hover:shadow-paper-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+        className="block relative premium-card premium-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
       >
 
         <span aria-hidden="true" className="absolute top-0 left-0 right-0 h-[2px] bg-accent" />

@@ -117,10 +117,8 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       whileTap={{ scale: 0.975, transition: { duration: 0.1 } }}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'news-card-premium group relative isolate flex flex-col h-full cursor-pointer overflow-hidden',
-        'rounded-md bg-paper border border-rule',
-        'transition-[border-color,transform,box-shadow] duration-200',
-        'hover:border-rule-strong hover:shadow-paper-lift',
+        'news-card-premium group relative isolate flex flex-col h-full cursor-pointer',
+        'premium-card premium-card-hover',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         isRead && 'opacity-70',
         isNew && 'flash-new-post',

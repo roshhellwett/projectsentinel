@@ -209,7 +209,7 @@ export function SwipeCard({
       data-swipe-depth={depth}
     >
       <article
-        className="relative w-full bg-paper border border-rule-strong rounded-md overflow-hidden shadow-paper-lift"
+        className="relative w-full premium-card overflow-hidden"
         role="article"
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >

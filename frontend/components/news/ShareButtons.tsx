@@ -111,7 +111,7 @@ export function ShareButtons({
         whileTap={{ scale: 0.94 }}
         onClick={() => setShowMenu(!showMenu)}
         className={cn(
-          'inline-flex items-center gap-2 px-3.5 py-2 rounded bg-paper border border-rule text-muted hover:text-ink hover:border-ink transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+          'inline-flex items-center gap-2 px-3.5 py-2 rounded bg-paper border border-rule text-muted hover:text-ink hover:border-ink transition-all hover-lift text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           (isInline || isSheet) && 'w-full justify-center',
           buttonClassName,
         )}

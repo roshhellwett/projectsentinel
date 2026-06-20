@@ -46,7 +46,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
         </span>
       </h2>
 
-      <ol className="relative bg-paper border border-rule rounded-md overflow-hidden">
+      <ol className="relative premium-card overflow-hidden">
         {trending.map((post, index) => {
           const read = hydrated && isRead(post.id);
           const rank = index + 1;

@@ -38,14 +38,14 @@ export function SwipeEmptyState({
             type="button"
             onClick={onRefresh}
             disabled={isFetching}
-            className="w-full px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-colors disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="w-full px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {isFetching ? 'Checking…' : 'Check for new stories'}
           </button>
         )}
         <Link
           href="/"
-          className="w-full inline-flex items-center justify-center px-4 py-2 border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 transition-colors rounded"
+          className="w-full inline-flex items-center justify-center px-4 py-2 border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 hover-lift transition-colors rounded"
         >
           Back to grid
         </Link>

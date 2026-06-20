@@ -57,7 +57,7 @@ export function CategoryBar() {
                 ref={isActive ? activeRef : undefined}
                 role="tab"
                 aria-selected={isActive}
-                className={`relative inline-flex items-center px-4 py-3 text-[13px] font-semibold tracking-wide whitespace-nowrap transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
+                className={`relative inline-flex items-center px-4 py-3 text-[13px] font-semibold tracking-wide whitespace-nowrap transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
                   isActive ? 'text-ink' : 'text-muted hover:text-ink'
                 }`}
               >

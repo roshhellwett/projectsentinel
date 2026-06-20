@@ -211,7 +211,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
           type="button"
           onClick={() => queue.retry()}
           disabled={queue.isFetching}
-          className="px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-colors disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-all hover-lift disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {queue.isFetching ? 'Retrying…' : 'Try again'}
         </button>
@@ -281,7 +281,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
             <button
               type="button"
               onClick={performUndo}
-              className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper text-[12px] font-semibold rounded-full shadow-paper-lift hover:bg-ink/90 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper text-[12px] font-semibold rounded-full shadow-paper-lift hover:bg-ink/90 active:scale-95 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label={`Undo: ${undoToast.label}`}
             >
               <Undo2 className="w-3.5 h-3.5" aria-hidden="true" />

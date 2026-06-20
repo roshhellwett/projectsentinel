@@ -67,17 +67,17 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
 
   return (
     <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-[120] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white/95 border border-slate-950/[0.10] rounded-xl p-6 w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-paper border border-rule-strong rounded-md p-6 w-full max-w-lg shadow-paper-lift" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-medium">
             {type === 'corrected' ? 'Add Correction' : 'Retract Article'}
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-slate-950/[0.06] rounded">
+          <button onClick={onClose} className="p-1 hover:bg-paper-2 rounded text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <p className="text-slate-600 mb-4">
+        <p className="text-muted mb-4">
           Article: {post.headline}
         </p>
 
@@ -87,7 +87,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
               {error}
             </div>
           )}
-          <label className="block text-sm text-slate-600 mb-2">
+          <label className="block text-sm text-muted mb-2">
             {type === 'corrected' ? 'Correction Note' : 'Retraction Reason'}
           </label>
           <textarea
@@ -97,7 +97,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
               ? 'Explain what was corrected...'
               : 'Explain why this article is being retracted...'
             }
-            className="w-full px-4 py-3 bg-white/70 border border-slate-950/[0.10] rounded-lg text-slate-950 placeholder-slate-400 focus:outline-none focus:border-accent mb-4 min-h-[100px]"
+            className="w-full px-4 py-3 bg-paper-2 border border-rule rounded text-ink placeholder-muted focus:outline-none focus:border-accent mb-4 min-h-[100px]"
             required
           />
 
@@ -105,14 +105,14 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 bg-slate-950/[0.06] hover:bg-slate-950/[0.10] text-slate-800 rounded-lg transition-colors"
+              className="flex-1 py-3 bg-paper-2 border border-rule hover:bg-rule text-ink font-medium rounded transition-colors hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 py-3 text-white rounded-lg transition-colors disabled:opacity-50 ${
+              className={`flex-1 py-3 text-paper font-medium rounded hover-lift transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 type === 'corrected'
                   ? 'bg-amber-500 hover:bg-amber-600'
                   : 'bg-red-500 hover:bg-red-600'

@@ -68,7 +68,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className={`tap-target text-muted hover:text-ink rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
+      className={`tap-target text-muted hover:text-ink hover-lift rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
     >
       <Icon className="w-[18px] h-[18px]" strokeWidth={1.8} />
     </button>

@@ -58,7 +58,7 @@ export function CookieConsent() {
           className="fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md z-[58]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <div className="relative bg-paper border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">
+          <div className="relative glass border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">
             <button
               type="button"
               onClick={reject}

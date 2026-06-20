@@ -61,7 +61,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className="sticky top-0 inset-x-0 z-50 bg-paper border-b border-rule"
+        className="sticky top-0 inset-x-0 z-50 bg-paper/80 backdrop-blur-md border-b border-rule"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
 
@@ -127,7 +127,7 @@ export function Navbar() {
                 onClick={openSearch}
                 aria-label="Search articles (press /)"
                 title="Search · press /"
-                className="tap-target inline-flex items-center gap-1.5 px-2 text-muted hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target inline-flex items-center gap-1.5 px-2 text-muted hover:text-ink hover-lift rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <Search className="w-[18px] h-[18px]" strokeWidth={1.8} />
                 <kbd
@@ -145,7 +145,7 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Source code on GitHub"
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-muted hover:text-ink rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-muted hover:text-ink hover-lift rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <Github className="w-3.5 h-3.5" />
                 GitHub
@@ -156,7 +156,7 @@ export function Navbar() {
                 onClick={() => setIsMobileOpen((v) => !v)}
                 aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={isMobileOpen}
-                className="tap-target lg:hidden text-muted hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target lg:hidden text-muted hover:text-ink hover-lift rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
               </button>
@@ -185,7 +185,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[82%] max-w-sm bg-paper border-l border-rule shadow-paper-lift flex flex-col"
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col"
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -198,7 +198,7 @@ export function Navbar() {
                 <button
                   onClick={() => setIsMobileOpen(false)}
                   aria-label="Close menu"
-                  className="tap-target text-muted hover:text-ink rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="tap-target text-muted hover:text-ink rounded transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -231,7 +231,7 @@ export function Navbar() {
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-rule-strong text-sm font-medium text-ink hover:bg-paper-2 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-rule-strong text-sm font-medium text-ink hover:bg-paper-2 transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   <Github className="w-4 h-4" />
                   View source on GitHub
