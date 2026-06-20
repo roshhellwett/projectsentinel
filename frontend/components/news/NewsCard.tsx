@@ -136,7 +136,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
 
-        <div className="flex items-center gap-3 flex-wrap min-w-0 mb-3">
+        <div className="flex items-center gap-3 flex-wrap min-w-0 mb-3" suppressHydrationWarning>
           <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
             {theme.label}
           </span>

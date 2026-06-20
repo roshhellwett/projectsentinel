@@ -41,6 +41,7 @@ export function dedupe(articles: Post[]): Post[] {
     const dupes = [...seen.entries()]
       .filter(([, count]) => count > 1)
       .map(([key, count]) => `"${key}" (×${count})`);
+    // eslint-disable-next-line no-console
     console.info(
       `[dedupe] Removed ${removed} duplicate article(s):\n  ${dupes.join('\n  ')}`
     );

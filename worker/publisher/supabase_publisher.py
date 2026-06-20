@@ -51,9 +51,9 @@ class SupabasePublisher:
             try:
                 result = self.supabase.table("posts").insert(post_data).execute()
             except Exception as e:
-                if "story_fingerprint" in post_data and "story_fingerprint" in str(e):
-                    post_data.pop("story_fingerprint", None)
-                    result = self.supabase.table("posts").insert(post_data).execute()
+                if "story_fingerprint" in str(e) and "unique constraint" in str(e).lower():
+                    self.logger.log("PUBLISH_SKIP", f"Skipped duplicate story_fingerprint: {headline[:50]}")
+                    return False
                 else:
                     raise
 

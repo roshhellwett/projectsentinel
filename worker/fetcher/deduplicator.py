@@ -226,6 +226,27 @@ class Deduplicator:
             self.logger.log("DEDUP_ERROR", f"Stale-singleton sweep failed: {str(e)}")
             return 0
 
+    def get_unprocessed_articles(self, limit: int = 200) -> list[dict]:
+
+        if not self.supabase:
+            return []
+
+        try:
+            twelve_hours_ago = (datetime.now(UTC) - timedelta(hours=12)).isoformat()
+            result = (
+                self.supabase.table("raw_articles")
+                .select("url_hash,url,headline,excerpt,source_name,source_url,category_hint")
+                .eq("processed", False)
+                .gte("fetched_at", twelve_hours_ago)
+                .order("fetched_at", desc=True)
+                .limit(limit)
+                .execute()
+            )
+            return result.data or []
+        except Exception as e:
+            self.logger.log("DEDUP_ERROR", f"Failed to get unprocessed articles: {str(e)}")
+            return []
+
     def compute_url_hash(self, url: str) -> str:
 
         return compute_url_hash(url)

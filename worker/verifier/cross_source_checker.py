@@ -146,47 +146,15 @@ class CrossSourceChecker:
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
-        self._recent_cache: list[dict] = []
-        self._cache_time: datetime = datetime.min.replace(tzinfo=UTC)
         self._init_supabase()
 
     def _init_supabase(self):
 
         self.supabase = get_supabase()
 
-    def _get_recent_raw_articles(self) -> list[dict]:
-
-        now = datetime.now(UTC)
-        if (now - self._cache_time).total_seconds() < 300:
-            return self._recent_cache
-
-        if not self.supabase:
-            return []
-
-        try:
-            twelve_hours_ago = (now - timedelta(hours=12)).isoformat()
-
-            result = (
-                self.supabase.table("raw_articles")
-                .select("url_hash,url,headline,excerpt,source_name,source_url,category_hint")
-                .eq("processed", False)
-                .gte("fetched_at", twelve_hours_ago)
-                .order("fetched_at", desc=True)
-                .limit(self.MAX_ARTICLES_TO_COMPARE)
-                .execute()
-            )
-
-            self._recent_cache = result.data or []
-            self._cache_time = now
-            return self._recent_cache
-        except Exception as e:
-            self.logger.log("CROSS_SOURCE_ERROR", f"Failed to get recent articles: {str(e)}")
-            return []
-
     def get_verified_groups(self, articles: list[dict]) -> list[list[dict]]:
 
-        recent_articles = self._get_recent_raw_articles()
-        all_articles = self._unique_articles(articles + recent_articles)
+        all_articles = self._unique_articles(articles)
 
         if len(all_articles) < 2:
             return []

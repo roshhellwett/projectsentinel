@@ -74,6 +74,7 @@ class GNewsFetcher:
                 "country": "in",
                 "max": self.PAGE_SIZE,
                 "from": yesterday,
+                "sortby": "publishedAt",
                 "apikey": api_key,
             }
 

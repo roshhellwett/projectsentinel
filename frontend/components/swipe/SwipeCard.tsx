@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { motion, useMotionValue, useTransform, useAnimation, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
 import type { Post, Source } from '@/types';
@@ -78,7 +79,7 @@ function SourceChip({ source }: { source: Source }) {
       aria-label={`Source: ${label} (opens in new tab)`}
     >
       {host && !faviconErrored ? (
-        <img
+        <Image
           src={`https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host)}`}
           alt=""
           width={12}

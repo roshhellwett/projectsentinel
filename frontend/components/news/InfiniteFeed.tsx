@@ -146,32 +146,7 @@ export function InfiniteFeed({
     return () => obs.disconnect();
   }, [loadMore]);
 
-  const DISMISSED_KEY = 'iv:liveDismissedIds';
-  const dismissedRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = sessionStorage.getItem(DISMISSED_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) dismissedRef.current = new Set(parsed.filter((x) => typeof x === 'string'));
-      }
-    } catch { /* corrupt JSON — start fresh */ }
-  }, []);
 
-  const markDismissed = useCallback((ids: string[]) => {
-    if (ids.length === 0) return;
-    const next = dismissedRef.current;
-    for (const id of ids) next.add(id);
-
-    if (next.size > 200) {
-      const arr = Array.from(next);
-      dismissedRef.current = new Set(arr.slice(arr.length - 200));
-    }
-    try {
-      sessionStorage.setItem(DISMISSED_KEY, JSON.stringify(Array.from(dismissedRef.current)));
-    } catch { /* quota/private-mode — non-fatal */ }
-  }, []);
 
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
@@ -200,12 +175,10 @@ export function InfiniteFeed({
     if (incoming.length === 0) return;
 
     const existing = new Set(postsRef.current.map((p) => p.id));
-    const dismissed = dismissedRef.current;
     const excluded = excludeIdsRef.current;
     const fresh = incoming.filter(
       (p) =>
         !existing.has(p.id) &&
-        !dismissed.has(p.id) &&
         !(excluded?.has(p.id)) &&
         (!category || p.category === category),
     );

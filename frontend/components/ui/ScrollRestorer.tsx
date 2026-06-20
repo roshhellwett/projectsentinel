@@ -39,6 +39,15 @@ export function ScrollRestorer() {
   const pathname = usePathname();
   const key = pathname ?? '/';
   const previousKeyRef = useRef<string | null>(null);
+  const scrollTrackerRef = useRef<number>(0);
+
+  useEffect(() => {
+    const trackScroll = () => {
+      scrollTrackerRef.current = window.scrollY;
+    };
+    window.addEventListener('scroll', trackScroll, { passive: true });
+    return () => window.removeEventListener('scroll', trackScroll);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -87,7 +96,7 @@ export function ScrollRestorer() {
     const prev = previousKeyRef.current;
     if (prev && prev !== key) {
       const map = readMap();
-      map[prev] = window.scrollY;
+      map[prev] = scrollTrackerRef.current;
       writeMap(map);
     }
 

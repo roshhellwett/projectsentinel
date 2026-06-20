@@ -66,7 +66,7 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-[120] flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white/95 border border-slate-950/[0.10] rounded-xl p-6 w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-medium">

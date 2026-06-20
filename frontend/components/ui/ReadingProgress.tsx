@@ -68,8 +68,8 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
         style={{
           transform: `scaleX(${progress})`,
           opacity: visible ? 1 : 0,
-          background: 'linear-gradient(to right, #8b7ff0, #a08cdc, #8b7ff0)',
-          boxShadow: '0 0 12px rgba(139, 127, 240, 0.55)',
+          background: 'linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))',
+          boxShadow: '0 0 12px rgb(var(--c-accent) / 0.55)',
           willChange: 'transform',
         }}
       />

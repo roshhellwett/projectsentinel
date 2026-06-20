@@ -37,7 +37,12 @@ class FactCheckMatcher:
                 .limit(500)
                 .execute()
             )
-            self.known_claims = result.data or []
+            claims = result.data or []
+            for claim in claims:
+                claim_summary = claim.get("claim_summary", "").lower()
+                if claim_summary and len(claim_summary) > 20:
+                    claim["_claim_words"] = set(re.findall(r"\b\w+\b", claim_summary))
+            self.known_claims = claims
             self._last_load = now
             self.logger.log("FACTCHECK_MATCHER", f"Loaded {len(self.known_claims)} known false claims")
         except Exception as e:
@@ -63,15 +68,14 @@ class FactCheckMatcher:
                 keyword_matches = sum(
                     1 for kw in keywords if re.search(r"\b" + re.escape(kw.lower()) + r"\b", headline_lower)
                 )
-                threshold = max(2, len(keywords) * 0.3)
+                threshold = max(1, int(len(keywords) * 0.5))
                 if keyword_matches >= threshold:
                     self.logger.log("FACTCHECK_MATCHER", f"Matched false claim: {claim.get('claim_summary', '')[:50]}")
                     return True
 
-            claim_summary = claim.get("claim_summary", "").lower()
-            if claim_summary and len(claim_summary) > 20:
-                claim_words = set(re.findall(r"\b\w+\b", claim_summary))
-                if not headline_words or not claim_words:
+            claim_words = claim.get("_claim_words")
+            if claim_words:
+                if not headline_words:
                     continue
                 overlap = headline_words & claim_words
                 if len(overlap) >= 4 and len(overlap) / min(len(headline_words), len(claim_words)) >= 0.5:

@@ -31,7 +31,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   const [heroPost, postsResult] = await Promise.all([
     fetchLatestPost(),
-    fetchPosts(1, 20),
+    fetchPosts(1, 50),
   ]);
 
   const allPosts = dedupe(

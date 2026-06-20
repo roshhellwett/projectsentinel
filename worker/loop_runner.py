@@ -1,5 +1,6 @@
 
 
+import os
 import sys
 import time
 import traceback
@@ -12,7 +13,7 @@ from scheduler.jobs import run_pipeline
 
 load_dotenv()
 
-MAX_RUNS = 50
+MAX_RUNS = int(os.getenv("MAX_RUNS", "50"))
 BASE_WAIT = 60
 MAX_WAIT = 600
 

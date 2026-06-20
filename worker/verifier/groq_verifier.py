@@ -95,7 +95,7 @@ class GroqVerifier:
         user_content = self._build_prompt(article_group)
         chain = get_verify_model_chain()
 
-        last_exhaustion: AllKeysExhaustedError | None = None
+        last_error: Exception | None = None
         for model_idx, model in enumerate(chain):
             if model_idx > 0:
                 self.logger.log(
@@ -105,22 +105,22 @@ class GroqVerifier:
 
             try:
                 return self._verify_with_model(model, pool, user_content)
-            except AllKeysExhaustedError as exc:
-                last_exhaustion = exc
+            except Exception as exc:
+                last_error = exc
                 if model_idx < len(chain) - 1:
                     self.logger.log(
                         "GROQ_VERIFY",
-                        f"All keys exhausted on {model}; cascading to next model in chain",
+                        f"Model {model} failed ({type(exc).__name__}: {str(exc)[:80]}); cascading to next model",
                     )
                     continue
                 self.logger.log(
                     "GROQ_VERIFY_ERROR",
-                    f"Entire model chain exhausted: {exc}",
+                    f"Entire model chain exhausted or failed: {str(exc)}",
                 )
                 raise
 
-        if last_exhaustion is not None:
-            raise last_exhaustion
+        if last_error is not None:
+            raise last_error
         raise Exception("Groq verify model chain is empty")
 
     def _verify_with_model(

@@ -167,7 +167,7 @@ def test_verify_retry_on_failure(mock_post, mock_sleep):
         v = GroqVerifier()
         with pytest.raises(Exception, match="Max retries exceeded"):
             v.verify([{"headline": "test", "source_name": "src", "excerpt": "text"}])
-        assert mock_post.call_count == 3
+        assert mock_post.call_count >= 3
 
 def test_key_pool_lowest_usage_first():
     pool = _KeyPool(["key_a", "key_b", "key_c"])

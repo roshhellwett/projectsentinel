@@ -12,7 +12,6 @@ from fetcher.factcheck_fetcher import FactCheckFetcher
 from fetcher.gnews_fetcher import GNewsFetcher
 from fetcher.newsapi_fetcher import NewsAPIFetcher
 from fetcher.rss_fetcher import RSSFetcher
-from fetcher.url_tools import title_similarity
 from logger.pipeline_logger import PipelineLogger
 from publisher.supabase_publisher import SupabasePublisher
 from rate_limiter.limiter import RateLimitExceededError
@@ -219,25 +218,43 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             _record_run_end(logger, run_id, duration, stats)
             return
 
+        old_unprocessed = deduplicator.get_unprocessed_articles(limit=200)
+        combined_articles = new_articles + old_unprocessed
+        
+        unique_combined = []
+        seen_keys = set()
+        for article in combined_articles:
+            key = article.get("url_hash") or article.get("url")
+            if not key or key in seen_keys:
+                continue
+            seen_keys.add(key)
+            unique_combined.append(article)
+
+        logger.log(
+            "PIPELINE",
+            f"Processing {len(unique_combined)} articles ({len(new_articles)} new, "
+            f"{len(unique_combined) - len(new_articles)} old unprocessed)"
+        )
+
         title_deduped: list[dict] = []
         title_dup_count = 0
-        for article in new_articles:
+        for article in unique_combined:
             if deduplicator.is_duplicate_by_title(article.get("headline", "")):
                 deduplicator.log_discarded(article, "duplicate_title")
                 deduplicator.mark_group_processed([article])
                 title_dup_count += 1
             else:
                 title_deduped.append(article)
-        new_articles = title_deduped
+        unique_combined = title_deduped
         stats["duplicates"] += title_dup_count
 
         logger.log(
             "DEDUPLICATE",
-            f"{len(new_articles)} articles after title dedup ({title_dup_count} title-dups removed)",
+            f"{len(unique_combined)} articles after title dedup ({title_dup_count} title-dups removed)",
         )
 
         unblocked_articles: list[dict] = []
-        for article in new_articles:
+        for article in unique_combined:
             if is_blocked_domain(article.get("source_url", "")):
                 deduplicator.log_discarded(article, "blocked_domain")
                 deduplicator.mark_group_processed([article])
@@ -264,16 +281,27 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
 
+        from difflib import SequenceMatcher
         unique_groups: list[list[dict]] = []
-        seen_rep_headlines: list[str] = []
+        seen_rep_headlines_lower: list[str] = []
+
         for grp in verified_groups:
             rep = grp[0].get("headline", "") if grp else ""
-            if any(title_similarity(rep, seen) >= 0.75 for seen in seen_rep_headlines):
+            rep_lower = rep.lower().strip()
+
+            # Fast optimization: pre-calculate lowercased strings and run SequenceMatcher directly
+            is_dup = False
+            for seen_lower in seen_rep_headlines_lower:
+                if rep_lower == seen_lower or SequenceMatcher(None, rep_lower, seen_lower).ratio() >= 0.75:
+                    is_dup = True
+                    break
+
+            if is_dup:
                 deduplicator.mark_group_processed(grp)
                 logger.log("DEDUP", f"Skipped near-duplicate group: {rep[:70]}")
             else:
                 unique_groups.append(grp)
-                seen_rep_headlines.append(rep)
+                seen_rep_headlines_lower.append(rep_lower)
         verified_groups = unique_groups
 
         effective_cap = _budgeted_groups_per_run(logger, max_ai_groups)
