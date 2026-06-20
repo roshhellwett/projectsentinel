@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, X, ArrowUp, Undo2 } from 'lucide-react';
+import { ArrowRight, ArrowDown, ArrowUp, Undo2 } from 'lucide-react';
 
 interface SwipeOverlayProps {
   drag: { x: number; y: number };
@@ -20,39 +20,39 @@ export function SwipeOverlay({ drag }: SwipeOverlayProps) {
   const ay = Math.abs(y);
   const horizontalDominant = ax > ay;
 
-  const opaSave    = horizontalDominant && x > 0  ? clamp01(x / TRIGGER) : 0;
-  const opaDismiss = horizontalDominant && x < 0  ? clamp01(-x / TRIGGER) : 0;
-  const opaNext    = !horizontalDominant && y < 0 ? clamp01(-y / TRIGGER) : 0;
-  const opaPrev    = !horizontalDominant && y > 0 ? clamp01(y / TRIGGER) : 0;
+  const opaNextRight = horizontalDominant && x > 0  ? clamp01(x / TRIGGER) : 0;
+  const opaPrevLeft  = horizontalDominant && x < 0  ? clamp01(-x / TRIGGER) : 0;
+  const opaNextUp    = !horizontalDominant && y < 0 ? clamp01(-y / TRIGGER) : 0;
+  const opaPrevDown  = !horizontalDominant && y > 0 ? clamp01(y / TRIGGER) : 0;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[40]">
       <Badge
-        label="Save"
-        icon={<Bookmark className="w-4 h-4" />}
-        opacity={opaSave}
+        label="Next"
+        icon={<ArrowRight className="w-4 h-4" />}
+        opacity={opaNextRight}
         position="right"
-        accent="border-cred-high text-cred-high bg-paper"
-      />
-      <Badge
-        label="Dismiss"
-        icon={<X className="w-4 h-4" />}
-        opacity={opaDismiss}
-        position="left"
-        accent="border-rule-strong text-muted bg-paper"
-      />
-      <Badge
-        label="Skip"
-        icon={<ArrowUp className="w-4 h-4" />}
-        opacity={opaNext}
-        position="bottom"
         accent="border-accent text-accent bg-paper"
       />
       <Badge
-        label="Go back"
+        label="Previous"
         icon={<Undo2 className="w-4 h-4" />}
-        opacity={opaPrev}
+        opacity={opaPrevLeft}
+        position="left"
+        accent="border-rule-strong text-ink bg-paper"
+      />
+      <Badge
+        label="Next"
+        icon={<ArrowUp className="w-4 h-4" />}
+        opacity={opaNextUp}
         position="top"
+        accent="border-accent text-accent bg-paper"
+      />
+      <Badge
+        label="Previous"
+        icon={<ArrowDown className="w-4 h-4" />}
+        opacity={opaPrevDown}
+        position="bottom"
         accent="border-rule-strong text-ink bg-paper"
       />
     </div>

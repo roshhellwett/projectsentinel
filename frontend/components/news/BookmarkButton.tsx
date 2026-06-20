@@ -72,7 +72,7 @@ export function BookmarkButton({
       aria-label={saved ? 'Remove from saved' : 'Save for later'}
       title={saved ? 'Saved' : 'Save for later'}
       className={cn(
-        'touch-polish p-1 -m-1 rounded-full transition-colors duration-200',
+        'touch-polish p-2 -m-2 rounded-full transition-colors duration-200',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
         saved
           ? 'text-accent'

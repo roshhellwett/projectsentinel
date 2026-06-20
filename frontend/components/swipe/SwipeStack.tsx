@@ -50,12 +50,6 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
 
 
-  const [undoToast, setUndoToast] = useState<{
-    entry: HistoryEntry;
-    label: string;
-  } | null>(null);
-  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const [stats, setStats] = useState({
     cardsToday: 0,
     uniqueHostsToday: 0,
@@ -76,12 +70,6 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   }, []);
 
 
-  useEffect(() => {
-    return () => {
-      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    };
-  }, []);
-
   const refreshStats = useCallback(() => {
     setStats({
       cardsToday: getCardsToday(),
@@ -96,62 +84,22 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       .filter((h): h is string => Boolean(h));
     if (hosts.length > 0) recordHostsToday(hosts);
   }, []);
-
-
-  const showUndoToast = useCallback((entry: HistoryEntry) => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    const label =
-      entry.direction === 'right' ? 'Saved' :
-      entry.direction === 'left'  ? 'Dismissed' :
-                                     'Skipped';
-    setUndoToast({ entry, label });
-    undoTimerRef.current = setTimeout(() => {
-      setUndoToast(null);
-    }, UNDO_TOAST_MS);
-  }, []);
-
-
-  const performUndo = useCallback(() => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    const entry = queue.rewind();
-    if (entry && entry.wasSaved) {
-
-      unsaveBookmark(entry.post.id);
-    }
-    setUndoToast(null);
-    setDrag({ x: 0, y: 0 });
-  }, [queue, unsaveBookmark]);
-
   const handleSwipe = useCallback(
     (direction: SwipeDirection, post: Post) => {
-      if (direction === 'down') {
-
-        const entry = queue.rewind();
-        if (entry && entry.wasSaved) {
-          unsaveBookmark(entry.post.id);
-        }
+      if (direction === 'down' || direction === 'left') {
+        queue.rewind();
         setDrag({ x: 0, y: 0 });
-        setUndoToast(null);
         return;
       }
 
-
-      const didSave = direction === 'right';
-      if (didSave) {
-        saveBookmark(post.id);
-      }
-
       markSeen(post.id);
-
       incrementCardsToday();
       recordSourceHosts(post);
       sessionCardsRef.current += 1;
-      queue.advance(post, direction as 'up' | 'left' | 'right', didSave);
+      
+      queue.advance(post, direction, false);
       refreshStats();
       setDrag({ x: 0, y: 0 });
-
-
-      showUndoToast({ post, direction: direction as 'up' | 'left' | 'right', wasSaved: didSave });
 
       if (
         !breakShownRef.current &&
@@ -162,7 +110,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
         setShowBreak(true);
       }
     },
-    [queue, saveBookmark, unsaveBookmark, recordSourceHosts, refreshStats, showUndoToast],
+    [queue, recordSourceHosts, refreshStats],
   );
 
   const handleTap = useCallback(
@@ -174,12 +122,8 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   );
 
   const handleRewindButton = useCallback(() => {
-    const entry = queue.rewind();
-    if (entry && entry.wasSaved) {
-      unsaveBookmark(entry.post.id);
-    }
-    setUndoToast(null);
-  }, [queue, unsaveBookmark]);
+    queue.rewind();
+  }, [queue]);
 
   const { current, next, upcoming } = queue;
   const visible = useMemo(
@@ -264,34 +208,8 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       </div>
 
       <p className="mt-3 px-4 text-center text-[9px] font-semibold uppercase tracking-[0.16em] text-subtle">
-        ↑ skip • ← dismiss • → save • ↓ go back
+        ↑ → next • ↓ ← previous
       </p>
-
-
-      <AnimatePresence>
-        {undoToast && (
-          <motion.div
-            key="undo-toast"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[60]"
-          >
-            <button
-              type="button"
-              onClick={performUndo}
-              className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper text-[12px] font-semibold rounded-full shadow-paper-lift hover:bg-ink/90 active:scale-95 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              aria-label={`Undo: ${undoToast.label}`}
-            >
-              <Undo2 className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{undoToast.label}</span>
-              <span className="text-paper/60">·</span>
-              <span className="text-paper/80">Undo</span>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <SwipeHint />
 
