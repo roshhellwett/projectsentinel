@@ -125,7 +125,7 @@ export function useSwipeQueue({
     setHydrated(true);
     
     
-  }, []);
+  }, [hideRead, initialPosts]);
 
 
   useEffect(() => {
