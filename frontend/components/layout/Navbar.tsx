@@ -19,7 +19,6 @@ import { LiveClock } from '@/components/layout/LiveClock';
 import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
 import { LastRefreshed } from '@/components/layout/LastRefreshed';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { BreakingTicker } from '@/components/layout/BreakingTicker';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 
@@ -172,8 +171,6 @@ export function Navbar() {
             </div>
           </div>
         </div>
-
-        <BreakingTicker />
       </header>
 
       <AnimatePresence>
