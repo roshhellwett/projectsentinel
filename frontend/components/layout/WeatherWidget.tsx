@@ -64,7 +64,7 @@ export function WeatherWidget({ className = '' }: { className?: string }) {
   const Icon = getWeatherIcon(data.code);
 
   return (
-    <div className={cn('relative inline-flex flex-col items-end gap-1 border border-rule bg-paper px-5 py-3', className)}>
+    <div className={cn('relative inline-flex flex-col items-start md:items-end gap-1 border border-rule bg-paper px-5 py-3', className)}>
       <div className="flex items-center gap-2">
         <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted">
           {data.city} Weather

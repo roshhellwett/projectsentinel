@@ -122,11 +122,9 @@ export default async function HomePage() {
               </p>
             </div>
             
-            <div className="flex gap-4 items-start">
-              <div className="flex flex-col w-full">
-                <LiveClock variant="hero" className="border-b-0 w-full flex-row justify-between items-center px-4 py-3" />
-                <WeatherWidget className="w-full flex-row justify-between items-center px-4 py-3" />
-              </div>
+            <div className="flex flex-col mt-2">
+              <LiveClock variant="hero" className="border-b-0 w-full" />
+              <WeatherWidget className="w-full" />
             </div>
           </div>
 
