@@ -139,7 +139,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 y.set(0);
               }
             }}
-            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu"
+            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:bottom-0 lg:h-auto lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-auto bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu"
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
