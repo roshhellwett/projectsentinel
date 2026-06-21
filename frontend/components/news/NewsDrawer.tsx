@@ -10,6 +10,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ExternalLink } from 'lucide-react';
 import { AnimatePresence, motion, useDragControls, useMotionValue } from 'framer-motion';
 import { Post } from '@/types';
@@ -102,20 +103,25 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
     }
   }, []);
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {post && (
         <>
 
           <motion.div
-
-            className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-[60] will-change-opacity"
+            className="fixed inset-0 bg-ink/20 backdrop-filter backdrop-blur-md z-[60] will-change-opacity"
+            style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           />
 
           <motion.div
@@ -139,11 +145,11 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 y.set(0);
               }
             }}
-            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:bottom-0 lg:h-auto lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-auto bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu"
-            initial={{ opacity: 0, y: '100%' }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-[100dvh] lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-auto bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu"
+            initial={{ opacity: 0, y: canDrag ? '100%' : 0, x: canDrag ? 0 : '100%' }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: canDrag ? '100%' : 0, x: canDrag ? 0 : '100%' }}
+            transition={{ type: 'spring', damping: 32, stiffness: 350, mass: 0.8 }}
           >
 
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />
@@ -256,6 +262,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

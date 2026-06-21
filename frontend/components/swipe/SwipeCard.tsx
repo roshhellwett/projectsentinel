@@ -224,7 +224,7 @@ export function SwipeCard({
         transform: `translateY(${style.translateY}px) scale(${style.scale})`,
         opacity: style.opacity,
         transformOrigin: 'top center' as const,
-        transition: 'transform 300ms cubic-bezier(0.175, 0.885, 0.32, 1.15), opacity 300ms ease',
+        transition: 'transform 400ms var(--ease-spring), opacity 400ms var(--ease-apple)',
         pointerEvents: 'none' as const,
         willChange: 'transform' as const,
       };
@@ -235,12 +235,12 @@ export function SwipeCard({
       initial={{ opacity: 0, y: -40, scale: 0.95 }}
       animate={interactive ? controls : { opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+      transition={{ type: 'spring', stiffness: 350, damping: 28, mass: 0.8 }}
       className="w-full touch-none select-none will-change-transform transform-gpu"
       style={interactive ? { ...wrapperStyle, x, y, rotate } : wrapperStyle}
       drag={interactive && !exiting}
       dragDirectionLock={true}
-      dragElastic={0.4}
+      dragElastic={0.25}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       aria-hidden={depth !== 0}

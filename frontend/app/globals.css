@@ -162,12 +162,10 @@ html.dark {
   .premium-card-hover:hover {
     border-color: rgb(var(--c-rule-strong));
     box-shadow: 0 1px 0 rgb(var(--c-rule)), 0 14px 32px -22px rgb(var(--c-ink) / 0.18);
-    transform: translateY(-2px) translateZ(0);
   }
 }
 .premium-card-hover:active,
 .glass-hover:active {
-  transform: translateY(0) scale(0.96) translateZ(0);
   transition: transform 100ms var(--ease-apple);
 }
 

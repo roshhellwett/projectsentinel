@@ -69,8 +69,8 @@ export function Navbar() {
   return (
     <>
       <header
-        className="sticky top-0 inset-x-0 z-50 bg-paper/90 supports-[backdrop-filter]:bg-paper/75 backdrop-blur-xl border-b border-rule transition-colors"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        className="sticky top-0 inset-x-0 z-50 bg-paper/90 supports-[backdrop-filter]:bg-paper/60 backdrop-filter backdrop-blur-lg border-b border-rule transition-colors"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)', WebkitBackdropFilter: 'blur(16px)', backdropFilter: 'blur(16px)' }}
       >
 
         <div className="container mx-auto px-4 lg:px-6">
