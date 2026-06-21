@@ -24,18 +24,9 @@ const SwipeBreakPrompt = dynamic(() => import('./SwipeBreakPrompt').then(m => m.
 import { useSwipeQueue, type HistoryEntry } from '@/lib/hooks/useSwipeQueue';
 import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
 import { markSeen } from '@/lib/utils/seenSet';
-import {
-  bumpStreak,
-  getCardsToday,
-  getStreak,
-  getUniqueHostsToday,
-  incrementCardsToday,
-  isBreakSnoozedToday,
-  pruneStaleStatsKeys,
-  recordHostsToday,
-  snoozeBreakToday,
-} from '@/lib/utils/swipeStats';
+import { snoozeBreakToday } from '@/lib/utils/swipeStats';
 import { getHostname } from '@/lib/utils/getHostname';
+import { useSwipeTracking } from '@/lib/hooks/useSwipeTracking';
 import { Undo2 } from 'lucide-react';
 
 const BREAK_PROMPT_AT = 25;
@@ -57,44 +48,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
   const [drag, setDrag] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
-  const [showBreak, setShowBreak] = useState(false);
-
-
-
-  const [stats, setStats] = useState({
-    cardsToday: 0,
-    uniqueHostsToday: 0,
-    streak: 0,
-  });
-  const sessionCardsRef = useRef(0);
-  const breakShownRef = useRef(false);
-
-
-  useEffect(() => {
-    pruneStaleStatsKeys();
-    bumpStreak();
-    setStats({
-      cardsToday: getCardsToday(),
-      uniqueHostsToday: getUniqueHostsToday(),
-      streak: getStreak(),
-    });
-  }, []);
-
-
-  const refreshStats = useCallback(() => {
-    setStats({
-      cardsToday: getCardsToday(),
-      uniqueHostsToday: getUniqueHostsToday(),
-      streak: getStreak(),
-    });
-  }, []);
-
-  const recordSourceHosts = useCallback((post: Post) => {
-    const hosts = (post.sources ?? [])
-      .map((s) => getHostname(s.url))
-      .filter((h): h is string => Boolean(h));
-    if (hosts.length > 0) recordHostsToday(hosts);
-  }, []);
+  const { stats, showBreak, setShowBreak, trackSwipe, sessionCards } = useSwipeTracking();
   const handleSwipe = useCallback(
     (direction: SwipeDirection, post: Post) => {
       if (direction === 'down' || direction === 'left') {
@@ -104,24 +58,12 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       }
 
       markSeen(post.id);
-      incrementCardsToday();
-      recordSourceHosts(post);
-      sessionCardsRef.current += 1;
+      trackSwipe(post);
       
       queue.advance(post, direction, false);
-      refreshStats();
       setDrag({ x: 0, y: 0 });
-
-      if (
-        !breakShownRef.current &&
-        !isBreakSnoozedToday() &&
-        sessionCardsRef.current >= BREAK_PROMPT_AT
-      ) {
-        breakShownRef.current = true;
-        setShowBreak(true);
-      }
     },
-    [queue, recordSourceHosts, refreshStats],
+    [queue, trackSwipe],
   );
 
   const handleTap = useCallback(
@@ -166,7 +108,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
           type="button"
           onClick={() => queue.retry()}
           disabled={queue.isFetching}
-          className="px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-all hover-lift disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-all hover-lift disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {queue.isFetching ? 'Retrying…' : 'Try again'}
         </button>
@@ -228,7 +170,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
       {showBreak && (
         <SwipeBreakPrompt
-          cardsThisSession={sessionCardsRef.current}
+          cardsThisSession={sessionCards}
           onSnooze={() => {
             snoozeBreakToday();
             setShowBreak(false);

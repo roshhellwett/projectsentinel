@@ -175,7 +175,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <OfflineBanner />
         <Navbar />
-        <main id="main" className="flex-1 w-full">
+        <main id="main" className="flex-1 w-full" tabIndex={-1}>
           {children}
         </main>
 

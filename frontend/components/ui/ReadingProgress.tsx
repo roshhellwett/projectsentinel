@@ -9,6 +9,8 @@
 
 'use client';
 
+import { motion, useScroll, useSpring } from 'framer-motion';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useRef, useState } from 'react';
 
 interface ReadingProgressProps {
@@ -69,7 +71,7 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-x-0 z-[54] h-[2px] pointer-events-none"
+      className={`fixed inset-x-0 ${Z_INDEX.readingProgress} h-[2px] pointer-events-none`}
       style={{ top: 'calc(env(safe-area-inset-top, 0px) + 4rem)' }}
     >
       <div

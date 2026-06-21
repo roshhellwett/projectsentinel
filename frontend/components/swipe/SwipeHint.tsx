@@ -9,6 +9,7 @@
 
 'use client';
 
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useState } from 'react';
 import { ArrowUp, Undo2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,7 +41,7 @@ export function SwipeHint() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center px-4 pb-24 pt-10"
+          className={`fixed inset-0 ${Z_INDEX.prompts} flex items-end sm:items-center justify-center px-4 pb-24 pt-10`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="swipe-hint-title"
@@ -79,7 +80,7 @@ export function SwipeHint() {
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
-                    <span className="text-[13px] font-bold text-ink tracking-tight">Next story</span>
+                    <span className="text-[13px] font-bold text-ink tracking-[-0.01em]">Next story</span>
                     <span className="text-[12px] text-muted">Swipe Up or Right</span>
                   </span>
                 </li>
@@ -94,7 +95,7 @@ export function SwipeHint() {
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
-                    <span className="text-[13px] font-bold text-ink tracking-tight">Previous story</span>
+                    <span className="text-[13px] font-bold text-ink tracking-[-0.01em]">Previous story</span>
                     <span className="text-[12px] text-muted">Swipe Down or Left</span>
                   </span>
                 </li>
@@ -107,7 +108,7 @@ export function SwipeHint() {
               <button
                 type="button"
                 onClick={close}
-                className="w-full px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="w-full px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 Got it
               </button>

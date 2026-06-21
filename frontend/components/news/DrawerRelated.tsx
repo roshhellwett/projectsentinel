@@ -36,9 +36,9 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     });
     fetch(`/api/posts?${params.toString()}`, { signal: ctrl.signal, cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data: { posts: Post[] }) => {
+      .then((payload: { posts: Post[] }) => {
         if (cancelled) return;
-        const filtered = (data.posts ?? [])
+        const filtered = (payload.posts ?? [])
           .filter((p) => p.id !== currentPost.id)
           .slice(0, 3);
         setRelated(filtered);
@@ -59,7 +59,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     <section className="mt-8 border-t border-rule pt-6">
       <div className="flex items-center gap-2 mb-4">
         <span aria-hidden="true" className="w-1 h-4 bg-accent" />
-        <h3 className="font-display text-sm font-bold text-ink tracking-tight">Keep reading</h3>
+        <h3 className="font-display text-sm font-bold text-ink tracking-[-0.01em]">Keep reading</h3>
       </div>
 
       {loading ? (

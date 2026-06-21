@@ -10,7 +10,8 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Share2, Link as LinkIcon, Check } from 'lucide-react';
+import { Share2, Link as LinkIcon, Twitter, Linkedin, Facebook, X, Check } from 'lucide-react';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 import { showToast } from '@/lib/utils/toast';
@@ -140,11 +141,11 @@ export function ShareButtons({
             ref={menuRef}
             key="share-menu"
             className={cn(
-              'z-[90] w-[min(21rem,calc(100vw-2rem))]',
+              `${Z_INDEX.shareMenu} w-[min(21rem,calc(100vw-2rem))]`,
               'rounded border border-rule-strong bg-paper p-2 shadow-paper-lift',
               placement === 'popover' && 'absolute right-0 top-full mt-2',
-              placement === 'inline' && 'relative mt-3 w-full max-w-none shadow-[0_16px_42px_-30px_rgba(15,23,42,0.32)]',
-              placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_22px_54px_-34px_rgba(15,23,42,0.42)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
+              placement === 'inline' && 'relative mt-3 w-full max-w-none shadow-paper-lift',
+              placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_16px_40px_-12px_rgba(0,0,0,0.24)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
             )}
             initial={{ opacity: 0, y: -6, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

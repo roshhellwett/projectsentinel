@@ -39,10 +39,11 @@ function subscribe(key: string, fn: () => void): () => void {
   };
 }
 
+import { safeRead, safeWrite as persistToStorage } from './safeStorage';
+
 function loadFromStorage(key: string): string[] {
-  if (typeof window === 'undefined') return [];
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = safeRead(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
@@ -50,8 +51,6 @@ function loadFromStorage(key: string): string[] {
     return [];
   }
 }
-
-import { safeWrite as persistToStorage } from './safeStorage';
 
 export function usePersistentIdSet({ key, max = 500 }: Options) {
   const [ids, setIds] = useState<Set<string>>(() => new Set());

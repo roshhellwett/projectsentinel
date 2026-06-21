@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
+import { ANIMATION } from '@/lib/theme/animations';
 import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
 
 interface CredibilityBarProps {
@@ -58,13 +59,13 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
         style={{ background: 'linear-gradient(to right, #ef4444 0%, #ea580c 25%, #eab308 50%, #84cc16 75%, #22c55e 100%)' }}
       >
         <div
-          className="absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+          className={cn("absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70", ANIMATION.slow)}
           style={{ clipPath: `inset(0 0 0 ${animatedScore}%)` }}
           aria-hidden="true"
         />
         <div
           className={cn(
-            'absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+            cn('absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper', ANIMATION.slow),
             compact ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5',
           )}
           style={{ 

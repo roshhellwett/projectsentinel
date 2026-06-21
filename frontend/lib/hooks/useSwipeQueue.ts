@@ -16,10 +16,11 @@ import { loadSeenWithinDays, unmarkSeen } from '@/lib/utils/seenSet';
 
 const READ_KEY = 'iv:readPosts:v1';
 
+import { safeRead } from '@/lib/utils/safeStorage';
+
 function loadReadIdsSync(): Set<string> {
-  if (typeof window === 'undefined') return new Set();
   try {
-    const raw = window.localStorage.getItem(READ_KEY);
+    const raw = safeRead(READ_KEY);
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? new Set(parsed.filter((x) => typeof x === 'string')) : new Set();
@@ -138,6 +139,9 @@ export function useSwipeQueue({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // We listen to cross-tab storage events to maintain perfect synchronization
+    // across multiple browser tabs. If a user swipes a card in Tab A, we want
+    // Tab B to instantly remove it from the queue without a full page reload.
     const onStorage = (e: StorageEvent) => {
       if (!e.key) return;
       if (e.key.startsWith(SEEN_PREFIX)) {
@@ -157,6 +161,9 @@ export function useSwipeQueue({
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
+    // Re-check disk storage when the tab becomes visible again.
+    // This catches edge cases where the storage event might have fired while
+    // the device was asleep or the browser aggressively throttled the background tab.
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
       refreshSeenFromDisk();
@@ -197,15 +204,15 @@ export function useSwipeQueue({
         clearTimeout(timeoutId);
       }
       if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-      const data: { posts: Post[]; count?: number } = await res.json();
-      const incoming = filterIds(data.posts ?? []);
+      const payload: { posts: Post[]; count?: number } = await res.json();
+      const incoming = filterIds(payload.posts ?? []);
       setQueue((prev) => {
         const existing = new Set(prev.map((p) => p.id));
         const toAppend = incoming.filter((p) => !existing.has(p.id));
         return dedupe([...prev, ...toAppend]);
       });
       setPage(nextPage);
-      if ((data.posts?.length ?? 0) < SWIPE_PAGE_SIZE) setExhausted(true);
+      if ((payload.posts?.length ?? 0) < SWIPE_PAGE_SIZE) setExhausted(true);
       failureCountRef.current = 0;
       setHasError(false);
     } catch {

@@ -9,16 +9,25 @@
 
 
 
+/** Represents the thematic category of a news article. */
+export type Category = 
+  | 'politics' | 'business' | 'sports' | 'crime' | 'science' 
+  | 'health' | 'tech' | 'world' | 'entertainment' | 'education';
+
+/** Indicates the editorial status of a post. */
+export type PostStatus = 'published' | 'corrected' | 'retracted';
+
+/** Represents an external news source referenced by a post. */
 export interface Source {
   title?: string;
   name?: string;
   url: string;
 }
 
-export type Category = 'politics' | 'business' | 'sports' | 'crime' | 'science' | 'health' | 'tech' | 'world' | 'entertainment' | 'education';
-
-export type PostStatus = 'published' | 'corrected' | 'retracted';
-
+/** 
+ * The core entity representing an AI-verified news post.
+ * Contains the headline, summary, and verification metadata.
+ */
 export interface Post {
   id: string;
   headline: string;

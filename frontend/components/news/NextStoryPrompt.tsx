@@ -9,6 +9,7 @@
 
 'use client';
 
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -92,7 +93,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.85 }}
-          className="fixed left-1/2 -translate-x-1/2 z-[58] w-[min(94vw,32rem)]"
+          className={`fixed left-1/2 -translate-x-1/2 ${Z_INDEX.cookieConsent} w-[min(94vw,32rem)]`}
           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}
         >
           <div className="relative">

@@ -9,6 +9,8 @@
 
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect } from 'react';
 
 interface SwipeBreakPromptProps {
@@ -30,7 +32,7 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center px-4"
+      className={`fixed inset-0 ${Z_INDEX.prompts} flex items-center justify-center px-4`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="swipe-break-title"
@@ -57,14 +59,14 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
             <button
               type="button"
               onClick={onSnooze}
-              className="w-full px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="w-full px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Take a break
             </button>
             <button
               type="button"
               onClick={onContinue}
-              className="w-full px-4 py-2 text-[12px] font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+              className="w-full px-4 pt-[7px] pb-[9px] text-[12px] font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
             >
               Keep reading
             </button>

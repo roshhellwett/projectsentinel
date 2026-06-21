@@ -31,18 +31,17 @@ function dayDiff(aYmd: string, bYmd: string): number {
   return Math.round((b.getTime() - a.getTime()) / 86_400_000);
 }
 
+import { safeRead as baseSafeRead, safeWrite, safeRemove } from './safeStorage';
+
 function safeRead<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = baseSafeRead(key);
     if (!raw) return fallback;
     return JSON.parse(raw) as T;
   } catch {
     return fallback;
   }
 }
-
-import { safeWrite } from './safeStorage';
 
 export function pruneStaleStatsKeys(): void {
   if (typeof window === 'undefined') return;
@@ -65,7 +64,7 @@ export function pruneStaleStatsKeys(): void {
         toDelete.push(k);
       }
     }
-    toDelete.forEach((k) => window.localStorage.removeItem(k));
+    toDelete.forEach((k) => safeRemove(k));
   } catch {
       }
 }

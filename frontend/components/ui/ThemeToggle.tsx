@@ -12,6 +12,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 
 const STORAGE_KEY = 'iv-theme';
 
@@ -23,8 +24,7 @@ function readSystem(): Theme {
 }
 
 function readStored(): Theme | null {
-  if (typeof window === 'undefined') return null;
-  const v = window.localStorage.getItem(STORAGE_KEY);
+  const v = safeRead(STORAGE_KEY);
   return v === 'dark' || v === 'light' ? v : null;
 }
 
@@ -63,10 +63,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     setTheme((prev) => {
       const next: Theme = prev === 'dark' ? 'light' : 'dark';
       applyTheme(next);
-      try {
-        window.localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-              }
+      safeWrite(STORAGE_KEY, next);
       return next;
     });
   }, []);

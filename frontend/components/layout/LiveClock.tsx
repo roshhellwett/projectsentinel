@@ -100,8 +100,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
           </span>
           <time
             dateTime={isoLabel}
-            className="text-[13px] font-semibold tabular-nums text-ink"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="text-[13px] font-semibold tabular-nums text-ink font-mono"
           >
             {time} IST
           </time>
@@ -129,8 +128,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
         </div>
         <time
           dateTime={isoLabel}
-          className="text-[26px] font-bold tabular-nums leading-none text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
+          className="text-[26px] font-bold tabular-nums leading-none text-ink font-mono"
         >
           {time}
         </time>
@@ -158,8 +156,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
       <span className="h-3 w-px bg-rule" aria-hidden="true" />
       <time
         dateTime={isoLabel}
-        className="text-[12px] font-semibold tabular-nums text-ink"
-        style={{ fontFamily: 'var(--font-mono)' }}
+        className="text-[12px] font-semibold tabular-nums text-ink font-mono"
       >
         {time}
       </time>

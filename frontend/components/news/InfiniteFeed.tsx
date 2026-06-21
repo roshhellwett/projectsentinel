@@ -16,14 +16,13 @@ import { dedupe } from '@/lib/utils/dedupe';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { useReadPosts } from '@/lib/utils/readPosts';
-import { subscribeToPosts } from '@/lib/supabase/client';
-import { markFresh } from '@/lib/utils/freshSignal';
 import {
   POLL_INTERVAL_MS,
-  BACKGROUND_POLL_INTERVAL_MS,
   DEFAULT_PAGE_SIZE,
 } from '@/lib/config/constants';
+import { useInfiniteFeed } from '@/lib/hooks/useInfiniteFeed';
+import { useIntersectionObserver } from '@/lib/hooks/useIntersectionObserver';
+import { useReadPosts } from '@/lib/utils/readPosts';
 
 const TICK_THROTTLE_MS = 4_000;
 
@@ -60,19 +59,13 @@ export function InfiniteFeed({
   excludeIds,
 }: InfiniteFeedProps) {
 
-  const excludeKey = excludeIds ? excludeIds.join(',') : '';
-  const excludeSet = useMemo(
-    () => (excludeKey ? new Set(excludeKey.split(',')) : undefined),
-    [excludeKey],
-  );
-
-  const dedupedInitial = dedupe(initialPosts);
-
-  const [posts, setPosts] = useState<Post[]>(dedupedInitial);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [exhausted, setExhausted] = useState(initialPosts.length >= initialCount);
-  const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
+  const { posts, setPosts, loading, exhausted, freshIds, loadMore } = useInfiniteFeed({
+    initialPosts,
+    initialCount,
+    category,
+    pageSize,
+    excludeIds,
+  });
 
 
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -93,236 +86,12 @@ export function InfiniteFeed({
 
   const { readIds, markRead } = useReadPosts();
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const loadingRef = useRef(false);
-  const postsRef = useRef(posts);
+  const sentinelRef = useIntersectionObserver({
+    onIntersect: loadMore,
+    rootMargin: '800px 0px',
+    enabled: !loading && !exhausted
+  });
 
-
-  const lastTickRef = useRef(0);
-  postsRef.current = posts;
-
-  const excludeIdsRef = useRef(excludeSet);
-  excludeIdsRef.current = excludeSet;
-
-  const loadMore = useCallback(async () => {
-    if (loadingRef.current || exhausted) return;
-    loadingRef.current = true;
-    setLoading(true);
-    try {
-      const next = page + 1;
-      const params = new URLSearchParams({ page: String(next), limit: String(pageSize) });
-      if (category) params.set('category', category);
-      const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Failed to load posts');
-      const data: { posts: Post[]; count: number } = await res.json();
-
-      setPosts((prev) => {
-        const existing = new Set(prev.map((p) => p.id));
-        const excluded = excludeIdsRef.current;
-        const incoming = data.posts.filter(
-          (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
-        );
-        return dedupe([...prev, ...incoming]);
-      });
-      setPage(next);
-
-      if (data.posts.length === 0 || data.posts.length < pageSize) {
-        setExhausted(true);
-      }
-    } catch {
-      
-    } finally {
-      setLoading(false);
-      loadingRef.current = false;
-    }
-  }, [page, pageSize, category, exhausted]);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            loadMore();
-            break;
-          }
-        }
-      },
-      { rootMargin: '800px 0px' }, 
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [loadMore]);
-
-
-
-  const flashFresh = useCallback((ids: string[]) => {
-    if (ids.length === 0) return;
-    setFreshIds((curr) => {
-      const next = new Set(curr);
-      for (const id of ids) next.add(id);
-      return next;
-    });
-    window.setTimeout(() => {
-      setFreshIds((curr) => {
-        const next = new Set(curr);
-        for (const id of ids) next.delete(id);
-        return next;
-      });
-    }, 5000);
-  }, []);
-
-
-  const incomingBufferRef = useRef<Post[]>([]);
-  const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const flushIncoming = useCallback(() => {
-    flushTimerRef.current = null;
-    const incoming = incomingBufferRef.current;
-    incomingBufferRef.current = [];
-    if (incoming.length === 0) return;
-
-    const existing = new Set(postsRef.current.map((p) => p.id));
-    const excluded = excludeIdsRef.current;
-    const fresh = incoming.filter(
-      (p) =>
-        !existing.has(p.id) &&
-        !(excluded?.has(p.id)) &&
-        (!category || p.category === category),
-    );
-    if (fresh.length === 0) return;
-    flashFresh(fresh.map((p) => p.id));
-    setPosts((prev) => dedupe([...fresh, ...prev]));
-  }, [category, flashFresh]);
-
-  const processIncomingPosts = useCallback((incoming: Post[]) => {
-    if (incoming.length === 0) return;
-
-
-    const bufIds = new Set(incomingBufferRef.current.map((p) => p.id));
-    for (const p of incoming) {
-      if (bufIds.has(p.id)) {
-
-        incomingBufferRef.current = incomingBufferRef.current.map((b) => (b.id === p.id ? p : b));
-      } else {
-        incomingBufferRef.current.push(p);
-        bufIds.add(p.id);
-      }
-    }
-
-    if (flushTimerRef.current === null) {
-      flushTimerRef.current = setTimeout(flushIncoming, 800);
-    }
-  }, [flushIncoming]);
-
-  useEffect(() => {
-    let sub: { unsubscribe: () => void } | null = null;
-
-    const connect = () => {
-
-      if (sub) {
-        try { sub.unsubscribe(); } catch {  }
-        sub = null;
-      }
-      try {
-        sub = subscribeToPosts((post) => {
-          processIncomingPosts([post]);
-        });
-      } catch {
-        
-        
-      }
-    };
-
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') connect();
-    };
-
-    connect();
-    document.addEventListener('visibilitychange', onVisible);
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisible);
-      if (sub) {
-        try { sub.unsubscribe(); } catch {  }
-      }
-    };
-  }, [processIncomingPosts]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const FOREGROUND_MS = POLL_INTERVAL_MS;
-    const BACKGROUND_MS = BACKGROUND_POLL_INTERVAL_MS;
-
-
-    const tick = async () => {
-      if (cancelled) return;
-      const now = Date.now();
-      if (now - lastTickRef.current < TICK_THROTTLE_MS) return;
-      lastTickRef.current = now;
-      try {
-        const params = new URLSearchParams({ page: '1', limit: '10', _t: String(now) });
-        if (category) params.set('category', category);
-        const res = await fetch(`/api/posts?${params.toString()}`, { cache: 'no-store' });
-        if (!res.ok || cancelled) return;
-        const data: { posts: Post[] } = await res.json();
-        if (cancelled) return;
-        processIncomingPosts(data.posts);
-        markFresh();
-      } catch {
-              }
-    };
-
-    let timerId: ReturnType<typeof setTimeout> | null = null;
-
-    const scheduleNext = (ms: number) => {
-      if (timerId !== null) clearTimeout(timerId);
-      timerId = setTimeout(async () => {
-        await tick();
-        if (!cancelled) {
-          const interval = document.visibilityState === 'hidden' ? BACKGROUND_MS : FOREGROUND_MS;
-          scheduleNext(interval);
-        }
-      }, ms);
-    };
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        tick();
-        scheduleNext(FOREGROUND_MS);
-      } else {
-        scheduleNext(BACKGROUND_MS);
-      }
-    };
-
-    const onOnline = () => { tick(); scheduleNext(FOREGROUND_MS); };
-
-
-
-
-    const onPageShow = (e: PageTransitionEvent) => {
-      if (e.persisted) tick();
-    };
-
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    window.addEventListener('online', onOnline);
-    window.addEventListener('pageshow', onPageShow);
-
-
-
-    scheduleNext(FOREGROUND_MS);
-
-    return () => {
-      cancelled = true;
-      if (timerId !== null) clearTimeout(timerId);
-      if (flushTimerRef.current !== null) clearTimeout(flushTimerRef.current);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('online', onOnline);
-      window.removeEventListener('pageshow', onPageShow);
-    };
-  }, [category, processIncomingPosts]);
 
   useEffect(() => {
     if (selectedPost && !posts.find((p) => p.id === selectedPost.id)) {
@@ -340,7 +109,7 @@ export function InfiniteFeed({
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5">
+        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float shadow-sm">
           <svg
             className="w-7 h-7 text-muted"
             fill="none"
@@ -351,7 +120,7 @@ export function InfiniteFeed({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
           </svg>
         </div>
-        <h3 className="font-display text-lg font-bold text-ink mb-1.5">No verified news found</h3>
+        <h3 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">No verified news found</h3>
         <p className="text-sm text-muted max-w-sm">
           We couldn&apos;t find any articles. Try a different category or check back in a few minutes.
         </p>

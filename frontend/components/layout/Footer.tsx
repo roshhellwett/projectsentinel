@@ -65,7 +65,7 @@ export function Footer() {
                 IV
               </span>
               <span className="flex flex-col leading-tight">
-                <span className="font-display text-2xl font-bold text-ink tracking-tight">
+                <span className="font-display text-2xl font-bold text-ink tracking-[-0.025em]">
                   India Verified
                 </span>
                 <span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-accent">
@@ -84,7 +84,7 @@ export function Footer() {
             <InstallAppButton />
             <a
               href={RSS_URL}
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Rss className="w-3.5 h-3.5" />
               RSS Feed
@@ -93,7 +93,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Github className="w-3.5 h-3.5" />
               View source

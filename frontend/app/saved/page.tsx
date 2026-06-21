@@ -91,7 +91,7 @@ export default function SavedPage() {
         <div>
           <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
           <p className="editorial-kicker mb-3">Your reading list</p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-3 leading-[1.05]">
+          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-[-0.03em] text-ink mb-3 leading-[1.05]">
             Saved stories
           </h1>
           <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
@@ -134,7 +134,7 @@ export default function SavedPage() {
           <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float">
             <Bookmark className="w-7 h-7 text-muted" />
           </div>
-          <h2 className="font-display text-lg font-bold text-ink mb-1.5">
+          <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">
             No saved stories yet
           </h2>
           <p className="text-sm text-muted max-w-sm mb-6">
@@ -143,7 +143,7 @@ export default function SavedPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-2 px-4 pt-[9px] pb-[11px] rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             Browse latest news
           </Link>

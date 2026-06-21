@@ -21,6 +21,7 @@ import { BookmarkButton } from './BookmarkButton';
 import { CredibilityBar } from './CredibilityBar';
 import { SourcePickerButton } from './SourcePickerButton';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { typographyStyles } from '@/lib/theme/typography';
 
 function ageDotClass(ageMs: number): string {
   if (ageMs < 60 * 60 * 1000) return 'bg-accent';
@@ -132,8 +133,8 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
         isRead && 'opacity-70',
         isNew && 'flash-new-post',
         wasRecentlyOpened && 'memory-ring',
+        'contain-layout'
       )}
-      style={{ contain: 'layout' }}
     >
 
       <span
@@ -144,7 +145,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
 
         <div className="flex items-center gap-3 flex-wrap min-w-0 mb-3" suppressHydrationWarning>
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
+          <span className={typographyStyles.kicker}>
             {theme.label}
           </span>
 
@@ -158,7 +159,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
             </span>
           )}
 
-          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted font-medium">
+          <span className={cn(typographyStyles.meta, "inline-flex items-center gap-1.5")}>
             <span
               className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${ageDot}`}
               aria-hidden="true"
@@ -167,7 +168,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
             <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
           </span>
 
-          <span className="inline-flex items-center gap-1 text-[11px] text-muted font-medium">
+          <span className={cn(typographyStyles.meta, "inline-flex items-center gap-1")}>
             <BookOpen className="w-2.5 h-2.5" aria-hidden="true" />
             <span className="tabular-nums">{readMinutes}</span>
             <span>min read</span>
@@ -185,11 +186,11 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
           )}
         </div>
 
-        <h3 className="font-display text-[20px] md:text-[22px] font-bold leading-[1.16] tracking-tight text-ink line-clamp-3 mb-2.5 transition-colors">
+        <h3 className={cn(typographyStyles.card.headline, "line-clamp-3 mb-2.5 transition-colors")}>
           {post.headline}
         </h3>
 
-        <p className="text-[14px] text-muted leading-relaxed line-clamp-2 mb-5">
+        <p className={cn(typographyStyles.card.summary, "line-clamp-2 mb-5")}>
           {truncateWords(post.summary, 24)}
         </p>
 

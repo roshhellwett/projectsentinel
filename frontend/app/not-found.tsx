@@ -17,12 +17,12 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 text-center animate-fade-in-up">
-      <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-paper-2 border border-rule flex items-center justify-center mb-6 animate-soft-float">
+    <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-paper-2 border border-rule flex items-center justify-center mb-6">
         <FileQuestion className="w-8 h-8 md:w-10 md:h-10 text-muted" strokeWidth={1.5} />
       </div>
       
-      <p className="editorial-kicker mb-3">Error 404</p>
+      <p className="text-accent text-[11px] font-bold tracking-[0.18em] uppercase mb-3">Error 404</p>
       <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-ink mb-4 leading-[1.05]">
         Page not found
       </h1>
@@ -34,14 +34,14 @@ export default function NotFound() {
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <Link
           href="/"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 hover-lift transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-transform active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home
         </Link>
         <Link
           href="/search"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded border border-rule-strong bg-paper text-ink text-sm font-semibold hover:border-ink hover:bg-paper-2 hover-lift transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded border border-rule-strong bg-paper text-ink text-sm font-semibold hover:border-ink hover:bg-paper-2 transition-transform active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <Search className="w-4 h-4" />
           Search news

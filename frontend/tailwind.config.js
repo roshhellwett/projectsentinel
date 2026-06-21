@@ -55,7 +55,7 @@ module.exports = {
         // Quiet editorial shadows — paper-on-paper, never glowy.
         'rule':         '0 0 0 1px rgb(var(--c-rule) / 1)',
         'paper':        '0 1px 0 rgb(var(--c-rule) / 1)',
-        'paper-lift':   '0 1px 0 rgb(var(--c-rule) / 1), 0 12px 32px -22px rgb(var(--c-ink) / 0.18)',
+        'paper-lift':   '0 1px 0 rgb(var(--c-rule) / 1), 0 2px 8px -2px rgb(var(--c-shadow) / 0.06), 0 12px 32px -10px rgb(var(--c-shadow) / 0.20)',
         'glow-accent':  '0 0 0 1px rgb(var(--c-accent) / 0.28)',
       },
       letterSpacing: {

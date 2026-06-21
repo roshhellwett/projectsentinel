@@ -11,7 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Flame, Layers, Newspaper } from 'lucide-react';
+import { Flame, Layers, Newspaper, CheckCircle2 } from 'lucide-react';
 
 interface SwipeEmptyStateProps {
   cardsToday: number;
@@ -44,8 +44,10 @@ export function SwipeEmptyState({
 
   return (
     <div className="w-full max-w-md mx-auto px-4 py-10 text-center">
-      <span className="block w-12 h-[2px] bg-accent mx-auto mb-5" aria-hidden="true" />
-      <h2 className="font-display text-2xl font-bold text-ink mb-2">You&apos;re caught up.</h2>
+      <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mx-auto mb-5 animate-soft-float shadow-sm">
+        <CheckCircle2 className="w-7 h-7 text-accent" />
+      </div>
+      <h2 className="font-display text-2xl font-bold text-ink tracking-[-0.015em] mb-2">You&apos;re caught up.</h2>
       <p className="text-[13px] text-muted mb-8">
         No more verified stories right now. Check back in a few minutes.
       </p>
@@ -62,14 +64,14 @@ export function SwipeEmptyState({
             type="button"
             onClick={handleRefresh}
             disabled={isFetching || cooldown > 0}
-            className="w-full px-4 py-2.5 bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="w-full px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {isFetching ? 'Checking…' : cooldown > 0 ? `Wait ${cooldown}s` : 'Check for new stories'}
           </button>
         )}
         <Link
           href="/"
-          className="w-full inline-flex items-center justify-center px-4 py-2 border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 hover-lift transition-colors rounded"
+          className="w-full inline-flex items-center justify-center px-4 pt-[7px] pb-[9px] border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 hover-lift transition-colors rounded"
         >
           Back to grid
         </Link>

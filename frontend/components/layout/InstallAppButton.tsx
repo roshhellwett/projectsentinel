@@ -21,7 +21,7 @@ export function InstallAppButton() {
     <button
       type="button"
       onClick={promptInstall}
-      className="inline-flex items-center gap-1.5 px-3 py-2 bg-ink text-[13px] font-semibold text-paper hover:bg-ink/90 transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] bg-ink text-[13px] font-semibold text-paper hover:bg-ink/90 transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       aria-label="Install App"
     >
       <Download className="w-3.5 h-3.5" />

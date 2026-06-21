@@ -25,10 +25,11 @@ export function todayKey(): string {
   return dayKey(new Date());
 }
 
+import { safeRead as baseSafeRead, safeWrite, safeRemove } from './safeStorage';
+
 function safeRead(key: string): string[] {
-  if (typeof window === 'undefined') return [];
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = baseSafeRead(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
@@ -36,8 +37,6 @@ function safeRead(key: string): string[] {
     return [];
   }
 }
-
-import { safeWrite } from './safeStorage';
 
 export function pruneStaleSeenKeys(): void {
   if (typeof window === 'undefined') return;
@@ -52,7 +51,7 @@ export function pruneStaleSeenKeys(): void {
       const parsed = new Date(`${datePart}T00:00:00`);
       if (Number.isFinite(parsed.getTime()) && parsed < cutoff) toDelete.push(k);
     }
-    toDelete.forEach((k) => window.localStorage.removeItem(k));
+    toDelete.forEach((k) => safeRemove(k));
   } catch {
       }
 }

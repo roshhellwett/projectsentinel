@@ -38,7 +38,7 @@ export function LegalPage({ kicker, title, lastUpdated, intro, children }: Legal
         <header className="mb-10">
           <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5" />
           <p className="editorial-kicker mb-3">{kicker}</p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-ink leading-[1.05] mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink leading-[1.05] mb-4">
             {title}
           </h1>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">

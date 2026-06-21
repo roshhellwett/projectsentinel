@@ -10,7 +10,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { AlertCircle, FileText, Send, X } from 'lucide-react';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { Post } from '@/types';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
@@ -64,8 +65,8 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
       if (response.ok) {
         window.location.reload();
       } else {
-        const data = await response.json().catch(() => ({}));
-        setError(data?.error || `Request failed (${response.status})`);
+        const payload = await response.json().catch(() => ({}));
+        setError(payload?.error || `Request failed (${response.status})`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Network error');
@@ -75,13 +76,13 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-[120] flex items-center justify-center p-4" onClick={onClose}>
+    <div className={`fixed inset-0 bg-slate-950/25 backdrop-blur-sm ${Z_INDEX.adminModal} flex items-center justify-center p-4`} onClick={onClose}>
       <div className="bg-paper border border-rule-strong rounded-md p-6 w-full max-w-lg shadow-paper-lift" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-medium">
             {type === 'corrected' ? 'Add Correction' : 'Retract Article'}
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-paper-2 rounded text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+          <button onClick={onClose} aria-label="Close modal" className="p-1 hover:bg-paper-2 rounded text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
             <X className="w-5 h-5" />
           </button>
         </div>

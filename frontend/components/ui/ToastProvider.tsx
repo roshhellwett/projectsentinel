@@ -10,19 +10,26 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookmarkCheck, BookmarkMinus, Share2, CheckCircle2 } from 'lucide-react';
+import { BookmarkCheck, BookmarkMinus, Share2, CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useToasts } from '@/lib/utils/toast';
 
 export function ToastProvider() {
   const toasts = useToasts();
 
   return (
-    <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-10 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none">
+    <div 
+      className={`fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-10 left-1/2 -translate-x-1/2 ${Z_INDEX.toast} flex flex-col items-center gap-2 pointer-events-none`}
+      aria-live="polite"
+      role="region"
+      aria-label="Notifications"
+    >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => (
           <motion.div
             layout
             key={toast.id}
+            role="status"
             initial={{ opacity: 0, y: 24, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] } }}

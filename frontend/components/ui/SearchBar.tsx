@@ -11,7 +11,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Search } from 'lucide-react';
+import { X, Search, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
@@ -55,9 +56,9 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           if (!res.ok) throw new Error('search failed');
           return res.json();
         })
-        .then((data: { posts?: Post[]; count?: number }) => {
-          setResults(data.posts || []);
-          setResultCount(typeof data.count === 'number' ? data.count : (data.posts?.length ?? 0));
+        .then((payload: { posts?: Post[]; count?: number }) => {
+          setResults(payload.posts || []);
+          setResultCount(typeof payload.count === 'number' ? payload.count : (payload.posts?.length ?? 0));
           setIsLoading(false);
         })
         .catch((err) => {
@@ -122,7 +123,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className="fixed inset-0 z-[100] overflow-y-auto bg-paper/80 backdrop-blur-md will-change-opacity"
+          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-paper/80 backdrop-blur-md will-change-opacity`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -138,7 +139,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="editorial-kicker mb-2">India Verified</p>
-                <h2 className="font-display text-3xl md:text-5xl font-bold text-ink tracking-tight">Search</h2>
+                <h2 className="font-display text-3xl md:text-5xl font-bold text-ink tracking-[-0.03em]">Search</h2>
               </div>
               <motion.button
                 whileTap={{ scale: 0.9 }}

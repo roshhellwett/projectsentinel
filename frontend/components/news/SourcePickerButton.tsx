@@ -16,6 +16,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Source } from '@/types';
 import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
+import { buttonVariants } from '@/components/ui/Button';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 
 interface SourcePickerButtonProps {
   sources: Source[];
@@ -158,7 +160,7 @@ export function SourcePickerButton({
         <motion.div
           ref={menuRef}
           role="menu"
-          className="z-[100] rounded border border-rule-strong bg-paper p-2 shadow-paper-lift will-change-transform will-change-opacity transform-gpu"
+          className={`${Z_INDEX.popover} rounded border border-rule-strong bg-paper p-2 shadow-paper-lift will-change-transform will-change-opacity transform-gpu`}
           style={{
             ...((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties),
             transformOrigin: isSheet && isMobile ? 'bottom center' : (isSheet ? 'bottom right' : 'bottom left')
@@ -215,8 +217,9 @@ export function SourcePickerButton({
           if (stopPropagation) event.stopPropagation();
         }}
         className={cn(
-          'inline-flex max-w-full items-center justify-center gap-2 rounded border border-rule-strong bg-paper px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-paper focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-          placement === 'sheet' && 'w-full rounded px-3 py-3',
+          buttonVariants({ variant: 'outline' }),
+          'gap-2 font-semibold max-w-full hover:bg-ink hover:text-paper hover:border-ink',
+          placement === 'sheet' && 'w-full px-3 py-3',
           buttonClassName,
         )}
       >
@@ -237,8 +240,9 @@ export function SourcePickerButton({
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
-          'inline-flex max-w-full items-center justify-center gap-2 rounded border border-rule-strong bg-paper px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-paper focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-55',
-          placement === 'sheet' && 'w-full rounded px-3 py-3',
+          buttonVariants({ variant: 'outline' }),
+          'gap-2 font-semibold max-w-full hover:bg-ink hover:text-paper hover:border-ink disabled:opacity-55',
+          placement === 'sheet' && 'w-full px-3 py-3',
           buttonClassName,
         )}
       >

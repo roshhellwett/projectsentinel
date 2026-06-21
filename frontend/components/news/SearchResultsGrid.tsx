@@ -14,11 +14,11 @@ import { Post } from '@/types';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
 
-interface Props {
+interface SearchResultsGridProps {
   posts: Post[];
 }
 
-export function SearchResultsGrid({ posts }: Props) {
+export function SearchResultsGrid({ posts }: SearchResultsGridProps) {
   const [selected, setSelected] = useState<Post | null>(null);
   const close = useCallback(() => setSelected(null), []);
 

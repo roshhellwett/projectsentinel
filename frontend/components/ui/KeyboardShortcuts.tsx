@@ -11,7 +11,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { X, Keyboard } from 'lucide-react';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
@@ -130,7 +131,7 @@ export function KeyboardShortcuts() {
         <>
           <motion.div
             key="kb-backdrop"
-            className="fixed inset-0 z-[110] bg-ink/30 backdrop-blur-md"
+            className={`fixed inset-0 ${Z_INDEX.shortcutBackdrop} bg-ink/30 backdrop-blur-md`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -143,13 +144,13 @@ export function KeyboardShortcuts() {
             role="dialog"
             aria-modal="true"
             aria-label="Keyboard shortcuts"
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[111] w-[min(calc(100vw-2rem),22rem)]"
+            className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 ${Z_INDEX.shortcutWidget} w-[min(calc(100vw-2rem),22rem)]`}
             initial={{ opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           >
-            <div className="premium-card rounded-2xl p-6 shadow-[0_30px_90px_-40px_rgba(15,23,42,0.45)]">
+            <div className="premium-card rounded-2xl p-6 shadow-paper-lift">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
@@ -179,7 +180,7 @@ export function KeyboardShortcuts() {
                       {keys.map((k) => (
                         <kbd
                           key={k}
-                          className="inline-flex items-center justify-center min-w-[1.65rem] h-7 px-2 rounded-md bg-paper border border-rule text-[11px] font-semibold text-ink shadow-[inset_0_-1px_0_rgba(15,23,42,0.08)]"
+                          className="inline-flex items-center justify-center min-w-[1.65rem] h-7 px-2 rounded-md bg-paper border border-rule text-[11px] font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
                         >
                           {k}
                         </kbd>

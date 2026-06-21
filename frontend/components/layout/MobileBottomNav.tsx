@@ -17,6 +17,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
+import { cn } from '@/lib/utils/cn';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
@@ -65,7 +67,7 @@ export function MobileBottomNav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="md:hidden fixed inset-0 z-[55]"
+            className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay}`}
           >
             <div className="absolute inset-0 bg-ink/35 backdrop-blur-[2px]" onClick={closeTopics} />
             <motion.div
@@ -112,7 +114,7 @@ export function MobileBottomNav() {
         initial={false}
         animate={{ y: hideForOverlay ? '100%' : '0%', opacity: hideForOverlay ? 0 : 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
-        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57] will-change-transform will-change-opacity transform-gpu"
+        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} will-change-transform will-change-opacity transform-gpu`}
         aria-hidden={hideForOverlay ? 'true' : 'false'}
         aria-label="Mobile navigation"
         style={{ pointerEvents: hideForOverlay ? 'none' : 'auto' }}

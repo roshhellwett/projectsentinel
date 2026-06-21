@@ -40,7 +40,7 @@ async function SearchResults({ query }: { query: string }) {
         <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float">
             <SearchX className="w-7 h-7 text-muted" />
         </div>
-        <h2 className="font-display text-lg font-bold text-ink mb-2">No results found</h2>
+        <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-2">No results found</h2>
         <p className="text-sm text-muted max-w-sm">
           No verified stories matched &ldquo;{query}&rdquo;. Try different keywords.
         </p>
@@ -70,7 +70,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <p className="editorial-kicker mb-3">
           {query ? 'Search Results' : 'Search'}
         </p>
-        <h1 className="font-display text-4xl md:text-6xl font-bold text-ink tracking-tight mb-3 leading-[1.05]">
+        <h1 className="font-display text-4xl md:text-6xl font-bold text-ink tracking-[-0.03em] mb-3 leading-[1.05]">
           {query ? query : 'Find verified news'}
         </h1>
         <p className="text-sm text-muted">

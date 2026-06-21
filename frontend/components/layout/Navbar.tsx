@@ -12,6 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -69,8 +70,8 @@ export function Navbar() {
   return (
     <>
       <header
-        className="sticky top-0 inset-x-0 z-50 bg-paper/90 supports-[backdrop-filter]:bg-paper/60 backdrop-filter backdrop-blur-lg border-b border-rule transition-colors"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)', WebkitBackdropFilter: 'blur(16px)', backdropFilter: 'blur(16px)' }}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/90 supports-[backdrop-filter]:bg-paper/60 backdrop-filter backdrop-blur-lg border-b border-rule transition-colors`}
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
 
         <div className="container mx-auto px-4 lg:px-6">
@@ -88,7 +89,7 @@ export function Navbar() {
                 IV
               </span>
               <span className="flex flex-col leading-none whitespace-nowrap">
-                <span className="font-display text-[17px] sm:text-[19px] font-bold text-ink tracking-tight">
+                <span className="font-display text-[17px] sm:text-[19px] font-bold text-ink tracking-[-0.02em]">
                   India Verified
                 </span>
                 <span className="hidden md:inline text-[10px] font-semibold tracking-[0.18em] uppercase text-accent mt-0.5">
@@ -184,7 +185,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="lg:hidden fixed inset-0 z-[60] bg-ink/40 backdrop-blur-[2px]"
+              className={`lg:hidden fixed inset-0 ${Z_INDEX.modalBackdrop} bg-ink/40 backdrop-blur-[2px]`}
               onClick={() => setIsMobileOpen(false)}
             />
             <motion.aside
@@ -193,7 +194,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
-              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu"
+              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
