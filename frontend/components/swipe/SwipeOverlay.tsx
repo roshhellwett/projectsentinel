@@ -31,7 +31,7 @@ export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
   const [hasSeen, setHasSeen] = useState(true);
 
   useEffect(() => {
-    setHasSeen(safeRead<boolean>(SEEN_KEY, false));
+    setHasSeen(safeRead(SEEN_KEY) === 'true');
   }, []);
 
   const { x, y } = drag;
