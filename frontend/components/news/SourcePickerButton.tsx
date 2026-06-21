@@ -139,7 +139,6 @@ export function SourcePickerButton({
     width: 'min(18rem, calc(100vw - 2rem))',
   };
 
-  
   const sheetStyle = isMobile ? {
     position: 'fixed' as const,
     bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
@@ -204,6 +203,28 @@ export function SourcePickerButton({
       )}
     </AnimatePresence>
   );
+
+  if (validSources.length === 1) {
+    return (
+      <motion.a
+        href={validSources[0].url}
+        target="_blank"
+        rel="noopener noreferrer"
+        whileTap={{ scale: 0.96 }}
+        onClick={(event: React.MouseEvent) => {
+          if (stopPropagation) event.stopPropagation();
+        }}
+        className={cn(
+          'inline-flex max-w-full items-center justify-center gap-2 rounded border border-rule-strong bg-paper px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-paper focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+          placement === 'sheet' && 'w-full rounded px-3 py-3',
+          buttonClassName,
+        )}
+      >
+        <Newspaper className="h-4 w-4" />
+        <span className="truncate">{label}</span>
+      </motion.a>
+    );
+  }
 
   return (
     <div className={cn('relative min-w-0', placement === 'sheet' && 'w-full', className)}>
