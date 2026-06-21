@@ -10,6 +10,8 @@
 'use client';
 
 import { ArrowRight, ArrowDown, ArrowUp, Undo2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 
 interface SwipeOverlayProps {
   drag: { x: number; y: number };
@@ -17,6 +19,7 @@ interface SwipeOverlayProps {
 }
 
 const TRIGGER = 110;
+const SEEN_KEY = 'iv:swipe:overlaySeen:v1';
 
 function clamp01(n: number): number {
   if (n < 0) return 0;
@@ -25,6 +28,12 @@ function clamp01(n: number): number {
 }
 
 export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
+  const [hasSeen, setHasSeen] = useState(true);
+
+  useEffect(() => {
+    setHasSeen(safeRead<boolean>(SEEN_KEY, false));
+  }, []);
+
   const { x, y } = drag;
   const ax = Math.abs(x);
   const ay = Math.abs(y);
@@ -34,6 +43,16 @@ export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
   const opaPrevLeft  = horizontalDominant && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0;
   const opaNextUp    = !horizontalDominant && y < 0 ? clamp01(-y / TRIGGER) : 0;
   const opaPrevDown  = !horizontalDominant && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0;
+
+  useEffect(() => {
+    if (!hasSeen && Math.max(opaNextRight, opaPrevLeft, opaNextUp, opaPrevDown) > 0.6) {
+      safeWrite(SEEN_KEY, true);
+      // Let them finish the current swipe before hiding it forever
+      setTimeout(() => setHasSeen(true), 2000);
+    }
+  }, [hasSeen, opaNextRight, opaPrevLeft, opaNextUp, opaPrevDown]);
+
+  if (hasSeen) return null;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[40]">
