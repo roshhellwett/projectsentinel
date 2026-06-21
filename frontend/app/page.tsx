@@ -16,6 +16,8 @@ import { TrendingSection } from '@/components/news/TrendingSection';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { LiveClock } from '@/components/layout/LiveClock';
+import { WeatherWidget } from '@/components/layout/WeatherWidget';
+import { Suspense } from 'react';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { dedupe } from '@/lib/utils/dedupe';
 
@@ -100,20 +102,32 @@ export default async function HomePage() {
                 ads or noise.
               </p>
             </div>
-            <LiveClock variant="hero" />
+            <div className="flex flex-col gap-0 items-end">
+              <LiveClock variant="hero" className="border-b-0" />
+              <WeatherWidget />
+            </div>
           </div>
 
-          <div className="md:hidden">
-            <p className="editorial-kicker mb-4">
-              <span>{getIndianGreeting()}</span>
-            </p>
-            <h1 className="font-display font-bold text-ink leading-[1.06] tracking-tight text-[clamp(2.25rem,8vw,3rem)] animate-fade-in-up">
-              A calmer, smarter front page for India.
-            </h1>
-            <p className="mt-4 text-[15px] leading-relaxed text-muted animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
-              Every story cross-referenced, scored for credibility, and
-              rewritten without ads or noise.
-            </p>
+          <div className="md:hidden flex flex-col gap-6">
+            <div>
+              <p className="editorial-kicker mb-4">
+                <span>{getIndianGreeting()}</span>
+              </p>
+              <h1 className="font-display font-bold text-ink leading-[1.06] tracking-tight text-[clamp(2.25rem,8vw,3rem)] animate-fade-in-up">
+                A calmer, smarter front page for India.
+              </h1>
+              <p className="mt-4 text-[15px] leading-relaxed text-muted animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
+                Every story cross-referenced, scored for credibility, and
+                rewritten without ads or noise.
+              </p>
+            </div>
+            
+            <div className="flex gap-4 items-start">
+              <div className="flex flex-col w-full">
+                <LiveClock variant="hero" className="border-b-0 w-full flex-row justify-between items-center px-4 py-3" />
+                <WeatherWidget className="w-full flex-row justify-between items-center px-4 py-3" />
+              </div>
+            </div>
           </div>
 
           {verifiedToday > 0 && (

@@ -10,6 +10,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils/cn';
 
 interface LiveClockProps {
   variant?: 'navbar' | 'menu' | 'hero';
@@ -112,7 +113,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
   if (variant === 'hero') {
     return (
       <div
-        className={`relative inline-flex flex-col items-end gap-1 border border-rule bg-paper px-5 py-3 ${className}`}
+        className={cn('relative inline-flex flex-col items-end gap-1 border border-rule bg-paper px-5 py-3', className)}
         role="status"
         aria-live="off"
         aria-label={`Current time ${time}, ${date}`}
