@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence, useMotionValue, useTransform, useAnimation, useReducedMotion, type PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
 import type { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
@@ -173,8 +173,8 @@ export function SwipeCard({
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
   const rotate = useTransform(dragX, [-220, 0, 220], [-12, 0, 12]);
-  const controls = useAnimation();
   const [exiting, setExiting] = useState(false);
+  const [exitDir, setExitDir] = useState<SwipeDirection | null>(null);
   const [showDoubleTap, setShowDoubleTap] = useState(false);
 
   const lastTapRef = useRef(0);
@@ -185,64 +185,63 @@ export function SwipeCard({
       setExiting(false);
       dragX.set(0);
       dragY.set(0);
-      controls.set({ x: 0, y: 0, opacity: 1, rotate: 0 });
       return;
     }
     const unsubX = dragX.on('change', (xv) => onDragProgress?.({ x: xv, y: dragY.get() }));
     const unsubY = dragY.on('change', (yv) => onDragProgress?.({ x: dragX.get(), y: yv }));
     return () => { unsubX(); unsubY(); };
-  }, [interactive, onDragProgress, dragX, dragY, controls]);
+  }, [interactive, onDragProgress, dragX, dragY]);
 
   const handleDragEnd = async (_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
     let dir = decideDirection(info);
     if ((dir === 'down' || dir === 'left') && !canRewind) dir = null;
     if (!dir || !interactive) {
-      controls.start({ x: 0, y: 0, transition: { type: 'spring', stiffness: 360, damping: 32 } });
       onDragProgress?.({ x: 0, y: 0 });
       return;
     }
 
-
     haptic(dir === 'right' ? [8, 40, 8] : 10);
-
     setExiting(true);
-    const target =
-      dir === 'up'    ? { y: -window.innerHeight, opacity: 0 } :
-      dir === 'down'  ? { y:  window.innerHeight, opacity: 0 } :
-      dir === 'left'  ? { x: -window.innerWidth,  opacity: 0, rotate: -18 } :
-                        { x:  window.innerWidth,  opacity: 0, rotate:  18 };
-    await controls.start(target, { duration: reducedMotion ? 0 : 0.28, ease: [0.4, 0, 1, 1] });
+    setExitDir(dir);
+    // Let Framer Motion trigger the exit animation automatically when the parent unmounts this card.
     onSwipe?.(dir, post);
   };
 
-  const wrapperStyle = interactive
-    ? {
-        zIndex: style.z,
-        transformOrigin: 'top center' as const,
-        willChange: 'transform' as const,
-      }
-    : {
-        zIndex: style.z,
-        transform: `translateY(${style.translateY}px) scale(${style.scale})`,
-        opacity: style.opacity,
-        transformOrigin: 'top center' as const,
-        transition: 'transform 400ms var(--ease-spring), opacity 400ms var(--ease-apple)',
-        pointerEvents: 'none' as const,
-        willChange: 'transform' as const,
-      };
+  const isClient = typeof window !== 'undefined';
+  const winW = isClient ? window.innerWidth : 500;
+  const winH = isClient ? window.innerHeight : 800;
 
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, y: -40, scale: 0.95 }}
-      animate={interactive ? controls : { opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ type: 'spring', stiffness: 350, damping: 28, mass: 0.8 }}
-      className="w-full touch-none select-none will-change-transform transform-gpu"
-      style={interactive ? { ...wrapperStyle, x: dragX, y: dragY, rotate } : wrapperStyle}
+      custom={{ depth, exitDir }}
+      variants={{
+        initial: { opacity: 0, y: -40, scale: 0.95 },
+        animate: ({ depth }) => ({
+          x: 0,
+          y: depth === 0 ? 0 : (depth === 1 ? 14 : 28),
+          scale: depth === 0 ? 1 : (depth === 1 ? 0.95 : 0.90),
+          opacity: depth === 0 ? 1 : (depth === 1 ? 0.8 : 0.5),
+          zIndex: depth === 0 ? 30 : (depth === 1 ? 20 : 10),
+          transition: { type: 'spring', stiffness: 350, damping: 28, mass: 0.8 }
+        }),
+        exit: ({ exitDir }) => {
+          const transition = { duration: reducedMotion ? 0 : 0.3, ease: 'easeOut' as const };
+          if (exitDir === 'up') return { y: -winH, opacity: 0, transition };
+          if (exitDir === 'down') return { y: winH, opacity: 0, transition };
+          if (exitDir === 'left') return { x: -winW, rotate: -20, opacity: 0, transition };
+          if (exitDir === 'right') return { x: winW, rotate: 20, opacity: 0, transition };
+          return { opacity: 0, scale: 0.8, transition: { duration: 0.2 } };
+        }
+      }}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="w-full touch-none select-none will-change-transform transform-gpu origin-top"
+      style={{ x: dragX, y: dragY, rotate, zIndex: style.z }}
       drag={interactive && !exiting}
+      dragConstraints={!canRewind ? { left: 0, bottom: 0 } : undefined}
       dragDirectionLock={true}
-      dragElastic={0.25}
+      dragElastic={0.4}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       aria-hidden={depth !== 0}

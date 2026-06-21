@@ -13,6 +13,7 @@ import { ArrowRight, ArrowDown, ArrowUp, Undo2 } from 'lucide-react';
 
 interface SwipeOverlayProps {
   drag: { x: number; y: number };
+  canRewind?: boolean;
 }
 
 const TRIGGER = 110;
@@ -23,16 +24,16 @@ function clamp01(n: number): number {
   return n;
 }
 
-export function SwipeOverlay({ drag }: SwipeOverlayProps) {
+export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
   const { x, y } = drag;
   const ax = Math.abs(x);
   const ay = Math.abs(y);
   const horizontalDominant = ax > ay;
 
   const opaNextRight = horizontalDominant && x > 0  ? clamp01(x / TRIGGER) : 0;
-  const opaPrevLeft  = horizontalDominant && x < 0  ? clamp01(-x / TRIGGER) : 0;
+  const opaPrevLeft  = horizontalDominant && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0;
   const opaNextUp    = !horizontalDominant && y < 0 ? clamp01(-y / TRIGGER) : 0;
-  const opaPrevDown  = !horizontalDominant && y > 0 ? clamp01(y / TRIGGER) : 0;
+  const opaPrevDown  = !horizontalDominant && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[40]">

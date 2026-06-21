@@ -137,7 +137,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
       <div className="relative w-full">
         <div className="relative grid w-full max-w-md mx-auto px-4 [&>*]:[grid-area:1/1]">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             {visible
               .slice()
               .reverse()
@@ -158,12 +158,12 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
                 );
               })}
           </AnimatePresence>
-          <SwipeOverlay drag={drag} />
+          <SwipeOverlay drag={drag} canRewind={queue.canRewind} />
         </div>
       </div>
 
       <p className="mt-3 px-4 text-center text-[9px] font-semibold uppercase tracking-[0.16em] text-subtle">
-        ↑ → next • ↓ ← previous
+        {queue.canRewind ? '↑ → next • ↓ ← previous' : '↑ → next'}
       </p>
 
       <SwipeHint />
