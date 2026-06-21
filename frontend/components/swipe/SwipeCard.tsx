@@ -24,8 +24,8 @@ import { BookmarkButton } from '@/components/news/BookmarkButton';
 
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 
-const SWIPE_DIST = 90;
-const SWIPE_VEL = 800;
+const SWIPE_DIST = 100;
+const SWIPE_VEL = 600;
 
 function decideDirection(info: PanInfo): SwipeDirection | null {
   const { offset, velocity } = info;
@@ -33,7 +33,10 @@ function decideDirection(info: PanInfo): SwipeDirection | null {
   const ay = Math.abs(offset.y);
   const avx = Math.abs(velocity.x);
   const avy = Math.abs(velocity.y);
-  const horizontalDominant = Math.max(ax, avx * 0.25) > Math.max(ay, avy * 0.25);
+  
+  if (ax < 20 && ay < 20 && avx < 200 && avy < 200) return null;
+
+  const horizontalDominant = Math.max(ax, avx * 0.3) > Math.max(ay, avy * 0.3);
   if (horizontalDominant) {
     if (offset.x >  SWIPE_DIST || velocity.x >  SWIPE_VEL) return 'right';
     if (offset.x < -SWIPE_DIST || velocity.x < -SWIPE_VEL) return 'left';
@@ -214,23 +217,30 @@ export function SwipeCard({
     ? {
         zIndex: style.z,
         transformOrigin: 'top center' as const,
+        willChange: 'transform' as const,
       }
     : {
         zIndex: style.z,
         transform: `translateY(${style.translateY}px) scale(${style.scale})`,
         opacity: style.opacity,
         transformOrigin: 'top center' as const,
-        transition: 'transform 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease',
+        transition: 'transform 300ms cubic-bezier(0.175, 0.885, 0.32, 1.15), opacity 300ms ease',
         pointerEvents: 'none' as const,
+        willChange: 'transform' as const,
       };
 
   return (
     <motion.div
-      className="w-full touch-none select-none"
+      layout
+      initial={{ opacity: 0, y: -40, scale: 0.95 }}
+      animate={interactive ? controls : { opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+      className="w-full touch-none select-none will-change-transform transform-gpu"
       style={interactive ? { ...wrapperStyle, x, y, rotate } : wrapperStyle}
-      animate={interactive ? controls : undefined}
       drag={interactive && !exiting}
-      dragElastic={0.65}
+      dragDirectionLock={true}
+      dragElastic={0.4}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       aria-hidden={depth !== 0}

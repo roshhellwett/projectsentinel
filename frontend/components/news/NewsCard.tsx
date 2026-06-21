@@ -66,7 +66,7 @@ function SourceChip({ source }: { source: Source }) {
           loading="lazy"
           decoding="async"
           onError={() => setFaviconErrored(true)}
-          className="w-3 h-3 flex-shrink-0"
+          className="w-3 h-3 flex-shrink-0 img-fade-in"
         />
       ) : host ? (
         <Globe className="w-3 h-3 text-subtle flex-shrink-0" aria-hidden="true" />

@@ -89,6 +89,7 @@ export function MobileBottomNav() {
                     <Link
                       key={cat.slug}
                       href={`/category/${cat.slug}/`}
+                      prefetch={true}
                       onClick={closeTopics}
                       className={`flex items-center justify-center px-3 py-3 rounded text-center text-[12px] font-semibold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                         active
@@ -107,12 +108,14 @@ export function MobileBottomNav() {
         )}
       </AnimatePresence>
 
-      <nav
-        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57] transition-[opacity,transform] duration-200 ${
-          hideForOverlay ? 'pointer-events-none opacity-0 translate-y-full' : 'opacity-100 translate-y-0'
-        }`}
+      <motion.nav
+        initial={false}
+        animate={{ y: hideForOverlay ? '100%' : '0%', opacity: hideForOverlay ? 0 : 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[57] will-change-transform will-change-opacity transform-gpu"
         aria-hidden={hideForOverlay ? 'true' : 'false'}
         aria-label="Mobile navigation"
+        style={{ pointerEvents: hideForOverlay ? 'none' : 'auto' }}
       >
         <div
           className="relative border-t border-rule-strong bg-paper/85 backdrop-blur-lg"
@@ -185,6 +188,7 @@ export function MobileBottomNav() {
                 <Link
                   key={tab.id}
                   href={tab.href!}
+                  prefetch={true}
                   onClick={closeTopics}
                   aria-label={tab.label}
                   className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
@@ -195,7 +199,7 @@ export function MobileBottomNav() {
             })}
           </div>
         </div>
-      </nav>
+      </motion.nav>
     </>
   );
 }

@@ -23,11 +23,11 @@ export function ToastProvider() {
           <motion.div
             layout
             key={toast.id}
-            initial={{ opacity: 0, y: 16, scale: 0.9 }}
+            initial={{ opacity: 0, y: 24, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.15 } }}
-            transition={{ type: 'spring', stiffness: 450, damping: 30 }}
-            className="flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper rounded-full shadow-paper-lift backdrop-blur-md"
+            exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] } }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 0.6 }}
+            className="flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper rounded-full shadow-paper-lift backdrop-blur-md will-change-transform will-change-opacity transform-gpu"
           >
             {toast.icon === 'bookmark' && <BookmarkCheck className="w-4 h-4 text-paper/80" strokeWidth={2.5} />}
             {toast.icon === 'bookmark-off' && <BookmarkMinus className="w-4 h-4 text-paper/80" strokeWidth={2.5} />}

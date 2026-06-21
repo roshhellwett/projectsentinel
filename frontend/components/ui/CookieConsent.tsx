@@ -62,13 +62,13 @@ export function CookieConsent() {
           initial={{ y: 24, opacity: 0, scale: 0.96 }}
           animate={{ 
             y: 0, opacity: 1, scale: 1,
-            transition: { type: 'spring', stiffness: 360, damping: 32, mass: 0.8 }
+            transition: { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }
           }}
           exit={{ 
             opacity: 0, scale: 0.96, y: 16,
-            transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] }
+            transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] }
           }}
-          className="fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md z-[58]"
+          className="fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md z-[58] will-change-transform will-change-opacity transform-gpu"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="relative glass border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">

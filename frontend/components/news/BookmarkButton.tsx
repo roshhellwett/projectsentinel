@@ -50,13 +50,14 @@ export function BookmarkButton({
       <motion.button
         type="button"
         whileTap={{ scale: 0.94 }}
+        transition={{ type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
         onClick={handleClick}
         aria-pressed={saved}
         aria-label={saved ? 'Remove from saved' : 'Save for later'}
         className={cn(
           'inline-flex items-center gap-2 px-3.5 py-2 rounded',
           'bg-paper border text-sm font-medium',
-          'transition-all duration-200 hover-lift',
+          'transition-all duration-200 hover-lift will-change-transform transform-gpu',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           saved
             ? 'border-accent text-accent hover:bg-accent-soft'
@@ -78,11 +79,12 @@ export function BookmarkButton({
     <motion.button
       type="button"
       whileTap={{ scale: 0.86 }}
+      transition={{ type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
       onClick={handleClick}
       aria-pressed={saved}
       aria-label={saved ? 'Remove from saved' : 'Save for later'}
       className={cn(
-        'group relative touch-polish p-2 -m-2 rounded-full transition-colors duration-200',
+        'group relative touch-polish p-2 -m-2 rounded-full transition-colors duration-200 will-change-transform transform-gpu',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
         saved
           ? 'text-accent'

@@ -54,7 +54,7 @@ function SourceIcon({ url }: { url: string }) {
       loading="lazy"
       decoding="async"
       onError={() => setErrored(true)}
-      className="h-5 w-5 flex-shrink-0 rounded bg-paper border border-rule"
+      className="h-5 w-5 flex-shrink-0 rounded bg-paper border border-rule img-fade-in"
     />
   );
 }
@@ -159,15 +159,15 @@ export function SourcePickerButton({
         <motion.div
           ref={menuRef}
           role="menu"
-          className="z-[100] rounded border border-rule-strong bg-paper p-2 shadow-paper-lift"
+          className="z-[100] rounded border border-rule-strong bg-paper p-2 shadow-paper-lift will-change-transform will-change-opacity transform-gpu"
           style={{
             ...((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties),
             transformOrigin: isSheet && isMobile ? 'bottom center' : (isSheet ? 'bottom right' : 'bottom left')
           }}
-          initial={{ opacity: 0, y: 12, scale: 0.94 }}
+          initial={{ opacity: 0, y: 12, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.8 }}
+          transition={{ type: 'spring', stiffness: 450, damping: 30, mass: 0.6 }}
           onClick={(event) => {
             if (stopPropagation) event.stopPropagation();
           }}

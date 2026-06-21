@@ -195,25 +195,27 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
       <div className="relative w-full">
         <div className="relative grid w-full max-w-md mx-auto px-4 [&>*]:[grid-area:1/1]">
-          {visible
-            .slice()
-            .reverse()
-            .map((post, i) => {
-              const depth = (visible.length - 1 - i) as 0 | 1 | 2;
-              const isFront = depth === 0;
-              return (
-                <SwipeCard
-                  key={post.id}
-                  post={post}
-                  depth={depth}
-                  interactive={isFront}
-                  canRewind={isFront ? queue.canRewind : false}
-                  onSwipe={isFront ? handleSwipe : undefined}
-                  onTap={isFront ? handleTap : undefined}
-                  onDragProgress={isFront ? setDrag : undefined}
-                />
-              );
-            })}
+          <AnimatePresence mode="popLayout">
+            {visible
+              .slice()
+              .reverse()
+              .map((post, i) => {
+                const depth = (visible.length - 1 - i) as 0 | 1 | 2;
+                const isFront = depth === 0;
+                return (
+                  <SwipeCard
+                    key={post.id}
+                    post={post}
+                    depth={depth}
+                    interactive={isFront}
+                    canRewind={isFront ? queue.canRewind : false}
+                    onSwipe={isFront ? handleSwipe : undefined}
+                    onTap={isFront ? handleTap : undefined}
+                    onDragProgress={isFront ? setDrag : undefined}
+                  />
+                );
+              })}
+          </AnimatePresence>
           <SwipeOverlay drag={drag} />
         </div>
       </div>

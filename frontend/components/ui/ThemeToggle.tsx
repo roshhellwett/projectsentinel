@@ -11,6 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const STORAGE_KEY = 'iv-theme';
 
@@ -81,9 +82,27 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className={`tap-target text-muted hover:text-ink hover-lift rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
+      className={`tap-target text-muted hover:text-ink hover-lift rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
     >
-      <Icon className="w-[18px] h-[18px]" strokeWidth={1.8} />
+      <AnimatePresence mode="wait" initial={false}>
+        {mounted && (
+          <motion.div
+            key={theme}
+            initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+            transition={{ type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
+            className="will-change-transform will-change-opacity transform-gpu flex items-center justify-center"
+          >
+            <Icon className="w-[18px] h-[18px]" strokeWidth={1.8} />
+          </motion.div>
+        )}
+        {!mounted && (
+          <div className="flex items-center justify-center opacity-0">
+            <Moon className="w-[18px] h-[18px]" strokeWidth={1.8} />
+          </div>
+        )}
+      </AnimatePresence>
     </button>
   );
 }

@@ -77,6 +77,7 @@ export function Navbar() {
           <div className="flex items-center justify-between gap-4 h-14 lg:h-16">
             <Link
               href="/"
+              prefetch={true}
               aria-label="India Verified — home"
               className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
             >
@@ -106,6 +107,7 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={true}
                     aria-current={active ? 'page' : undefined}
                     className={`relative inline-flex items-center px-3 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
                       active ? 'text-ink' : 'text-muted hover:text-ink'
@@ -190,8 +192,8 @@ export function Navbar() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col"
+              transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu"
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',

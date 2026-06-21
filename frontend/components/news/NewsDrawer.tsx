@@ -109,7 +109,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
 
           <motion.div
 
-            className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-[60] will-change-opacity"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -139,11 +139,11 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 y.set(0);
               }
             }}
-            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col"
+            className="fixed z-[65] bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] bottom-0 left-0 right-0 h-[88dvh] max-h-[calc(100dvh-4.5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu"
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', stiffness: 320, damping: 32, mass: 0.85 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
           >
 
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />

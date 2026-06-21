@@ -122,18 +122,18 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className="fixed inset-0 z-[100] overflow-y-auto bg-paper/80 backdrop-blur-md"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-paper/80 backdrop-blur-md will-change-opacity"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
         >
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            initial={{ opacity: 0, y: -20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 30, mass: 0.8 }}
-            className="container mx-auto px-4 py-8 md:py-10"
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+            className="container mx-auto px-4 py-8 md:py-10 will-change-transform transform-gpu"
           >
             <div className="flex items-center justify-between mb-8">
               <div>
