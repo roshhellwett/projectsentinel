@@ -16,7 +16,6 @@ import { TrendingSection } from '@/components/news/TrendingSection';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { LiveClock } from '@/components/layout/LiveClock';
-import { WeatherWidget } from '@/components/layout/WeatherWidget';
 import { Suspense } from 'react';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { dedupe } from '@/lib/utils/dedupe';
@@ -103,8 +102,7 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="flex flex-col gap-0 items-end">
-              <LiveClock variant="hero" className="border-b-0" />
-              <WeatherWidget />
+              <LiveClock variant="hero" />
             </div>
           </div>
 
@@ -121,10 +119,8 @@ export default async function HomePage() {
                 rewritten without ads or noise.
               </p>
             </div>
-            
             <div className="flex flex-col mt-2">
-              <LiveClock variant="hero" className="border-b-0 w-full" />
-              <WeatherWidget className="w-full" />
+              <LiveClock variant="hero" className="w-full" />
             </div>
           </div>
 
