@@ -11,9 +11,14 @@
 
 from datetime import UTC, datetime, timedelta
 
+from cache.keys import KNOWN_HASHES, KNOWN_HASHES_TTL, RECENT_HEADLINES, RECENT_HEADLINES_TTL
+from cache.shared_cache import cache
 from database.client import get_supabase
 from fetcher.url_tools import compute_url_hash, is_duplicate_title
 from logger.pipeline_logger import PipelineLogger
+
+cache.register(KNOWN_HASHES, KNOWN_HASHES_TTL)
+cache.register(RECENT_HEADLINES, RECENT_HEADLINES_TTL)
 
 
 class Deduplicator:
@@ -21,8 +26,6 @@ class Deduplicator:
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
-        self._known_hashes: set[str] | None = None
-        self._recent_post_headlines: list[str] | None = None
         self._init_supabase()
 
     def _init_supabase(self):
@@ -35,12 +38,15 @@ class Deduplicator:
 
     def _load_known_hashes(self) -> set[str]:
 
-        if self._known_hashes is not None:
-            return self._known_hashes
+        cached = cache.fresh_copy(KNOWN_HASHES)
+        if cached is not None:
+            return cached
+
+        self.logger.log("DEDUP_CACHE", "Loading known hashes")
 
         if not self.supabase:
-            self._known_hashes = set()
-            return self._known_hashes
+            cache.set(KNOWN_HASHES, set())
+            return set()
 
         hashes: set[str] = set()
         try:
@@ -67,28 +73,35 @@ class Deduplicator:
                     break
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load hashes: {str(e)}")
+            stale = cache.stale_or_none(KNOWN_HASHES)
+            if stale is not None:
+                self.logger.log("DEDUP_CACHE", "Falling back to stale hash cache")
+                return stale
+            return set()
 
-        self._known_hashes = hashes
-        return self._known_hashes
+        cache.set(KNOWN_HASHES, hashes)
+        return hashes
 
     def _load_recent_post_headlines(self) -> list[str]:
 
-        if self._recent_post_headlines is not None:
-            return self._recent_post_headlines
+        cached = cache.fresh_copy(RECENT_HEADLINES)
+        if cached is not None:
+            return cached
 
         if not self.supabase:
-            self._recent_post_headlines = []
-            return self._recent_post_headlines
+            cache.set(RECENT_HEADLINES, [])
+            return []
 
         try:
             cutoff = (datetime.now(UTC) - timedelta(hours=6)).isoformat()
             result = self.supabase.table("posts").select("headline").gte("published_at", cutoff).execute()
-            self._recent_post_headlines = [row["headline"] for row in (result.data or []) if row.get("headline")]
+            headlines = [row["headline"] for row in (result.data or []) if row.get("headline")]
+            cache.set(RECENT_HEADLINES, headlines)
+            return headlines
         except Exception as e:
             self.logger.log("DEDUP_ERROR", f"Failed to load recent headlines: {str(e)}")
-            self._recent_post_headlines = []
-
-        return self._recent_post_headlines
+            stale = cache.stale_or_none(RECENT_HEADLINES) or []
+            return stale
 
     def is_duplicate_by_title(self, headline: str) -> bool:
 
@@ -108,7 +121,7 @@ class Deduplicator:
         if url_hash in known:
             return False
 
-        known.add(url_hash)
+        cache.add_to_set(KNOWN_HASHES, url_hash)
         return True
 
     def batch_insert_new_articles(self, articles: list[dict]) -> int:
@@ -151,6 +164,9 @@ class Deduplicator:
                 ).execute()
             except TypeError:
                 self.supabase.table("raw_articles").insert(insert_data).execute()
+
+            for d in insert_data:
+                cache.add_to_set(KNOWN_HASHES, d["url_hash"])
 
             self.logger.log("DEDUP", f"Batch inserted {len(insert_data)} new articles")
             return len(insert_data)

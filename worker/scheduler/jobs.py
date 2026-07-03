@@ -16,6 +16,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 
 from archiver.old_post_archiver import OldPostArchiver
+from cache.keys import FACTCHECK_INTERVAL, FACTCHECK_LAST_RUN
+from cache.shared_cache import cache
 from fetcher.deduplicator import Deduplicator
 from fetcher.factcheck_fetcher import FactCheckFetcher
 from fetcher.gnews_fetcher import GNewsFetcher
@@ -32,6 +34,8 @@ from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
 from verifier.score_evaluator import ScoreEvaluator
 from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
+
+cache.register(FACTCHECK_LAST_RUN, FACTCHECK_INTERVAL)
 
 
 def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
@@ -137,11 +141,10 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
     try:
         if archive_only:
             archiver = OldPostArchiver()
-            deleted_count = archiver.archive_old_posts()
-            cleanup_counts = archiver.cleanup_pipeline_tables()
-            logger.log("ARCHIVE", f"Archived {deleted_count} old posts", cleanup_counts)
+            results = archiver.cleanup_all()
+            logger.log("ARCHIVE", f"Cleanup results: {results}")
             duration = (datetime.now(UTC) - start_time).total_seconds()
-            _record_run_end(logger, run_id, duration, {"archived": deleted_count, **cleanup_counts})
+            _record_run_end(logger, run_id, duration, results)
             return
 
         deduplicator = Deduplicator()
@@ -165,9 +168,12 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         rss_articles: list[dict] = []
         if not supplementary_only:
             rss_fetcher = RSSFetcher()
-            rss_articles = rss_fetcher.fetch_all()
-            all_articles.extend(rss_articles)
-            logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
+            try:
+                rss_articles = rss_fetcher.fetch_all()
+                all_articles.extend(rss_articles)
+                logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
+            finally:
+                rss_fetcher.close()
 
         should_supplement = supplementary_only or (
             len(rss_articles) == 0
@@ -181,30 +187,45 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             )
 
         if should_supplement:
+            gnews_fetcher = GNewsFetcher() if GNewsFetcher.has_quota() else None
+            newsapi_fetcher = NewsAPIFetcher() if NewsAPIFetcher.has_quota() else None
             tasks = []
-            if GNewsFetcher.has_quota():
-                tasks.append((GNewsFetcher().fetch, "GNews"))
-            if NewsAPIFetcher.has_quota():
-                tasks.append((NewsAPIFetcher().fetch, "NewsAPI"))
+            if gnews_fetcher:
+                tasks.append((gnews_fetcher.fetch, "GNews"))
+            if newsapi_fetcher:
+                tasks.append((newsapi_fetcher.fetch, "NewsAPI"))
 
             if tasks:
-                with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
-                    futures = {executor.submit(fn): name for fn, name in tasks}
-                    for future in as_completed(futures):
-                        name = futures[future]
-                        try:
-                            api_articles = future.result(timeout=30)
-                            all_articles.extend(api_articles)
-                            logger.log("FETCH", f"Fetched {len(api_articles)} articles from {name}")
-                        except Exception as e:
-                            logger.log("FETCH_ERROR", f"{name} failed: {str(e)}")
+                try:
+                    with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
+                        futures = {executor.submit(fn): name for fn, name in tasks}
+                        for future in as_completed(futures):
+                            name = futures[future]
+                            try:
+                                api_articles = future.result(timeout=30)
+                                all_articles.extend(api_articles)
+                                logger.log("FETCH", f"Fetched {len(api_articles)} articles from {name}")
+                            except Exception as e:
+                                logger.log("FETCH_ERROR", f"{name} failed: {str(e)}")
+                finally:
+                    if gnews_fetcher:
+                        gnews_fetcher.close()
+                    if newsapi_fetcher:
+                        newsapi_fetcher.close()
             else:
                 logger.log("FETCH", "Supplementary requested but all keys exhausted, skipping API calls")
 
         if not supplementary_only:
-            factcheck_fetcher = FactCheckFetcher()
-            new_fact_checks = factcheck_fetcher.update_known_false_claims()
-            logger.log("FACTCHECK", f"Updated {new_fact_checks} known false claims")
+            if cache.get(FACTCHECK_LAST_RUN) is None:
+                factcheck_fetcher = FactCheckFetcher()
+                try:
+                    new_fact_checks = factcheck_fetcher.update_known_false_claims()
+                    logger.log("FACTCHECK", f"Updated {new_fact_checks} known false claims")
+                except Exception as e:
+                    logger.log("FACTCHECK_ERROR", f"Fact-check update failed (non-fatal): {str(e)}")
+                cache.set(FACTCHECK_LAST_RUN, True)
+            else:
+                logger.log("FACTCHECK", "Skipping fact-check fetch (last run < 1h ago)")
 
         stats["fetched"] = len(all_articles)
 
@@ -250,7 +271,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         for article in unique_combined:
             if deduplicator.is_duplicate_by_title(article.get("headline", "")):
                 deduplicator.log_discarded(article, "duplicate_title")
-                deduplicator.mark_group_processed([article])
                 title_dup_count += 1
             else:
                 title_deduped.append(article)
@@ -266,7 +286,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         for article in unique_combined:
             if is_blocked_domain(article.get("source_url", "")):
                 deduplicator.log_discarded(article, "blocked_domain")
-                deduplicator.mark_group_processed([article])
                 stats["blocked"] += 1
             else:
                 unblocked_articles.append(article)
@@ -277,14 +296,18 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         for article in unblocked_articles:
             if factcheck_matcher.is_false_claim(article.get("headline", "")):
                 deduplicator.log_discarded(article, "known_false_claim")
-                deduplicator.mark_group_processed([article])
                 stats["false_claims"] += 1
             else:
                 clean_articles.append(article)
 
         logger.log("FACT_CHECK", f"{len(clean_articles)} articles after fact-check filtering")
 
-        verified_groups = cross_source_checker.get_verified_groups(clean_articles)
+        try:
+            verified_groups = cross_source_checker.get_verified_groups(clean_articles)
+        except Exception as e:
+            logger.log("CROSS_SOURCE_ERROR", f"Cross-source verification failed: {str(e)}")
+            verified_groups = []
+
         articles_in_groups = sum(len(g) for g in verified_groups)
         stats["single_source"] = len(clean_articles) - articles_in_groups
 
@@ -293,6 +316,25 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         from difflib import SequenceMatcher
         unique_groups: list[list[dict]] = []
         seen_rep_headlines_lower: list[str] = []
+        _processed_hashes: set[str] = set()
+
+        def _batch_mark(articles_or_group: list[dict]) -> None:
+            """Collect url_hashes for deferred batch update."""
+            for a in articles_or_group:
+                h = a.get("url_hash", "")
+                if h:
+                    _processed_hashes.add(h)
+
+        def _flush_processed() -> None:
+            """Batch-mark all collected hashes as processed in a single call."""
+            if not _processed_hashes or not deduplicator.supabase:
+                return
+            try:
+                deduplicator.supabase.table("raw_articles").update(
+                    {"processed": True}
+                ).in_("url_hash", list(_processed_hashes)).execute()
+            except Exception as e:
+                logger.log("DEDUP_ERROR", f"Batch mark processed failed: {str(e)}")
 
         for grp in verified_groups:
             rep = grp[0].get("headline", "") if grp else ""
@@ -306,7 +348,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     break
 
             if is_dup:
-                deduplicator.mark_group_processed(grp)
+                _batch_mark(grp)
                 logger.log("DEDUP", f"Skipped near-duplicate group: {rep[:70]}")
             else:
                 unique_groups.append(grp)
@@ -324,10 +366,11 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 f"Processing {len(groups_to_process)} of {len(verified_groups)} groups this run "
                 f"(effective_cap={effective_cap}, hard_cap={max_ai_groups})",
             )
-            if len(verified_groups) > max_ai_groups:
-                hard_overflow = verified_groups[max_ai_groups:]
-                for grp in hard_overflow:
-                    deduplicator.mark_group_processed(grp)
+            for grp in deferred_groups:
+                _batch_mark(grp)
+
+        # ── Dead letter queue: groups that survive but aren't processed ──
+        _dead_letter: list[list[dict]] = []
 
         for group in groups_to_process:
             representative_url = group[0].get("url", "unknown") if group else "unknown"
@@ -337,6 +380,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     verification = groq_verifier.verify(group)
                 except (RateLimitExceededError, AllKeysExhaustedError) as budget_err:
                     logger.log("AI_BUDGET", f"Groq budget exhausted — stopping AI processing: {budget_err}")
+                    _dead_letter.append(group)
                     break
                 except Exception as groq_err:
                     logger.log(
@@ -345,7 +389,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                         {"url": representative_url, "headline": representative_headline[:80], "error": str(groq_err)},
                     )
                     deduplicator.log_discarded_group(group, f"groq_error: {str(groq_err)[:120]}")
-                    deduplicator.mark_group_processed(group)
+                    _batch_mark(group)
                     continue
 
                 score_result = ScoreEvaluator.evaluate(
@@ -356,7 +400,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 score = score_result["final_score"]
                 if score < 65:
                     deduplicator.log_discarded_group(group, "low_credibility_score", score)
-                    deduplicator.mark_group_processed(group)
+                    _batch_mark(group)
                     stats["low_score"] += 1
                     continue
 
@@ -376,6 +420,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                             "AI_BUDGET",
                             f"Groq writer budget exhausted — stopping AI processing: {budget_err}",
                         )
+                        _dead_letter.append(group)
                         break
                     except Exception as write_err:
                         logger.log(
@@ -384,7 +429,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                             {"url": representative_url, "error": str(write_err)},
                         )
                         deduplicator.log_discarded_group(group, f"groq_write_error: {str(write_err)[:120]}")
-                        deduplicator.mark_group_processed(group)
+                        _batch_mark(group)
                         continue
 
                 post = post_builder.build(
@@ -397,7 +442,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 )
 
                 published = publisher.publish(post)
-                deduplicator.mark_group_processed(group)
+                _batch_mark(group)
                 if published:
                     stats["published"] += 1
                 else:
@@ -410,7 +455,17 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     {"url": representative_url, "error": str(e)},
                 )
                 logger.log("ERROR", traceback.format_exc())
+                _batch_mark(group)
                 continue
+
+        # ── Flush all deferred batch marks ──
+        _flush_processed()
+
+        if _dead_letter:
+            logger.log(
+                "DEAD_LETTER",
+                f"{len(_dead_letter)} group(s) queued for retry on budget exhaust",
+            )
 
         duration = (datetime.now(UTC) - start_time).total_seconds()
         logger.log("COMPLETE", f"Pipeline completed in {duration:.1f}s", stats)

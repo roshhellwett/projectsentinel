@@ -83,6 +83,15 @@ class RSSFetcher:
             self._local.session = session
         return session
 
+    def close(self) -> None:
+        session = getattr(self._local, "session", None)
+        if session is not None:
+            try:
+                session.close()
+            except Exception:
+                pass
+            self._local.session = None
+
     def fetch_all(self) -> list[dict]:
 
         articles = []

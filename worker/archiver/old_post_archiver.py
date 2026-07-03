@@ -26,40 +26,66 @@ class OldPostArchiver:
 
         self.supabase = get_supabase()
 
-    def archive_old_posts(self) -> int:
+    # ── Retention defaults (aggressive to stay within free tier) ──
+    POSTS_RETENTION_DAYS = 90
+    RAW_ARTICLES_RETENTION_DAYS = 14
+    DISCARDED_RETENTION_DAYS = 7
+    PIPELINE_RUNS_RETENTION_DAYS = 3
+    TELEGRAM_DELIVERIES_RETENTION_DAYS = 60
+
+    def archive_old_posts(self, days: int | None = None) -> int:
 
         if not self.supabase:
             self.logger.log("ARCHIVER_ERROR", "Supabase not initialized")
             return 0
 
+        days = days or self.POSTS_RETENTION_DAYS
         try:
-            cutoff_date = (datetime.now(UTC) - timedelta(days=180)).isoformat()
+            cutoff_date = (datetime.now(UTC) - timedelta(days=days)).isoformat()
             delete_result = self.supabase.table("posts").delete().lt("published_at", cutoff_date).execute()
             deleted = len(delete_result.data) if delete_result.data else 0
             if deleted == 0:
                 self.logger.log("ARCHIVER", "No old posts to archive")
             else:
-                self.logger.log("ARCHIVER", f"Archived {deleted} posts older than 6 months")
+                self.logger.log("ARCHIVER", f"Archived {deleted} posts older than {days} days")
             return deleted
 
         except Exception as e:
             self.logger.log("ARCHIVER_ERROR", f"Failed to archive: {str(e)}")
             return 0
 
-    def cleanup_discarded_articles(self, days: int = 30) -> int:
+    def cleanup_discarded_articles(self, days: int | None = None) -> int:
 
-        return self._delete_old_rows("discarded_articles", "discarded_at", days)
+        return self._delete_old_rows("discarded_articles", "discarded_at", days or self.DISCARDED_RETENTION_DAYS)
 
-    def cleanup_raw_articles(self, days: int = 60) -> int:
+    def cleanup_raw_articles(self, days: int | None = None) -> int:
 
-        return self._delete_old_rows("raw_articles", "fetched_at", days)
+        return self._delete_old_rows("raw_articles", "fetched_at", days or self.RAW_ARTICLES_RETENTION_DAYS)
 
-    def cleanup_pipeline_tables(self) -> dict[str, int]:
+    def cleanup_pipeline_runs(self, days: int | None = None) -> int:
 
-        return {
-            "discarded_articles": self.cleanup_discarded_articles(),
-            "raw_articles": self.cleanup_raw_articles(),
-        }
+        return self._delete_old_rows("pipeline_runs", "started_at", days or self.PIPELINE_RUNS_RETENTION_DAYS)
+
+    def cleanup_telegram_deliveries(self, days: int | None = None) -> int:
+
+        return self._delete_old_rows("telegram_deliveries", "sent_at", days or self.TELEGRAM_DELIVERIES_RETENTION_DAYS)
+
+    def cleanup_all(self) -> dict[str, int]:
+
+        results: dict[str, int] = {}
+        for method, name in [
+            (self.archive_old_posts, "posts_archived"),
+            (self.cleanup_discarded_articles, "discarded_articles_deleted"),
+            (self.cleanup_raw_articles, "raw_articles_deleted"),
+            (self.cleanup_pipeline_runs, "pipeline_runs_deleted"),
+            (self.cleanup_telegram_deliveries, "telegram_deliveries_deleted"),
+        ]:
+            try:
+                results[name] = method()
+            except Exception as e:
+                self.logger.log("ARCHIVER_ERROR", f"{name} failed: {str(e)}")
+                results[name] = -1
+        return results
 
     def _delete_old_rows(self, table: str, date_column: str, days: int) -> int:
         if not self.supabase:

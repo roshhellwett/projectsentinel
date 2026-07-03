@@ -154,6 +154,9 @@ class NewsAPIFetcher:
         self.logger.log("NEWSAPI", "Exceeded 429 rotation cap, giving up for this run")
         return []
 
+    def close(self) -> None:
+        self.session.close()
+
     def _parse_item(self, item: dict) -> dict | None:
 
         url = normalize_url(item.get("url", ""))

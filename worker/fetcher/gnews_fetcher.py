@@ -165,6 +165,9 @@ class GNewsFetcher:
             "fetched_at": datetime.now(UTC).isoformat(),
         }
 
+    def close(self) -> None:
+        self.session.close()
+
     def _get_base_url(self, url: str) -> str:
 
         try:

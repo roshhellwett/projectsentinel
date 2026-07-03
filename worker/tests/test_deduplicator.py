@@ -13,7 +13,15 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
+from cache.shared_cache import cache
+from cache.keys import KNOWN_HASHES, KNOWN_HASHES_TTL, RECENT_HEADLINES, RECENT_HEADLINES_TTL
 from fetcher.deduplicator import Deduplicator
+
+
+def setup_function():
+    cache.reset_state()
+    cache.register(KNOWN_HASHES, KNOWN_HASHES_TTL)
+    cache.register(RECENT_HEADLINES, RECENT_HEADLINES_TTL)
 
 
 def _make_dedup_with_mock_supabase() -> tuple[Deduplicator, MagicMock]:
@@ -78,3 +86,123 @@ def test_sweep_returns_zero_when_response_payload_is_empty():
     )
 
     assert dedup.sweep_stale_unprocessed(hours=4) == 0
+
+
+def test_is_new_caches_in_shared_cache():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.return_value.execute.return_value = MagicMock(
+        data=[]
+    )
+    article = {"url_hash": "abc123", "url": "https://example.com", "headline": "Test"}
+    assert dedup.is_new(article) is True
+    assert dedup.is_new(article) is False
+
+
+def test_is_new_uses_shared_cache():
+    cache.set(KNOWN_HASHES, {"existing_hash"})
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    article = {"url_hash": "existing_hash"}
+    assert dedup.is_new(article) is False
+    mock_sb.table.return_value.select.assert_not_called()
+
+
+def test_is_new_no_hash_returns_false():
+    dedup, _ = _make_dedup_with_mock_supabase()
+    assert dedup.is_new({}) is False
+
+
+def test_batch_insert_updates_shared_cache():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.return_value.execute.return_value = MagicMock(
+        data=[]
+    )
+    mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock(data=[])
+    articles = [
+        {"url_hash": "h1", "url": "https://example.com/1", "headline": "Headline 1", "source_name": "Src", "source_url": "https://src.com", "excerpt": "excerpt", "category_hint": "general"},
+    ]
+    dedup._load_known_hashes()
+    dedup.batch_insert_new_articles(articles)
+    assert "h1" in cache.get(KNOWN_HASHES)
+
+
+def test_batch_insert_empty_articles():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    assert dedup.batch_insert_new_articles([]) == 0
+    mock_sb.table.assert_not_called()
+
+
+def test_load_known_hashes_returns_stale_on_supabase_error():
+    cache.set(KNOWN_HASHES, {"stale_hash"})
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("db timeout")
+    hashes = dedup._load_known_hashes()
+    assert "stale_hash" in hashes
+
+
+def test_load_known_hashes_returns_empty_on_error_with_no_stale():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("db timeout")
+    hashes = dedup._load_known_hashes()
+    assert hashes == set()
+
+
+def test_load_recent_headlines_uses_shared_cache():
+    cache.set(RECENT_HEADLINES, ["Cached Headline"])
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    headlines = dedup._load_recent_post_headlines()
+    assert "Cached Headline" in headlines
+    mock_sb.table.return_value.select.assert_not_called()
+
+
+def test_load_recent_headlines_loads_from_db():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.execute.return_value = MagicMock(
+        data=[{"headline": "DB Headline"}]
+    )
+    headlines = dedup._load_recent_post_headlines()
+    assert headlines == ["DB Headline"]
+    assert cache.get(RECENT_HEADLINES) == ["DB Headline"]
+
+
+def test_load_recent_headlines_returns_stale_on_db_error():
+    cache.set(RECENT_HEADLINES, ["Stale Headline"])
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.execute.side_effect = Exception("timeout")
+    headlines = dedup._load_recent_post_headlines()
+    assert headlines == ["Stale Headline"]
+
+
+def test_load_recent_headlines_returns_empty_on_error_no_stale():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.select.return_value.gte.return_value.execute.side_effect = Exception("timeout")
+    headlines = dedup._load_recent_post_headlines()
+    assert headlines == []
+
+
+def test_is_new_without_supabase():
+    cache.set(KNOWN_HASHES, set())
+    with patch("fetcher.deduplicator.get_supabase", return_value=None):
+        dedup = Deduplicator()
+    article = {"url_hash": "h1", "url": "https://example.com", "headline": "Test"}
+    assert dedup.is_new(article) is True
+
+
+def test_mark_group_processed_calls_supabase():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    mock_sb.table.return_value.update.return_value.in_.return_value.execute.return_value = MagicMock(data=[])
+    group = [{"url_hash": "h1"}, {"url_hash": "h2"}]
+    dedup.mark_group_processed(group)
+    mock_sb.table.assert_called_with("raw_articles")
+    mock_sb.table.return_value.update.assert_called_with({"processed": True})
+
+
+def test_mark_group_processed_no_url_hashes():
+    dedup, mock_sb = _make_dedup_with_mock_supabase()
+    dedup.mark_group_processed([{}])
+    mock_sb.table.assert_not_called()
+
+
+def test_mark_group_processed_no_supabase():
+    with patch("fetcher.deduplicator.get_supabase", return_value=None):
+        dedup = Deduplicator()
+    dedup.mark_group_processed([{"url_hash": "h1"}])

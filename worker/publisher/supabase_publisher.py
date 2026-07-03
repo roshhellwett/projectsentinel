@@ -12,6 +12,8 @@
 import hashlib
 import re
 
+from cache.keys import PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL
+from cache.shared_cache import cache
 from database.client import get_supabase
 from fetcher.url_tools import title_similarity
 from logger.pipeline_logger import PipelineLogger
@@ -22,12 +24,15 @@ def _normalize_headline(text: str) -> str:
 
     return _NORMALIZE_RE.sub("", text.lower()).replace(" ", "")
 
+# Register cache key at module load time
+cache.register(PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL)
+
+
 class SupabasePublisher:
 
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
-        self._recent_headlines: list[str] | None = None
         self._init_supabase()
 
     def _init_supabase(self):
@@ -68,8 +73,7 @@ class SupabasePublisher:
 
             if result.data:
                 self.logger.log("PUBLISH", f"Published: {post.get('headline', '')[:50]}")
-                if headline and self._recent_headlines is not None:
-                    self._recent_headlines.append(headline)
+                cache.add_to_list(PUBLISH_HEADLINES, headline)
                 return True
             else:
                 self.logger.log("PUBLISHER_ERROR", "Insert returned no data")
@@ -81,12 +85,13 @@ class SupabasePublisher:
 
     def _get_recent_headlines(self) -> list[str]:
 
-        if self._recent_headlines is not None:
-            return self._recent_headlines
+        cached = cache.fresh_copy(PUBLISH_HEADLINES)
+        if cached is not None:
+            return cached
 
-        self._recent_headlines = []
         if not self.supabase:
-            return self._recent_headlines
+            cache.set(PUBLISH_HEADLINES, [])
+            return []
 
         try:
             recent = (
@@ -96,10 +101,10 @@ class SupabasePublisher:
                 .limit(200)
                 .execute()
             )
-            self._recent_headlines = [
-                row.get("headline", "") for row in (recent.data or []) if row.get("headline")
-            ]
+            headlines = [row.get("headline", "") for row in (recent.data or []) if row.get("headline")]
+            cache.set(PUBLISH_HEADLINES, headlines)
+            return headlines
         except Exception as e:
             self.logger.log("PUBLISHER_WARN", f"Headline dedup load failed (proceeding): {str(e)[:80]}")
-
-        return self._recent_headlines
+            stale = cache.stale_or_none(PUBLISH_HEADLINES) or []
+            return stale

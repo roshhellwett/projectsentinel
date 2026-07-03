@@ -50,3 +50,6 @@ coverage/
 
 *.pem
 .vercel
+
+# Database backups
+db-backups/

@@ -12,7 +12,6 @@
 import re
 from collections import defaultdict
 
-from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 
@@ -153,12 +152,6 @@ class CrossSourceChecker:
 
     def __init__(self):
         self.logger = PipelineLogger()
-        self.supabase = None
-        self._init_supabase()
-
-    def _init_supabase(self):
-
-        self.supabase = get_supabase()
 
     def get_verified_groups(self, articles: list[dict]) -> list[list[dict]]:
 

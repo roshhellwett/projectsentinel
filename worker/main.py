@@ -54,9 +54,8 @@ async def lifespan(app: FastAPI):
 
     scheduler.add_job(
         run_pipeline,
-        "cron",
-        day=1,
-        hour=2,
+        "interval",
+        hours=6,
         id="archive_old_posts",
         replace_existing=True,
         max_instances=1,
@@ -68,7 +67,7 @@ async def lifespan(app: FastAPI):
         print("Scheduler started")
         print("  - Main pipeline: every 10 minutes")
         print("  - Supplementary APIs: every 2 hours")
-        print("  - Archive job: 1st of month at 2 AM")
+        print("  - Archive/cleanup: every 6 hours")
     except Exception as e:
         print(f"Scheduler failed to start: {e}")
         raise RuntimeError(f"Scheduler failed to start: {e}") from e
