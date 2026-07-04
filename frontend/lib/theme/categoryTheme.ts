@@ -8,26 +8,26 @@ export interface CategoryTheme {
   label: string;
 }
 
-const GOLD = '#f1a82c';
-const GOLD_LIGHT = 'rgba(241, 168, 44, 0.12)';
-const GOLD_BORDER = 'rgba(241, 168, 44, 0.30)';
-const GOLD_TEXT = '#b2801e';
-const GOLD_DARK = 'rgba(241, 168, 44, 0.18)';
-const GOLD_DARK_BORDER = 'rgba(241, 168, 44, 0.35)';
-const GOLD_DARK_TEXT = '#f1c87a';
+const ACCENT = '#1e1e1a';
+const ACCENT_LIGHT = 'rgba(30, 30, 26, 0.10)';
+const ACCENT_BORDER = 'rgba(30, 30, 26, 0.25)';
+const ACCENT_TEXT = '#1e1e1a';
+const ACCENT_DARK = 'rgba(245, 240, 235, 0.15)';
+const ACCENT_DARK_BORDER = 'rgba(245, 240, 235, 0.30)';
+const ACCENT_DARK_TEXT = '#f5f0eb';
 
 function makeTheme(label: string): CategoryTheme {
   return {
-    hex: GOLD,
+    hex: ACCENT,
     pill: {
-      background: GOLD_LIGHT,
-      borderColor: GOLD_BORDER,
-      color: GOLD_TEXT,
+      background: ACCENT_LIGHT,
+      borderColor: ACCENT_BORDER,
+      color: ACCENT_TEXT,
     },
     darkPill: {
-      background: GOLD_DARK,
-      borderColor: GOLD_DARK_BORDER,
-      color: GOLD_DARK_TEXT,
+      background: ACCENT_DARK,
+      borderColor: ACCENT_DARK_BORDER,
+      color: ACCENT_DARK_TEXT,
     },
     gradient: 'from-accent/25 via-accent/8 to-transparent',
     label,
@@ -48,16 +48,16 @@ const THEME: Record<string, CategoryTheme> = {
 };
 
 const DEFAULT_THEME: CategoryTheme = {
-  hex: GOLD,
+  hex: ACCENT,
   pill: {
-    background: GOLD_LIGHT,
-    borderColor: GOLD_BORDER,
-    color: GOLD_TEXT,
+    background: ACCENT_LIGHT,
+    borderColor: ACCENT_BORDER,
+    color: ACCENT_TEXT,
   },
   darkPill: {
-    background: GOLD_DARK,
-    borderColor: GOLD_DARK_BORDER,
-    color: GOLD_DARK_TEXT,
+    background: ACCENT_DARK,
+    borderColor: ACCENT_DARK_BORDER,
+    color: ACCENT_DARK_TEXT,
   },
   gradient: 'from-accent/25 via-accent/8 to-transparent',
   label: 'News',

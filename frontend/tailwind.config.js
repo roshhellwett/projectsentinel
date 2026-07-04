@@ -46,8 +46,8 @@ module.exports = {
         'india-green':   '#138808',
 
         // Portfolio accent tokens (derived from the Zenith palette)
-        'amber-button':     '#f1a82c',
-        'saffron-deep':     '#eb9d2a',
+        'accent-neutral':   '#1e1e1a',
+        'accent-neutral-hover': '#373732',
       },
       fontFamily: {
         sans:    ['var(--font-sans)', 'system-ui', 'sans-serif'],

@@ -4,25 +4,25 @@
 
 :root {
 
-  --font-sans:    'Source Sans 3', system-ui, sans-serif;
-  --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
   --c-paper:        225 215 194;
   --c-paper-2:      245 240 230;
   --c-paper-tint:   250 247 240;
 
-  --c-ink:          35 37 29;
-  --c-ink-soft:     92 94 82;
-  --c-muted:        138 140 128;
-  --c-subtle:       160 162 150;
+  --c-ink:          30 30 26;
+  --c-ink-soft:     85 87 75;
+  --c-muted:        92 94 82;
+  --c-subtle:       122 124 112;
 
   --c-rule:         201 191 168;
   --c-rule-strong:  185 175 150;
 
-  --c-accent:       241 168 44;
-  --c-accent-hover: 235 157 36;
-  --c-accent-soft:  252 235 190;
+  --c-accent:       30 30 26;
+  --c-accent-hover: 55 55 50;
+  --c-accent-soft:  210 205 195;
 
   --c-shadow:       0 0 0;
 
@@ -48,17 +48,17 @@
 
   --c-ink:          240 235 225;
   --c-ink-soft:     200 195 185;
-  --c-muted:        160 155 145;
-  --c-subtle:       120 115 105;
+  --c-muted:        170 165 155;
+  --c-subtle:       140 135 125;
 
   --c-shadow:       0 0 0;
 
   --c-rule:         60 56 50;
   --c-rule-strong:  80 75 68;
 
-  --c-accent:       241 168 44;
-  --c-accent-hover: 255 185 60;
-  --c-accent-soft:  60 42 10;
+  --c-accent:       245 240 235;
+  --c-accent-hover: 255 255 255;
+  --c-accent-soft:  50 46 42;
 
   --c-cred-high: 52 168 96;
   --c-cred-mid:  198 132 64;
@@ -99,14 +99,12 @@ html:not(.dark) {
     background-color: rgb(var(--c-paper));
 
     background-image:
-      radial-gradient(ellipse at 50% 35%, transparent 30%, rgb(var(--c-paper) / 0.45) 70%, rgb(var(--c-paper)) 100%),
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-      url('/light-mode-desktop.webp');
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
-    background-repeat: no-repeat, repeat, no-repeat;
-    background-size: auto, 220px 220px, cover;
-    background-attachment: fixed, fixed, fixed;
-    background-position: center, center, center;
+    background-repeat: repeat;
+    background-size: 220px 220px;
+    background-attachment: fixed;
+    background-position: center;
 
     color: rgb(var(--c-ink-soft));
     font-family: var(--font-sans);
@@ -119,25 +117,19 @@ html:not(.dark) {
   .dark body,
   body.dark {
     background-image:
-      radial-gradient(ellipse at 50% 35%, transparent 30%, rgb(var(--c-paper) / 0.55) 70%, rgb(var(--c-paper)) 100%),
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-      url('/dark-mode-desktop.webp');
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   @media (max-width: 767px) {
     body {
       background-image:
-        radial-gradient(ellipse at 50% 25%, transparent 25%, rgb(var(--c-paper) / 0.45) 70%, rgb(var(--c-paper)) 100%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-        url('/light-mode-mobile.webp');
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     .dark body,
     body.dark {
       background-image:
-        radial-gradient(ellipse at 50% 25%, transparent 25%, rgb(var(--c-paper) / 0.55) 70%, rgb(var(--c-paper)) 100%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-        url('/dark-mode-mobile.webp');
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.30 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
   }
   h1, h2, h3, h4, h5, h6 {

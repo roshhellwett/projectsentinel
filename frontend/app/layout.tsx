@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Source_Sans_3, Source_Serif_4, JetBrains_Mono } from 'next/font/google';
+import { Inter, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 
 import './globals.css';
@@ -15,14 +15,14 @@ const ScrollRestorer = dynamic(() => import('@/components/ui/ScrollRestorer').th
 const CookieConsent = dynamic(() => import('@/components/ui/CookieConsent').then(m => m.CookieConsent));
 const ToastProvider = dynamic(() => import('@/components/ui/ToastProvider').then(m => m.ToastProvider));
 
-const sourceSans = Source_Sans_3({
+const inter = Inter({
   variable: '--font-sans',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700', '900'],
+  weight: ['300', '400', '500', '600', '700'],
 });
 
-const sourceSerif = Source_Serif_4({
+const playfair = Playfair_Display({
   variable: '--font-display',
   subsets: ['latin'],
   display: 'swap',
@@ -132,10 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
         <link rel="preconnect" href="https://www.google.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://www.google.com" />
-        <link rel="preload" as="image" href="/light-mode-desktop.webp" media="(min-width: 768px) and (prefers-color-scheme: light)" />
-        <link rel="preload" as="image" href="/light-mode-mobile.webp" media="(max-width: 767px) and (prefers-color-scheme: light)" />
-        <link rel="preload" as="image" href="/dark-mode-desktop.webp" media="(min-width: 768px) and (prefers-color-scheme: dark)" />
-        <link rel="preload" as="image" href="/dark-mode-mobile.webp" media="(max-width: 767px) and (prefers-color-scheme: dark)" />
+
 
         {gtmId && (
           <Script id="gtm-script" strategy="afterInteractive">
@@ -150,7 +147,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body
-        className={`${sourceSans.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased`}
+        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased`}
       >
         {gtmId && (
           <noscript>
