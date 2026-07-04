@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { LiveClock } from '@/components/layout/LiveClock';
 import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
@@ -13,6 +13,8 @@ import { LastRefreshed } from '@/components/layout/LastRefreshed';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
+import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
+import { StreakBadge } from '@/components/ui/StreakBadge';
 
 const NAV_LINKS = [
   { href: '/category/politics/',   label: 'Politics' },
@@ -27,7 +29,9 @@ const NAV_LINKS = [
 const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
 
 export function Navbar() {
+  const reducedMotion = useReducedMotion();
   const pathname = usePathname();
+  const { streak } = useDailyReadCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -68,11 +72,13 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/90 supports-[backdrop-filter]:bg-paper/60 backdrop-filter backdrop-blur-lg border-b border-rule transition-colors`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/85 supports-[backdrop-filter]:bg-paper/55 backdrop-filter backdrop-blur-xl backdrop-saturate-[1.3] border-b border-rule/60 transition-colors`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
+        {/* Premium gradient edge */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" aria-hidden="true" />
 
-        <div className="container mx-auto px-4 lg:px-6">
+        <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between gap-4 h-14 lg:h-16">
             <Link
               href="/"
@@ -109,7 +115,7 @@ export function Navbar() {
                     prefetch={true}
                     aria-current={active ? 'page' : undefined}
                     className={`relative inline-flex items-center px-3 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
-                      active ? 'text-ink' : 'text-muted hover:text-ink nav-link-hover'
+                      active ? 'text-ink' : 'text-muted hover:text-ink'
                     }`}
                   >
                     {link.label === 'Saved' && (
@@ -128,6 +134,7 @@ export function Navbar() {
             </nav>
 
             <div className="flex items-center gap-1 sm:gap-2">
+              <StreakBadge streak={streak} size="sm" className="hidden sm:inline-flex mr-1" />
               <LastRefreshed />
               <ConnectionStatus />
 
@@ -165,6 +172,7 @@ export function Navbar() {
                 onClick={() => setIsMobileOpen((v) => !v)}
                 aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={isMobileOpen}
+                aria-controls="mobile-nav-drawer"
                 className="tap-target lg:hidden text-muted hover:text-ink hover-lift rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {isMobileOpen ? <X className="w-[20px] h-[20px]" /> : <Menu className="w-[20px] h-[20px]" />}
@@ -188,10 +196,11 @@ export function Navbar() {
             />
             <motion.aside
               key="nav-drawer"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+              id="mobile-nav-drawer"
+              initial={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
+              transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
               className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',

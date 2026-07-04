@@ -3,10 +3,11 @@
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useState } from 'react';
 import { ArrowUp, Undo2, ArrowLeft, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { isHintDismissed, dismissHint } from '@/lib/utils/swipeStats';
 
 export function SwipeHint() {
+  const reducedMotion = useReducedMotion();
   const [show, setShow] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -64,10 +65,10 @@ export function SwipeHint() {
                 <li className="flex items-start gap-3">
                   <div className="flex gap-1">
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-accent text-accent rounded-md bg-paper shadow-sm">
-                      <motion.span animate={{ y: [0, -4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}><ArrowUp className="w-3.5 h-3.5" /></motion.span>
+                      <motion.span animate={reducedMotion ? undefined : { y: [0, -4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}><ArrowUp className="w-3.5 h-3.5" /></motion.span>
                     </span>
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-accent text-accent rounded-md bg-paper shadow-sm">
-                      <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}><ArrowRight className="w-3.5 h-3.5" /></motion.span>
+                      <motion.span animate={reducedMotion ? undefined : { x: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}><ArrowRight className="w-3.5 h-3.5" /></motion.span>
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
@@ -79,10 +80,10 @@ export function SwipeHint() {
                 <li className="flex items-start gap-3">
                   <div className="flex gap-1">
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-rule-strong text-ink rounded-md bg-paper shadow-sm">
-                      <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}><Undo2 className="w-3.5 h-3.5" /></motion.span>
+                      <motion.span animate={reducedMotion ? undefined : { y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}><Undo2 className="w-3.5 h-3.5" /></motion.span>
                     </span>
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-rule-strong text-ink rounded-md bg-paper shadow-sm">
-                      <motion.span animate={{ x: [0, -4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}><ArrowLeft className="w-3.5 h-3.5" /></motion.span>
+                      <motion.span animate={reducedMotion ? undefined : { x: [0, -4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}><ArrowLeft className="w-3.5 h-3.5" /></motion.span>
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">

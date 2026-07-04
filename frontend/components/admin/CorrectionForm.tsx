@@ -88,10 +88,11 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
               {error}
             </div>
           )}
-          <label className="block text-sm text-muted mb-2">
+          <label htmlFor="correction-note" className="block text-sm text-muted mb-2">
             {type === 'corrected' ? 'Correction Note' : 'Retraction Reason'}
           </label>
           <textarea
+            id="correction-note"
             autoFocus
             value={note}
             onChange={(e) => setNote(e.target.value)}

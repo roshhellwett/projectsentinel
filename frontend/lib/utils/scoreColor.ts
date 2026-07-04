@@ -12,10 +12,9 @@ export function getScoreLabel(score: number): string {
   return 'Low';
 }
 
+// Linear interpolation (lerp): maps score [0–100] to HSL hue [0°–130°] (red→green)
 export function getScoreHex(score: number): string {
   const c = Math.max(0, Math.min(100, Math.round(score)));
-  
   const hue = Math.round((c / 100) * 130);
-  
   return `hsl(${hue}, var(--cred-s), var(--cred-l))`;
 }

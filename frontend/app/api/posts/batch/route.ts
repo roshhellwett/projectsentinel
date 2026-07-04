@@ -38,7 +38,10 @@ export async function POST(request: Request) {
       .in('id', valid);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Batch fetch error:', error.message);
+      }
+      return NextResponse.json({ error: 'Failed to fetch batch posts' }, { status: 500 });
     }
 
     const byId = new Map((data as Post[]).map((p) => [p.id, p]));
@@ -48,7 +51,9 @@ export async function POST(request: Request) {
       headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Batch route exception:', err);
+    }
+    return NextResponse.json({ error: 'Failed to fetch batch posts' }, { status: 500 });
   }
 }

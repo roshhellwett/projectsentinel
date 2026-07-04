@@ -18,8 +18,8 @@ function ymd(d: Date): string {
 function todayYmd(): string { return ymd(new Date()); }
 
 function dayDiff(aYmd: string, bYmd: string): number {
-  const a = new Date(`${aYmd}T00:00:00`);
-  const b = new Date(`${bYmd}T00:00:00`);
+  const a = new Date(`${aYmd}T00:00:00Z`);
+  const b = new Date(`${bYmd}T00:00:00Z`);
   return Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
 }
 
@@ -89,6 +89,7 @@ interface StreakState {
   lastDay: string;
 }
 
+// Consecutive-day streak counter — resets on gap > 1 day, no-op if same day
 export function bumpStreak(): StreakState {
   const today = todayYmd();
   const prev = safeRead<StreakState | null>(STREAK_KEY, null);

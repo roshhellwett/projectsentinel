@@ -45,22 +45,24 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
         </span>
       </div>
 
-      <div
-        className={cn('relative w-full rounded-full overflow-hidden bg-ink/[0.08]', compact ? 'h-1.5' : 'h-2')}
-        style={{ background: 'linear-gradient(to right, #ef4444 0%, #ea580c 25%, #eab308 50%, #84cc16 75%, #22c55e 100%)' }}
-      >
+      <div className="relative w-full flex items-center">
         <div
-          className={cn("absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70", ANIMATION.slow)}
-          style={{ clipPath: `inset(0 0 0 ${animatedScore}%)` }}
-          aria-hidden="true"
-        />
+          className={cn('w-full rounded-full overflow-hidden bg-ink/[0.08]', compact ? 'h-1.5' : 'h-2')}
+          style={{ background: 'linear-gradient(to right, #ef4444 0%, #ea580c 25%, #eab308 50%, #84cc16 75%, #22c55e 100%)' }}
+        >
+          <div
+            className={cn("absolute inset-0 rounded-full bg-paper/50 dark:bg-paper/70", ANIMATION.slow)}
+            style={{ clipPath: `inset(0 0 0 ${animatedScore}%)` }}
+            aria-hidden="true"
+          />
+        </div>
         <div
           className={cn(
-            cn('absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper', ANIMATION.slow),
+            'absolute top-1/2 rounded-full border-[1.5px] border-paper bg-paper pointer-events-none', ANIMATION.slow,
             compact ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5',
           )}
           style={{ 
-            left: `${animatedScore}%`, 
+            left: `max(${compact ? '5px' : '7px'}, min(calc(100% - ${compact ? '5px' : '7px'}), ${animatedScore}%))`, 
             transform: 'translate(-50%, -50%)',
             boxShadow: `0 0 0 1px ${scoreColor}, 0 2px 6px -1px ${scoreColor}80` 
           }}

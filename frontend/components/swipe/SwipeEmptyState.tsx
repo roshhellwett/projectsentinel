@@ -35,7 +35,7 @@ export function SwipeEmptyState({
 
   return (
     <div className="w-full max-w-md mx-auto px-4 py-10 text-center">
-      <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mx-auto mb-5 animate-soft-float shadow-sm">
+      <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mx-auto mb-5 shadow-sm">
         <CheckCircle2 className="w-7 h-7 text-accent" />
       </div>
       <h2 className="font-display text-2xl font-bold text-ink tracking-[-0.015em] mb-2">You&apos;re caught up.</h2>
@@ -43,10 +43,10 @@ export function SwipeEmptyState({
         No more verified stories right now. Check back in a few minutes.
       </p>
 
-      <dl className="grid grid-cols-3 gap-3 mb-8 text-left">
+      <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8 text-left">
         <Stat icon={<Layers className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={cardsToday} label="read today" />
         <Stat icon={<Newspaper className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={uniqueHostsToday} label="sources" />
-        <Stat icon={<Flame className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={streak} label={streak === 1 ? 'day streak' : 'day streak'} />
+        <Stat icon={<Flame className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={streak} label={streak === 1 ? 'day' : 'days'} />
       </dl>
 
       <div className="flex flex-col gap-2">
@@ -62,7 +62,7 @@ export function SwipeEmptyState({
         )}
         <Link
           href="/"
-          className="w-full inline-flex items-center justify-center px-4 pt-[7px] pb-[9px] border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 hover-lift transition-colors rounded"
+          className="w-full tap-target min-h-[44px] inline-flex items-center justify-center px-4 pt-[7px] pb-[9px] border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 hover-lift transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           Back to grid
         </Link>

@@ -15,10 +15,12 @@ interface DrawerRelatedProps {
 export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
   const [related, setRelated] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(false);
     const ctrl = new AbortController();
     const params = new URLSearchParams({
       page: '1',
@@ -34,7 +36,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
           .slice(0, 3);
         setRelated(filtered);
       })
-      .catch(() => {})
+      .catch(() => { setError(true); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -44,7 +46,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     };
   }, [currentPost.id, currentPost.category]);
 
-  if (!loading && related.length === 0) return null;
+  if (!loading && related.length === 0 && !error) return null;
 
   return (
     <section className="mt-8 border-t border-rule pt-6">
@@ -62,6 +64,8 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
             />
           ))}
         </div>
+      ) : error ? (
+        <p className="text-[13px] text-muted py-4 text-center">Could not load related stories.</p>
       ) : (
         <ul className="space-y-2.5">
           {related.map((post, i) => (

@@ -17,7 +17,8 @@
       "files": [
         "components/news/NewsCard.tsx",
         "components/news/SourceLinks.tsx",
-        "components/news/SourcePickerButton.tsx"
+        "components/news/SourcePickerButton.tsx",
+        "components/news/DrawerContent.tsx"
       ],
       "rules": { "@next/next/no-img-element": "off" }
     }

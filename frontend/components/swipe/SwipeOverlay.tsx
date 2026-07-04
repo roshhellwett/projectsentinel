@@ -39,9 +39,10 @@ export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
   useEffect(() => {
     if (!hasSeen && Math.max(opaNextRight, opaPrevLeft, opaNextUp, opaPrevDown) > 0.6) {
       safeWrite(SEEN_KEY, true);
-      // Let them finish the current swipe before hiding it forever
-      setTimeout(() => setHasSeen(true), 2000);
+      const timer = setTimeout(() => setHasSeen(true), 2000);
+      return () => clearTimeout(timer);
     }
+    return undefined;
   }, [hasSeen, opaNextRight, opaPrevLeft, opaNextUp, opaPrevDown]);
 
   if (hasSeen) return null;
@@ -108,7 +109,7 @@ function Badge({
   const composedTransform = `${base.transform ?? ''} scale(${scale})`.trim();
   return (
     <div
-      className={`absolute inline-flex items-center gap-2 px-3 py-1.5 border-2 rounded-md text-[11px] font-bold uppercase tracking-[0.18em] shadow-paper-lift ${accent}`}
+      className={`absolute inline-flex items-center gap-2 px-3 py-1.5 border-2 rounded-md text-[11px] font-bold uppercase tracking-[0.18em] shadow-paper-lift will-change-transform transform-gpu ${accent}`}
       style={{ ...base, transform: composedTransform, opacity }}
     >
       {icon}

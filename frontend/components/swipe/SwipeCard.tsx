@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
@@ -8,18 +8,20 @@ import type { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { summaryToBullets } from '@/lib/utils/summaryToBullets';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
-import { SwipeHint } from './SwipeHint';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { getHostname } from '@/lib/utils/getHostname';
 import { CredibilityBar } from '@/components/news/CredibilityBar';
 import { SourcePickerButton } from '@/components/news/SourcePickerButton';
 import { BookmarkButton } from '@/components/news/BookmarkButton';
+import { useSavedPosts } from '@/lib/utils/readPosts';
+import { showToast } from '@/lib/utils/toast';
 
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 
 const SWIPE_DIST = 100;
 const SWIPE_VEL = 600;
 
+// Velocity-weighted dominant-axis swipe detection — compares offset + scaled velocity
 function decideDirection(info: PanInfo): SwipeDirection | null {
   const { offset, velocity } = info;
   const ax = Math.abs(offset.x);
@@ -141,23 +143,25 @@ export function SwipeCard({
   onTap,
   onDragProgress,
 }: SwipeCardProps) {
+  const { isSaved, toggleSaved } = useSavedPosts();
   const theme = getCategoryTheme(post.category);
 
-  const bullets = summaryToBullets(post.summary, 2);
-  const topSources = (post.sources ?? []).slice(0, 3);
-  const sourcesTotal = post.source_count ?? topSources.length;
-  const extraSources = Math.max(0, sourcesTotal - topSources.length);
-  const ageMs = Date.now() - new Date(post.published_at).getTime();
+  const bullets = useMemo(() => summaryToBullets(post.summary, 2), [post.summary]);
+  const { topSources, sourcesTotal, extraSources, uniqueHostCount, sourcesNoun } = useMemo(() => {
+    const ts = (post.sources ?? []).slice(0, 3);
+    const st = post.source_count ?? ts.length;
+    const es = Math.max(0, st - ts.length);
+    const uhc = new Set((post.sources ?? []).map((s) => getHostname(s.url)).filter(Boolean)).size;
+    const sn = uhc > 1 && uhc === st
+      ? (st === 1 ? 'publication' : 'publications')
+      : (st === 1 ? 'source' : 'sources');
+    return { topSources: ts, sourcesTotal: st, extraSources: es, uniqueHostCount: uhc, sourcesNoun: sn };
+  }, [post.sources, post.source_count]);
+  const ageMs = useMemo(() => Date.now() - new Date(post.published_at).getTime(), [post.published_at]);
   const ageDot = ageDotClass(ageMs);
   const readMinutes = estimateReadMinutes(post.summary);
   const breaking = isBreaking(post);
   const flagsCount = post.fact_check_flags?.length ?? 0;
-  const uniqueHostCount = new Set(
-    (post.sources ?? []).map((s) => getHostname(s.url)).filter(Boolean),
-  ).size;
-  const sourcesNoun = uniqueHostCount > 1 && uniqueHostCount === sourcesTotal
-    ? (sourcesTotal === 1 ? 'publication' : 'publications')
-    : (sourcesTotal === 1 ? 'source' : 'sources');
   const style = DEPTH_STYLES[depth];
 
   const reducedMotion = useReducedMotion();
@@ -169,7 +173,15 @@ export function SwipeCard({
   const [showDoubleTap, setShowDoubleTap] = useState(false);
 
   const lastTapRef = useRef(0);
-  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const doubleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+      if (doubleTapTimerRef.current) clearTimeout(doubleTapTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!interactive) {
@@ -183,7 +195,7 @@ export function SwipeCard({
     return () => { unsubX(); unsubY(); };
   }, [interactive, onDragProgress, dragX, dragY]);
 
-  const handleDragEnd = async (_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+  const handleDragEnd = useCallback((_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
     let dir = decideDirection(info);
     if ((dir === 'down' || dir === 'left') && !canRewind) dir = null;
     if (!dir || !interactive) {
@@ -196,7 +208,7 @@ export function SwipeCard({
     setExitDir(dir);
     // Let Framer Motion trigger the exit animation automatically when the parent unmounts this card.
     onSwipe?.(dir, post);
-  };
+  }, [interactive, canRewind, onDragProgress, onSwipe, post]);
 
   const isClient = typeof window !== 'undefined';
   const winW = isClient ? window.innerWidth : 500;
@@ -244,10 +256,11 @@ export function SwipeCard({
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
         <div
-          className={`p-5 ${interactive ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset' : ''}`}
+          className={`p-5 ${interactive ? 'cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset' : ''}`}
           role={interactive ? 'button' : undefined}
           tabIndex={interactive ? 0 : undefined}
           aria-label={interactive ? `Read article: ${post.headline}` : undefined}
+          data-swipe-card={interactive ? 'true' : undefined}
           onClick={(e) => {
             if (!interactive) return;
             if ((e.target as HTMLElement).closest('[data-swipe-actions]')) return;
@@ -260,10 +273,16 @@ export function SwipeCard({
               
               if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
               haptic([10, 40, 10]);
+              const wasNotSaved = !isSaved(post.id);
+              toggleSaved(post.id);
+              if (wasNotSaved) {
+                showToast('Saved to reading list', 'bookmark');
+                onSwipe?.('right', post);
+              } else {
+                showToast('Removed from reading list', 'bookmark');
+              }
               setShowDoubleTap(true);
-              setTimeout(() => setShowDoubleTap(false), 900);
-              
-              onSwipe?.('right', post);
+              doubleTapTimerRef.current = setTimeout(() => setShowDoubleTap(false), 900);
             } else {
               
               haptic(6);
@@ -287,7 +306,7 @@ export function SwipeCard({
                 initial={{ opacity: 0, scale: 0.5, rotate: -15 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.2 } }}
-                className={`absolute inset-0 ${Z_INDEX.stickyNav} flex items-center justify-center pointer-events-none`}
+                className={`absolute inset-0 ${Z_INDEX.cardOverlay} flex items-center justify-center pointer-events-none`}
               >
                 <div className="bg-ink/80 backdrop-blur-sm p-6 rounded-full shadow-2xl text-paper">
                   <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">

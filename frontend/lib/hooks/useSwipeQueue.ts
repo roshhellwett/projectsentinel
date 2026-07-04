@@ -26,6 +26,7 @@ const PREFETCH_THRESHOLD = 10;
 const HISTORY_MAX = 25;
 const SEEN_PREFIX = 'iv:swipe:seen:';
 const MAX_REFILL_FAILURES = 3;
+// Incremental backoff sequence — 1.5s → 4s → 10s
 const REFILL_BACKOFF_MS = [1500, 4000, 10000] as const;
 
 export interface HistoryEntry {
@@ -76,6 +77,12 @@ export function useSwipeQueue({
   const exhaustedRef = useRef(exhausted);
   const filterIdsRef = useRef<(posts: Post[]) => Post[]>(() => []);
   const historyRef = useRef(history);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
 
 
@@ -227,7 +234,7 @@ export function useSwipeQueue({
         return;
       }
     } finally {
-      if (!retryTimerRef.current) {
+      if (!retryTimerRef.current && mountedRef.current) {
         setIsFetching(false);
         fetchingRef.current = false;
       }

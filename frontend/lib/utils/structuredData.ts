@@ -26,8 +26,19 @@ export function newsArticleJsonLd(post: Post): object {
     },
     articleSection: post.category,
     url: `${siteUrl}/news/${post.id}/`,
-    credibilityScore: post.credibility_score,
-    sourceCount: post.source_count,
+    image: [`${siteUrl}/opengraph-image.png`],
+    additionalProperty: [
+      {
+        '@type': 'PropertyValue',
+        name: 'credibilityScore',
+        value: post.credibility_score,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'sourceCount',
+        value: post.source_count,
+      },
+    ],
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `${siteUrl}/news/${post.id}/`,

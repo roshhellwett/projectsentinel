@@ -6,6 +6,7 @@ import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 import dynamic from 'next/dynamic';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { OfflineBanner } from '@/components/layout/OfflineBanner';
@@ -79,6 +80,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
+    canonical: siteUrl,
     types: { 'application/rss+xml': `${siteUrl}/rss.xml` },
   },
   icons: {
@@ -97,9 +99,9 @@ export const viewport: Viewport = {
   ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
   colorScheme: 'light dark',
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -162,7 +164,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-paper focus:rounded focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-paper"
+          className={`sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 ${Z_INDEX.skipLink} focus:px-4 focus:py-2 focus:bg-accent focus:text-paper focus:rounded focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-paper`}
         >
           Skip to content
         </a>

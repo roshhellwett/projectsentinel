@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Sun, Moon } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 
 const STORAGE_KEY = 'iv-theme';
@@ -30,6 +30,7 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeToggle({ className = '' }: { className?: string }) {
+  const reducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>('light');
 
@@ -46,14 +47,29 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       setTheme(sys);
       applyTheme(sys);
     };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) {
+        const updated = readStored() ?? readSystem();
+        setTheme(updated);
+        applyTheme(updated);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
     if (mq.addEventListener) {
       mq.addEventListener('change', onChange);
-      return () => mq.removeEventListener('change', onChange);
+      return () => {
+        window.removeEventListener('storage', onStorage);
+        mq.removeEventListener('change', onChange);
+      };
     } else if (mq.addListener) {
       mq.addListener(onChange);
-      return () => mq.removeListener(onChange);
+      return () => {
+        window.removeEventListener('storage', onStorage);
+        mq.removeListener(onChange);
+      };
     }
-    return () => {};
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   const toggle = useCallback(() => {
@@ -82,10 +98,10 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
         {mounted && (
           <motion.div
             key={theme}
-            initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+            initial={{ opacity: 0, rotate: reducedMotion ? 0 : -90, scale: reducedMotion ? 1 : 0.5 }}
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
-            exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
-            transition={{ type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
+            exit={{ opacity: 0, rotate: reducedMotion ? 0 : 90, scale: reducedMotion ? 1 : 0.5 }}
+            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
             className="will-change-transform will-change-opacity transform-gpu flex items-center justify-center"
           >
             <Icon className="w-[18px] h-[18px]" strokeWidth={1.8} />

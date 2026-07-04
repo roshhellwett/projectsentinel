@@ -4,9 +4,9 @@ import { TrendingSection } from '@/components/news/TrendingSection';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { LiveClock } from '@/components/layout/LiveClock';
-import { Suspense } from 'react';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { dedupe } from '@/lib/utils/dedupe';
+import { Zap, ShieldCheck, Flame, Sparkles, Radio } from 'lucide-react';
 
 const IST_HOUR_FMT = new Intl.DateTimeFormat('en-GB', {
   hour: '2-digit',
@@ -16,8 +16,8 @@ const IST_HOUR_FMT = new Intl.DateTimeFormat('en-GB', {
 
 function getIndianGreeting(): string {
   const hour = parseInt(IST_HOUR_FMT.format(new Date()), 10);
-  if (Number.isNaN(hour)) return 'Welcome';
-  if (hour < 5) return 'Late night';
+  if (Number.isNaN(hour)) return 'Welcome back';
+  if (hour < 5) return 'Late night scrolling';
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   if (hour < 21) return 'Good evening';
@@ -46,7 +46,7 @@ export default async function HomePage() {
       return { post, score: post.credibility_score * 0.6 + freshness * 40 };
     })
     .sort((a, b) => b.score - a.score)
-    .slice(0, 5)
+    .slice(0, 6)
     .map(({ post }) => post);
   const trendingIdList = trendingPosts.map((p) => p.id);
   const trendingIds = new Set(trendingIdList);
@@ -58,6 +58,11 @@ export default async function HomePage() {
 
   const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
 
+  // Calculate average credibility score of today's stories
+  const avgScore = allPosts.length > 0 
+    ? Math.round(allPosts.reduce((acc, p) => acc + p.credibility_score, 0) / allPosts.length)
+    : 92;
+
   return (
     <div className="relative min-h-screen">
       <script
@@ -67,92 +72,114 @@ export default async function HomePage() {
         }}
       />
 
-      <div className="relative z-10 px-4 lg:px-10 pb-16">
-
+      <div className="relative z-10 px-4 sm:px-6 lg:px-10 pb-20 max-w-[1600px] mx-auto">
+        {/* ── Premium Editorial Masthead ─────────────────────────── */}
         <section
-          aria-label="Today's masthead"
-          className="relative mb-12 pt-8 lg:pt-12"
+          aria-label="Today's stats masthead"
+          className="relative my-6 sm:my-8 p-7 sm:p-9 rounded-2xl bg-paper border border-rule/60 shadow-card overflow-hidden"
         >
-          <div className="hidden md:flex items-start justify-between gap-6">
-            <div className="max-w-3xl stagger-entry">
-              <p className="editorial-kicker mb-5">
-                <span>{getIndianGreeting()}</span>
-                <span aria-hidden="true" className="muted">·</span>
-                <span className="muted">AI-verified Indian news</span>
-              </p>
-              <h1 className="font-display font-bold text-ink leading-[1.04] tracking-tight text-[clamp(2.5rem,5vw,4.75rem)] animate-fade-in-up">
-                A calmer, smarter front page for India.
+          {/* Ambient gradient backdrop */}
+          <div 
+            className="absolute -right-24 -top-24 w-96 h-96 rounded-full opacity-[0.07] dark:opacity-[0.12] blur-3xl pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgb(var(--c-accent)), transparent 70%)' }}
+            aria-hidden="true"
+          />
+          <div 
+            className="absolute -left-16 -bottom-16 w-72 h-72 rounded-full opacity-[0.05] dark:opacity-[0.08] blur-3xl pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgb(var(--c-glow-to)), transparent 70%)' }}
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="max-w-2xl stagger-entry">
+              <div className="flex items-center gap-2.5 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-[0.15em] border border-accent/15">
+                  <Radio className="w-3 h-3" />
+                  <span>Live Verified Feed</span>
+                </span>
+                <span className="text-xs font-semibold text-muted">&middot; {getIndianGreeting()}</span>
+              </div>
+
+              <h1 className="font-display font-black text-ink leading-[1.04] tracking-[-0.025em] text-[clamp(2rem,4.5vw,3.5rem)] mb-4">
+                Real-time news, <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-purple-500 to-pink-500 animate-gradient-shift" style={{ backgroundSize: '200% 200%' }}>zero noise.</span>
               </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
-                Every story cross-referenced across multiple trusted Indian
-                publications, scored for credibility, and rewritten without
-                ads or noise.
+
+              <p className="text-sm sm:text-base text-muted leading-relaxed max-w-xl">
+                Every article is instantly cross-referenced across trusted Indian publications, scored for accuracy by AI, and served in a distraction-free feed.
               </p>
             </div>
-            <div className="flex flex-col gap-0 items-end">
-              <LiveClock variant="hero" />
+
+            {/* Stats Pills & Clock */}
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 justify-end flex-shrink-0">
+              <div className="flex items-center justify-between sm:justify-start gap-5 p-4 rounded-xl bg-paper-2/80 border border-rule/60 shadow-sm backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <span className="p-2.5 rounded-xl bg-cred-high/10 text-cred-high">
+                    <ShieldCheck className="w-5 h-5" strokeWidth={2} />
+                  </span>
+                  <div>
+                    <div className="text-[10px] font-bold text-muted uppercase tracking-[0.12em]">Avg Credibility</div>
+                    <div className="text-sm font-bold text-ink tabular-nums">{avgScore}% Verified</div>
+                  </div>
+                </div>
+
+                <div className="h-9 w-px bg-rule/50 hidden sm:block" />
+
+                <div className="flex items-center gap-3">
+                  <span className="p-2.5 rounded-xl bg-accent/10 text-accent">
+                    <Zap className="w-5 h-5" strokeWidth={2} />
+                  </span>
+                  <div>
+                    <div className="text-[10px] font-bold text-muted uppercase tracking-[0.12em]">24h Updates</div>
+                    <div className="text-sm font-bold text-ink flex items-center gap-1">
+                      <AnimatedCounter value={verifiedToday} />
+                      <span>stories</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="self-end sm:self-auto w-full sm:w-auto">
+                <LiveClock variant="hero" className="w-full bg-paper-2/80 rounded-xl border border-rule/60 px-4 py-2.5 shadow-sm backdrop-blur-sm" />
+              </div>
             </div>
           </div>
-
-          <div className="md:hidden flex flex-col gap-6">
-            <div className="stagger-entry">
-              <p className="editorial-kicker mb-4">
-                <span>{getIndianGreeting()}</span>
-              </p>
-              <h1 className="font-display font-bold text-ink leading-[1.06] tracking-tight text-[clamp(2.25rem,8vw,3rem)] animate-fade-in-up">
-                A calmer, smarter front page for India.
-              </h1>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
-                Every story cross-referenced, scored for credibility, and
-                rewritten without ads or noise.
-              </p>
-            </div>
-            <div className="flex flex-col mt-2">
-              <LiveClock variant="hero" className="w-full" />
-            </div>
-          </div>
-
-          {verifiedToday > 0 && (
-            <p className="mt-7 inline-flex items-center gap-2.5 text-xs">
-              <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0">
-                <span className="absolute inset-0 rounded-full bg-accent/60 animate-ping" aria-hidden="true" />
-              </span>
-              <AnimatedCounter
-                value={verifiedToday}
-                className="font-bold text-ink tabular-nums"
-              />
-              <span className="font-medium text-muted">
-                {verifiedToday === 1 ? 'story verified in the last 24 hours' : 'stories verified in the last 24 hours'}
-              </span>
-            </p>
-          )}
         </section>
 
-        <div className="bg-paper/80 backdrop-blur-sm rounded-2xl shadow-[0_4px_30px_-10px_rgb(0_0_0_/_0.12)] border border-paper-2 p-6 md:p-8 lg:p-10 mb-8">
-          {heroPost && (
-            <div id="latest" className="mb-12 scroll-mt-24">
-              <HeroCard post={heroPost} />
-            </div>
-          )}
+        {/* ── Full-bleed Hero Card Section ───────────────────────── */}
+        {heroPost && (
+          <div id="latest" className="mb-12 scroll-mt-24">
+            <HeroCard post={heroPost} badge="breaking" />
+          </div>
+        )}
 
-          {trendingPosts.length > 0 && <TrendingSection posts={trendingPosts} />}
-        </div>
+        {/* ── Trending Carousel ──────────────────────────────────── */}
+        {trendingPosts.length > 0 && (
+          <div className="mb-12">
+            <TrendingSection posts={trendingPosts} />
+          </div>
+        )}
 
-        <div className="bg-paper/80 backdrop-blur-sm rounded-2xl shadow-[0_4px_30px_-10px_rgb(0_0_0_/_0.12)] border border-paper-2 p-6 md:p-8 lg:p-10">
-          <section aria-label="Latest verified news">
-            <h2 className="section-rule mb-7">
-              <span>Latest News</span>
-              <span className="ml-auto editorial-kicker text-[10px]">
-                <span className="muted">Live updates</span>
+        {/* ── Infinite Feed ──────────────────────────────────────── */}
+        <section aria-label="Latest verified news" className="mt-10">
+          <div className="flex items-center justify-between gap-4 mb-7 pb-4 border-b border-rule/60">
+            <h2 className="flex items-center gap-2.5 font-display text-xl sm:text-2xl font-bold text-ink">
+              <span className="p-1.5 rounded-lg bg-accent/10 text-accent">
+                <Flame className="w-5 h-5" strokeWidth={2.2} />
               </span>
+              <span>Your Verified Feed</span>
             </h2>
-            <InfiniteFeed
-              initialPosts={feedPosts}
-              initialCount={Math.max(0, postsResult.count - trendingIdList.length - (heroPost ? 1 : 0))}
-              excludeIds={[...trendingIdList, ...(heroPost ? [heroPost.id] : [])]}
-            />
-          </section>
-        </div>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted bg-paper-2 px-3 py-1.5 rounded-full border border-rule/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-cred-high animate-pulse" />
+              Live Stream
+            </span>
+          </div>
+
+          <InfiniteFeed
+            initialPosts={feedPosts}
+            initialCount={Math.max(0, postsResult.count - trendingIdList.length - (heroPost ? 1 : 0))}
+            excludeIds={[...trendingIdList, ...(heroPost ? [heroPost.id] : [])]}
+          />
+        </section>
       </div>
     </div>
   );

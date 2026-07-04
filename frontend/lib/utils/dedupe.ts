@@ -20,6 +20,7 @@ function stableKey(article: Post): string {
   return `id::${article.id}`;
 }
 
+// Hash-based duplicate detection — O(n) using Set + Map
 export function dedupe(articles: Post[]): Post[] {
   const before = articles.length;
   const seenIds = new Set<string>();

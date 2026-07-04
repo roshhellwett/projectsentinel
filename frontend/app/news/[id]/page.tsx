@@ -37,6 +37,8 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
     };
   }
 
+  const ogImage = ((post as unknown as Record<string, unknown>).image_url as string) || `${siteUrl}/opengraph-image.png`;
+
   return {
     title: post.headline,
     description: post.summary,
@@ -46,11 +48,20 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       type: 'article',
       publishedTime: post.published_at,
       url: `${siteUrl}/news/${post.id}/`,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.headline,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.headline,
       description: post.summary,
+      images: [ogImage],
     },
     alternates: {
       canonical: `${siteUrl}/news/${post.id}/`,
@@ -83,7 +94,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden pb-12">
+    <div className="relative min-h-screen overflow-x-clip pb-12">
       <ReadingProgress targetSelector="#article-body" />
       <MarkReadOnMount postId={post.id} />
       <script
@@ -99,7 +110,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group"
           >
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded border border-rule bg-paper group-hover:border-ink transition-colors">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-rule/60 bg-paper-2/80 group-hover:border-accent/40 group-hover:bg-paper transition-all shadow-sm">
               <ArrowLeft className="w-4 h-4" />
             </span>
             Back to all news
@@ -127,7 +138,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <article id="article-body" className={`relative max-w-3xl mx-auto mb-10 md:mb-14 ${isRetracted ? 'opacity-60' : ''}`}>
 
-          <span aria-hidden="true" className="block w-16 h-[3px] bg-gradient-to-r from-accent to-accent/30 rounded-full mb-6" />
+          <span aria-hidden="true" className="block w-16 h-[3px] bg-gradient-to-r from-accent via-accent/60 to-transparent rounded-full mb-7" />
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
             <CategoryTag category={post.category} />
@@ -141,19 +152,23 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </span>
           </div>
 
-          <h1 className={`font-display font-bold text-ink tracking-tight leading-[1.04] mb-8 text-[clamp(2rem,4.6vw,3.75rem)] ${isRetracted ? 'line-through text-muted' : ''}`}>
+          <h1 className={`font-display font-bold text-ink tracking-[-0.03em] leading-[1.04] mb-9 text-[clamp(2.1rem,4.8vw,4rem)] ${isRetracted ? 'line-through text-muted' : ''}`}>
             {post.headline}
           </h1>
 
-          <div className="mb-10 rounded-xl border border-rule bg-paper-2/80 backdrop-blur-sm p-5 sm:p-6 shadow-sm">
+          <div className="mb-10 rounded-2xl border border-rule/50 bg-paper-2/60 backdrop-blur-sm p-5 sm:p-6 shadow-sm">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-5 flex flex-col gap-4 border-t border-rule pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
                 <Database className="w-4 h-4 text-accent" />
-                <span className="tabular-nums">{post.source_count}</span>
-                <span className="text-muted uppercase tracking-[0.14em] text-[10px] font-bold">
-                  {post.source_count === 1 ? 'source verified' : 'sources verified'}
-                </span>
+                {typeof post.source_count === 'number' && (
+                  <>
+                    <span className="tabular-nums">{post.source_count}</span>
+                    <span className="text-muted uppercase tracking-[0.14em] text-[10px] font-bold">
+                      {post.source_count === 1 ? 'source verified' : 'sources verified'}
+                    </span>
+                  </>
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
@@ -162,7 +177,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </div>
 
-          <p className="font-display text-[19px] md:text-[21px] leading-[1.7] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.4em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2.5 first-letter:mt-1 first-letter:text-accent">
+          <p className="font-display text-[19px] md:text-[22px] leading-[1.75] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[3.5em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-3 first-letter:mt-1.5 first-letter:text-accent">
             {post.summary}
           </p>
         </article>
@@ -188,7 +203,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
         </div>
 
-        <div className="premium-card bg-paper-2/80 backdrop-blur-sm p-6 mb-12 shadow-sm">
+        <div className="premium-card bg-paper-2/60 backdrop-blur-sm p-7 mb-12 shadow-sm border-rule/50">
           <h3 className="text-[11px] font-bold text-accent mb-5 uppercase tracking-[0.18em] text-center">
             How this story was built
           </h3>
@@ -199,8 +214,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
               { label: 'Unbiased AI', icon: <span className="font-bold text-[11px] leading-none">AI</span> },
               { label: 'Auto-Published', icon: <span className="text-base">&#9889;</span> },
             ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center text-center p-3 rounded-xl hover:bg-paper transition-all duration-200">
-                <div className="w-10 h-10 rounded-full border border-rule-strong bg-paper text-accent flex items-center justify-center mb-3 shadow-sm">
+              <div key={item.label} className="flex flex-col items-center text-center p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step">
+                <div className="w-10 h-10 rounded-xl border border-rule/60 bg-paper text-accent flex items-center justify-center mb-3 shadow-sm group-hover/step:border-accent/30 group-hover/step:shadow-card transition-all duration-300">
                   {item.icon}
                 </div>
                 <span className="text-[11px] font-semibold text-ink">{item.label}</span>
@@ -209,8 +224,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         </div>
 
-        <div id="related-news" className="mt-12 border-t border-rule pt-10">
-          <h2 className="section-rule mb-7">
+        <div id="related-news" className="mt-14 pt-10 relative">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rule to-transparent" />
+          <h2 className="section-heading mb-7">
             Related stories
           </h2>
           <RelatedStories posts={relatedPosts.posts} currentPostId={post.id} />

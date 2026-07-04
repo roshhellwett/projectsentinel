@@ -41,6 +41,8 @@ export function useInfiniteFeed({
   const loadMoreRef = useRef<() => void>(() => {});
   const pageSizeRef = useRef(pageSize);
   pageSizeRef.current = pageSize;
+  const mountedRef = useRef(true);
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
 
   // Flash new posts green for 5 seconds
   const flashFresh = useCallback((ids: string[]) => {
@@ -75,32 +77,35 @@ export function useInfiniteFeed({
         { cacheTtl: 15_000 },
       );
 
-      setPosts((prev) => {
-        const existing = new Set(prev.map((p) => p.id));
-        const excluded = excludeIdsRef.current;
-        const incoming = payload.posts.filter(
-          (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
-        );
-        return dedupe([...prev, ...incoming]);
-      });
-      
-      setPage(next);
-      if (payload.posts.length === 0 || payload.posts.length < pageSizeRef.current) {
-        setExhausted(true);
+      if (mountedRef.current) {
+        setPosts((prev) => {
+          const existing = new Set(prev.map((p) => p.id));
+          const excluded = excludeIdsRef.current;
+          const incoming = payload.posts.filter(
+            (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
+          );
+          return dedupe([...prev, ...incoming]);
+        });
+        
+        setPage(next);
+        if (payload.posts.length === 0 || payload.posts.length < pageSizeRef.current) {
+          setExhausted(true);
+        }
       }
     } catch (err) {
       console.error('Failed to load more posts', err);
     } finally {
-      setLoading(false);
-      loadingRef.current = false;
+      if (mountedRef.current) {
+        setLoading(false);
+        loadingRef.current = false;
+      }
     }
   }, []);
 
   loadMoreRef.current = loadMore;
 
-  // Buffer incoming posts to prevent rapid state updates and UI thrashing.
-  // We collect all incoming socket events into a ref array, then flush them
-  // periodically. This is crucial for performance when many posts arrive at once.
+  // Buffer-and-flush pattern — batches rapid socket events into periodic state updates (800ms window)
+  // Uses a ref-based accumulator to avoid cascading re-renders from individual events
   const incomingBufferRef = useRef<Post[]>([]);
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -118,13 +123,13 @@ export function useInfiniteFeed({
       (p) =>
         !existing.has(p.id) &&
         !(excluded?.has(p.id)) &&
-        (!category || p.category === category),
+        (!categoryRef.current || p.category === categoryRef.current),
     );
     
     if (fresh.length === 0) return;
     flashFresh(fresh.map((p) => p.id));
     setPosts((prev) => dedupe([...fresh, ...prev]));
-  }, [category, flashFresh]);
+  }, [flashFresh]);
 
   const processIncomingPosts = useCallback((incoming: Post[]) => {
     if (incoming.length === 0) return;
@@ -168,7 +173,7 @@ export function useInfiniteFeed({
       if (document.visibilityState === 'visible') connect();
     };
 
-    const flashTimers = flashTimersRef.current;
+    const timers = flashTimersRef.current;
     connect();
     document.addEventListener('visibilitychange', onVisible);
 
@@ -181,10 +186,10 @@ export function useInfiniteFeed({
         clearTimeout(flushTimerRef.current);
         flushTimerRef.current = null;
       }
-      for (const tid of flashTimers) {
+      for (const tid of timers) {
         clearTimeout(tid);
       }
-      flashTimers.clear();
+      timers.clear();
     };
   }, [processIncomingPosts]);
 

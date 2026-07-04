@@ -25,6 +25,7 @@ export function getCached<T>(key: string): T | null {
   return entry.data as T;
 }
 
+// FIFO eviction when cache exceeds max entries (100)
 export function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
   if (cache.size > 100) {
     const oldest = cache.entries().next().value;
@@ -43,6 +44,8 @@ export function clearCache(pattern?: string): void {
   }
 }
 
+const inflight = new Map<string, Promise<unknown>>();
+
 export async function cachedFetch<T>(
   url: string,
   options?: RequestInit & { cacheTtl?: number },
@@ -50,21 +53,35 @@ export async function cachedFetch<T>(
   const method = options?.method || 'GET';
   const cacheKey = getCacheKey(url, method, options?.body);
 
-  if (method === 'GET' && !options?.signal) {
+  if (method === 'GET') {
     const cached = getCached<T>(cacheKey);
     if (cached !== null) return cached;
+
+    const existing = inflight.get(cacheKey);
+    if (existing) return (await existing) as T;
   }
 
-  const res = await fetch(url, { ...options, cache: options?.cache || 'no-store' });
-  if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-
-  const data: T = await res.json();
+  const fetchPromise = (async () => {
+    try {
+      const res = await fetch(url, { ...options, cache: options?.cache || 'no-store' });
+      if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+      const data: T = await res.json();
+      if (method === 'GET') {
+        setCache(cacheKey, data, options?.cacheTtl);
+      }
+      return data;
+    } finally {
+      if (method === 'GET') {
+        inflight.delete(cacheKey);
+      }
+    }
+  })();
 
   if (method === 'GET') {
-    setCache(cacheKey, data, options?.cacheTtl);
+    inflight.set(cacheKey, fetchPromise);
   }
 
-  return data;
+  return (await fetchPromise) as T;
 }
 
 export function invalidatePostsCache(): void {

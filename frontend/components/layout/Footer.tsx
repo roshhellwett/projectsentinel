@@ -46,11 +46,13 @@ function ColumnHeading({ children }: { children: React.ReactNode }) {
 export function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="relative mt-auto bg-paper-2/90 backdrop-blur-sm border-t border-rule">
+    <footer className="relative mt-auto bg-paper-2/80 backdrop-blur-sm border-t border-rule/40">
 
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent/80 to-transparent" aria-hidden="true" />
+      {/* Premium gradient divider */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
+      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent/20 to-transparent blur-sm" aria-hidden="true" />
 
-      <div className="px-4 lg:px-10 pt-12 pb-10">
+      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-12 pb-10">
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-10 mb-10 border-b border-rule">
           <div>
@@ -60,7 +62,7 @@ export function Footer() {
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-10 h-10 bg-ink text-paper font-display font-bold text-base tracking-[0.06em]"
+                className="flex items-center justify-center w-10 h-10 bg-ink text-paper font-display font-bold text-base tracking-[0.06em] rounded-lg"
               >
                 IV
               </span>
@@ -102,7 +104,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-10 mb-12">
           <div>
             <ColumnHeading>News</ColumnHeading>
             <ul className="space-y-3 sm:space-y-2.5 text-sm">
@@ -164,14 +166,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6 sm:gap-3 pt-8 md:pt-6 border-t border-rule">
-          <p className="text-xs text-subtle leading-relaxed max-w-[54ch]">
-            &copy; {year} Zenith Open Source Projects. Reporting cross-verified by AI;
-            stories may be republished under the MIT licence with attribution.
-          </p>
+        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-6 sm:gap-3 pt-8 md:pt-6 border-t border-rule">
           <p className="text-xs text-subtle leading-relaxed">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-paper-tint border border-rule">
-              <span aria-hidden="true">🇮🇳</span>
+              <span aria-hidden="true" className="inline-block w-4 h-3 rounded-[2px] overflow-hidden flex-shrink-0" style={{ background: 'linear-gradient(180deg, #ff9933 33%, #fff 33% 66%, #138808 66%)' }} />
               <span className="font-semibold text-muted">Built in India</span>
             </span>
             <span aria-hidden="true" className="mx-2 text-rule-strong">·</span>
@@ -194,6 +192,10 @@ export function Footer() {
               Claude
             </a>{' '}
             &amp; other tools.
+          </p>
+          <p className="text-xs text-subtle leading-relaxed" suppressHydrationWarning>
+            &copy; {year} Zenith Open Source Projects. Reporting cross-verified by AI;
+            stories may be republished under the MIT licence with attribution.
           </p>
         </div>
       </div>

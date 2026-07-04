@@ -18,7 +18,7 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div role="alert" aria-live="assertive" className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 text-center">
       <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-accent-soft/50 border border-accent/20 flex items-center justify-center mb-6">
         <AlertOctagon className="w-8 h-8 md:w-10 md:h-10 text-accent" strokeWidth={1.5} />
       </div>
@@ -61,7 +61,7 @@ export default function Error({ error, reset }: ErrorProps) {
         </button>
         
         {showDetails && (
-          <div className="mt-4 p-4 rounded-md bg-paper-2 border border-rule text-left overflow-x-auto animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="mt-4 p-4 rounded-md bg-paper-2 border border-rule text-left overflow-x-auto">
             <p className="text-sm font-mono font-semibold text-ink mb-2">Error digest: {error.digest || 'N/A'}</p>
             <p className="text-xs font-mono text-muted whitespace-pre-wrap break-all">
               {error.message || 'Unknown error occurred'}

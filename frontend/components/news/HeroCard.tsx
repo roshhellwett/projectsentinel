@@ -1,14 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Clock, Database, Flame, ShieldCheck, Radio } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, Clock, ShieldCheck, Flame, Radio } from 'lucide-react';
 import { Post } from '@/types';
-import { CategoryTag } from './CategoryTag';
-import { CategoryPlaceholder } from './CategoryPlaceholder';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { getHostname } from '@/lib/utils/getHostname';
-import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
+import { ScoreRing } from './ScoreRing';
+import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { CategoryIcon } from './CategoryIcon';
+import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 interface HeroCardProps {
   post: Post;
@@ -16,118 +17,120 @@ interface HeroCardProps {
 }
 
 export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
-  const clampedScore = Math.min(100, Math.max(0, Math.round(post.credibility_score ?? 0)));
-  const scoreLabel = getScoreLabel(clampedScore);
-  const scoreHex = getScoreHex(clampedScore);
+  const reducedMotion = useReducedMotion();
+  const haptic = useHapticFeedback();
+  const theme = getCategoryTheme(post.category);
 
   const firstSource = (post.sources ?? [])[0];
   const firstHost = firstSource ? getHostname(firstSource.url) : '';
   const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
 
-  const { scrollY } = useScroll();
-  const imgY = useTransform(scrollY, [0, 600], [0, 30]);
-
   return (
     <motion.div
-      initial={{ y: 18 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, scale: 0.96, y: reducedMotion ? 0 : 24 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="relative group [perspective:1200px]"
     >
       <Link
         href={`/news/${post.id}/`}
-        className="block relative overflow-hidden rounded-2xl bg-paper/85 backdrop-blur-md border border-rule shadow-sm hover:shadow-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper group/hero"
+        onClick={() => haptic.medium()}
+        className="block relative overflow-hidden rounded-2xl border border-rule/60 shadow-hero hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.15)] transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-paper"
       >
+        {/* Category accent gradient bar — thicker, more prominent */}
+        <div
+          className="absolute top-0 left-0 right-0 h-1 z-20 transition-all duration-500 group-hover/hero:h-1.5"
+          style={{ background: theme.cssGradient }}
+          aria-hidden="true"
+        />
 
-        <div className="relative grid grid-cols-1 lg:grid-cols-5 2xl:grid-cols-12 min-h-[320px] lg:min-h-[420px] 2xl:min-h-[460px]">
+        {/* Immersive ambient backdrop — dual radial gradient */}
+        <div 
+          className="absolute inset-0 opacity-[0.12] dark:opacity-[0.20] transition-opacity duration-700 group-hover/hero:opacity-[0.22] dark:group-hover/hero:opacity-[0.32]"
+          style={{ 
+            background: `radial-gradient(ellipse at 75% 15%, ${theme.gradientFrom}, transparent 65%), radial-gradient(ellipse at 25% 85%, ${theme.gradientTo}, transparent 65%)` 
+          }}
+          aria-hidden="true"
+        />
 
-          <motion.div
-            className="relative lg:col-span-2 2xl:col-span-5 min-h-[200px] lg:min-h-full overflow-hidden rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none"
-            style={{ y: imgY }}
-          >
-            <CategoryPlaceholder category={post.category} />
+        {/* Subtle noise overlay for texture */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none z-10"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }}
+          aria-hidden="true"
+        />
 
-            {/* Category gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent" aria-hidden="true" />
-
-            {badge && (
-              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-2.5 py-1 bg-accent text-paper text-[10px] font-bold uppercase tracking-[0.18em] rounded-md shadow-lg">
-                <Flame className="w-3 h-3" strokeWidth={2.2} />
-                {badge === 'breaking' ? 'Breaking' : 'Trending'}
-              </span>
-            )}
-          </motion.div>
-
-          <div className="relative lg:col-span-3 2xl:col-span-7 p-7 md:p-10 lg:p-12 2xl:p-14 flex flex-col justify-center">
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <CategoryTag category={post.category} />
+        <div className="relative z-10 p-7 sm:p-9 md:p-11 lg:p-14 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] lg:min-h-[440px]">
+          {/* Top Header Row */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Category Pill */}
               <span
-                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted"
-                suppressHydrationWarning
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] rounded-full border backdrop-blur-md"
+                style={theme.pill}
               >
-                <Clock className="w-3 h-3" />
-                {formatTimeAgo(post.published_at)}
+                <CategoryIcon name={theme.icon} className="w-3.5 h-3.5" strokeWidth={2.2} aria-hidden="true" />
+                {theme.label}
+              </span>
+
+              {/* Live / Breaking Badge */}
+              {badge && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-like text-white text-[11px] font-extrabold uppercase tracking-[0.12em] rounded-full shadow-glow-like animate-pulse">
+                  <Flame className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  {badge === 'breaking' ? 'Breaking Story' : 'Top Trending'}
+                </span>
+              )}
+
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted bg-paper/80 px-2.5 py-1 rounded-full border border-rule/50 backdrop-blur-md shadow-sm">
+                <Clock className="w-3.5 h-3.5" />
+                <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
               </span>
             </div>
 
-            <h2 className="font-display font-bold text-ink leading-[1.06] tracking-[-0.03em] mb-5 text-[clamp(1.875rem,3.4vw,3rem)]">
+            {/* Prominent Score Ring */}
+            <div className="flex items-center gap-2.5 bg-paper/85 backdrop-blur-md px-3.5 py-2 rounded-full border border-rule/50 shadow-glass">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted hidden sm:inline">Credibility</span>
+              <ScoreRing score={post.credibility_score} size={40} strokeWidth={3.5} compact />
+            </div>
+          </div>
+
+          {/* Center Content Row */}
+          <div className="my-8 max-w-4xl">
+            <h2 className="font-display font-bold text-ink leading-[1.06] tracking-[-0.03em] mb-5 text-[clamp(1.85rem,4vw,3.5rem)] group-hover/hero:text-accent transition-colors duration-300">
               {post.headline}
             </h2>
 
-            <p className="text-[15px] md:text-base text-ink-soft leading-relaxed line-clamp-3 max-w-2xl mb-5">
+            <p className="text-sm sm:text-base md:text-lg text-ink-soft leading-[1.7] line-clamp-3 max-w-3xl mb-7">
               {post.summary}
             </p>
 
             {firstHost && (
-              <p className="mb-5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted">
-                <Radio className="w-3 h-3 text-accent" aria-hidden="true" />
-                <span className="font-bold uppercase tracking-[0.18em] text-accent">First by</span>
-                <span className="font-semibold text-ink truncate max-w-[180px]">{firstHost}</span>
+              <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted bg-paper/80 border border-rule/50 px-4 py-2.5 rounded-xl backdrop-blur-md shadow-sm">
+                <Radio className="w-3.5 h-3.5 text-accent" />
+                <span className="font-bold uppercase tracking-[0.15em] text-accent">First reported by</span>
+                <span className="font-bold text-ink">{firstHost}</span>
                 {otherSourceCount > 0 && (
                   <>
-                    <span aria-hidden="true" className="text-subtle">·</span>
+                    <span className="text-rule-strong">&middot;</span>
                     <span>
-                      cross-verified by{' '}
-                      <span className="font-semibold text-ink tabular-nums">{otherSourceCount}</span>{' '}
-                      {otherSourceCount === 1 ? 'other' : 'other publications'}
+                      verified by <span className="font-bold text-ink">{otherSourceCount}</span> other publications
                     </span>
                   </>
                 )}
-              </p>
-            )}
-
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-5 border-t border-rule/60">
-              <div className="inline-flex items-center gap-3.5">
-                <span
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-current"
-                  style={{ color: scoreHex }}
-                  aria-hidden="true"
-                >
-                  <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2.2} />
-                </span>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-display text-[20px] font-bold tabular-nums leading-none text-ink">
-                    {clampedScore}
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">
-                    {scoreLabel}
-                  </span>
-                </div>
-                <span className="h-4 w-px bg-rule" aria-hidden="true" />
-                <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
-                  <Database className="h-3 w-3 text-accent" />
-                  <span className="tabular-nums font-semibold text-ink">{post.source_count}</span>
-                  <span>
-                    {post.source_count === 1 ? 'source verified' : 'sources verified'}
-                  </span>
-                </span>
               </div>
+            )}
+          </div>
 
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-paper text-[13px] font-bold tracking-wide rounded-lg transition-all duration-300 group-hover/hero:gap-3 group-hover/hero:shadow-[0_4px_12px_rgb(var(--c-accent)/0.3)]">
-                Read full story
-                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/hero:translate-x-1" />
-              </span>
+          {/* Bottom Call to Action Row */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-rule/40">
+            <div className="flex items-center gap-2 text-xs font-bold text-muted">
+              <ShieldCheck className="w-4 h-4 text-cred-high" />
+              <span>Cross-referenced &amp; AI fact-checked across <strong className="text-ink">{post.source_count || 1}</strong> sources</span>
             </div>
+
+            <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-accent text-paper text-sm font-bold tracking-wide rounded-xl shadow-md transition-all duration-400 group-hover/hero:bg-accent-hover group-hover/hero:gap-3.5 group-hover/hero:shadow-card-glow group-hover/hero:scale-[1.02]">
+              <span>Read Full Story</span>
+              <ArrowRight className="h-4 w-4 transition-transform duration-400 group-hover/hero:translate-x-1.5" />
+            </span>
           </div>
         </div>
       </Link>

@@ -5,7 +5,7 @@ import { useSyncExternalStore } from 'react';
 export interface ToastMessage {
   id: string;
   message: string;
-  icon?: 'bookmark' | 'bookmark-off' | 'share' | 'success';
+  icon?: 'bookmark' | 'bookmark-off' | 'share' | 'success' | 'error';
 }
 
 type Subscriber = (toasts: ToastMessage[]) => void;
@@ -18,8 +18,12 @@ function notify() {
 
 export function showToast(message: string, icon?: ToastMessage['icon']) {
   if (typeof window === 'undefined') return;
-  const id = Math.random().toString(36).substring(2, 9);
+  const existingIndex = toasts.findIndex((t) => t.message === message && t.icon === icon);
+  const id = existingIndex !== -1 ? toasts[existingIndex].id : Math.random().toString(36).substring(2, 9);
   
+  if (existingIndex !== -1) {
+    toasts = toasts.filter((_, i) => i !== existingIndex);
+  }
   
   toasts = [...toasts, { id, message, icon }].slice(-3);
   notify();

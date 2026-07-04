@@ -25,12 +25,12 @@ export function PostTable({ posts }: PostTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-rule">
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted">Headline</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted">Category</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted">Score</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted">Status</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted">Published</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted">Actions</th>
+              <th scope="col" className="text-left py-3 px-4 text-sm font-medium text-muted">Headline</th>
+              <th scope="col" className="text-left py-3 px-4 text-sm font-medium text-muted">Category</th>
+              <th scope="col" className="text-left py-3 px-4 text-sm font-medium text-muted">Score</th>
+              <th scope="col" className="text-left py-3 px-4 text-sm font-medium text-muted">Status</th>
+              <th scope="col" className="text-left py-3 px-4 text-sm font-medium text-muted">Published</th>
+              <th scope="col" className="text-left py-3 px-4 text-sm font-medium text-muted">Actions</th>
             </tr>
           </thead>
           <tbody>

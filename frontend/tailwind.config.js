@@ -10,9 +10,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // ── Editorial paper + ink palette (driven by CSS vars so dark mode
-        //    flips with a single class on <html>). Hex fallbacks live in
-        //    globals.css :root and .dark blocks.
+        // ── Core paper + ink palette (driven by CSS vars) ──────────
         paper:        'rgb(var(--c-paper) / <alpha-value>)',
         'paper-2':    'rgb(var(--c-paper-2) / <alpha-value>)',
         'paper-tint': 'rgb(var(--c-paper-tint) / <alpha-value>)',
@@ -23,29 +21,35 @@ module.exports = {
         rule:         'rgb(var(--c-rule) / <alpha-value>)',
         'rule-strong':'rgb(var(--c-rule-strong) / <alpha-value>)',
 
-        // Editorial crimson — the single accent. Used sparingly on category
-        // labels, links, active state, and the breaking-news bar.
+        // ── Vibrant accent system ──────────────────────────────────
         accent:       'rgb(var(--c-accent) / <alpha-value>)',
         'accent-hover':'rgb(var(--c-accent-hover) / <alpha-value>)',
         'accent-soft': 'rgb(var(--c-accent-soft) / <alpha-value>)',
 
-        // Back-compat aliases so we don't have to touch every component yet.
+        // ── Dopamine engagement colors ─────────────────────────────
+        'glow-from':  'rgb(var(--c-glow-from) / <alpha-value>)',
+        'glow-to':    'rgb(var(--c-glow-to) / <alpha-value>)',
+        'like':       'rgb(var(--c-like) / <alpha-value>)',
+        'streak':     'rgb(var(--c-streak) / <alpha-value>)',
+        'xp':         'rgb(var(--c-xp) / <alpha-value>)',
+
+        // Back-compat aliases
         background:    'rgb(var(--c-paper) / <alpha-value>)',
         'background-2':'rgb(var(--c-paper-2) / <alpha-value>)',
         foreground:    'rgb(var(--c-ink) / <alpha-value>)',
         surface:       'rgb(var(--c-paper) / <alpha-value>)',
         'surface-hover':'rgb(var(--c-paper-2) / <alpha-value>)',
 
-        // Credibility tiers — re-tuned to editorial hues.
+        // Credibility tiers
         'cred-high': 'rgb(var(--c-cred-high) / <alpha-value>)',
         'cred-mid':  'rgb(var(--c-cred-mid) / <alpha-value>)',
         'cred-low':  'rgb(var(--c-cred-low) / <alpha-value>)',
 
-        // India tricolor — retained for decorative civic accents only.
+        // India tricolor — retained for decorative civic accents
         'india-saffron': '#ff9933',
         'india-green':   '#138808',
 
-        // Portfolio accent tokens (derived from the Zenith palette)
+        // Portfolio accent tokens
         'accent-neutral':   '#1e1e1a',
         'accent-neutral-hover': '#373732',
       },
@@ -56,20 +60,33 @@ module.exports = {
         mono:    ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        // Quiet editorial shadows — paper-on-paper, never glowy.
         'rule':         '0 0 0 1px rgb(var(--c-rule) / 1)',
         'paper':        '0 1px 0 rgb(var(--c-rule) / 1)',
-        'paper-lift':   '0 1px 0 rgb(var(--c-rule) / 1), 0 2px 8px -2px rgb(var(--c-shadow) / 0.06), 0 12px 32px -10px rgb(var(--c-shadow) / 0.20)',
-        'glow-accent':  '0 0 0 1px rgb(var(--c-accent) / 0.28)',
+        'paper-lift':   '0 1px 0 rgb(var(--c-rule) / 1), 0 4px 12px -2px rgb(var(--c-shadow) / 0.08), 0 16px 40px -10px rgb(var(--c-shadow) / 0.18)',
+        'glow-accent':  '0 0 0 1px rgb(var(--c-accent) / 0.28), 0 0 16px rgb(var(--c-accent) / 0.08)',
+        'card':         '0 2px 8px -4px rgb(var(--c-shadow) / 0.06), 0 8px 24px -12px rgb(var(--c-shadow) / 0.08)',
+        'card-lg':      '0 4px 16px -8px rgb(var(--c-shadow) / 0.08), 0 16px 48px -16px rgb(var(--c-shadow) / 0.12)',
+        'card-glow':    '0 4px 16px -4px rgb(var(--c-accent) / 0.12), 0 16px 48px -12px rgb(var(--c-accent) / 0.08)',
+        'hero':         '0 8px 32px -8px rgb(var(--c-shadow) / 0.12), 0 24px 64px -16px rgb(var(--c-shadow) / 0.10)',
+        'glass':        '0 4px 24px -4px rgb(var(--c-shadow) / 0.06), 0 0 0 1px rgb(var(--c-rule) / 0.5)',
+        'glow-like':    '0 0 20px rgb(var(--c-like) / 0.3)',
+        'glow-streak':  '0 0 20px rgb(var(--c-streak) / 0.3)',
       },
       letterSpacing: {
-        'editorial': '-0.011em',
+        'editorial': '-0.015em',
         'kicker':    '0.18em',
       },
+      borderRadius: {
+        'card': '16px',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        shimmer:   'shimmer 1.6s linear infinite',
-        'ticker':  'ticker 38s linear infinite',
+        'fade-in':       'fadeIn 0.4s ease-out',
+        'shimmer':       'shimmer 1.8s linear infinite',
+        'ticker':        'ticker 38s linear infinite',
+        'streak-glow':   'streakGlow 2s ease-in-out infinite',
+        'breathe':       'breathe 3s ease-in-out infinite',
+        'glow-pulse':    'glowPulse 3s ease-in-out infinite',
+        'gradient-shift':'gradientShift 8s ease infinite',
       },
       keyframes: {
         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -80,6 +97,18 @@ module.exports = {
         ticker: {
           '0%':   { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
+        },
+        breathe: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.02)', opacity: '0.92' },
+        },
+        glowPulse: {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '0.8' },
+        },
+        gradientShift: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
         },
       },
     },

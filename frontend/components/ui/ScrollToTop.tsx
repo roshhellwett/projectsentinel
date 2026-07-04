@@ -36,7 +36,7 @@ export function ScrollToTop() {
       className={`
         tap-target min-w-[44px] min-h-[44px] flex items-center justify-center
         scroll-to-top fixed right-4 p-3
-        bottom-24 md:bottom-8
+        bottom-[calc(6rem+env(safe-area-inset-bottom,0px))] md:bottom-[calc(2rem+env(safe-area-inset-bottom,0px))]
         bg-accent hover:bg-accent/90 text-paper rounded-full
         shadow-paper-lift hover-lift
         touch-polish transition-all duration-300 ${Z_INDEX.dropdown}

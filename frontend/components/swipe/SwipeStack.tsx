@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type { Post } from '@/types';
 import { SwipeCard, type SwipeDirection } from './SwipeCard';
@@ -38,21 +38,26 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   const [drag, setDrag] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
   const { stats, showBreak, setShowBreak, trackSwipe, sessionCards } = useSwipeTracking();
+
+  const queueRef = useRef(queue);
+  queueRef.current = queue;
+
   const handleSwipe = useCallback(
     (direction: SwipeDirection, post: Post) => {
+      const q = queueRef.current;
       if (direction === 'down' || direction === 'left') {
-        queue.rewind();
+        q.rewind();
         setDrag({ x: 0, y: 0 });
         return;
       }
 
       markSeen(post.id);
       trackSwipe(post);
-      
-      queue.advance(post, direction, false);
+
+      q.advance(post, direction, false);
       setDrag({ x: 0, y: 0 });
     },
-    [queue, trackSwipe],
+    [trackSwipe],
   );
 
   const handleTap = useCallback(
@@ -64,8 +69,8 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   );
 
   const handleRewindButton = useCallback(() => {
-    queue.rewind();
-  }, [queue]);
+    queueRef.current.rewind();
+  }, []);
 
   const { current, next, upcoming } = queue;
   const visible = useMemo(
@@ -73,25 +78,33 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
     [current, next, upcoming],
   );
 
+  const drawerPostRef = useRef(drawerPost);
+  drawerPostRef.current = drawerPost;
+  const showBreakRef = useRef(showBreak);
+  showBreakRef.current = showBreak;
+  const handleSwipeRef = useRef(handleSwipe);
+  handleSwipeRef.current = handleSwipe;
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!current || drawerPost || showBreak) return;
+      const cur = queueRef.current.current;
+      if (!cur || drawerPostRef.current || showBreakRef.current) return;
       const target = e.target as HTMLElement;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable || target.closest('a, button, [role="button"]:not([data-swipe-card])'))) return;
 
       if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
         e.preventDefault();
-        handleSwipe(e.key === 'ArrowRight' ? 'right' : 'up', current);
+        handleSwipeRef.current(e.key === 'ArrowRight' ? 'right' : 'up', cur);
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
-        if (queue.canRewind) {
+        if (queueRef.current.canRewind) {
           e.preventDefault();
-          queue.rewind();
+          handleSwipeRef.current('left', cur);
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [current, drawerPost, showBreak, handleSwipe, queue]);
+  }, []);
 
   if (queue.isExhausted) {
     return (
@@ -144,7 +157,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
         onRewind={handleRewindButton}
       />
 
-      <div className="relative w-full">
+      <div className="relative w-full overscroll-x-contain">
         <div className="relative grid w-full max-w-md mx-auto px-4 [&>*]:[grid-area:1/1]">
           <AnimatePresence mode="popLayout">
             {visible
@@ -171,7 +184,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
         </div>
       </div>
 
-      <p className="mt-3 px-4 text-center text-[9px] font-semibold uppercase tracking-[0.16em] text-subtle">
+      <p className="mt-3 px-4 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-subtle">
         {queue.canRewind ? '↑ → next • ↓ ← previous' : '↑ → next'}
       </p>
 

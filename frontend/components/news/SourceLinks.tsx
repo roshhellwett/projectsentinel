@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { ExternalLink, Globe } from 'lucide-react';
 import { Source } from '@/types';
 import { getHostname } from '@/lib/utils/getHostname';
@@ -16,7 +16,7 @@ function getSourceLabel(source: Source): string {
   return host || source.url || 'Source';
 }
 
-function SourceFavicon({ url }: { url: string }) {
+const SourceFavicon = memo(function SourceFavicon({ url }: { url: string }) {
   const [errored, setErrored] = useState(false);
   const host = getHostname(url);
 
@@ -41,10 +41,11 @@ function SourceFavicon({ url }: { url: string }) {
       loading="lazy"
       decoding="async"
       onError={() => setErrored(true)}
+      sizes="16px"
       className="flex-shrink-0 w-4 h-4 rounded-sm bg-paper shadow-[0_1px_2px_rgba(15,23,42,0.10)]"
     />
   );
-}
+});
 
 export function SourceLinks({ sources }: SourceLinksProps) {
   if (!sources || sources.length === 0) {

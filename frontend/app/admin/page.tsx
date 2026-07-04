@@ -29,7 +29,7 @@ export default async function AdminPage() {
   const posts = await fetchAllPosts();
 
   return (
-    <div className="container mx-auto px-4 py-8 animate-fade-in-up">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-ink mb-8 tracking-normal">Admin Dashboard</h1>
 
       <div className="premium-card p-6">

@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, useScroll, useSpring } from 'framer-motion';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useRef, useState } from 'react';
 
@@ -63,17 +62,17 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
     <div
       aria-hidden="true"
       className={`fixed inset-x-0 ${Z_INDEX.readingProgress} h-[2px] pointer-events-none`}
-      style={{ top: 'calc(env(safe-area-inset-top, 0px) + 4rem)' }}
+      style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
     >
-      <div
-        className="h-full origin-left transition-opacity duration-300"
-        style={{
-          transform: `scaleX(${progress})`,
-          opacity: visible ? 1 : 0,
-          background: 'linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))',
-          boxShadow: '0 0 12px rgb(var(--c-accent) / 0.55)',
-          willChange: 'transform',
-        }}
+        <div
+          className="h-full origin-left transition-opacity duration-300"
+          style={{
+            transform: `scaleX(${progress})`,
+            opacity: visible ? 1 : 0,
+            background: 'linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))',
+            boxShadow: '0 0 12px rgb(var(--c-accent) / 0.55)',
+            willChange: visible ? 'transform' : 'auto',
+          }}
       />
     </div>
   );

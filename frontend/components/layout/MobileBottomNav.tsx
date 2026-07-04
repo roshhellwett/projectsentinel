@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
 import { Home, Search, LayoutGrid, Bookmark, Layers } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
 import { cn } from '@/lib/utils/cn';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
+import { StreakBadge } from '@/components/ui/StreakBadge';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, label: 'Home' },
@@ -20,7 +22,9 @@ const TABS = [
 ] as const;
 
 export function MobileBottomNav() {
+  const reducedMotion = useReducedMotion();
   const pathname = usePathname();
+  const { streak } = useDailyReadCount();
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
 
@@ -54,20 +58,21 @@ export function MobileBottomNav() {
         {topicsOpen && (
           <motion.div
             key="topics-sheet"
+            id="mobile-topics-sheet"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay}`}
           >
-            <div className="absolute inset-0 bg-ink/35 backdrop-blur-[2px]" onClick={closeTopics} />
+            <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={closeTopics} />
             <motion.div
               key="topics-sheet-inner"
-              initial={{ y: '100%', opacity: 0 }}
+              initial={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.85 }}
-              className="absolute left-3 right-3 rounded-md overflow-hidden bg-paper border border-rule-strong shadow-paper-lift"
+              exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
+              transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 380, damping: 32, mass: 0.85 }}
+              className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper/95 backdrop-blur-xl border border-rule/60 shadow-card-lg will-change-transform transform-gpu"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
@@ -110,8 +115,13 @@ export function MobileBottomNav() {
         aria-label="Mobile navigation"
         style={{ pointerEvents: hideForOverlay ? 'none' : 'auto' }}
       >
+        {streak > 0 && (
+          <div className="absolute -top-11 right-3 z-20">
+            <StreakBadge streak={streak} size="sm" className="shadow-card bg-paper backdrop-blur-md" />
+          </div>
+        )}
         <div
-          className="relative border-t border-rule-strong bg-paper/90 backdrop-blur-xl"
+          className="relative border-t border-rule/40 bg-paper/80 backdrop-blur-xl backdrop-saturate-[1.3]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
@@ -123,7 +133,7 @@ export function MobileBottomNav() {
 
               const inner = (
                 <motion.div
-                  whileTap={{ scale: 0.84 }}
+                  whileTap={reducedMotion ? undefined : { scale: 0.84 }}
                   transition={{ type: 'spring', stiffness: 600, damping: 28 }}
                   className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl min-w-[52px]"
                 >
@@ -158,6 +168,7 @@ export function MobileBottomNav() {
                     className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                     aria-label="Browse topics"
                     aria-expanded={topicsOpen}
+                    aria-controls="mobile-topics-sheet"
                   >
                     {inner}
                   </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, X } from 'lucide-react';
@@ -23,6 +23,7 @@ function writeDecision(d: Decision) {
 
 export function CookieConsent() {
   const [open, setOpen] = useState(false);
+  const consentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (readDecision() !== null) return;
@@ -30,6 +31,12 @@ export function CookieConsent() {
     const t = window.setTimeout(() => setOpen(true), 600);
     return () => window.clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (!open || !consentRef.current) return;
+    const firstFocusable = consentRef.current.querySelector<HTMLElement>('button, a, input, [tabindex]:not([tabindex="-1"])');
+    firstFocusable?.focus();
+  }, [open]);
 
   const accept = useCallback(() => {
     writeDecision('accepted');
@@ -45,6 +52,7 @@ export function CookieConsent() {
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={consentRef}
           key="cookie-consent"
           role="dialog"
           aria-label="Cookie preferences"
@@ -66,9 +74,9 @@ export function CookieConsent() {
               type="button"
               onClick={reject}
               aria-label="Dismiss without accepting"
-              className="tap-target absolute top-1.5 right-1.5 text-subtle hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="tap-target absolute top-2 right-2 text-subtle hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent p-1"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-accent mb-2">
               Cookies &amp; privacy

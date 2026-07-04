@@ -130,7 +130,7 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <div className="text-center mb-16 pb-10 border-b border-rule animate-fade-in-up">
+      <div className="text-center mb-16 pb-10 border-b border-rule">
         <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5 mx-auto" />
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 text-accent text-sm font-semibold rounded-full mb-6 border border-accent/20">
           <Zap className="w-4 h-4" />
@@ -158,7 +158,7 @@ export default function HowItWorksPage() {
                   </span>
                   <span className="text-[11px] text-muted font-medium">{step.subtitle}</span>
                 </div>
-                <h3 className="font-display text-lg font-bold text-ink mb-1">{step.title}</h3>
+                <h2 className="font-display text-lg font-bold text-ink mb-1">{step.title}</h2>
                 <p className="text-sm text-ink-soft leading-relaxed">{step.description}</p>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="premium-card rounded-md p-8 md:p-10 mb-12 animate-fade-in-up">
+      <div className="premium-card rounded-md p-8 md:p-10 mb-12">
         <h2 className="font-display text-2xl font-bold mb-3 text-ink tracking-tight">Trusted sources</h2>
         <p className="text-muted mb-6">
           We only pull from established Indian news organizations with editorial standards.
@@ -215,7 +215,7 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="premium-card text-center rounded-md p-10 animate-fade-in-up">
+      <div className="premium-card text-center rounded-md p-10">
         <div className="w-16 h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-5">
           <Github className="w-8 h-8 text-ink" />
         </div>

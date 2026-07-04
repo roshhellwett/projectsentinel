@@ -16,7 +16,8 @@ export function OfflineBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -50, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          className={`fixed top-0 inset-x-0 ${Z_INDEX.offlineBanner} flex justify-center pointer-events-none`}
+          style={{ top: 'env(safe-area-inset-top, 0px)' }}
+          className={`fixed inset-x-0 ${Z_INDEX.offlineBanner} flex justify-center pointer-events-none`}
         >
           <div className="bg-accent text-paper px-4 py-2 mt-2 rounded-full shadow-lg flex items-center gap-2 text-[13px] font-medium tracking-wide">
             <WifiOff className="w-4 h-4" />

@@ -8,6 +8,7 @@ export function ConnectionStatus() {
   const { isOnline } = useNetworkStatus();
 
   return (
+    <div className="flex-shrink-0" aria-live="polite">
     <AnimatePresence>
       {!isOnline && (
         <motion.div
@@ -30,5 +31,6 @@ export function ConnectionStatus() {
         </motion.div>
       )}
     </AnimatePresence>
+    </div>
   );
 }

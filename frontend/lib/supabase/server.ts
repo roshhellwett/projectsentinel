@@ -27,6 +27,7 @@ export function getSupabaseServer() {
   return supabaseServerInstance;
 }
 
+// Exponential backoff with jitter — 500ms * 2^attempt + random 0–30% jitter
 async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < retries; attempt++) {

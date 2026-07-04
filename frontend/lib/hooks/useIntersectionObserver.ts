@@ -6,6 +6,7 @@ interface UseIntersectionObserverProps {
   enabled?: boolean;
 }
 
+// Intersection Observer — fires callback when sentinel enters viewport
 export function useIntersectionObserver({
   onIntersect,
   rootMargin = '0px',

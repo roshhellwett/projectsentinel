@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { X, Keyboard } from 'lucide-react';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
@@ -18,6 +18,7 @@ const SHORTCUTS: Array<{ keys: string[]; description: string }> = [
 export const OPEN_SEARCH_EVENT = 'iv:open-search';
 
 export function KeyboardShortcuts() {
+  const reducedMotion = useReducedMotion();
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -141,11 +142,11 @@ export function KeyboardShortcuts() {
             role="dialog"
             aria-modal="true"
             aria-label="Keyboard shortcuts"
-            className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 ${Z_INDEX.shortcutWidget} w-[min(calc(100vw-2rem),22rem)]`}
-            initial={{ opacity: 0, scale: 0.94, y: 16 }}
+            className={`fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] right-4 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:right-6 ${Z_INDEX.shortcutWidget} w-[min(calc(100vw-2rem),22rem)] will-change-transform transform-gpu`}
+            initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.94, y: reducedMotion ? 0 : 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 12 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 12 }}
+            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 30 }}
           >
             <div className="premium-card rounded-2xl p-6 shadow-paper-lift">
               <div className="flex items-center justify-between mb-5">

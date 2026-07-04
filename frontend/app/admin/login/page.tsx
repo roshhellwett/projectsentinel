@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-600 rounded-lg text-sm">
+            <div role="alert" className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-600 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -71,6 +71,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
+              aria-invalid={error ? 'true' : undefined}
               className="w-full px-4 py-3 bg-paper-2 border border-rule rounded-lg text-ink placeholder-muted focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 mb-4 transition-all"
               required
             />

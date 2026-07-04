@@ -3,9 +3,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Share2, Link as LinkIcon, Twitter, Linkedin, Facebook, X, Check } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 import { showToast } from '@/lib/utils/toast';
+import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 interface ShareButtonsProps {
   headline: string;
@@ -47,6 +48,8 @@ export function ShareButtons({
   className,
   buttonClassName,
 }: ShareButtonsProps) {
+  const reducedMotion = useReducedMotion();
+  const haptic = useHapticFeedback();
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const copyTimerRef = useRef<number | null>(null);
@@ -81,6 +84,7 @@ export function ShareButtons({
   }, [showMenu]);
 
   const copyLink = useCallback(async () => {
+    haptic.success();
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -101,19 +105,38 @@ export function ShareButtons({
         showToast('Link copied to clipboard', 'success');
         if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current);
         copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
+      } catch {
+        showToast('Could not copy link. Try manually selecting the URL.', 'error');
       } finally {
         document.body.removeChild(textArea);
       }
     }
-  }, [url]);
+  }, [url, haptic]);
+
+  const handleShareClick = useCallback(async () => {
+    haptic.medium();
+    if (typeof navigator !== 'undefined' && navigator.share && (isInline || isSheet || window.innerWidth < 768)) {
+      try {
+        await navigator.share({
+          title: headline,
+          text: headline,
+          url: url,
+        });
+        return;
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return;
+      }
+    }
+    setShowMenu((v) => !v);
+  }, [headline, url, isInline, isSheet, haptic]);
 
   return (
     <div className={cn('relative min-w-0', (isInline || isSheet) && 'w-full', className)}>
       <motion.button
         ref={buttonRef}
         type="button"
-        whileTap={{ scale: 0.94 }}
-        onClick={() => setShowMenu(!showMenu)}
+        whileTap={reducedMotion ? undefined : { scale: 0.94 }}
+        onClick={handleShareClick}
         className={cn(
           'tap-target inline-flex items-center gap-2 px-3.5 py-2 rounded bg-paper border border-rule text-muted hover:text-ink hover:border-ink transition-all hover-lift text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           (isInline || isSheet) && 'w-full justify-center',
@@ -121,6 +144,7 @@ export function ShareButtons({
         )}
         aria-label="Share this article"
         aria-expanded={showMenu}
+        aria-controls="share-menu"
       >
         <Share2 className="w-4 h-4" />
         Share
@@ -131,20 +155,21 @@ export function ShareButtons({
           <motion.div
             ref={menuRef}
             key="share-menu"
+            id="share-menu"
             role="dialog"
             aria-modal="true"
             aria-label="Share article options"
             className={cn(
-              `${Z_INDEX.shareMenu} w-[min(21rem,calc(100vw-2rem))]`,
+              `${Z_INDEX.shareMenu} w-[min(21rem,calc(100vw-2rem))] will-change-transform transform-gpu`,
               'rounded border border-rule-strong bg-paper p-2 shadow-paper-lift',
               placement === 'popover' && 'absolute right-0 top-full mt-2',
               placement === 'inline' && 'relative mt-3 w-full max-w-none shadow-paper-lift',
               placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_16px_40px_-12px_rgba(0,0,0,0.24)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
             )}
-            initial={{ opacity: 0, y: -6, scale: 0.95 }}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : -6, scale: reducedMotion ? 1 : 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
+            exit={{ opacity: 0, y: reducedMotion ? 0 : -4, scale: reducedMotion ? 1 : 0.96 }}
+            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
           >
             <div className="grid grid-cols-2 gap-1.5 mb-2 pb-2 border-b border-rule">
               {SHARE_PLATFORMS.map((platform) => (
@@ -153,7 +178,7 @@ export function ShareButtons({
                   href={platform.getUrl(url, headline)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setShowMenu(false)}
+                  onClick={() => { haptic.light(); setShowMenu(false); }}
                   className="tap-target flex min-w-0 items-center gap-2.5 rounded px-3 py-2.5 text-ink hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent min-h-[44px]"
                   title={platform.name}
                 >

@@ -17,10 +17,13 @@ export function usePWAInstall() {
   const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true)) {
+      setIsInstallable(false);
+      return;
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
-      
       e.preventDefault();
-      
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };

@@ -1,48 +1,68 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
 import { NewsCard } from './NewsCard';
 import { NewsDrawer } from './NewsDrawer';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import {
-  POLL_INTERVAL_MS,
-  DEFAULT_PAGE_SIZE,
-} from '@/lib/config/constants';
+import { DEFAULT_PAGE_SIZE } from '@/lib/config/constants';
 import { useInfiniteFeed } from '@/lib/hooks/useInfiniteFeed';
 import { useIntersectionObserver } from '@/lib/hooks/useIntersectionObserver';
 import { useReadPosts } from '@/lib/utils/readPosts';
+import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
+import { EngagementCounter } from '@/components/ui/EngagementCounter';
+import { MilestoneCelebration } from '@/components/ui/MilestoneCelebration';
 import { cn } from '@/lib/utils/cn';
 
-const TICK_THROTTLE_MS = 4_000;
+const MILESTONE_LABELS: Record<number, string> = {
+  5: 'First 5 stories!',
+  10: 'Double digits!',
+  15: 'Half a dozen more!',
+  25: 'A quarter century!',
+  50: '50 stories deep!',
+  100: 'Century club!',
+};
+
+const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
   initialCount: number;
   category?: string;
   pageSize?: number;
-
   excludeIds?: string[];
 }
 
-const gridVariants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.045, delayChildren: 0.02 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring' as const, stiffness: 340, damping: 28, mass: 0.55 },
-  },
-};
+function FeedSkeleton() {
+  return (
+    <div className="premium-card animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3" aria-hidden="true">
+      <div className="flex items-center gap-3">
+        <div className="h-3 w-16 rounded-full bg-rule/60" />
+        <div className="h-3 w-12 rounded-full bg-rule/40" />
+      </div>
+      <div className="space-y-2 mt-2">
+        <div className="h-5 w-full rounded bg-rule/50" />
+        <div className="h-5 w-3/4 rounded bg-rule/40" />
+      </div>
+      <div className="space-y-1.5 mt-1">
+        <div className="h-3 w-full rounded bg-rule/30" />
+        <div className="h-3 w-5/6 rounded bg-rule/30" />
+      </div>
+      <div className="mt-auto pt-4 border-t border-rule/50">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-full rounded-full bg-rule/30" />
+          <div className="h-3 w-16 rounded bg-rule/30" />
+        </div>
+        <div className="flex gap-1.5 mt-3">
+          <div className="h-6 w-20 rounded bg-rule/30" />
+          <div className="h-6 w-16 rounded bg-rule/20" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function InfiniteFeed({
   initialPosts,
@@ -60,24 +80,12 @@ export function InfiniteFeed({
     excludeIds,
   });
 
-
-  const [hasAnimated, setHasAnimated] = useState(false);
-  useEffect(() => {
-
-    const t = window.setTimeout(() => setHasAnimated(true), 900);
-    return () => window.clearTimeout(t);
-  }, []);
-
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!lastOpenedId) return;
-    const t = window.setTimeout(() => setLastOpenedId(null), 1100);
-    return () => window.clearTimeout(t);
-  }, [lastOpenedId]);
+  const openedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { readIds, markRead } = useReadPosts();
+  const { dailyCount, streak, milestone, recordRead } = useDailyReadCount();
 
   const loadMoreRef = useRef(loadMore);
   loadMoreRef.current = loadMore;
@@ -90,69 +98,35 @@ export function InfiniteFeed({
 
   const gridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const active = document.activeElement;
-      if (!active || !grid.contains(active)) return;
-
-      const cards = Array.from(
-        grid.querySelectorAll<HTMLElement>('[role="button"][tabindex="0"]')
-      );
-      if (cards.length === 0) return;
-
-      const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
-      const currentIdx = cards.indexOf(active as HTMLElement);
-      if (currentIdx === -1) return;
-
-      let nextIdx = currentIdx;
-      switch (e.key) {
-        case 'ArrowRight':
-          nextIdx = Math.min(currentIdx + 1, cards.length - 1);
-          break;
-        case 'ArrowLeft':
-          nextIdx = Math.max(currentIdx - 1, 0);
-          break;
-        case 'ArrowDown':
-          nextIdx = Math.min(currentIdx + cols, cards.length - 1);
-          break;
-        case 'ArrowUp':
-          nextIdx = Math.max(currentIdx - cols, 0);
-          break;
-        default:
-          return;
-      }
-
-      if (nextIdx !== currentIdx) {
-        e.preventDefault();
-        cards[nextIdx]?.focus();
-      }
-    };
-
-    grid.addEventListener('keydown', handleKeyDown);
-    return () => grid.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-
-  useEffect(() => {
-    if (selectedPost && !posts.find((p) => p.id === selectedPost.id)) {
-      setSelectedPost(null);
-    }
-  }, [posts, selectedPost]);
-
   const handleOpen = useCallback((post: Post) => {
     markRead(post.id);
+    recordRead();
     setSelectedPost(post);
-  }, [markRead]);
+  }, [markRead, recordRead]);
+
+  const handleCardKeyDown = useCallback((e: React.KeyboardEvent, post: Post) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setLastOpenedId(post.id);
+      if (openedTimerRef.current) clearTimeout(openedTimerRef.current);
+      openedTimerRef.current = setTimeout(() => {
+        openedTimerRef.current = null;
+        setLastOpenedId(null);
+      }, 1100);
+      handleOpen(post);
+    }
+  }, [handleOpen]);
 
   const readMap = readIds;
+  const readCount = posts.filter((p) => readMap.has(p.id)).length;
+  const nextMilestone = [5, 10, 15, 25, 50, 100].find((m) => m > dailyCount) ?? 100;
+  const progressPct = Math.min(100, (dailyCount / nextMilestone) * 100);
+  const streakLabel = STREAK_MILESTONES.slice().reverse().find((s) => streak >= s);
 
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 shadow-sm">
           <svg
             className="w-7 h-7 text-muted"
             fill="none"
@@ -174,43 +148,78 @@ export function InfiniteFeed({
   return (
     <>
       <ErrorBoundary>
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+        <EngagementCounter
+          dailyCount={dailyCount}
+          streak={streak}
+          nextMilestone={nextMilestone}
+        />
+
+        {readCount > 0 && (
+          <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto bg-paper-2 px-3 py-1 rounded-full border border-rule/60">
+            <span className="text-[11px] font-semibold text-muted tabular-nums whitespace-nowrap">
+              <span className="text-ink font-bold">{readCount}</span> / {posts.length} stories read
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="mb-6 relative z-20">
+        <MilestoneCelebration milestone={milestone} />
+      </div>
+
       <motion.div
         ref={gridRef}
-        className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch"
-        variants={gridVariants}
-        initial={hasAnimated ? false : 'hidden'}
-        animate="show"
+        className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch"
       >
-        <AnimatePresence initial={false}>
-          {posts.map((post) => (
+        {posts.map((post, index) => {
+          return (
             <motion.div
               key={post.id}
-              initial={freshIds.has(post.id) ? 'hidden' : false}
-              animate="show"
-              exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.18 } }}
-              variants={itemVariants}
-              layout={false}
-              className="feed-card-shell h-full"
+              initial={{ opacity: 0, y: 36, scale: 0.92, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              viewport={{ once: true, margin: '-30px 0px' }}
+              transition={{
+                type: 'spring',
+                stiffness: 280,
+                damping: 20,
+                mass: 0.7,
+                delay: Math.min(index * 0.03, 0.35),
+              }}
+              className="feed-card-shell h-full rounded-xl transition-all"
             >
               <NewsCard
                 post={post}
-                onClick={() => handleOpen(post)}
+                onClick={() => {
+                  setLastOpenedId(post.id);
+                  if (openedTimerRef.current) clearTimeout(openedTimerRef.current);
+                  openedTimerRef.current = setTimeout(() => {
+                    openedTimerRef.current = null;
+                    setLastOpenedId(null);
+                  }, 1100);
+                  handleOpen(post);
+                }}
                 isNew={freshIds.has(post.id)}
                 isRead={readMap.has(post.id)}
                 wasRecentlyOpened={lastOpenedId === post.id}
               />
             </motion.div>
-          ))}
-        </AnimatePresence>
+          );
+        })}
       </motion.div>
 
       {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-[218px] rounded-md"
-            />
+            <motion.div
+              key={`skeleton-${i}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.06 }}
+            >
+              <FeedSkeleton />
+            </motion.div>
           ))}
         </div>
       )}
@@ -221,7 +230,7 @@ export function InfiniteFeed({
 
       {exhausted && posts.length > pageSize && (
         <p className="text-center text-xs text-muted mt-12">
-          You&apos;ve reached the end — {posts.length} verified stories.
+          {readCount}/{posts.length} stories read &middot; you&apos;ve reached the end.
         </p>
       )}
       </ErrorBoundary>
@@ -234,8 +243,29 @@ export function InfiniteFeed({
         }}
         onSelectRelated={(next) => {
           markRead(next.id);
+          recordRead();
           setPosts((prev) => (prev.some((p) => p.id === next.id) ? prev : dedupe([next, ...prev])));
           setSelectedPost(next);
+        }}
+        onNext={() => {
+          if (!selectedPost) return;
+          const idx = posts.findIndex((p) => p.id === selectedPost.id);
+          if (idx !== -1 && idx < posts.length - 1) {
+            const next = posts[idx + 1];
+            markRead(next.id);
+            recordRead();
+            setSelectedPost(next);
+          }
+        }}
+        onPrev={() => {
+          if (!selectedPost) return;
+          const idx = posts.findIndex((p) => p.id === selectedPost.id);
+          if (idx > 0) {
+            const prev = posts[idx - 1];
+            markRead(prev.id);
+            recordRead();
+            setSelectedPost(prev);
+          }
         }}
       />
 

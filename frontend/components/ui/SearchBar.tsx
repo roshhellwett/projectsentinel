@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Search, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -16,6 +16,7 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ isOpen, onClose }: SearchBarProps) {
+  const reducedMotion = useReducedMotion();
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Post[]>([]);
@@ -130,6 +131,27 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     }
   }, []);
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const cards = Array.from(containerRef.current?.querySelectorAll<HTMLElement>('#search-results [role="article"]') || []);
+      const idx = cards.indexOf(document.activeElement as HTMLElement);
+      if (e.key === 'ArrowDown') {
+        if (idx === -1 && cards.length > 0 && document.activeElement === inputRef.current) {
+          e.preventDefault();
+          cards[0].focus();
+        } else if (idx !== -1 && idx < cards.length - 1) {
+          e.preventDefault();
+          cards[idx + 1].focus();
+        }
+      } else if (e.key === 'ArrowUp' && idx !== -1) {
+        e.preventDefault();
+        if (idx > 0) cards[idx - 1].focus();
+        else inputRef.current?.focus();
+      }
+    }
+    handleTabKey(e);
+  }, [handleTabKey]);
+
   const handleSelect = useCallback((post: Post) => {
     onClose();
     router.push(`/news/${post.id}/`);
@@ -140,7 +162,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       {isOpen && (
         <motion.div
           ref={containerRef}
-          onKeyDown={handleTabKey}
+          onKeyDown={handleKeyDown}
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
@@ -152,10 +174,10 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
         >
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.96 }}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : -20, scale: reducedMotion ? 1 : 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+            exit={{ opacity: 0, y: reducedMotion ? 0 : -10, scale: reducedMotion ? 1 : 0.98 }}
+            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
             className="container mx-auto px-4 py-8 md:py-10 will-change-transform transform-gpu"
           >
             <div className="flex items-center justify-between mb-8">
@@ -188,7 +210,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               <input
                 ref={inputRef}
                 id="search-input"
-                type="text"
+                type="search"
                 role="combobox"
                 aria-expanded={results.length > 0}
                 aria-controls="search-results"

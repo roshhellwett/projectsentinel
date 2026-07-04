@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ExternalLink, Globe, Newspaper } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Source } from '@/types';
 import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
@@ -26,7 +26,7 @@ function getSourceLabel(source: Source): string {
   return host || 'Source';
 }
 
-function SourceIcon({ url }: { url: string }) {
+const SourceIcon = memo(function SourceIcon({ url }: { url: string }) {
   const [errored, setErrored] = useState(false);
   const host = getHostname(url);
 
@@ -47,10 +47,11 @@ function SourceIcon({ url }: { url: string }) {
       loading="lazy"
       decoding="async"
       onError={() => setErrored(true)}
+      sizes="20px"
       className="h-5 w-5 flex-shrink-0 rounded bg-paper border border-rule img-fade-in"
     />
   );
-}
+});
 
 export function SourcePickerButton({
   sources,
@@ -62,9 +63,12 @@ export function SourcePickerButton({
 }: SourcePickerButtonProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, bottom: 0, width: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
+  const reducedMotion = useReducedMotion();
   
   const validSources = (sources ?? []).filter((source) => source.url);
   const disabled = validSources.length === 0;
@@ -72,6 +76,20 @@ export function SourcePickerButton({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (open) {
+      wasOpenRef.current = true;
+      requestAnimationFrame(() => {
+        const firstItem = menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]');
+        if (firstItem) firstItem.focus();
+        else menuRef.current?.focus();
+      });
+    } else if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      buttonRef.current?.focus();
+    }
+  }, [open]);
 
   const updateCoords = useCallback(() => {
     if (buttonRef.current) {
@@ -83,6 +101,10 @@ export function SourcePickerButton({
         width: rect.width,
       });
     }
+  }, []);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 640);
   }, []);
 
   useEffect(() => {
@@ -120,7 +142,6 @@ export function SourcePickerButton({
     if (!disabled) setOpen((value) => !value);
   }, [disabled, stopPropagation]);
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   const isSheet = placement === 'sheet';
 
   
@@ -151,15 +172,16 @@ export function SourcePickerButton({
         <motion.div
           ref={menuRef}
           role="menu"
+          tabIndex={-1}
           className={`${Z_INDEX.popover} rounded border border-rule-strong bg-paper p-2 shadow-paper-lift will-change-transform will-change-opacity transform-gpu`}
           style={{
             ...((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties),
             transformOrigin: isSheet && isMobile ? 'bottom center' : (isSheet ? 'bottom right' : 'bottom left')
           }}
-          initial={{ opacity: 0, y: 12, scale: 0.9 }}
+          initial={{ opacity: 0, y: reducedMotion ? 0 : 12, scale: reducedMotion ? 1 : 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 8, scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 450, damping: 30, mass: 0.6 }}
+          exit={{ opacity: 0, y: reducedMotion ? 0 : 8, scale: reducedMotion ? 1 : 0.96 }}
+          transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 450, damping: 30, mass: 0.6 }}
           onClick={(event) => {
             if (stopPropagation) event.stopPropagation();
           }}
@@ -214,11 +236,13 @@ export function SourcePickerButton({
           buttonClassName,
         )}
       >
-        <Newspaper className="h-4 w-4" />
+        <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
         <span className="truncate">{label}</span>
       </motion.a>
     );
   }
+
+  const topFavicon = validSources[0]?.url;
 
   return (
     <div className={cn('relative min-w-0', placement === 'sheet' && 'w-full', className)}>
@@ -237,7 +261,11 @@ export function SourcePickerButton({
           buttonClassName,
         )}
       >
-        <Newspaper className="h-4 w-4" />
+        {topFavicon ? (
+          <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+        ) : (
+          <Newspaper className="h-4 w-4" />
+        )}
         <span className="truncate">{label}</span>
       </motion.button>
       

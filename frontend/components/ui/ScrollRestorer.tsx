@@ -79,11 +79,13 @@ export function ScrollRestorer() {
     window.addEventListener('pagehide', save);
     window.addEventListener('beforeunload', save);
     window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('visibilitychange', save);
 
     return () => {
       window.removeEventListener('pagehide', save);
       window.removeEventListener('beforeunload', save);
       window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('visibilitychange', save);
       try {
         history.scrollRestoration = prevMode;
       } catch {

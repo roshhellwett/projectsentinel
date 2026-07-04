@@ -44,8 +44,8 @@ export function CategoryBar() {
       aria-label="News categories"
     >
 
-      <div className={`absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-paper to-transparent ${Z_INDEX.content} pointer-events-none`} />
-      <div className={`absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-paper to-transparent ${Z_INDEX.content} pointer-events-none`} />
+      <div className={`absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-paper to-transparent pointer-events-none`} />
+      <div className={`absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-paper to-transparent pointer-events-none`} />
 
       <div ref={scrollRef} className="overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x overscroll-x-contain">
         <div className="flex items-stretch min-w-max">
@@ -67,7 +67,7 @@ export function CategoryBar() {
                 {isActive && (
                   <motion.span
                     layoutId="activeCategoryRule"
-                    className="absolute left-3 right-3 -bottom-[1px] h-[2px] bg-accent rounded-full will-change-transform transform-gpu"
+                    className="absolute left-3 right-3 -bottom-[1px] h-[2px] bg-accent rounded-full"
                     transition={{ type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
                   />
                 )}

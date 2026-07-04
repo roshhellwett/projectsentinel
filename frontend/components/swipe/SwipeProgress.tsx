@@ -12,7 +12,7 @@ interface SwipeProgressProps {
 
 export function SwipeProgress({ consumedToday, remaining, streak, canRewind, onRewind }: SwipeProgressProps) {
   return (
-    <div className="w-full max-w-md mx-auto px-4 mb-2">
+    <div className="w-full max-w-md mx-auto px-4 mb-2" role="status" aria-live="polite">
       <div className="flex items-center justify-between gap-3 text-[11px]">
         <div className="flex items-center gap-3 text-muted">
           <span className="inline-flex items-center gap-1 font-medium">
@@ -36,7 +36,7 @@ export function SwipeProgress({ consumedToday, remaining, streak, canRewind, onR
             type="button"
             onClick={onRewind}
             disabled={!canRewind}
-            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-ink disabled:text-subtle disabled:cursor-not-allowed hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded px-1"
+            className="tap-target min-h-[44px] inline-flex items-center gap-1.5 text-[11px] font-semibold text-ink disabled:text-subtle disabled:cursor-not-allowed hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded px-3"
             aria-label="Go back one card"
           >
             <Undo2 className="w-3 h-3" strokeWidth={1.5} aria-hidden="true" />

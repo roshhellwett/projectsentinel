@@ -12,6 +12,7 @@ import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
 import { showToast } from '@/lib/utils/toast';
 import { PageShell } from '@/components/layout/PageShell';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 
 export default function SavedPage() {
   const { savedIds, clearSaved } = useSavedPosts();
@@ -21,6 +22,7 @@ export default function SavedPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Post | null>(null);
+  const [confirmingClear, setConfirmingClear] = useState(false);
 
   const idList = useMemo(() => Array.from(savedIds).reverse(), [savedIds]);
 
@@ -76,7 +78,12 @@ export default function SavedPage() {
           Back to all news
         </Link>
 
-        <header className="mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4 animate-fade-in-up">
+        <motion.header
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4"
+        >
           <div>
             <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
             <p className="editorial-kicker mb-3">Your reading list</p>
@@ -91,12 +98,7 @@ export default function SavedPage() {
           {idList.length > 0 && (
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                if (window.confirm('Clear all saved stories?')) {
-                  clearSaved();
-                  showToast('All saved stories cleared', 'success');
-                }
-              }}
+              onClick={() => setConfirmingClear(true)}
               className="tap-target min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label="Clear all saved stories"
             >
@@ -104,7 +106,7 @@ export default function SavedPage() {
               Clear all
             </motion.button>
           )}
-        </header>
+        </motion.header>
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -163,6 +165,43 @@ export default function SavedPage() {
           }}
         />
       </PageShell>
+
+      {confirmingClear && (
+        <div className={`fixed inset-0 ${Z_INDEX.modalBackdrop} flex items-center justify-center px-4`}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setConfirmingClear(false)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="relative bg-paper border border-rule-strong rounded-2xl p-6 w-full max-w-sm shadow-card-lg"
+            role="alertdialog"
+            aria-label="Confirm clear all saved stories"
+          >
+            <h3 className="font-display text-lg font-bold text-ink mb-2">Clear all saved stories?</h3>
+            <p className="text-sm text-muted mb-6 leading-relaxed">
+              This action cannot be undone. All your bookmarks will be permanently removed from this device.
+            </p>
+            <div className="flex items-center gap-3 justify-end">
+              <button
+                onClick={() => setConfirmingClear(false)}
+                className="tap-target min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  clearSaved();
+                  showToast('All saved stories cleared', 'success');
+                  setConfirmingClear(false);
+                }}
+                className="tap-target min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded border border-transparent bg-like text-white text-sm font-semibold hover:bg-like/90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                Clear all
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

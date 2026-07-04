@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ExternalLink } from 'lucide-react';
-import { AnimatePresence, motion, useDragControls, useMotionValue } from 'framer-motion';
+import { AnimatePresence, motion, useDragControls, useMotionValue, useReducedMotion } from 'framer-motion';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
 import { DrawerHeader } from './DrawerHeader';
@@ -17,11 +17,14 @@ interface NewsDrawerProps {
   post: Post | null;
   onClose: () => void;
   onSelectRelated?: (post: Post) => void;
+  onNext?: () => void;
+  onPrev?: () => void;
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
-export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) {
+export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: NewsDrawerProps) {
+  const reducedMotion = useReducedMotion();
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
@@ -45,12 +48,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
   }, []);
 
   const isOpen = post !== null;
-  const postId = post?.id;
-  useEffect(() => {
-    if (!isOpen) return;
-    const t = window.setTimeout(() => drawerRef.current?.focus(), 0);
-    return () => window.clearTimeout(t);
-  }, [postId, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -136,7 +133,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
             dragListener={false}
             dragConstraints={{ top: 0 }}
             dragElastic={{ top: 0, bottom: 0.3 }}
-            style={{ y }}
+            style={{ y, paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 120 || info.velocity.y > 700) {
                 onClose();
@@ -144,11 +141,11 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
                 y.set(0);
               }
             }}
-            className={`fixed ${Z_INDEX.drawerPanel} bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-[100dvh] lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-auto bottom-0 left-0 right-0 h-[85dvh] max-h-[calc(100dvh-5rem)] rounded-t-xl lg:rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
-            initial={{ opacity: 0, y: canDrag ? '100%' : 0, x: canDrag ? 0 : '100%' }}
+            className={`fixed ${Z_INDEX.drawerPanel} bg-paper border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: canDrag ? '100%' : 0, x: canDrag ? 0 : '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 350, mass: 0.8 }}
+            exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
+            transition={reducedMotion ? { duration: 0.2 } : { type: 'spring', damping: 32, stiffness: 350, mass: 0.8 }}
           >
 
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />
@@ -164,6 +161,9 @@ export function NewsDrawer({ post, onClose, onSelectRelated }: NewsDrawerProps) 
               category={post.category} 
               publishedAt={post.published_at} 
               onClose={onClose} 
+              score={post.credibility_score}
+              onNext={onNext}
+              onPrev={onPrev}
             />
 
             <DrawerContent 

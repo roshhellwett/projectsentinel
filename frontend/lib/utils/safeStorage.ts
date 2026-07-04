@@ -5,21 +5,21 @@ function panicFreeLocalStorage(): void {
   const toDelete: string[] = [];
   const swipePrefix = 'iv:swipe:';
   const today = new Date();
-  
   const pad = (n: number) => String(n).padStart(2, '0');
-  const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
-  
-  
+  const getDayStr = (offset: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - offset);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  };
+  const validDates = new Set([getDayStr(0), getDayStr(1), getDayStr(2), getDayStr(3)]);
+
   for (let i = 0; i < window.localStorage.length; i++) {
     const k = window.localStorage.key(i);
     if (!k) continue;
-    
-    
     if (!k.startsWith(swipePrefix)) continue;
-    
-    
+
     const dateMatch = k.match(/(\d{4}-\d{2}-\d{2})$/);
-    if (dateMatch && dateMatch[1] !== todayStr) {
+    if (dateMatch && !validDates.has(dateMatch[1])) {
       toDelete.push(k);
     }
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Component, type ReactNode, type ErrorInfo } from 'react';
+import { AlertOctagon, RefreshCw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -33,13 +34,21 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         return this.props.fallback;
       }
       return (
-        <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="flex flex-col items-center justify-center py-12 px-4 text-center" role="alert" aria-live="assertive">
           <div className="w-12 h-12 rounded-full bg-accent-soft/50 border border-accent/20 flex items-center justify-center mb-4">
-            <span className="text-accent text-lg font-bold">!</span>
+            <AlertOctagon className="w-6 h-6 text-accent" strokeWidth={1.5} />
           </div>
-          <p className="text-sm text-muted max-w-sm">
+          <p className="text-sm text-muted max-w-sm mb-3">
             Something went wrong loading this section.
           </p>
+          <button
+            type="button"
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="tap-target min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg border border-rule bg-paper-2 text-ink hover:bg-rule/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Try again
+          </button>
         </div>
       );
     }

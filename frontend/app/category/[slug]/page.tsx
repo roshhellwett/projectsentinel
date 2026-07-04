@@ -11,6 +11,7 @@ export const revalidate = 60;
 export const dynamicParams = false;
 
 const VALID_CATEGORIES = CATEGORY_SLUGS;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -39,11 +40,24 @@ export async function generateMetadata({ params }: CategoryPageProps) {
     openGraph: {
       title: `${category} News - India Verified`,
       description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
+      url: `${siteUrl}/category/${slug}/`,
+      images: [
+        {
+          url: `${siteUrl}/opengraph-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${category} News`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${category} News - India Verified`,
       description: `Latest verified ${category} news from India. Every story verified across multiple sources.`,
+      images: [`${siteUrl}/opengraph-image.png`],
+    },
+    alternates: {
+      canonical: `${siteUrl}/category/${slug}/`,
     },
   };
 }
@@ -62,8 +76,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   }
 
   const categoryName = titleCase(slug);
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
 
   return (
     <div className="relative min-h-screen">
@@ -84,7 +96,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-        <header className="mb-10 pb-8 border-b border-rule animate-fade-in-up">
+        <header className="mb-10 pb-8 border-b border-rule">
           <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
           <p className="editorial-kicker mb-3">Category</p>
           <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4">

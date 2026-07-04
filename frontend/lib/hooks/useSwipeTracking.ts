@@ -43,8 +43,17 @@ export function useSwipeTracking() {
         refreshStats();
       }
     };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refreshStats();
+      }
+    };
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [refreshStats]);
 
   const recordSourceHosts = useCallback((post: Post) => {

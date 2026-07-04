@@ -27,7 +27,7 @@ async function SearchResults({ query }: { query: string }) {
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 animate-soft-float">
+        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5">
             <SearchX className="w-7 h-7 text-muted" />
         </div>
         <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-2">No results found</h2>
@@ -38,10 +38,12 @@ async function SearchResults({ query }: { query: string }) {
     );
   }
 
+  const displayCount = typeof count === 'number' ? count : posts.length;
+
   return (
     <>
       <p className="text-sm text-muted mb-6">
-        {count} result{count !== 1 ? 's' : ''} for &ldquo;
+        {displayCount} result{displayCount !== 1 ? 's' : ''} for &ldquo;
         <span className="font-semibold text-ink">{query}</span>&rdquo;
       </p>
       <SearchResultsGrid posts={posts} />
@@ -56,12 +58,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="relative min-h-screen">
       <PageShell>
-        <header className="mb-10 pb-8 border-b border-rule animate-fade-in-up">
+        <header className="mb-10 pb-8 border-b border-rule">
           <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
           <p className="editorial-kicker mb-3">
             {query ? 'Search Results' : 'Search'}
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-ink tracking-[-0.03em] mb-3 leading-[1.05]">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-3 leading-[1.05]">
             {query ? query : 'Find verified news'}
           </h1>
           <p className="text-sm text-muted">
