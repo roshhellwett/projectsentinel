@@ -1,6 +1,8 @@
 *.md
 scripts/screenshots/
 smoke-out.txt
+frontend-prompt.md
+.frontend-prompt.md
 
 # Environment variables — contains secrets
 .env
