@@ -44,6 +44,10 @@ module.exports = {
         // India tricolor — retained for decorative civic accents only.
         'india-saffron': '#ff9933',
         'india-green':   '#138808',
+
+        // Portfolio accent tokens (derived from the Zenith palette)
+        'amber-button':     '#f1a82c',
+        'saffron-deep':     '#eb9d2a',
       },
       fontFamily: {
         sans:    ['var(--font-sans)', 'system-ui', 'sans-serif'],

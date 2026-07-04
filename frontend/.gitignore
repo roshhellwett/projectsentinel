@@ -1,3 +1,9 @@
 *.md
 scripts/screenshots/
 smoke-out.txt
+
+# Environment variables — contains secrets
+.env
+.env.local
+.env.production
+.env.development

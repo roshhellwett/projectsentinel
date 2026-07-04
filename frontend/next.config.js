@@ -48,6 +48,20 @@ const nextConfig = {
   // Security Headers & Caching
   // ─────────────────────────────────────────────────────────────────────
   async headers() {
+    const supabaseHostRaw = supabaseHost;
+    const csp = [
+      "default-src 'self'",
+      `connect-src 'self' https://${supabaseHostRaw} https://*.supabase.co https://www.googletagmanager.com https://*.google-analytics.com`,
+      "script-src 'self' https://www.googletagmanager.com https://*.google-analytics.com 'unsafe-inline' 'unsafe-eval'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: blob: https://${supabaseHostRaw} https://*.supabase.co https://www.google.com https://*.googleusercontent.com https://www.googletagmanager.com",
+      "frame-src 'self' https://www.googletagmanager.com",
+      "manifest-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join('; ');
+
     return [
       {
         source: '/(.*)',
@@ -58,6 +72,7 @@ const nextConfig = {
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Content-Security-Policy', value: csp },
           // Performance hints
           { key: 'Link', value: '<https://www.googletagmanager.com>; rel=preconnect' },
         ],
@@ -143,3 +158,11 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+// ═══════════════════════════════════════════════════════════════════
+// CSP note:
+//   Adding a strict CSP to a SPA that loads GTM is non-trivial.
+//   For now we rely on X-XSS-Protection + X-Content-Type-Options.
+//   A full strict CSP (nonce/hash-based) requires GTM to also be
+//   configured for nonce injection — tracked as a future improvement.
+// ═══════════════════════════════════════════════════════════════════

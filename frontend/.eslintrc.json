@@ -14,10 +14,6 @@
   },
   "overrides": [
     {
-      "files": ["lib/utils/logger.ts"],
-      "rules": { "no-console": "off" }
-    },
-    {
       "files": [
         "components/news/NewsCard.tsx",
         "components/news/SourceLinks.tsx",

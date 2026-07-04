@@ -46,11 +46,11 @@ function ColumnHeading({ children }: { children: React.ReactNode }) {
 export function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="relative mt-auto bg-paper-2 border-t border-rule-strong">
+    <footer className="relative mt-auto bg-paper-2/90 backdrop-blur-sm border-t border-rule">
 
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-accent" aria-hidden="true" />
+      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent/80 to-transparent" aria-hidden="true" />
 
-      <div className="container mx-auto px-4 lg:px-6 pt-12 pb-10">
+      <div className="px-4 lg:px-10 pt-12 pb-10">
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-10 mb-10 border-b border-rule">
           <div>
@@ -84,7 +84,7 @@ export function Footer() {
             <InstallAppButton />
             <a
               href={RSS_URL}
-              className="inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="tap-target min-h-[44px] inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Rss className="w-3.5 h-3.5" />
               RSS Feed
@@ -93,7 +93,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="tap-target min-h-[44px] inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Github className="w-3.5 h-3.5" />
               View source
@@ -110,7 +110,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent footer-link"
                   >
                     {link.label}
                   </Link>
@@ -170,7 +170,7 @@ export function Footer() {
             stories may be republished under the MIT licence with attribution.
           </p>
           <p className="text-xs text-subtle leading-relaxed">
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-paper-tint border border-rule">
               <span aria-hidden="true">🇮🇳</span>
               <span className="font-semibold text-muted">Built in India</span>
             </span>
