@@ -84,7 +84,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
         </div>
       )}
 
-      <div className="mb-7 rounded-xl border border-rule/50 bg-paper-2/60 backdrop-blur-sm p-5 lg:p-5 shadow-sm">
+      <div className="mb-7 rounded-xl border border-rule/50 bg-paper-2/50 backdrop-blur-xl backdrop-saturate-[1.3] p-5 lg:p-5 shadow-sm">
         <CredibilityBar score={post.credibility_score} />
         <div className="mt-3 flex items-center justify-between gap-3 border-t border-rule pt-3">
           <span className={typographyStyles.kicker}>
@@ -120,7 +120,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
         </p>
       </div>
 
-      <div className="rounded-xl border border-rule/50 bg-paper-2/60 backdrop-blur-sm p-5 mb-7 shadow-sm">
+      <div className="rounded-xl border border-rule/50 bg-paper-2/50 backdrop-blur-xl backdrop-saturate-[1.3] p-5 mb-7 shadow-sm">
         <h3 className={cn(typographyStyles.sectionHeading, "mb-3 flex items-center gap-2")}>
           <span aria-hidden="true" className="w-1 h-4 bg-accent" />
           {t('drawer.why_score')}

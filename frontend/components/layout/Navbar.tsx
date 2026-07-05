@@ -75,7 +75,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/80 supports-[backdrop-filter]:bg-paper/50 backdrop-filter backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/70 supports-[backdrop-filter]:bg-paper/30 backdrop-filter backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
@@ -204,7 +204,7 @@ export function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
               transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 450, damping: 28, mass: 0.7 }}
-              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu`}
+              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/80 backdrop-blur-2xl backdrop-saturate-[1.4] border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',

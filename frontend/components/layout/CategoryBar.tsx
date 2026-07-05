@@ -41,7 +41,7 @@ export function CategoryBar() {
 
   return (
     <nav
-      className="relative -mx-4 px-4 border-y border-rule"
+      className="relative -mx-4 px-4 border-y border-rule bg-paper/50 backdrop-blur-xl backdrop-saturate-[1.2]"
       role="tablist"
       aria-label={t('category.aria_label')}
     >

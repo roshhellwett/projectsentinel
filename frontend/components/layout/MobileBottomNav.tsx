@@ -74,7 +74,7 @@ export function MobileBottomNav() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
               transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 420, damping: 30, mass: 0.75 }}
-              className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper/95 backdrop-blur-xl border border-rule/60 shadow-card-lg will-change-transform transform-gpu"
+              className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper/80 backdrop-blur-2xl backdrop-saturate-[1.3] border border-rule/60 shadow-card-lg will-change-transform transform-gpu"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
@@ -119,11 +119,11 @@ export function MobileBottomNav() {
       >
         {streak > 0 && (
           <div className="absolute -top-11 right-3 z-20">
-            <StreakBadge streak={streak} size="sm" className="shadow-card bg-paper backdrop-blur-md" />
+            <StreakBadge streak={streak} size="sm" className="shadow-card bg-paper/70 backdrop-blur-xl" />
           </div>
         )}
         <div
-          className="relative border-t border-rule/40 bg-paper/80 backdrop-blur-xl backdrop-saturate-[1.3]"
+          className="relative border-t border-rule/40 bg-paper/65 backdrop-blur-2xl backdrop-saturate-[1.4]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />

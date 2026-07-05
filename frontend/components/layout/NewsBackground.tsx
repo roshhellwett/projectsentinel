@@ -99,9 +99,9 @@ export function NewsBackground() {
       aria-hidden="true"
     >
       <div
-        className="absolute inset-0 opacity-[0.35] dark:opacity-[0.25]"
+        className="absolute inset-0 opacity-[0.48] dark:opacity-[0.32]"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, rgb(var(--c-rule-strong) / 0.45) 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgb(var(--c-rule-strong) / 0.55) 1px, transparent 0)`,
           backgroundSize: '32px 32px',
         }}
       />

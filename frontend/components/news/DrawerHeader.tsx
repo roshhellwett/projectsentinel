@@ -30,7 +30,7 @@ export function DrawerHeader({
   const haptic = useHapticFeedback();
 
   return (
-    <header className={`relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-paper border-b border-rule/50 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
+    <header className={`relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-paper/60 backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/50 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
       {/* Gradient Category Header Bar across exact top */}
       <div
         className="w-full h-[3px] flex-shrink-0 transition-all duration-500"
@@ -53,7 +53,7 @@ export function DrawerHeader({
         <div className="flex items-center gap-1.5">
           {/* Swipe / Story Navigation Buttons */}
           {(onPrev || onNext) && (
-            <div className="flex items-center gap-1 mr-2 bg-paper-2/80 p-1 rounded-xl border border-rule/50 shadow-sm backdrop-blur-sm">
+            <div className="flex items-center gap-1 mr-2 bg-paper-2/70 p-1 rounded-xl border border-rule/50 shadow-sm backdrop-blur-xl">
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.88 }}

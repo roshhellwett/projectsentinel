@@ -166,7 +166,6 @@ html:not(.dark) {
 .premium-card,
 .news-card-wrap {
   position: relative;
-  background: rgb(var(--c-paper));
   border: 1px solid rgb(var(--c-rule));
   border-radius: 16px;
   box-shadow:
@@ -178,10 +177,27 @@ html:not(.dark) {
     transform 350ms var(--ease-apple);
 }
 
+/* --- Glassmorphism background & blur --- */
 .glass {
-  background: rgb(var(--c-paper) / 0.82);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  background: rgb(var(--c-paper) / 0.62);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+}
+
+.premium-card,
+.news-card-wrap {
+  background: rgb(var(--c-paper) / 0.72);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+}
+
+.dark .glass {
+  background: rgb(var(--c-paper) / 0.35);
+}
+
+.dark .premium-card,
+.dark .news-card-wrap {
+  background: rgb(var(--c-paper) / 0.50);
 }
 
 @keyframes cardGlow {

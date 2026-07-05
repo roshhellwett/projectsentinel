@@ -19,7 +19,7 @@ export function ConnectionStatus() {
           transition={{ type: 'spring', stiffness: 360, damping: 28 }}
           role="status"
           aria-live="polite"
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cred-mid/40 bg-paper backdrop-blur-md shadow-paper-lift"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cred-mid/40 bg-paper/70 backdrop-blur-xl shadow-paper-lift"
         >
           <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-cred-mid flex-shrink-0">
             <span className="absolute inset-0 rounded-full bg-cred-mid/55 animate-ping" aria-hidden="true" />

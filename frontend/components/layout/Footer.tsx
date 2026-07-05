@@ -48,7 +48,7 @@ export function Footer() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
   return (
-    <footer className="relative mt-auto bg-paper-2/80 backdrop-blur-sm border-t border-rule/40">
+    <footer className="relative mt-auto bg-paper-2/60 backdrop-blur-xl backdrop-saturate-[1.3] border-t border-rule/40">
 
       {/* Premium gradient divider */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />

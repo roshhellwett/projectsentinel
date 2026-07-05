@@ -129,7 +129,7 @@ export function KeyboardShortcuts() {
         <>
           <motion.div
             key="kb-backdrop"
-            className={`fixed inset-0 ${Z_INDEX.shortcutBackdrop} bg-ink/30 backdrop-blur-md`}
+            className={`fixed inset-0 ${Z_INDEX.shortcutBackdrop} bg-ink/30 backdrop-blur-lg`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
