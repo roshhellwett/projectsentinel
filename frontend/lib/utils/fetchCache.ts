@@ -25,7 +25,6 @@ export function getCached<T>(key: string): T | null {
   return entry.data as T;
 }
 
-// FIFO eviction when cache exceeds max entries (100)
 export function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
   if (cache.size > 100) {
     const oldest = cache.entries().next().value;

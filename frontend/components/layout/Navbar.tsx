@@ -75,7 +75,6 @@ export function Navbar() {
         className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/80 supports-[backdrop-filter]:bg-paper/50 backdrop-filter backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
-        {/* Premium gradient edge */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
 
         <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10">
@@ -200,7 +199,7 @@ export function Navbar() {
               initial={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
-              transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 450, damping: 28, mass: 0.7 }}
               className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/95 backdrop-blur-xl border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',

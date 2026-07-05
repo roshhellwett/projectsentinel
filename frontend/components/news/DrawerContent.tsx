@@ -22,7 +22,7 @@ const SourceFaviconChip = memo(function SourceFaviconChip({ source }: { source: 
     );
   }
   return (
-    // eslint-disable-next-line @next/next/no-img-element
+  
     <img
       src={`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`}
       alt=""

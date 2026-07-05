@@ -12,7 +12,6 @@ function normalizeHeadline(s: string): string {
 
 function stableKey(article: Post): string {
   const head = article.headline ? normalizeHeadline(article.headline) : '';
-  // Only dedupe by headline if it's substantial enough to avoid generic collisions
   if (head.length > 15) {
     return `${head}::${article.category || 'general'}`;
   }
@@ -20,7 +19,6 @@ function stableKey(article: Post): string {
   return `id::${article.id}`;
 }
 
-// Hash-based duplicate detection — O(n) using Set + Map
 export function dedupe(articles: Post[]): Post[] {
   const before = articles.length;
   const seenIds = new Set<string>();
@@ -42,14 +40,6 @@ export function dedupe(articles: Post[]): Post[] {
       const key = stableKey(a);
       seen.set(key, (seen.get(key) || 0) + 1);
     }
-    const dupes = [...seen.entries()]
-      .filter(([, count]) => count > 1)
-      .map(([key, count]) => `"${key}" (×${count})`);
-    
-    // eslint-disable-next-line no-console
-    console.info(
-      `[dedupe] Removed ${removed} duplicate article(s):\n  ${dupes.join('\n  ')}`
-    );
   }
 
   return result;

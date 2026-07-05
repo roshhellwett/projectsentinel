@@ -10,7 +10,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // ── Core paper + ink palette (driven by CSS vars) ──────────
         paper:        'rgb(var(--c-paper) / <alpha-value>)',
         'paper-2':    'rgb(var(--c-paper-2) / <alpha-value>)',
         'paper-tint': 'rgb(var(--c-paper-tint) / <alpha-value>)',
@@ -20,36 +19,24 @@ module.exports = {
         subtle:       'rgb(var(--c-subtle) / <alpha-value>)',
         rule:         'rgb(var(--c-rule) / <alpha-value>)',
         'rule-strong':'rgb(var(--c-rule-strong) / <alpha-value>)',
-
-        // ── Vibrant accent system ──────────────────────────────────
         accent:       'rgb(var(--c-accent) / <alpha-value>)',
         'accent-hover':'rgb(var(--c-accent-hover) / <alpha-value>)',
         'accent-soft': 'rgb(var(--c-accent-soft) / <alpha-value>)',
-
-        // ── Dopamine engagement colors ─────────────────────────────
         'glow-from':  'rgb(var(--c-glow-from) / <alpha-value>)',
         'glow-to':    'rgb(var(--c-glow-to) / <alpha-value>)',
         'like':       'rgb(var(--c-like) / <alpha-value>)',
         'streak':     'rgb(var(--c-streak) / <alpha-value>)',
         'xp':         'rgb(var(--c-xp) / <alpha-value>)',
-
-        // Back-compat aliases
         background:    'rgb(var(--c-paper) / <alpha-value>)',
         'background-2':'rgb(var(--c-paper-2) / <alpha-value>)',
         foreground:    'rgb(var(--c-ink) / <alpha-value>)',
         surface:       'rgb(var(--c-paper) / <alpha-value>)',
         'surface-hover':'rgb(var(--c-paper-2) / <alpha-value>)',
-
-        // Credibility tiers
         'cred-high': 'rgb(var(--c-cred-high) / <alpha-value>)',
         'cred-mid':  'rgb(var(--c-cred-mid) / <alpha-value>)',
         'cred-low':  'rgb(var(--c-cred-low) / <alpha-value>)',
-
-        // India tricolor — retained for decorative civic accents
         'india-saffron': '#ff9933',
         'india-green':   '#138808',
-
-        // Portfolio accent tokens
         'accent-neutral':   '#1e1e1a',
         'accent-neutral-hover': '#373732',
       },

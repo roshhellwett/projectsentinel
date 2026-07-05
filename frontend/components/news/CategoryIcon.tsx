@@ -29,14 +29,9 @@ const ICON_MAP: Record<string, FC<LucideProps>> = {
 };
 
 interface CategoryIconProps extends LucideProps {
-  /** The icon identifier from CategoryTheme.icon */
   name: string;
 }
 
-/**
- * Renders a Lucide icon for a category, resolved by its string identifier.
- * Falls back to Newspaper if the name is unrecognized.
- */
 export function CategoryIcon({ name, ...props }: CategoryIconProps) {
   const Icon = ICON_MAP[name] ?? Newspaper;
   return <Icon {...props} />;

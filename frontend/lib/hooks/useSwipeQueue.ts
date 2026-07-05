@@ -26,7 +26,6 @@ const PREFETCH_THRESHOLD = 10;
 const HISTORY_MAX = 25;
 const SEEN_PREFIX = 'iv:swipe:seen:';
 const MAX_REFILL_FAILURES = 3;
-// Incremental backoff sequence — 1.5s → 4s → 10s
 const REFILL_BACKOFF_MS = [1500, 4000, 10000] as const;
 
 export interface HistoryEntry {
@@ -144,9 +143,6 @@ export function useSwipeQueue({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    // We listen to cross-tab storage events to maintain perfect synchronization
-    // across multiple browser tabs. If a user swipes a card in Tab A, we want
-    // Tab B to instantly remove it from the queue without a full page reload.
     const onStorage = (e: StorageEvent) => {
       if (!e.key) return;
       if (e.key.startsWith(SEEN_PREFIX)) {
@@ -166,9 +162,6 @@ export function useSwipeQueue({
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    // Re-check disk storage when the tab becomes visible again.
-    // This catches edge cases where the storage event might have fired while
-    // the device was asleep or the browser aggressively throttled the background tab.
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
       refreshSeenFromDisk();

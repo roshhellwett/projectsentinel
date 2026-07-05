@@ -44,7 +44,6 @@ export function useInfiniteFeed({
   const mountedRef = useRef(true);
   useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
 
-  // Flash new posts green for 5 seconds
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
     setFreshIds((curr) => {
@@ -104,8 +103,7 @@ export function useInfiniteFeed({
 
   loadMoreRef.current = loadMore;
 
-  // Buffer-and-flush pattern — batches rapid socket events into periodic state updates (800ms window)
-  // Uses a ref-based accumulator to avoid cascading re-renders from individual events
+
   const incomingBufferRef = useRef<Post[]>([]);
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -118,7 +116,6 @@ export function useInfiniteFeed({
     const existing = new Set(postsRef.current.map((p) => p.id));
     const excluded = excludeIdsRef.current;
     
-    // Only keep posts that are new, not excluded, and match the current category (if any)
     const fresh = incoming.filter(
       (p) =>
         !existing.has(p.id) &&
@@ -152,9 +149,6 @@ export function useInfiniteFeed({
   useEffect(() => {
     let sub: { unsubscribe: () => void } | null = null;
 
-    // We explicitly manage the websocket connection lifecycle based on page visibility.
-    // This prevents background tabs from consuming unnecessary bandwidth and battery
-    // by only subscribing to real-time events when the user is actively viewing the tab.
     const connect = () => {
       if (sub) {
         try { sub.unsubscribe(); } catch { /* ignore */ }
@@ -165,7 +159,6 @@ export function useInfiniteFeed({
           processIncomingPosts([post]);
         });
       } catch {
-        // Fallback or retry logic can be added here
       }
     };
 

@@ -58,7 +58,6 @@ export default async function HomePage() {
 
   const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
 
-  // Calculate average credibility score of today's stories
   const avgScore = allPosts.length > 0 
     ? Math.round(allPosts.reduce((acc, p) => acc + p.credibility_score, 0) / allPosts.length)
     : 92;
@@ -73,12 +72,10 @@ export default async function HomePage() {
       />
 
       <div className="relative z-10 px-4 sm:px-6 lg:px-10 pb-20 max-w-[1600px] mx-auto">
-        {/* ── Premium Editorial Masthead ─────────────────────────── */}
         <section
           aria-label="Today's stats masthead"
           className="relative my-6 sm:my-8 p-7 sm:p-9 rounded-2xl bg-paper border border-rule/60 shadow-card overflow-hidden"
         >
-          {/* Ambient gradient backdrop */}
           <div 
             className="absolute -right-24 -top-24 w-96 h-96 rounded-full opacity-[0.07] dark:opacity-[0.12] blur-3xl pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgb(var(--c-accent)), transparent 70%)' }}
@@ -109,8 +106,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* Stats Pills & Clock */}
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 justify-end flex-shrink-0">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 justify-end flex-shrink-0">
               <div className="flex items-center justify-between sm:justify-start gap-5 p-4 rounded-xl bg-paper-2/80 border border-rule/60 shadow-sm backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <span className="p-2.5 rounded-xl bg-cred-high/10 text-cred-high">
@@ -145,21 +141,18 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ── Full-bleed Hero Card Section ───────────────────────── */}
         {heroPost && (
           <div id="latest" className="mb-12 scroll-mt-24">
             <HeroCard post={heroPost} badge="breaking" />
           </div>
         )}
 
-        {/* ── Trending Carousel ──────────────────────────────────── */}
         {trendingPosts.length > 0 && (
           <div className="mb-12">
             <TrendingSection posts={trendingPosts} />
           </div>
         )}
 
-        {/* ── Infinite Feed ──────────────────────────────────────── */}
         <section aria-label="Latest verified news" className="mt-10">
           <div className="flex items-center justify-between gap-4 mb-7 pb-4 border-b border-rule/60">
             <h2 className="flex items-center gap-2.5 font-display text-xl sm:text-2xl font-bold text-ink">

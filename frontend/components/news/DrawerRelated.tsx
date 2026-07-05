@@ -45,7 +45,6 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
               filtered = [...filtered, ...more];
             }
           } catch {
-            // Ignore fallback errors
           }
         }
 

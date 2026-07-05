@@ -36,14 +36,11 @@ export function safeWrite(key: string, value: unknown): void {
   try {
     window.localStorage.setItem(key, str);
   } catch (e) {
-    
     if (e instanceof DOMException && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014)) {
       panicFreeLocalStorage();
       try {
-        
         window.localStorage.setItem(key, str);
       } catch {
-        
         console.warn('LocalStorage quota permanently exceeded.');
       }
     }

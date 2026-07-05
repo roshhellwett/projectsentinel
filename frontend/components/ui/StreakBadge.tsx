@@ -19,7 +19,6 @@ export function StreakBadge({
 }: StreakBadgeProps) {
   if (streak <= 0) return null;
 
-  // Determine tier and styling
   let tierName = 'Warmup';
   let tierColor = 'text-streak';
   let bgColor = 'bg-streak/10 border-streak/20';

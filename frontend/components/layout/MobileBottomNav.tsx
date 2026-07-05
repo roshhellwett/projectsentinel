@@ -71,7 +71,7 @@ export function MobileBottomNav() {
               initial={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
-              transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 380, damping: 32, mass: 0.85 }}
+              transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 420, damping: 30, mass: 0.75 }}
               className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper/95 backdrop-blur-xl border border-rule/60 shadow-card-lg will-change-transform transform-gpu"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
@@ -109,7 +109,7 @@ export function MobileBottomNav() {
       <motion.nav
         initial={false}
         animate={{ y: hideForOverlay ? '100%' : '0%', opacity: hideForOverlay ? 0 : 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
+        transition={{ type: 'spring', stiffness: 450, damping: 30, mass: 0.7 }}
         className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} will-change-transform will-change-opacity transform-gpu`}
         aria-hidden={hideForOverlay ? 'true' : 'false'}
         aria-label="Mobile navigation"

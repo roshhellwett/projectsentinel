@@ -60,7 +60,7 @@ export function CookieConsent() {
           initial={{ y: 24, opacity: 0, scale: 0.96 }}
           animate={{ 
             y: 0, opacity: 1, scale: 1,
-            transition: { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }
+            transition: { type: 'spring', stiffness: 450, damping: 28, mass: 0.7 }
           }}
           exit={{ 
             opacity: 0, scale: 0.96, y: 16,

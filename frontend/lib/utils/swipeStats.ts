@@ -89,7 +89,6 @@ interface StreakState {
   lastDay: string;
 }
 
-// Consecutive-day streak counter — resets on gap > 1 day, no-op if same day
 export function bumpStreak(): StreakState {
   const today = todayYmd();
   const prev = safeRead<StreakState | null>(STREAK_KEY, null);

@@ -25,7 +25,6 @@ export function AnimatedCounter({ value, duration = 1100, className }: AnimatedC
     const step = (now: number) => {
       if (startRef.current === null) startRef.current = now;
       const t = Math.min(1, (now - startRef.current) / duration);
-      // Cubic ease-out: f(t) = 1 − (1−t)³ — decelerating interpolation
       const eased = 1 - Math.pow(1 - t, 3);
       const next = Math.round(fromRef.current + (target - fromRef.current) * eased);
       

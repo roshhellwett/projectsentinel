@@ -79,7 +79,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
         'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
       )
     ).filter((el) => {
-      // Filter out hidden elements
       return el.offsetWidth > 0 && el.offsetHeight > 0 && window.getComputedStyle(el).visibility !== 'hidden';
     });
 
@@ -117,7 +116,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
           />
 
           <motion.div
@@ -145,7 +144,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
             initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
-            transition={reducedMotion ? { duration: 0.2 } : { type: 'spring', damping: 32, stiffness: 350, mass: 0.8 }}
+            transition={reducedMotion ? { duration: 0.2 } : { type: 'spring', damping: 28, stiffness: 380, mass: 0.7 }}
           >
 
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />

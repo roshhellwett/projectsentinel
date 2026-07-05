@@ -177,15 +177,15 @@ export function InfiniteFeed({
           return (
             <motion.div
               key={post.id}
-              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              initial={{ opacity: 0, y: 20, scale: 0.97 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: '-40px 0px' }}
               transition={{
                 type: 'spring',
-                stiffness: 300,
-                damping: 24,
-                mass: 0.8,
-                delay: Math.min(index * 0.04, 0.28),
+                stiffness: 350,
+                damping: 28,
+                mass: 0.7,
+                delay: Math.min(index * 0.03, 0.2),
               }}
               className="feed-card-shell h-full rounded-xl transition-all"
             >

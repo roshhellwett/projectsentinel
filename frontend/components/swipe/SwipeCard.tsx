@@ -21,7 +21,6 @@ export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 const SWIPE_DIST = 100;
 const SWIPE_VEL = 600;
 
-// Velocity-weighted dominant-axis swipe detection — compares offset + scaled velocity
 function decideDirection(info: PanInfo): SwipeDirection | null {
   const { offset, velocity } = info;
   const ax = Math.abs(offset.x);
@@ -206,7 +205,6 @@ export function SwipeCard({
     haptic(dir === 'right' ? [8, 40, 8] : 10);
     setExiting(true);
     setExitDir(dir);
-    // Let Framer Motion trigger the exit animation automatically when the parent unmounts this card.
     onSwipe?.(dir, post);
   }, [interactive, canRewind, onDragProgress, onSwipe, post]);
 

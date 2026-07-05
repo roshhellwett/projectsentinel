@@ -32,7 +32,6 @@ function getSourceLabel(source: Source): string {
   return host || 'Source';
 }
 
-/** Clean source count indicator — no more broken favicons */
 const SourceCount = memo(function SourceCount({ count }: { count: number }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted">
@@ -103,7 +102,6 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       <div className="card-hover-glow" aria-hidden="true" />
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
-        {/* ── Top row: category pill + score ring ── */}
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2.5 flex-wrap min-w-0">
             {/* Category pill with color */}
@@ -134,19 +132,15 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
           <ScoreRing score={post.credibility_score} compact />
         </div>
 
-        {/* ── Headline ── */}
         <h3 className="font-display text-[18px] sm:text-[19px] md:text-[20px] font-bold leading-[1.24] tracking-[-0.018em] text-ink line-clamp-3 mb-2.5 transition-colors duration-200 group-hover:text-accent">
           {post.headline}
         </h3>
 
-        {/* ── Summary ── */}
         <p className="text-[13px] sm:text-[13.5px] text-muted leading-relaxed line-clamp-2 mb-5">
           {truncateWords(post.summary, 22)}
         </p>
 
-        {/* ── Engagement footer ── */}
         <div className="mt-auto pt-4 border-t border-rule/60">
-          {/* Source verification info */}
           <div className="flex items-center gap-3 mb-3">
             <SourceCount count={sourcesTotal} />
             <span className="inline-flex items-center gap-1 text-[11px] text-muted font-medium ml-auto">
@@ -156,7 +150,6 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
             </span>
           </div>
 
-          {/* Action row — social media style */}
           <div className={`relative ${Z_INDEX.cardOverlay} flex items-center justify-between gap-2`}>
             <SourcePickerButton
               sources={post.sources}

@@ -49,7 +49,6 @@ export function pruneStaleSeenKeys(): void {
 
 let hasPruned = false;
 
-// Time-windowed hash set — per-day localStorage buckets with sliding-window read
 export function loadSeenWithinDays(days: number = 1): Set<string> {
   if (typeof window === 'undefined') return new Set();
   

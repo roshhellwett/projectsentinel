@@ -17,11 +17,10 @@ function clampScore(score: number) {
   return Math.min(100, Math.max(0, Number.isFinite(score) ? Math.round(score) : 0));
 }
 
-/** Maps score tier to a gradient color pair */
 function getGradientColors(score: number): [string, string] {
-  if (score >= 85) return ['#10b981', '#06b6d4'];   // cred-high → cyan
-  if (score >= 60) return ['#f59e0b', '#f97316'];   // cred-mid → orange
-  return ['#ef4444', '#f97316'];                     // cred-low → orange
+  if (score >= 85) return ['#10b981', '#06b6d4'];
+  if (score >= 60) return ['#f59e0b', '#f97316'];
+  return ['#ef4444', '#f97316'];
 }
 
 export function ScoreRing({ 
