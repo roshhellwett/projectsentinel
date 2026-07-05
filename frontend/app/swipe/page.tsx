@@ -32,7 +32,7 @@ export default async function SwipePage() {
         <SwipeStack initialPosts={deduped} />
       </main>
 
-      <div className="hidden md:flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="hidden md:flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] px-4">
         <div className="max-w-md text-center">
           <h1 className="font-display text-3xl font-bold text-ink mb-3">Swipe is a mobile experience</h1>
           <p className="text-muted mb-6">Open this page on your phone to swipe through verified news, one story at a time.</p>

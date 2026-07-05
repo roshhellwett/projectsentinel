@@ -1,8 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { fetchPosts } from '@/lib/supabase/server';
-import { InfiniteFeed } from '@/components/news/InfiniteFeed';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { InfiniteFeed, FeedSkeleton } from '@/components/news/InfiniteFeed';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { PageShell } from '@/components/layout/PageShell';
@@ -11,7 +10,7 @@ export const revalidate = 60;
 export const dynamicParams = false;
 
 const VALID_CATEGORIES = CATEGORY_SLUGS;
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -108,9 +107,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </header>
 
         <Suspense fallback={
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <Skeleton key={i} className="h-[218px] rounded-md" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i}>
+                <FeedSkeleton />
+              </div>
             ))}
           </div>
         }>

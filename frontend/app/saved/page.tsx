@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 import { NewsDrawer } from '@/components/news/NewsDrawer';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { FeedSkeleton } from '@/components/news/InfiniteFeed';
 import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
 import { showToast } from '@/lib/utils/toast';
 import { PageShell } from '@/components/layout/PageShell';
@@ -37,7 +37,7 @@ export default function SavedPage() {
     setLoading(true);
     setError(null);
 
-    fetch('/api/posts/batch', {
+    fetch('/api/posts/batch/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: idList }),
@@ -109,9 +109,11 @@ export default function SavedPage() {
         </motion.header>
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-[218px] rounded-md" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i}>
+                <FeedSkeleton />
+              </div>
             ))}
           </div>
         )}
@@ -143,7 +145,7 @@ export default function SavedPage() {
 
         {!loading && !error && posts.length > 0 && (
           <ErrorBoundary>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
               {posts.map((post) => (
                 <NewsCard
                   key={post.id}

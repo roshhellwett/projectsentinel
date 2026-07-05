@@ -9,7 +9,7 @@ interface PageShellProps {
 
 export function PageShell({ children, className = '', narrow = false }: PageShellProps) {
   return (
-    <div className={`relative ${Z_INDEX.content} px-4 lg:px-10 pb-16 md:pb-12 ${className}`}>
+    <div className={`relative ${Z_INDEX.content} px-4 sm:px-6 lg:px-10 pb-24 md:pb-20 ${className}`}>
       {narrow ? (
         <div className="max-w-4xl mx-auto">
           <div className="bg-paper/80 backdrop-blur-sm rounded-2xl shadow-[0_4px_30px_-10px_rgb(0_0_0_/_0.12)] border border-rule p-6 md:p-8 lg:p-10">
@@ -17,7 +17,7 @@ export function PageShell({ children, className = '', narrow = false }: PageShel
           </div>
         </div>
       ) : (
-        <div className="max-w-7xl mx-auto bg-paper/80 backdrop-blur-sm rounded-2xl shadow-[0_4px_30px_-10px_rgb(0_0_0_/_0.12)] border border-rule p-6 md:p-8 lg:p-10">
+        <div className="max-w-[1600px] mx-auto">
           {children}
         </div>
       )}

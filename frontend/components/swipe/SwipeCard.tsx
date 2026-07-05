@@ -50,7 +50,7 @@ function haptic(pattern: number | number[] = 12) {
   } catch {  }
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
 function estimateReadMinutes(text: string | null | undefined): number {
   if (!text) return 1;
@@ -351,7 +351,7 @@ export function SwipeCard({
 
           <h2
             id={`swipe-card-headline-${post.id}`}
-            className="font-display text-[22px] sm:text-[24px] font-bold leading-[1.18] tracking-[-0.015em] text-ink mb-4"
+            className="font-display text-[21px] sm:text-[23px] font-extrabold leading-[1.22] tracking-[-0.02em] text-ink mb-4"
           >
             {post.headline}
           </h2>

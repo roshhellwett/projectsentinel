@@ -3,7 +3,7 @@ import { fetchPosts } from '@/lib/supabase/server';
 export const revalidate = 900; 
 
 export async function GET() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
   const { posts } = await fetchPosts(1, 50);
 
   function escapeCdata(value: string): string {
@@ -18,7 +18,7 @@ export async function GET() {
       <guid isPermaLink="true">${siteUrl}/news/${post.id}/</guid>
       <category>${post.category}</category>
       <pubDate>${new Date(post.published_at).toUTCString()}</pubDate>
-      <source url="${siteUrl}/rss.xml">India Verified</source>
+      <source url="${siteUrl}/rss.xml">Zenith Open Source Projects</source>
     </item>
   `).join('\n');
 
@@ -28,15 +28,15 @@ export async function GET() {
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title><![CDATA[India Verified — AI-Verified Indian News]]></title>
+    <title><![CDATA[Zenith Open Source — AI-Verified Indian News by Roshhellwett]]></title>
     <link>${siteUrl}</link>
-    <description><![CDATA[Fully automated, AI-powered Indian news aggregator. Every story verified through cross-referencing multiple trusted sources.]]></description>
+    <description><![CDATA[Fully automated, AI-powered Indian news aggregator by Roshhellwett and Zenith Open Source Projects. Every story verified through cross-referencing multiple trusted sources.]]></description>
     <language>en-in</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${siteUrl}/favicon.svg</url>
-      <title>India Verified</title>
+      <title>Zenith Open Source Projects</title>
       <link>${siteUrl}</link>
     </image>
 ${items}

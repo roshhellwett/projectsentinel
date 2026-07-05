@@ -37,36 +37,51 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'India Verified — AI-Verified Indian News',
-    template: '%s — India Verified',
+    default: 'Zenith Open Source — AI-Verified Indian News by Roshhellwett',
+    template: '%s — Zenith Open Source Projects',
   },
   description:
-    'AI-powered Indian news aggregator. Every story cross-referenced across multiple trusted sources. No ads. No bias. Open source.',
+    'AI-powered Indian news aggregator by Roshhellwett and Zenith Open Source Projects. Every story cross-referenced across multiple trusted sources. No ads. No bias. 100% open source.',
   keywords: [
+    'Roshhellwett',
+    'Zenith Open Source Projects',
+    'roshhellwett organization',
+    'zenith open source news',
     'Indian news',
     'AI verified news',
     'fact-check',
     'news aggregator',
     'India news',
     'trusted news',
+    'AI news India',
   ],
+  authors: [{ name: 'Roshhellwett', url: 'https://github.com/roshhellwett' }, { name: 'Zenith Open Source Projects', url: siteUrl }],
+  creator: 'Roshhellwett',
+  publisher: 'Zenith Open Source Projects',
+  category: 'News & Media',
+  verification: {
+    google: 'google1bd198fa5b4dc9f1.html',
+    other: {
+      'google-site-verification': ['google1bd198fa5b4dc9f1.html', '1bd198fa5b4dc9f1'],
+    },
+  },
   openGraph: {
-    title: 'India Verified — AI-Verified Indian News',
-    description: 'AI-Verified Indian News. No Ads. No Bias.',
+    title: 'Zenith Open Source — AI-Verified Indian News by Roshhellwett',
+    description: 'AI-Verified Indian News by Roshhellwett and Zenith Open Source Projects. No Ads. No Bias.',
     type: 'website',
     locale: 'en_IN',
-    siteName: 'India Verified',
+    siteName: 'Zenith Open Source Projects',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'India Verified — AI-Verified Indian News',
-    description: 'AI-Verified Indian News. No Ads. No Bias.',
+    title: 'Zenith Open Source — AI-Verified Indian News by Roshhellwett',
+    description: 'AI-Verified Indian News by Roshhellwett and Zenith Open Source Projects. No Ads. No Bias.',
   },
   robots: {
     index: true,

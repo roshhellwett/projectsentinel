@@ -85,6 +85,6 @@ export async function cachedFetch<T>(
 }
 
 export function invalidatePostsCache(): void {
-  clearCache('/api/posts');
-  clearCache('/api/post');
+  clearCache('/api/posts/');
+  clearCache('/api/post/');
 }

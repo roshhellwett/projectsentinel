@@ -72,11 +72,11 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/85 supports-[backdrop-filter]:bg-paper/55 backdrop-filter backdrop-blur-xl backdrop-saturate-[1.3] border-b border-rule/60 transition-colors`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/80 supports-[backdrop-filter]:bg-paper/50 backdrop-filter backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         {/* Premium gradient edge */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" aria-hidden="true" />
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
 
         <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between gap-4 h-14 lg:h-16">
@@ -88,12 +88,12 @@ export function Navbar() {
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-9 h-9 bg-ink text-paper font-display font-bold text-[15px] tracking-[0.06em]"
+                className="flex items-center justify-center w-9 h-9 bg-ink text-paper font-display font-bold text-[15px] tracking-[0.06em] shadow-sm group-hover:scale-105 transition-transform duration-200"
               >
                 IV
               </span>
               <span className="flex flex-col leading-none whitespace-nowrap">
-                <span className="font-display text-[17px] sm:text-[19px] font-bold text-ink tracking-[-0.02em]">
+                <span className="font-display text-[17px] sm:text-[19px] font-bold text-ink tracking-[-0.02em] group-hover:text-accent transition-colors">
                   India Verified
                 </span>
                 <span className="hidden md:inline text-[10px] font-semibold tracking-[0.18em] uppercase text-accent mt-0.5">
@@ -114,8 +114,8 @@ export function Navbar() {
                     href={link.href}
                     prefetch={true}
                     aria-current={active ? 'page' : undefined}
-                    className={`relative inline-flex items-center px-3 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded ${
-                      active ? 'text-ink' : 'text-muted hover:text-ink'
+                    className={`relative inline-flex items-center px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg ${
+                      active ? 'text-ink bg-paper-2/80 shadow-xs' : 'text-muted hover:text-ink hover:bg-paper-2/40'
                     }`}
                   >
                     {link.label === 'Saved' && (
@@ -125,7 +125,7 @@ export function Navbar() {
                     {active && (
                       <span
                         aria-hidden="true"
-                        className="absolute left-3 right-3 -bottom-[1px] h-[2px] bg-accent rounded-full"
+                        className="absolute left-3 right-3 -bottom-[1px] h-[2.5px] bg-accent rounded-full shadow-glow-sm"
                       />
                     )}
                   </Link>

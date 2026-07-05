@@ -35,7 +35,7 @@ interface InfiniteFeedProps {
   excludeIds?: string[];
 }
 
-function FeedSkeleton() {
+export function FeedSkeleton() {
   return (
     <div className="premium-card animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3" aria-hidden="true">
       <div className="flex items-center gap-3">
@@ -177,15 +177,15 @@ export function InfiniteFeed({
           return (
             <motion.div
               key={post.id}
-              initial={{ opacity: 0, y: 36, scale: 0.92, filter: 'blur(8px)' }}
-              whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-              viewport={{ once: true, margin: '-30px 0px' }}
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-40px 0px' }}
               transition={{
                 type: 'spring',
-                stiffness: 280,
-                damping: 20,
-                mass: 0.7,
-                delay: Math.min(index * 0.03, 0.35),
+                stiffness: 300,
+                damping: 24,
+                mass: 0.8,
+                delay: Math.min(index * 0.04, 0.28),
               }}
               className="feed-card-shell h-full rounded-xl transition-all"
             >
@@ -211,7 +211,7 @@ export function InfiniteFeed({
 
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <motion.div
               key={`skeleton-${i}`}
               initial={{ opacity: 0, y: 12 }}

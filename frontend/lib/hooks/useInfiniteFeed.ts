@@ -73,7 +73,7 @@ export function useInfiniteFeed({
       if (categoryRef.current) params.set('category', categoryRef.current);
       
       const payload = await cachedFetch<{ posts: Post[]; count: number }>(
-        `/api/posts?${params.toString()}`,
+        `/api/posts/?${params.toString()}`,
         { cacheTtl: 15_000 },
       );
 

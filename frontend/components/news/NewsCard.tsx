@@ -23,8 +23,7 @@ function estimateReadMinutes(text: string | null | undefined): number {
 }
 
 function getSiteUrl(): string {
-  if (typeof window !== 'undefined') return window.location.origin;
-  return process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+  return process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 }
 
 function getSourceLabel(source: Source): string {
@@ -140,12 +139,12 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
         </div>
 
         {/* ── Headline ── */}
-        <h3 className="font-display text-[19px] md:text-[21px] font-bold leading-[1.18] tracking-[-0.015em] text-ink line-clamp-3 mb-2 transition-colors duration-200 group-hover:text-accent">
+        <h3 className="font-display text-[18px] sm:text-[19px] md:text-[20px] font-bold leading-[1.24] tracking-[-0.018em] text-ink line-clamp-3 mb-2.5 transition-colors duration-200 group-hover:text-accent">
           {post.headline}
         </h3>
 
         {/* ── Summary ── */}
-        <p className="text-[13px] text-muted leading-relaxed line-clamp-2 mb-5">
+        <p className="text-[13px] sm:text-[13.5px] text-muted leading-relaxed line-clamp-2 mb-5">
           {truncateWords(post.summary, 22)}
         </p>
 

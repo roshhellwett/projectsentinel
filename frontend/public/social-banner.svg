@@ -98,17 +98,17 @@
 
   <!-- ── BOTTOM-RIGHT BADGE ── -->
   <!-- Badge pill -->
-  <rect x="1296" y="420" width="160" height="38" rx="19" ry="19"
+  <rect x="1196" y="420" width="260" height="38" rx="19" ry="19"
     fill="#ffffff" fill-opacity="0.05"
     stroke="#ffffff" stroke-opacity="0.10" stroke-width="1"/>
   <text
-    x="1376" y="444"
+    x="1326" y="444"
     text-anchor="middle"
     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
-    font-size="15"
+    font-size="14"
     font-weight="400"
-    letter-spacing="1.5"
+    letter-spacing="1"
     fill="#ffffff"
     fill-opacity="0.40"
-  >verifiedindian.vercel.app</text>
+  >zenithopensourceprojects.vercel.app</text>
 </svg>

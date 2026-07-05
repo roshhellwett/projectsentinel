@@ -114,10 +114,10 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
               <motion.div
                 key={post.id}
-                initial={{ opacity: 0, scale: 0.92, x: 24 }}
-                whileInView={{ opacity: 1, scale: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.06, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, scale: 0.94, y: 16 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true, margin: '-20px 0px' }}
+                transition={{ delay: index * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 className="flex-shrink-0 w-[275px] sm:w-[315px] snap-start"
               >
                 <Link
@@ -139,7 +139,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
 
                   {/* Huge watermark rank number */}
                   <span
-                    className="absolute -right-2 -bottom-4 font-display font-black text-[80px] sm:text-[96px] leading-none text-ink/[0.03] dark:text-ink/[0.05] select-none pointer-events-none group-hover:scale-110 transition-transform duration-500"
+                    className="absolute -right-2 -bottom-4 font-display font-black text-[80px] sm:text-[96px] leading-none text-ink/[0.04] dark:text-ink/[0.06] select-none pointer-events-none group-hover:scale-105 transition-transform duration-500"
                     aria-hidden="true"
                   >
                     {String(rank).padStart(2, '0')}

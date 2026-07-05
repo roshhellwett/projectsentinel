@@ -39,7 +39,7 @@ function createEnvConfig(): EnvConfig {
     }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || null;
 
   return {

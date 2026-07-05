@@ -41,7 +41,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     const timer = window.setTimeout(() => {
       setIsLoading(true);
       setError(null);
-      fetch(`/api/search?q=${encodeURIComponent(q)}&limit=10`, {
+      fetch(`/api/search/?q=${encodeURIComponent(q)}&limit=10`, {
         signal: controller.signal,
       })
         .then((res) => {

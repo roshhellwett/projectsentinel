@@ -21,7 +21,7 @@ import { PageShell } from '@/components/layout/PageShell';
 
 export const revalidate = 300;
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
 
   if (!post) {
     return {
-      title: 'Not Found - India Verified'
+      title: 'Not Found - Zenith Open Source Projects'
     };
   }
 
@@ -94,7 +94,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-x-clip pb-12">
+    <div className="relative min-h-screen overflow-x-clip pb-0">
       <ReadingProgress targetSelector="#article-body" />
       <MarkReadOnMount postId={post.id} />
       <script

@@ -87,7 +87,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-allowed_origins = os.getenv("CORS_ORIGINS", "https://verifiedindian.vercel.app,https://indiaverified.vercel.app").split(
+allowed_origins = os.getenv("CORS_ORIGINS", "https://zenithopensourceprojects.vercel.app,https://verifiedindian.vercel.app,https://indiaverified.vercel.app").split(
     ","
 )
 app.add_middleware(

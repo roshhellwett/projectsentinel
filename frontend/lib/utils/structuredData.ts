@@ -1,7 +1,7 @@
 import { Post } from '@/types';
 
 export function newsArticleJsonLd(post: Post): object {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
   return {
     '@context': 'https://schema.org',
@@ -12,12 +12,12 @@ export function newsArticleJsonLd(post: Post): object {
     dateModified: post.updated_at || post.published_at,
     author: {
       '@type': 'Organization',
-      name: 'India Verified',
+      name: 'Zenith Open Source Projects by Roshhellwett',
       url: siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'India Verified',
+      name: 'Roshhellwett Organization',
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
@@ -47,14 +47,15 @@ export function newsArticleJsonLd(post: Post): object {
 }
 
 export function websiteJsonLd(): object {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'India Verified',
+    name: 'Zenith Open Source Projects — India Verified News',
+    alternateName: ['India Verified', 'Roshhellwett News', 'Zenith Open Source News'],
     url: siteUrl,
-    description: 'Fully automated, AI-powered Indian news aggregator.',
+    description: 'Fully automated, AI-powered verified Indian news aggregator by Roshhellwett and Zenith Open Source Projects.',
     image: `${siteUrl}/opengraph-image.png`,
     potentialAction: {
       '@type': 'SearchAction',
@@ -68,17 +69,22 @@ export function websiteJsonLd(): object {
 }
 
 export function organizationJsonLd(): object {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'India Verified',
+    name: 'Zenith Open Source Projects',
+    alternateName: 'Roshhellwett Organization',
     url: siteUrl,
     logo: `${siteUrl}/favicon.svg`,
     image: `${siteUrl}/opengraph-image.png`,
-    description: 'AI-powered, fully automated Indian news aggregator.',
+    description: 'AI-powered, fully automated Indian news aggregator by Roshhellwett and Zenith Open Source Projects.',
     foundingDate: '2025',
+    sameAs: [
+      'https://github.com/roshhellwett',
+      'https://zenithopensourceprojects.vercel.app',
+    ],
   };
 }
 

@@ -25,18 +25,37 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     const params = new URLSearchParams({
       page: '1',
       limit: '8',
-      category: currentPost.category,
+      category: currentPost.category || '',
     });
-    fetch(`/api/posts?${params.toString()}`, { signal: ctrl.signal, cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((payload: { posts: Post[] }) => {
+    fetch(`/api/posts/?${params.toString()}`, { signal: ctrl.signal, cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to fetch related'))))
+      .then(async (payload: { posts: Post[] }) => {
         if (cancelled) return;
-        const filtered = (payload.posts ?? [])
-          .filter((p) => p.id !== currentPost.id)
-          .slice(0, 3);
-        setRelated(filtered);
+        let filtered = (payload.posts ?? [])
+          .filter((p) => p.id !== currentPost.id);
+
+        if (filtered.length < 3 && !cancelled) {
+          try {
+            const fallbackRes = await fetch('/api/posts/?limit=10', { signal: ctrl.signal, cache: 'no-store' });
+            if (fallbackRes.ok) {
+              const fallbackPayload = await fallbackRes.json();
+              const more = (fallbackPayload.posts ?? []).filter(
+                (p: Post) => p.id !== currentPost.id && !filtered.some((f) => f.id === p.id)
+              );
+              filtered = [...filtered, ...more];
+            }
+          } catch {
+            // Ignore fallback errors
+          }
+        }
+
+        if (cancelled) return;
+        setRelated(filtered.slice(0, 3));
       })
-      .catch(() => { setError(true); })
+      .catch((err) => {
+        if (cancelled || err?.name === 'AbortError') return;
+        setError(true);
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

@@ -21,7 +21,7 @@ interface NewsDrawerProps {
   onPrev?: () => void;
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://verifiedindian.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
 
 export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: NewsDrawerProps) {
   const reducedMotion = useReducedMotion();
@@ -111,13 +111,13 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
         <>
 
           <motion.div
-            className={`fixed inset-0 bg-ink/20 backdrop-filter backdrop-blur-md ${Z_INDEX.modalBackdrop} will-change-opacity`}
+            className={`fixed inset-0 bg-ink/30 dark:bg-ink/50 backdrop-filter backdrop-blur-xs ${Z_INDEX.modalBackdrop}`}
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
           />
 
           <motion.div

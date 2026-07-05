@@ -369,7 +369,7 @@ export default async function PostOgImage(
               letterSpacing: '0.5px',
             }}
           >
-            verifiedindian.vercel.app
+            zenithopensourceprojects.vercel.app
           </span>
         </div>
       </div>
