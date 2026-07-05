@@ -3,26 +3,27 @@
 import Link from 'next/link';
 import { Github, Rss, ExternalLink } from 'lucide-react';
 import { InstallAppButton } from './InstallAppButton';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 
 const NEWS_LINKS = [
-  { href: '/category/politics/',     label: 'Politics' },
-  { href: '/category/business/',     label: 'Business' },
-  { href: '/category/sports/',       label: 'Sports' },
-  { href: '/category/tech/',         label: 'Technology' },
-  { href: '/category/world/',        label: 'World' },
-  { href: '/category/entertainment/', label: 'Entertainment' },
+  { href: '/category/politics/',     key: 'nav.politics' },
+  { href: '/category/business/',     key: 'nav.business' },
+  { href: '/category/sports/',       key: 'nav.sports' },
+  { href: '/category/tech/',         key: 'nav.tech' },
+  { href: '/category/world/',        key: 'nav.world' },
+  { href: '/category/entertainment/', key: 'nav.entertainment' },
 ];
 
 const ABOUT_LINKS = [
-  { href: '/how-it-works/', label: 'How verification works' },
-  { href: '/saved/',        label: 'Saved stories' },
+  { href: '/how-it-works/', key: 'nav.how_it_works' },
+  { href: '/saved/',        key: 'nav.saved' },
 ];
 
 const LEGAL_LINKS = [
-  { href: '/privacy/',     label: 'Privacy Policy' },
-  { href: '/terms/',       label: 'Terms of Use' },
-  { href: '/corrections/', label: 'Corrections Policy' },
-  { href: '/contact/',     label: 'Contact & Tips' },
+  { href: '/privacy/',     key: 'footer.privacy' },
+  { href: '/terms/',       key: 'footer.terms' },
+  { href: '/corrections/', key: 'footer.corrections' },
+  { href: '/contact/',     key: 'footer.contact' },
 ];
 
 const TRANSPARENCY = [
@@ -44,6 +45,7 @@ function ColumnHeading({ children }: { children: React.ReactNode }) {
 }
 
 export function Footer() {
+  const { t } = useI18n();
   const year = new Date().getFullYear();
   return (
     <footer className="relative mt-auto bg-paper-2/80 backdrop-blur-sm border-t border-rule/40">
@@ -76,9 +78,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-sm text-muted leading-relaxed max-w-md">
-              An independent newsroom of one. Every story is cross-referenced
-              across multiple trusted Indian publications, scored, and rewritten
-              without ads, bias, or noise.
+              {t('footer.description')}
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export function Footer() {
               className="tap-target min-h-[44px] inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Rss className="w-3.5 h-3.5" />
-              RSS Feed
+              {t('footer.rss_feed')}
             </a>
             <a
               href={REPO_URL}
@@ -98,7 +98,7 @@ export function Footer() {
               className="tap-target min-h-[44px] inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Github className="w-3.5 h-3.5" />
-              View source
+              {t('footer.github')}
               <ExternalLink className="w-3 h-3 opacity-60" />
             </a>
           </div>
@@ -106,7 +106,7 @@ export function Footer() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-10 mb-12">
           <div>
-            <ColumnHeading>News</ColumnHeading>
+            <ColumnHeading>{t('footer.news')}</ColumnHeading>
             <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {NEWS_LINKS.map((link) => (
                 <li key={link.href}>
@@ -114,7 +114,7 @@ export function Footer() {
                     href={link.href}
                     className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent footer-link"
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
@@ -122,7 +122,7 @@ export function Footer() {
           </div>
 
           <div>
-            <ColumnHeading>About</ColumnHeading>
+            <ColumnHeading>{t('footer.about')}</ColumnHeading>
             <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.href}>
@@ -130,7 +130,7 @@ export function Footer() {
                     href={link.href}
                     className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
@@ -138,7 +138,7 @@ export function Footer() {
           </div>
 
           <div>
-            <ColumnHeading>Legal</ColumnHeading>
+            <ColumnHeading>{t('footer.legal')}</ColumnHeading>
             <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
@@ -146,7 +146,7 @@ export function Footer() {
                     href={link.href}
                     className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
@@ -154,7 +154,7 @@ export function Footer() {
           </div>
 
           <div>
-            <ColumnHeading>Transparency</ColumnHeading>
+            <ColumnHeading>{t('footer.transparency')}</ColumnHeading>
             <ul className="space-y-3 sm:space-y-2.5 text-sm">
               {TRANSPARENCY.map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-muted">
@@ -170,7 +170,7 @@ export function Footer() {
           <p className="text-xs text-subtle leading-relaxed">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-paper-tint border border-rule">
               <span aria-hidden="true" className="inline-block w-4 h-3 rounded-[2px] overflow-hidden flex-shrink-0" style={{ background: 'linear-gradient(180deg, #ff9933 33%, #fff 33% 66%, #138808 66%)' }} />
-              <span className="font-semibold text-muted">Built in India</span>
+              <span className="font-semibold text-muted">{t('footer.built_in_india')}</span>
             </span>
             <span aria-hidden="true" className="mx-2 text-rule-strong">·</span>
             Designed &amp; engineered by{' '}

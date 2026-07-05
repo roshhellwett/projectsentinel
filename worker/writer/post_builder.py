@@ -48,6 +48,7 @@ DOMAIN_TO_NAME: dict[str, str] = {
     "mid-day.com": "Mid-Day",
     "bollywoodhungama.com": "Bollywood Hungama",
     "filmfare.com": "Filmfare",
+    "youtube.com": "YouTube",
 }
 
 def _derive_source_title(source_name: str, url: str) -> str:
@@ -74,6 +75,8 @@ class PostBuilder:
         credibility_score: int,
         credibility_reason: str,
         source_articles: list[dict],
+        language: str = "en",
+        content_type: str = "article",
     ) -> dict:
 
         if not headline or not headline.strip():
@@ -91,6 +94,11 @@ class PostBuilder:
         ]
 
         now = datetime.now(UTC).isoformat()
+        video_url = None
+        video_thumbnail = None
+        if content_type == "video" and source_articles:
+            video_url = source_articles[0].get("video_url")
+            video_thumbnail = source_articles[0].get("video_thumbnail")
 
         return {
             "headline": headline.strip(),
@@ -105,4 +113,8 @@ class PostBuilder:
             "correction_note": None,
             "published_at": now,
             "updated_at": now,
+            "language": language,
+            "content_type": content_type,
+            "video_url": video_url,
+            "video_thumbnail": video_thumbnail,
         }

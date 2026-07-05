@@ -11,19 +11,21 @@ import { LiveClock } from '@/components/layout/LiveClock';
 import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
 import { LastRefreshed } from '@/components/layout/LastRefreshed';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LanguageFilter } from '@/components/layout/LanguageFilter';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { StreakBadge } from '@/components/ui/StreakBadge';
 
 const NAV_LINKS = [
-  { href: '/category/politics/',   label: 'Politics' },
-  { href: '/category/business/',   label: 'Business' },
-  { href: '/category/sports/',     label: 'Sports' },
-  { href: '/category/tech/',       label: 'Tech' },
-  { href: '/category/world/',      label: 'World' },
-  { href: '/saved/',               label: 'Saved' },
-  { href: '/how-it-works/',        label: 'How It Works' },
+  { href: '/category/politics/',   labelKey: 'nav.politics' },
+  { href: '/category/business/',   labelKey: 'nav.business' },
+  { href: '/category/sports/',     labelKey: 'nav.sports' },
+  { href: '/category/tech/',       labelKey: 'nav.tech' },
+  { href: '/category/world/',      labelKey: 'nav.world' },
+  { href: '/saved/',               labelKey: 'nav.saved' },
+  { href: '/how-it-works/',        labelKey: 'nav.how_it_works' },
 ] as const;
 
 const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
@@ -31,6 +33,7 @@ const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
 export function Navbar() {
   const reducedMotion = useReducedMotion();
   const pathname = usePathname();
+  const { t } = useI18n();
   const { streak } = useDailyReadCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -117,10 +120,10 @@ export function Navbar() {
                       active ? 'text-ink bg-paper-2/80 shadow-xs' : 'text-muted hover:text-ink hover:bg-paper-2/40'
                     }`}
                   >
-                    {link.label === 'Saved' && (
+                    {link.labelKey === 'nav.saved' && (
                       <Bookmark className="w-3.5 h-3.5 mr-1.5 -ml-0.5" strokeWidth={1.8} />
                     )}
-                    {link.label}
+                    {t(link.labelKey)}
                     {active && (
                       <span
                         aria-hidden="true"
@@ -136,6 +139,7 @@ export function Navbar() {
               <StreakBadge streak={streak} size="sm" className="hidden sm:inline-flex mr-1" />
               <LastRefreshed />
               <ConnectionStatus />
+              <LanguageFilter />
 
               <button
                 type="button"
@@ -232,8 +236,8 @@ export function Navbar() {
                       }`}
                     >
                       <span className="inline-flex items-center gap-2">
-                        {link.label === 'Saved' && <Bookmark className="w-4 h-4" strokeWidth={1.8} />}
-                        {link.label}
+                        {link.labelKey === 'nav.saved' && <Bookmark className="w-4 h-4" strokeWidth={1.8} />}
+                        {t(link.labelKey)}
                       </span>
                       <span aria-hidden="true" className={`transition-transform ${active ? 'text-accent' : 'text-subtle'}`}>→</span>
                     </Link>
@@ -241,6 +245,10 @@ export function Navbar() {
                 })}
               </nav>
               <div className="p-4 border-t border-rule flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-muted uppercase tracking-[0.12em]">{t('nav.sections')}</span>
+                  <LanguageFilter />
+                </div>
                 <LiveClock variant="menu" />
                 <a
                   href={REPO_URL}

@@ -179,7 +179,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         if not supplementary_only:
             rss_fetcher = RSSFetcher()
             try:
-                rss_articles = rss_fetcher.fetch_all()
+                rss_articles = rss_fetcher.fetch_all(include_video=True)
                 all_articles.extend(rss_articles)
                 logger.log("FETCH", f"Fetched {len(rss_articles)} articles from RSS feeds")
             finally:
@@ -450,6 +450,8 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     credibility_score=score,
                     credibility_reason=verification.get("reason", ""),
                     source_articles=group,
+                    language=group[0].get("language", "en") if group else "en",
+                    content_type=group[0].get("content_type", "article") if group else "article",
                 )
 
                 published = publisher.publish(post)

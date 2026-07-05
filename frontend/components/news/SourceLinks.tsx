@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import { ExternalLink, Globe } from 'lucide-react';
 import { Source } from '@/types';
 import { getHostname } from '@/lib/utils/getHostname';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 
 interface SourceLinksProps {
   sources: Source[];
@@ -48,8 +49,9 @@ const SourceFavicon = memo(function SourceFavicon({ url }: { url: string }) {
 });
 
 export function SourceLinks({ sources }: SourceLinksProps) {
+  const { t } = useI18n();
   if (!sources || sources.length === 0) {
-    return <p className="text-sm text-muted">No sources available.</p>;
+    return <p className="text-sm text-muted">{t('drawer.no_sources')}</p>;
   }
 
   return (

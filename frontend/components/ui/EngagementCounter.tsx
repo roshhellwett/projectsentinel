@@ -3,6 +3,7 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Flame, Target, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 
 interface EngagementCounterProps {
   dailyCount: number;
@@ -17,6 +18,7 @@ export function EngagementCounter({
   nextMilestone,
   className,
 }: EngagementCounterProps) {
+  const { t } = useI18n();
   const reducedMotion = useReducedMotion();
   const progressPct = Math.min(100, (dailyCount / nextMilestone) * 100);
 
@@ -51,7 +53,7 @@ export function EngagementCounter({
             {dailyCount}
           </motion.span>
         </AnimatePresence>
-        <span className="text-[11px] text-muted font-medium">today</span>
+        <span className="text-[11px] text-muted font-medium">{t('common.today')}</span>
       </div>
 
       {/* Progress to next milestone */}
@@ -65,7 +67,7 @@ export function EngagementCounter({
       </div>
 
       <span className="text-[10px] text-subtle font-semibold tabular-nums">
-        {nextMilestone - dailyCount} to go
+        {nextMilestone - dailyCount} {t('common.to_go')}
       </span>
 
       {/* Streak badge */}

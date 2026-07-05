@@ -1,4 +1,7 @@
+'use client';
+
 import { AlertTriangle, XCircle } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 
 interface CorrectionsNoticeProps {
   type: 'corrected' | 'retracted';
@@ -6,6 +9,7 @@ interface CorrectionsNoticeProps {
 }
 
 export function CorrectionsNotice({ type, note }: CorrectionsNoticeProps) {
+  const { t } = useI18n();
   const isRetracted = type === 'retracted';
 
   return (
@@ -18,7 +22,7 @@ export function CorrectionsNotice({ type, note }: CorrectionsNoticeProps) {
         )}
         <div>
           <h4 className={`font-medium ${isRetracted ? 'text-cred-low' : 'text-cred-mid'}`}>
-            {isRetracted ? 'Article Retracted' : 'Correction Notice'}
+            {isRetracted ? t('drawer.retracted') : t('drawer.corrected')}
           </h4>
           {note && (
             <p className="text-sm text-muted mt-1">

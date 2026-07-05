@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertOctagon, RefreshCw, ChevronDown, ChevronUp, TerminalSquare } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -11,6 +12,7 @@ interface ErrorProps {
 }
 
 export default function Error({ error, reset }: ErrorProps) {
+  const { t } = useI18n();
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
@@ -23,9 +25,9 @@ export default function Error({ error, reset }: ErrorProps) {
         <AlertOctagon className="w-8 h-8 md:w-10 md:h-10 text-accent" strokeWidth={1.5} />
       </div>
       
-      <p className="text-accent text-[11px] font-bold tracking-[0.18em] uppercase mb-3">System error</p>
+      <p className="text-accent text-[11px] font-bold tracking-[0.18em] uppercase mb-3">{t('common.system_error')}</p>
       <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-ink mb-4 leading-[1.05]">
-        Something went wrong
+        {t('common.error')}
       </h1>
       
       <p className="text-muted max-w-md mb-8 text-base leading-relaxed">
@@ -39,7 +41,7 @@ export default function Error({ error, reset }: ErrorProps) {
           className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-transform active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <RefreshCw className="w-4 h-4" />
-          Try again
+          {t('common.retry')}
         </button>
         <Link
           href="/"

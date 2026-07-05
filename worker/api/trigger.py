@@ -14,7 +14,7 @@ import threading
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Header, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from scheduler.jobs import run_pipeline
 
@@ -25,17 +25,29 @@ _pipeline_running = threading.Event()
 _pipeline_lock = threading.Lock()
 
 class TriggerResponse(BaseModel):
+    """Response from a pipeline trigger request."""
 
-    success: bool
-    message: str
-    timestamp: str
+    success: bool = Field(description="Whether the pipeline was successfully triggered")
+    message: str = Field(description="Human-readable status message")
+    timestamp: str = Field(description="ISO 8601 timestamp of the trigger attempt")
 
 class TriggerRequest(BaseModel):
+    """Optional parameters for triggering the pipeline."""
 
-    supplementary_only: bool = False
-    archive_only: bool = False
+    supplementary_only: bool = Field(default=False, description="Only fetch from supplementary sources (GNews, NewsAPI)")
+    archive_only: bool = Field(default=False, description="Only run old-post archiving/cleanup")
 
-@router.post("/trigger", response_model=TriggerResponse)
+@router.post(
+    "/trigger",
+    response_model=TriggerResponse,
+    summary="Manually trigger the news pipeline",
+    description="Triggers a pipeline run with optional mode flags. Requires X-Admin-Token header. "
+    "Returns immediately — the pipeline runs in a background thread.",
+    responses={
+        401: {"description": "Invalid or missing admin token"},
+        500: {"description": "Admin token not configured on server"},
+    },
+)
 async def trigger_pipeline(
     request: TriggerRequest | None = None, x_admin_token: str = Header(..., alias="X-Admin-Token")
 ):

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 import { Target, Flame, Zap, Trophy, Diamond, Crown, Award, type LucideProps } from 'lucide-react';
 import type { FC } from 'react';
 
@@ -50,6 +51,7 @@ function Particle({ index }: { index: number }) {
 }
 
 export function MilestoneCelebration({ milestone, onDismiss }: MilestoneCelebrationProps) {
+  const { t } = useI18n();
   const reducedMotion = useReducedMotion();
   const haptic = useHapticFeedback();
   const [visible, setVisible] = useState(false);
@@ -103,7 +105,7 @@ export function MilestoneCelebration({ milestone, onDismiss }: MilestoneCelebrat
           <div className="flex flex-col">
             <span className="text-[13px] font-bold text-ink">{msg.title}</span>
             <span className="text-[11px] text-muted font-medium">
-              {milestone} stories read today
+              {milestone} {t('feed.stories_read')} {t('common.today')}
             </span>
           </div>
 

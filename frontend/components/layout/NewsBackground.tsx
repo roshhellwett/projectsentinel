@@ -150,11 +150,7 @@ export function NewsBackground() {
         </div>
       </div>
 
-      <div className="absolute top-28 left-6 sm:left-10 flex items-center gap-3 text-[9px] font-mono tracking-[0.25em] text-muted/40 uppercase">
-        <span className="w-1.5 h-1.5 rounded-full bg-cred-high" />
-        <span>SATYAMEVA JAYATE &middot; TRUTH ALONE TRIUMPHS</span>
-        <span className="hidden sm:inline">&middot; EST. BY ROSHHELLWETT</span>
-      </div>
+
       <div className="absolute bottom-6 right-6 sm:right-10 flex items-center gap-4 text-[9px] font-mono tracking-[0.25em] text-muted/30 uppercase">
         <span>ZENITH OPEN SOURCE &middot; INDEPENDENT JOURNALISM</span>
       </div>

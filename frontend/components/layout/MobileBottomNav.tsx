@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
 import { Home, Search, LayoutGrid, Bookmark, Layers } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
@@ -14,16 +15,17 @@ import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { StreakBadge } from '@/components/ui/StreakBadge';
 
 const TABS = [
-  { id: 'home', href: '/', icon: Home, label: 'Home' },
-  { id: 'swipe', href: '/swipe/', icon: Layers, label: 'Swipe' },
-  { id: 'search', href: null, icon: Search, label: 'Search' },
-  { id: 'topics', href: null, icon: LayoutGrid, label: 'Topics' },
-  { id: 'saved', href: '/saved/', icon: Bookmark, label: 'Saved' },
+  { id: 'home', href: '/', icon: Home, key: 'nav.home' },
+  { id: 'swipe', href: '/swipe/', icon: Layers, key: 'nav.swipe' },
+  { id: 'search', href: null, icon: Search, key: 'nav.search' },
+  { id: 'topics', href: null, icon: LayoutGrid, key: 'nav.topics' },
+  { id: 'saved', href: '/saved/', icon: Bookmark, key: 'nav.saved' },
 ] as const;
 
 export function MobileBottomNav() {
   const reducedMotion = useReducedMotion();
   const pathname = usePathname();
+  const { t } = useI18n();
   const { streak } = useDailyReadCount();
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
@@ -95,7 +97,7 @@ export function MobileBottomNav() {
                           : 'bg-paper text-ink border border-rule hover:border-ink'
                       }`}
                     >
-                      {cat.label}
+                      {t(`nav.${cat.slug}`)}
                     </Link>
                   );
                 })}
@@ -155,7 +157,7 @@ export function MobileBottomNav() {
                       active ? 'text-accent' : 'text-muted'
                     }`}
                   >
-                    {tab.label}
+                    {t(tab.key)}
                   </span>
                 </motion.div>
               );
@@ -195,7 +197,7 @@ export function MobileBottomNav() {
                   href={tab.href!}
                   prefetch={true}
                   onClick={closeTopics}
-                  aria-label={tab.label}
+                  aria-label={t(tab.key)}
                   className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
                   {inner}

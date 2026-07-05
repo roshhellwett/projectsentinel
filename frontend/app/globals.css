@@ -91,7 +91,7 @@ html {
   scroll-behavior: smooth;
   background-color: rgb(var(--c-paper));
   text-rendering: optimizeLegibility;
-  scrollbar-gutter: auto;
+  scrollbar-gutter: stable;
 }
 
 html.dark {

@@ -95,16 +95,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-        <header className="mb-10 pb-8 border-b border-rule">
-          <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
-          <p className="editorial-kicker mb-3">Category</p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4">
-            {categoryName}
-          </h1>
-          <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
-            AI-verified {slug} stories cross-referenced across multiple trusted sources.
-          </p>
-        </header>
+          <header className="mb-10 pb-8 border-b border-rule">
+            <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
+            <p className="editorial-kicker mb-3">Category</p>
+            <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4">
+              {categoryName}
+            </h1>
+            <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
+              AI-verified {slug} stories cross-referenced across multiple trusted sources.
+            </p>
+          </header>
 
         <Suspense fallback={
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">

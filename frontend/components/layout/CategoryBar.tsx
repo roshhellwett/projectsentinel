@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
@@ -11,6 +12,7 @@ const ALL_CATEGORIES = [{ slug: 'all', label: 'All' }, ...CATEGORIES.map((c) => 
 
 export function CategoryBar() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const currentCategory: string = pathname?.startsWith('/category/')
     ? pathname.split('/')[2]
     : 'all';
@@ -41,7 +43,7 @@ export function CategoryBar() {
     <nav
       className="relative -mx-4 px-4 border-y border-rule"
       role="tablist"
-      aria-label="News categories"
+      aria-label={t('category.aria_label')}
     >
 
       <div className={`absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-paper to-transparent pointer-events-none`} />
@@ -63,7 +65,7 @@ export function CategoryBar() {
                   isActive ? 'text-ink' : 'text-muted hover:text-ink hover:bg-paper-2/60'
                 }`}
               >
-                {cat.label}
+                  {cat.slug === 'all' ? t('nav.all') : t(`nav.${cat.slug}`)}
                 {isActive && (
                   <motion.span
                     layoutId="activeCategoryRule"

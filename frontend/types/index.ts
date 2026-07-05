@@ -20,6 +20,12 @@ export interface PostsCursorResponse {
   hasMore: boolean;
 }
 
+/** Supported content languages (ISO 639-1). */
+export type ContentLanguage = 'en' | 'hi' | 'ta' | 'te' | 'bn' | 'mr' | 'ml' | 'kn' | 'gu' | 'ur';
+
+/** Content type variant. */
+export type ContentType = 'article' | 'video';
+
 /** 
  * The core entity representing an AI-verified news post.
  * Contains the headline, summary, and verification metadata.
@@ -38,5 +44,9 @@ export interface Post {
   correction_note: string | null;
   published_at: string;
   updated_at: string;
+  language?: ContentLanguage;
+  content_type?: ContentType;
+  video_url?: string | null;
+  video_thumbnail?: string | null;
 }
 

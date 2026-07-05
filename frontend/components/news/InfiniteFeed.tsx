@@ -12,6 +12,7 @@ import { useInfiniteFeed } from '@/lib/hooks/useInfiniteFeed';
 import { useIntersectionObserver } from '@/lib/hooks/useIntersectionObserver';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 import { EngagementCounter } from '@/components/ui/EngagementCounter';
 import { MilestoneCelebration } from '@/components/ui/MilestoneCelebration';
 
@@ -80,6 +81,7 @@ export function InfiniteFeed({
     excludeIds,
   });
 
+  const { t } = useI18n();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
   const openedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -137,9 +139,9 @@ export function InfiniteFeed({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
           </svg>
         </div>
-        <h3 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">No verified news found</h3>
+        <h3 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">{t('feed.no_news_title')}</h3>
         <p className="text-sm text-muted max-w-sm">
-          We couldn&apos;t find any articles. Try a different category or check back in a few minutes.
+          {t('feed.no_news_desc')}
         </p>
       </div>
     );
@@ -159,7 +161,7 @@ export function InfiniteFeed({
         {readCount > 0 && (
           <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto bg-paper-2 px-3 py-1 rounded-full border border-rule/60">
             <span className="text-[11px] font-semibold text-muted tabular-nums whitespace-nowrap">
-              <span className="text-ink font-bold">{readCount}</span> / {posts.length} stories read
+              <span className="text-ink font-bold">{readCount}</span> / {posts.length} {t('feed.stories_read')}
             </span>
           </div>
         )}
@@ -230,7 +232,7 @@ export function InfiniteFeed({
 
       {exhausted && posts.length > pageSize && (
         <p className="text-center text-xs text-muted mt-12">
-          {readCount}/{posts.length} stories read &middot; you&apos;ve reached the end.
+          {readCount}/{posts.length} {t('feed.stories_read')} &middot; {t('feed.reached_end')}
         </p>
       )}
       </ErrorBoundary>

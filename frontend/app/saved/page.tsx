@@ -14,8 +14,10 @@ import { PageShell } from '@/components/layout/PageShell';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 
 export default function SavedPage() {
+  const { t } = useI18n();
   const { savedIds, clearSaved } = useSavedPosts();
   const { readIds, markRead } = useReadPosts();
 
@@ -60,7 +62,7 @@ export default function SavedPage() {
       })
       .catch((err) => {
         if (err.name === 'AbortError') return;
-        setError('Could not load your saved stories.');
+        setError(t('saved.load_error'));
         setLoading(false);
       });
 
@@ -82,7 +84,7 @@ export default function SavedPage() {
           <span className="inline-flex items-center justify-center w-8 h-8 rounded border border-rule bg-paper group-hover:border-ink transition-all hover-lift">
             <ArrowLeft className="w-4 h-4" />
           </span>
-          Back to all news
+          {t('saved.back')}
         </Link>
 
         <motion.header
@@ -93,13 +95,12 @@ export default function SavedPage() {
         >
           <div>
             <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
-            <p className="editorial-kicker mb-3">Your reading list</p>
+            <p className="editorial-kicker mb-3">{t('saved.your_list')}</p>
             <h1 className="font-display text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink mb-3 leading-[1.05]">
-              Saved stories
+              {t('saved.page_title')}
             </h1>
             <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
-              Bookmarks are stored on this device only — private and synced
-              instantly across tabs.
+              {t('saved.page_desc')}
             </p>
           </div>
           {idList.length > 0 && (
@@ -107,10 +108,10 @@ export default function SavedPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setConfirmingClear(true)}
               className="tap-target min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              aria-label="Clear all saved stories"
+              aria-label={t('saved.clear_all_aria')}
             >
               <Trash2 className="w-3.5 h-3.5" />
-              Clear all
+              {t('saved.clear_all')}
             </motion.button>
           )}
         </motion.header>
@@ -135,17 +136,16 @@ export default function SavedPage() {
               <Bookmark className="w-7 h-7 text-muted" />
             </div>
             <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">
-              No saved stories yet
+              {t('saved.empty_title')}
             </h2>
             <p className="text-sm text-muted max-w-sm mb-6">
-              Tap the bookmark icon on any story to save it for later. Your
-              reading list stays on this device.
+              {t('saved.empty_desc')}
             </p>
             <Link
               href="/"
               className="tap-target min-h-[44px] inline-flex items-center gap-2 px-4 pt-[9px] pb-[11px] rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              Browse latest news
+              {t('saved.browse_latest')}
             </Link>
           </div>
         )}
@@ -184,28 +184,28 @@ export default function SavedPage() {
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="relative bg-paper border border-rule-strong rounded-2xl p-6 w-full max-w-sm shadow-card-lg"
             role="alertdialog"
-            aria-label="Confirm clear all saved stories"
+            aria-label={t('saved.confirm_aria')}
           >
-            <h3 className="font-display text-lg font-bold text-ink mb-2">Clear all saved stories?</h3>
+            <h3 className="font-display text-lg font-bold text-ink mb-2">{t('saved.confirm_title')}</h3>
             <p className="text-sm text-muted mb-6 leading-relaxed">
-              This action cannot be undone. All your bookmarks will be permanently removed from this device.
+              {t('saved.confirm_desc')}
             </p>
             <div className="flex items-center gap-3 justify-end">
               <button
                 onClick={() => setConfirmingClear(false)}
                 className="tap-target min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => {
                   clearSaved();
-                  showToast('All saved stories cleared', 'success');
+                  showToast(t('saved.cleared_msg'), 'success');
                   setConfirmingClear(false);
                 }}
                 className="tap-target min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded border border-transparent bg-like text-white text-sm font-semibold hover:bg-like/90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                Clear all
+                {t('saved.clear_all')}
               </button>
             </div>
           </motion.div>

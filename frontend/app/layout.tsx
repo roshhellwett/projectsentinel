@@ -3,19 +3,10 @@ import { Inter, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 
 import './globals.css';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
-import { Z_INDEX } from '@/lib/theme/zIndex';
 import dynamic from 'next/dynamic';
-import { ScrollToTop } from '@/components/ui/ScrollToTop';
-import { OfflineBanner } from '@/components/layout/OfflineBanner';
-import { NewsBackground } from '@/components/layout/NewsBackground';
+import { Z_INDEX } from '@/lib/theme/zIndex';
 
-const KeyboardShortcuts = dynamic(() => import('@/components/ui/KeyboardShortcuts').then(m => m.KeyboardShortcuts));
-const ScrollRestorer = dynamic(() => import('@/components/ui/ScrollRestorer').then(m => m.ScrollRestorer));
-const CookieConsent = dynamic(() => import('@/components/ui/CookieConsent').then(m => m.CookieConsent));
-const ToastProvider = dynamic(() => import('@/components/ui/ToastProvider').then(m => m.ToastProvider));
+const ClientShell = dynamic(() => import('@/components/layout/ClientShell'));
 
 const inter = Inter({
   variable: '--font-sans',
@@ -184,20 +175,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <NewsBackground />
-        <OfflineBanner />
-        <Navbar />
-        <main id="main" className="flex-1 w-full" tabIndex={-1}>
+        <ClientShell>
           {children}
-        </main>
-
-        <Footer />
-        <MobileBottomNav />
-        <ScrollToTop />
-        <KeyboardShortcuts />
-        <ScrollRestorer />
-        <CookieConsent />
-        <ToastProvider />
+        </ClientShell>
       </body>
     </html>
   );

@@ -2,14 +2,21 @@
 
 import { Post, Source } from '@/types';
 import { memo, useState } from 'react';
-import { ExternalLink, Globe } from 'lucide-react';
+import { ExternalLink, Globe, Play } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CorrectionsNotice } from './CorrectionsNotice';
 import { CredibilityBar } from './CredibilityBar';
 import { SourceLinks } from './SourceLinks';
 import { DrawerRelated } from './DrawerRelated';
+import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { typographyStyles } from '@/lib/theme/typography';
 import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
+
+function extractYoutubeId(url: string): string {
+  const match = url.match(/(?:v=|youtu\.be\/|\/v\/|\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return match?.[1] || '';
+}
 
 const SourceFaviconChip = memo(function SourceFaviconChip({ source }: { source: Source }) {
   const [errored, setErrored] = useState(false);
@@ -43,6 +50,7 @@ interface DrawerContentProps {
 }
 
 export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
+  const { t } = useI18n();
   return (
     <article className={`article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain bg-paper px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-7 lg:px-10 lg:pt-12 lg:pb-12 flex flex-col ${post.status === 'retracted' ? 'opacity-50' : ''}`}>
       {post.status === 'corrected' && (
@@ -52,18 +60,38 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
         <CorrectionsNotice type="retracted" note={post.correction_note} />
       )}
 
-      <h2 className={cn(typographyStyles.drawer.headline, "mb-5")}>
+      <h2 className={cn(typographyStyles.drawer.headline, "mb-2")}>
         {post.headline}
       </h2>
+
+      {post.language && post.language !== 'en' && (
+        <div className="mb-4">
+          <LanguageBadge language={post.language} />
+        </div>
+      )}
+
+      {post.content_type === 'video' && post.video_url && (
+        <div className="mb-6 rounded-xl overflow-hidden border border-rule/50 shadow-sm">
+          <div className="relative aspect-video bg-black">
+            <iframe
+              src={`https://www.youtube.com/embed/${extractYoutubeId(post.video_url)}`}
+              title={post.headline}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mb-7 rounded-xl border border-rule/50 bg-paper-2/60 backdrop-blur-sm p-5 lg:p-5 shadow-sm">
         <CredibilityBar score={post.credibility_score} />
         <div className="mt-3 flex items-center justify-between gap-3 border-t border-rule pt-3">
           <span className={typographyStyles.kicker}>
-            Verified Sources
+            {t('drawer.verified_sources')}
           </span>
           <span className="text-sm font-semibold tabular-nums text-ink">
-            {(post.source_count ?? (post.sources?.length || 0))} {(post.source_count ?? (post.sources?.length || 0)) === 1 ? 'source' : 'sources'}
+            {(post.source_count ?? (post.sources?.length || 0))} {(post.source_count ?? (post.sources?.length || 0)) === 1 ? t('drawer.source') : t('drawer.sources')}
           </span>
         </div>
         {post.sources && post.sources.length > 0 && (
@@ -95,7 +123,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
       <div className="rounded-xl border border-rule/50 bg-paper-2/60 backdrop-blur-sm p-5 mb-7 shadow-sm">
         <h3 className={cn(typographyStyles.sectionHeading, "mb-3 flex items-center gap-2")}>
           <span aria-hidden="true" className="w-1 h-4 bg-accent" />
-          Why this score?
+          {t('drawer.why_score')}
         </h3>
         <p className="text-sm text-ink-soft leading-7">
           {post.credibility_reason}
@@ -105,7 +133,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
       <div>
         <h3 className={cn(typographyStyles.sectionHeading, "mb-3 flex items-center gap-2")}>
           <ExternalLink className="w-4 h-4 text-accent" />
-          Original Sources
+          {t('drawer.original_sources')}
         </h3>
         <SourceLinks sources={post.sources} />
       </div>
@@ -117,7 +145,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           <span className="block w-8 h-px bg-rule-strong" />
         </div>
         <span className="font-display text-[11px] font-bold uppercase tracking-[0.22em] text-subtle">
-          End of story
+          {t('drawer.end_of_story')}
         </span>
       </div>
 

@@ -21,7 +21,7 @@ from bs4 import BeautifulSoup
 
 from fetcher.url_tools import compute_url_hash, normalize_url
 from logger.pipeline_logger import PipelineLogger
-from sources.rss_sources import get_rss_sources
+from sources.rss_sources import get_rss_sources, get_video_sources
 
 
 class RSSFetcher:
@@ -92,10 +92,13 @@ class RSSFetcher:
                 pass
             self._local.session = None
 
-    def fetch_all(self) -> list[dict]:
+    def fetch_all(self, include_video: bool = False) -> list[dict]:
 
         articles = []
         all_sources = get_rss_sources()
+
+        if include_video:
+            all_sources = all_sources + get_video_sources()
 
         active_sources = []
         parked_count = 0
@@ -182,7 +185,7 @@ class RSSFetcher:
 
         excerpt = self._extract_excerpt(entry)
 
-        return {
+        article: dict = {
             "url": url,
             "url_hash": compute_url_hash(url),
             "headline": headline,
@@ -190,8 +193,40 @@ class RSSFetcher:
             "source_name": source["name"],
             "source_url": self._get_base_url(url),
             "category_hint": source.get("category_hint", "general"),
+            "language": source.get("language", "en"),
+            "content_type": "article",
             "fetched_at": datetime.now(UTC).isoformat(),
         }
+
+        # Detect video content from YouTube RSS
+        media_group = entry.get("media_group") or entry.get("media_content")
+        if media_group:
+            article["content_type"] = "video"
+            article["video_url"] = url
+
+            # Extract thumbnail: prefer top-level media_thumbnail, then nested, then fallback
+            thumb_list = entry.get("media_thumbnail")
+            if thumb_list and isinstance(thumb_list, list) and thumb_list[0].get("url"):
+                article["video_thumbnail"] = thumb_list[0]["url"]
+            elif isinstance(media_group, list):
+                for item in media_group:
+                    nested = (item.get("media_thumbnail") or [{}])[0].get("url") or (item.get("media:thumbnail") or [{}])[0].get("url")
+                    if nested:
+                        article["video_thumbnail"] = nested
+                        break
+            elif isinstance(media_group, dict):
+                thumb = media_group.get("thumbnail") or media_group.get("media:thumbnail")
+                if isinstance(thumb, dict):
+                    article["video_thumbnail"] = thumb.get("url")
+                elif isinstance(thumb, list) and thumb:
+                    article["video_thumbnail"] = thumb[0].get("url")
+
+            # Ensure YouTube video URL uses the standard watch format
+            if "youtube.com" in url and "/watch" not in url and "/v/" in url:
+                video_id = url.rstrip("/").split("/")[-1]
+                article["url"] = f"https://www.youtube.com/watch?v={video_id}"
+
+        return article
 
     def _extract_excerpt(self, entry) -> str:
 

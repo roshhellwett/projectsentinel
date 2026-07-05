@@ -1,11 +1,17 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:storybook/recommended"
+  ],
   "rules": {
     "react-hooks/exhaustive-deps": "warn",
     "no-console": [
       "warn",
       {
-        "allow": ["warn", "error"]
+        "allow": [
+          "warn",
+          "error"
+        ]
       }
     ],
     "no-debugger": "error",
@@ -20,8 +26,9 @@
         "components/news/SourcePickerButton.tsx",
         "components/news/DrawerContent.tsx"
       ],
-      "rules": { "@next/next/no-img-element": "off" }
+      "rules": {
+        "@next/next/no-img-element": "off"
+      }
     }
   ]
 }
-
