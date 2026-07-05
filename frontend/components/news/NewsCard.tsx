@@ -1,7 +1,6 @@
 'use client';
 
 import { memo, useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useAnimation, useReducedMotion } from 'framer-motion';
 import { ShieldCheck, Globe, BookOpen, Share2 } from 'lucide-react';
 import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
@@ -58,7 +57,6 @@ function isBreaking(post: Post): boolean {
 }
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRecentlyOpened = false }: NewsCardProps) => {
-  const reducedMotion = useReducedMotion();
   const haptic = useHapticFeedback();
   const breaking = isBreaking(post);
   const theme = getCategoryTheme(post.category);
@@ -72,7 +70,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
   }, [haptic, onClick]);
 
   return (
-    <motion.div
+    <div
       role="article"
       tabIndex={0}
       onClick={handleClick}
@@ -84,15 +82,13 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
         }
       }}
       aria-label={`Read article: ${post.headline}`}
-      whileTap={reducedMotion ? undefined : { scale: 0.97 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 20 }}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'group relative isolate flex flex-col h-full cursor-pointer',
+        'group relative isolate flex flex-col h-full cursor-pointer transition-transform duration-150 ease-out active:scale-[0.98]',
         'premium-card',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         isRead && 'opacity-70 saturate-[0.7]',
-        isNew && !reducedMotion && 'new-post-ring',
+        isNew && 'new-post-ring',
         'contain-layout'
       )}
     >
@@ -193,7 +189,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
           Read
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 

@@ -125,21 +125,32 @@ html:not(.dark) {
     -webkit-tap-highlight-color: transparent;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply leading-normal antialiased overscroll-y-none;
 
     background-color: rgb(var(--c-paper));
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgb(var(--c-accent) / 0.04), transparent),
-      radial-gradient(ellipse 60% 40% at 90% 90%, rgb(var(--c-glow-to) / 0.03), transparent);
-    background-attachment: fixed;
-
     color: rgb(var(--c-ink-soft));
     font-family: var(--font-sans);
     font-feature-settings: 'kern', 'liga', 'calt';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgb(var(--c-accent) / 0.04), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 90%, rgb(var(--c-glow-to) / 0.03), transparent);
+    transform: translateZ(0);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -197,6 +208,7 @@ html:not(.dark) {
 
 /* ── Card hover states ─────────────────────────── */
 .glass-hover,
+.premium-card,
 .premium-card-hover,
 .dopamine-card-hover {
   transform: translateY(0) translateZ(0);
@@ -204,6 +216,7 @@ html:not(.dark) {
 
 @media (hover: hover) {
   .glass-hover:hover,
+  .premium-card:hover,
   .premium-card-hover:hover,
   .dopamine-card-hover:hover {
     border-color: rgb(var(--c-accent) / 0.25);
@@ -216,6 +229,7 @@ html:not(.dark) {
 }
 
 .glass-hover:active,
+.premium-card:active,
 .premium-card-hover:active,
 .dopamine-card-hover:active {
   transform: translateY(0) scale(0.985) translateZ(0);
