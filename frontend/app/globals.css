@@ -913,6 +913,44 @@ img, video { max-width: 100%; height: auto; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   LIVING EDITORIAL NEWSROOM ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes editorial-marquee-left {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes editorial-marquee-right {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes editorial-breathe {
+  0%, 100% { opacity: 0.025; transform: scale(1); }
+  50% { opacity: 0.055; transform: scale(1.03); }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: editorial-marquee-left 80s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: editorial-marquee-right 95s linear infinite;
+  will-change: transform;
+}
+
+.animate-editorial-breathe {
+  animation: editorial-breathe 14s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    REDUCED MOTION — Respecting user preferences
    ═══════════════════════════════════════════════════════════════ */
 
@@ -924,7 +962,10 @@ img, video { max-width: 100%; height: auto; }
     scroll-behavior: auto !important;
   }
   .animate-ping,
-  .animate-pulse {
+  .animate-pulse,
+  .animate-marquee-left,
+  .animate-marquee-right,
+  .animate-editorial-breathe {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }

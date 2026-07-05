@@ -10,6 +10,7 @@ import { Z_INDEX } from '@/lib/theme/zIndex';
 import dynamic from 'next/dynamic';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { OfflineBanner } from '@/components/layout/OfflineBanner';
+import { NewsBackground } from '@/components/layout/NewsBackground';
 
 const KeyboardShortcuts = dynamic(() => import('@/components/ui/KeyboardShortcuts').then(m => m.KeyboardShortcuts));
 const ScrollRestorer = dynamic(() => import('@/components/ui/ScrollRestorer').then(m => m.ScrollRestorer));
@@ -183,6 +184,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
+        <NewsBackground />
         <OfflineBanner />
         <Navbar />
         <main id="main" className="flex-1 w-full" tabIndex={-1}>

@@ -1,6 +1,7 @@
 {
   "name": "india-verified-frontend",
   "version": "1.0.0",
+  "author": "Roshhellwett <roshhellwett@icloud.com>",
   "private": true,
   "scripts": {
     "dev": "next dev",

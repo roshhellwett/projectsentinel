@@ -92,9 +92,9 @@ export default async function HomePage() {
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="max-w-2xl stagger-entry">
-              <div className="flex items-center gap-2.5 mb-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-[0.15em] border border-accent/15">
-                  <Radio className="w-3 h-3" />
+                  <Radio className="w-3 h-3 flex-shrink-0" />
                   <span>Live Verified Feed</span>
                 </span>
                 <span className="text-xs font-semibold text-muted">&middot; {getIndianGreeting()}</span>
