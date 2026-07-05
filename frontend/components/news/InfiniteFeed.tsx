@@ -14,7 +14,7 @@ import { useReadPosts } from '@/lib/utils/readPosts';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { EngagementCounter } from '@/components/ui/EngagementCounter';
 import { MilestoneCelebration } from '@/components/ui/MilestoneCelebration';
-import { cn } from '@/lib/utils/cn';
+
 
 const MILESTONE_LABELS: Record<number, string> = {
   5: 'First 5 stories!',

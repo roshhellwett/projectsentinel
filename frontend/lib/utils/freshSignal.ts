@@ -3,13 +3,6 @@ import { useEffect, useState } from 'react';
 let lastFreshAt = 0;
 const subscribers = new Set<(ts: number) => void>();
 
-export function markFresh() {
-  lastFreshAt = Date.now();
-  for (const s of subscribers) {
-    try { s(lastFreshAt); } catch {  }
-  }
-}
-
 export function useLastFresh(): number {
   const [value, setValue] = useState<number>(0);
   useEffect(() => {

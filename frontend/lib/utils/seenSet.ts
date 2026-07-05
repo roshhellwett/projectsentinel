@@ -12,7 +12,7 @@ function dayKey(d: Date): string {
   return `${PREFIX}${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-export function todayKey(): string {
+function todayKey(): string {
   return dayKey(new Date());
 }
 
@@ -29,7 +29,7 @@ function safeRead(key: string): string[] {
   }
 }
 
-export function pruneStaleSeenKeys(): void {
+function pruneStaleSeenKeys(): void {
   if (typeof window === 'undefined') return;
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - KEEP_DAYS);

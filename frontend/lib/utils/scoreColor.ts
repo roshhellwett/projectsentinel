@@ -1,4 +1,4 @@
-export function getScoreTier(score: number): 'high' | 'mid' | 'low' {
+function getScoreTier(score: number): 'high' | 'mid' | 'low' {
   const c = Math.max(0, Math.min(100, score));
   if (c >= 90) return 'high';
   if (c >= 70) return 'mid';

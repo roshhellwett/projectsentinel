@@ -83,7 +83,4 @@ export function getCategoryTheme(category: string | undefined | null): CategoryT
   };
 }
 
-/** Get just the gradient CSS for a category */
-export function getCategoryGradient(category: string | undefined | null): string {
-  return getCategoryTheme(category).cssGradient;
-}
+

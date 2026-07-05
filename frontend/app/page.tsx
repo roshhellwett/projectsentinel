@@ -6,7 +6,7 @@ import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { LiveClock } from '@/components/layout/LiveClock';
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 import { dedupe } from '@/lib/utils/dedupe';
-import { Zap, ShieldCheck, Flame, Sparkles, Radio } from 'lucide-react';
+import { Zap, ShieldCheck, Flame, Radio } from 'lucide-react';
 
 const IST_HOUR_FMT = new Intl.DateTimeFormat('en-GB', {
   hour: '2-digit',

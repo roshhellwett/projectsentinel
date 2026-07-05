@@ -10,12 +10,12 @@ const cache = new Map<string, CacheEntry>();
 
 const DEFAULT_TTL = 30_000;
 
-export function getCacheKey(url: string, method: string, body?: unknown): string {
+function getCacheKey(url: string, method: string, body?: unknown): string {
   if (body) return `${method}:${url}:${JSON.stringify(body)}`;
   return `${method}:${url}`;
 }
 
-export function getCached<T>(key: string): T | null {
+function getCached<T>(key: string): T | null {
   const entry = cache.get(key);
   if (!entry) return null;
   if (Date.now() - entry.timestamp > entry.ttl) {
@@ -25,7 +25,7 @@ export function getCached<T>(key: string): T | null {
   return entry.data as T;
 }
 
-export function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
+function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
   if (cache.size > 100) {
     const oldest = cache.entries().next().value;
     if (oldest) cache.delete(oldest[0]);
@@ -33,7 +33,7 @@ export function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
   cache.set(key, { data, timestamp: Date.now(), ttl });
 }
 
-export function clearCache(pattern?: string): void {
+function clearCache(pattern?: string): void {
   if (!pattern) {
     cache.clear();
     return;
