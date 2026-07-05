@@ -121,7 +121,6 @@ class Deduplicator:
         if url_hash in known:
             return False
 
-        cache.add_to_set(KNOWN_HASHES, url_hash)
         return True
 
     def batch_insert_new_articles(self, articles: list[dict]) -> int:

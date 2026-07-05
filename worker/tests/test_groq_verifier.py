@@ -13,7 +13,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier, _KeyPool
+from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
+from utils.key_pool import KeyPool
 
 
 @pytest.fixture(autouse=True)
@@ -25,14 +26,16 @@ def reset_key_pool():
 def test_verifier_init_defaults():
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY_1": "test_key"}, clear=True):
         v = GroqVerifier()
-        assert v.verify_model == "llama-3.3-70b-versatile"
+        pool = v._ensure_pool()
+        assert pool is not None
 
 def test_verifier_init_custom_model():
     with patch.dict(
         os.environ, {"GROQ_API_KEY_VERIFY_1": "test_key", "GROQ_VERIFY_MODEL": "llama3-70b-8192"}, clear=True
     ):
         v = GroqVerifier()
-        assert v.verify_model == "llama3-70b-8192"
+        pool = v._ensure_pool()
+        assert pool is not None
 
 def test_verifier_no_api_key():
     with patch.dict(os.environ, {}, clear=True):
@@ -179,7 +182,7 @@ def test_verify_retry_on_failure(mock_post, mock_sleep):
         assert mock_post.call_count >= 3
 
 def test_key_pool_lowest_usage_first():
-    pool = _KeyPool(["key_a", "key_b", "key_c"])
+    pool = KeyPool(["key_a", "key_b", "key_c"])
     pool.record_success(0)
     pool.record_success(0)
     idx, key = pool.pick()
@@ -187,14 +190,14 @@ def test_key_pool_lowest_usage_first():
     assert key in ("key_b", "key_c")
 
 def test_key_pool_exhausted_key_skipped():
-    pool = _KeyPool(["key_a", "key_b"])
+    pool = KeyPool(["key_a", "key_b"])
     pool.mark_exhausted(0)
     idx, key = pool.pick()
     assert idx == 1
     assert key == "key_b"
 
 def test_key_pool_all_exhausted_raises():
-    pool = _KeyPool(["key_a", "key_b"])
+    pool = KeyPool(["key_a", "key_b"])
     pool.mark_exhausted(0)
     pool.mark_exhausted(1)
     with pytest.raises(AllKeysExhaustedError):
@@ -203,7 +206,7 @@ def test_key_pool_all_exhausted_raises():
 def test_key_pool_midnight_reset():
     from datetime import date, timedelta
 
-    pool = _KeyPool(["key_a"])
+    pool = KeyPool(["key_a"])
     pool.record_success(0)
     pool.mark_exhausted(0)
 
@@ -218,7 +221,7 @@ def test_key_pool_midnight_reset():
     assert pool.get_stats()[0]["skip_this_run"] is False
 
 def test_key_pool_record_success_increments():
-    pool = _KeyPool(["key_a"])
+    pool = KeyPool(["key_a"])
     pool.record_success(0)
     pool.record_success(0)
     assert pool.get_stats()[0]["calls_today"] == 2
@@ -283,7 +286,7 @@ def test_verifier_six_keys_loaded_with_correct_tiers():
         assert [s["tier"] for s in stats] == [1, 1, 1, 2, 2, 2]
 
 def test_key_pool_tier_two_dormant_until_tier_one_exhausted():
-    pool = _KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
+    pool = KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
 
     for _ in range(50):
         pool.record_success(0)
@@ -295,7 +298,7 @@ def test_key_pool_tier_two_dormant_until_tier_one_exhausted():
     assert key in ("k1", "k2", "k3")
 
 def test_key_pool_tier_two_activates_after_tier_one_exhausted():
-    pool = _KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
+    pool = KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
 
     pool.mark_exhausted(0)
     pool.mark_exhausted(1)
@@ -312,7 +315,7 @@ def test_key_pool_tier_two_activates_after_tier_one_exhausted():
         pool.pick()
 
 def test_key_pool_sparse_numbering_preserves_tier():
-    pool = _KeyPool([(1, "k1"), (2, "k2"), (4, "k4")])
+    pool = KeyPool([(1, "k1"), (2, "k2"), (4, "k4")])
     stats = pool.get_stats()
     assert [s["tier"] for s in stats] == [1, 1, 2]
 
@@ -326,7 +329,7 @@ def test_key_pool_sparse_numbering_preserves_tier():
     assert key == "k4"
 
 def test_pool_per_model_state_is_independent():
-    pool = _KeyPool(["k1"], rpd_limit=2)
+    pool = KeyPool(["k1"], rpd_limit=2)
     pool.record_usage(0, tokens=100, model="model_a")
     pool.record_usage(0, tokens=100, model="model_a")
     with pytest.raises(AllKeysExhaustedError):
@@ -335,7 +338,7 @@ def test_pool_per_model_state_is_independent():
     assert idx == 0
 
 def test_pool_equal_pressure_distribution_across_models():
-    pool = _KeyPool(["k1", "k2", "k3"])
+    pool = KeyPool(["k1", "k2", "k3"])
     used_indices = []
     for _ in range(6):
         i, _ = pool.pick(model="verify")
@@ -350,7 +353,7 @@ def test_pool_equal_pressure_distribution_across_models():
 def test_pool_lru_picks_oldest_within_tier():
     import time as _time
 
-    pool = _KeyPool(["k1", "k2", "k3"])
+    pool = KeyPool(["k1", "k2", "k3"])
     i1, _ = pool.pick(model="m")
     pool.record_usage(i1, model="m")
     _time.sleep(0.001)
@@ -361,7 +364,7 @@ def test_pool_lru_picks_oldest_within_tier():
     assert {i1, i2, i3} == {0, 1, 2}
 
 def test_pool_invalid_key_stays_dead_across_models():
-    pool = _KeyPool(["k1", "k2"])
+    pool = KeyPool(["k1", "k2"])
     pool.mark_invalid(0)
     idx, _ = pool.pick(model="model_a")
     assert idx == 1

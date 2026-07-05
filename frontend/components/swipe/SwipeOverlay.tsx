@@ -20,7 +20,7 @@ function clamp01(n: number): number {
 }
 
 export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
-  const [hasSeen, setHasSeen] = useState(true);
+  const [hasSeen, setHasSeen] = useState(false);
 
   useEffect(() => {
     setHasSeen(safeRead(SEEN_KEY) === 'true');

@@ -25,15 +25,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
 
   const trending = useMemo(() => {
     if (!posts || posts.length === 0) return [];
-    const seen = new Set<string>();
-    const out: Post[] = [];
-    for (const p of posts) {
-      if (seen.has(p.id)) continue;
-      seen.add(p.id);
-      out.push(p);
-      if (out.length === 6) break;
-    }
-    return out;
+    return posts.slice(0, 6);
   }, [posts]);
 
   const { isRead } = useReadPosts();

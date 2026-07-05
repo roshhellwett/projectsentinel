@@ -18,7 +18,6 @@ export async function GET() {
       <guid isPermaLink="true">${siteUrl}/news/${post.id}/</guid>
       <category>${post.category}</category>
       <pubDate>${new Date(post.published_at).toUTCString()}</pubDate>
-      <source url="${siteUrl}/rss.xml">Zenith Open Source Projects</source>
     </item>
   `).join('\n');
 

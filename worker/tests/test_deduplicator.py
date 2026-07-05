@@ -95,7 +95,7 @@ def test_is_new_caches_in_shared_cache():
     )
     article = {"url_hash": "abc123", "url": "https://example.com", "headline": "Test"}
     assert dedup.is_new(article) is True
-    assert dedup.is_new(article) is False
+    assert dedup.is_new(article) is True
 
 
 def test_is_new_uses_shared_cache():

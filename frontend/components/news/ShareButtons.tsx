@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Share2, Link as LinkIcon, Twitter, Linkedin, Facebook, X, Check } from 'lucide-react';
+import { Share2, Link as LinkIcon, X, Check } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';

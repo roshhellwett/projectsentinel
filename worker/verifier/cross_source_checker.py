@@ -9,6 +9,7 @@
 
 
 
+import random
 import re
 from collections import defaultdict
 
@@ -191,7 +192,7 @@ class CrossSourceChecker:
         candidate_pairs: set[tuple[int, int]] = set()
         for indices in keyword_to_indices.values():
             if len(indices) > 12:
-                continue
+                indices = random.sample(indices, 12)
             for left_pos, left in enumerate(indices):
                 for right in indices[left_pos + 1 :]:
                     candidate_pairs.add((left, right))

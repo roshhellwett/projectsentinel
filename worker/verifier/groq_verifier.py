@@ -9,11 +9,12 @@
 
 
 
+import email.utils
 import json
-import os
 import re
 import threading
 import time
+from datetime import UTC, datetime
 
 import requests
 
@@ -25,9 +26,6 @@ from utils.groq_pool import (
     save_verify_pool_stats,
 )
 from utils.key_pool import AllKeysExhaustedError, KeyPool
-
-_KeyPool = KeyPool
-__all__ = ["AllKeysExhaustedError", "GroqVerifier", "_KeyPool"]
 
 class GroqVerifier:
 
@@ -69,11 +67,8 @@ class GroqVerifier:
         "Key facts: 3-5 verified info points only. Headline and summary must use only those facts."
     )
 
-    FALLBACK_MODELS = ["llama-3.1-8b-instant"]
-
     def __init__(self):
         self.logger = PipelineLogger()
-        self.verify_model = os.getenv("GROQ_VERIFY_MODEL", "llama-3.3-70b-versatile")
 
     @classmethod
     def _ensure_pool(cls) -> KeyPool | None:
@@ -264,17 +259,20 @@ class GroqVerifier:
                 self.logger.log("GROQ_VERIFY_ERROR", f"Verification failed: {str(e)}")
                 raise
 
-        try:
-            pool.pick(estimated_tokens=self.EST_TOKENS_PER_CALL, model=model)
-        except AllKeysExhaustedError:
-            raise
-        raise Exception("Max retries exceeded for Groq verification")
+        if pool.has_available(model=model):
+            raise Exception("Max retries exceeded for Groq verification")
+        raise AllKeysExhaustedError(f"All keys exhausted on '{model}' after max retries")
 
     def _extract_429_wait(self, response: requests.Response) -> int:
 
         retry_after = response.headers.get("Retry-After", "").strip()
         if retry_after.isdigit():
             return int(retry_after) + 1
+        try:
+            date = email.utils.parsedate_to_datetime(retry_after)
+            return max(1, int((date - datetime.now(UTC)).total_seconds()) + 1)
+        except Exception:
+            pass
         body = response.text or ""
         match = re.search(r"retry in (\d+(?:\.\d+)?)s", body, re.IGNORECASE)
         if match:
@@ -342,7 +340,7 @@ class GroqVerifier:
             return None
 
         if not isinstance(result["key_facts"], list):
-            result["key_facts"] = [str(result["key_facts"])]
+            result["key_facts"] = list(result["key_facts"]) if isinstance(result["key_facts"], (list, tuple)) else []
 
         valid_categories = [
             "politics",

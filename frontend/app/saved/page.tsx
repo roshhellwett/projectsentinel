@@ -13,6 +13,7 @@ import { showToast } from '@/lib/utils/toast';
 import { PageShell } from '@/components/layout/PageShell';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 export default function SavedPage() {
   const { savedIds, clearSaved } = useSavedPosts();
@@ -23,6 +24,12 @@ export default function SavedPage() {
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Post | null>(null);
   const [confirmingClear, setConfirmingClear] = useState(false);
+
+  useEffect(() => {
+    if (!confirmingClear) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [confirmingClear]);
 
   const idList = useMemo(() => Array.from(savedIds).reverse(), [savedIds]);
 

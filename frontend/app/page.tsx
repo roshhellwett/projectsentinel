@@ -1,4 +1,4 @@
-import { fetchLatestPost, fetchPosts } from '@/lib/supabase/server';
+import { fetchLatestPost, fetchPostsCursor } from '@/lib/supabase/server';
 import { HeroCard } from '@/components/news/HeroCard';
 import { TrendingSection } from '@/components/news/TrendingSection';
 import { InfiniteFeed } from '@/components/news/InfiniteFeed';
@@ -29,7 +29,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   const [heroPost, postsResult] = await Promise.all([
     fetchLatestPost(),
-    fetchPosts(1, 50),
+    fetchPostsCursor(undefined, 50),
   ]);
 
   const allPosts = dedupe(
@@ -169,7 +169,7 @@ export default async function HomePage() {
 
           <InfiniteFeed
             initialPosts={feedPosts}
-            initialCount={Math.max(0, postsResult.count - trendingIdList.length - (heroPost ? 1 : 0))}
+            hasInitialMore={postsResult.hasMore}
             excludeIds={[...trendingIdList, ...(heroPost ? [heroPost.id] : [])]}
           />
         </section>

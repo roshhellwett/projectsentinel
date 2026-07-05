@@ -7,7 +7,7 @@ import { cachedFetch, invalidatePostsCache } from '@/lib/utils/fetchCache';
 
 interface UseInfiniteFeedProps {
   initialPosts: Post[];
-  initialCount: number;
+  hasInitialMore: boolean;
   category?: string;
   pageSize?: number;
   excludeIds?: string[];
@@ -15,15 +15,15 @@ interface UseInfiniteFeedProps {
 
 export function useInfiniteFeed({
   initialPosts,
-  initialCount,
+  hasInitialMore,
   category,
   pageSize = DEFAULT_PAGE_SIZE,
   excludeIds,
 }: UseInfiniteFeedProps) {
   const [posts, setPosts] = useState<Post[]>(() => dedupe(initialPosts));
-  const [page, setPage] = useState(1);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [exhausted, setExhausted] = useState(initialPosts.length >= initialCount);
+  const [exhausted, setExhausted] = useState(!hasInitialMore);
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
 
   const excludeIdsRef = useRef(excludeIds ? new Set(excludeIds) : undefined);
@@ -32,8 +32,8 @@ export function useInfiniteFeed({
   const flashTimersRef = useRef<Set<number>>(new Set());
   const postsRef = useRef(posts);
   postsRef.current = posts;
-  const pageRef = useRef(page);
-  pageRef.current = page;
+  const cursorRef = useRef(cursor);
+  cursorRef.current = cursor;
   const exhaustedRef = useRef(exhausted);
   exhaustedRef.current = exhausted;
   const categoryRef = useRef(category);
@@ -67,11 +67,11 @@ export function useInfiniteFeed({
     loadingRef.current = true;
     setLoading(true);
     try {
-      const next = pageRef.current + 1;
-      const params = new URLSearchParams({ page: String(next), limit: String(pageSizeRef.current) });
+      const params = new URLSearchParams({ limit: String(pageSizeRef.current) });
+      if (cursorRef.current) params.set('cursor', cursorRef.current);
       if (categoryRef.current) params.set('category', categoryRef.current);
       
-      const payload = await cachedFetch<{ posts: Post[]; count: number }>(
+      const payload = await cachedFetch<{ posts: Post[]; nextCursor: string | null; hasMore: boolean }>(
         `/api/posts/?${params.toString()}`,
         { cacheTtl: 15_000 },
       );
@@ -86,8 +86,8 @@ export function useInfiniteFeed({
           return dedupe([...prev, ...incoming]);
         });
         
-        setPage(next);
-        if (payload.posts.length === 0 || payload.posts.length < pageSizeRef.current) {
+        setCursor(payload.nextCursor);
+        if (!payload.hasMore) {
           setExhausted(true);
         }
       }

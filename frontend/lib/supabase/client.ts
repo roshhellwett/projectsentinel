@@ -59,7 +59,11 @@ export function subscribeToPosts(callback: (post: Post) => void) {
         callback(payload.new as Post);
       },
     )
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[realtime] Subscription error:', status, err);
+      }
+    });
 
   return {
     unsubscribe: () => {

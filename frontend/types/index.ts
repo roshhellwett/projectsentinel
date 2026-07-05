@@ -13,6 +13,13 @@ export interface Source {
   url: string;
 }
 
+/** Response shape for cursor-based posts API. */
+export interface PostsCursorResponse {
+  posts: Post[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}
+
 /** 
  * The core entity representing an AI-verified news post.
  * Contains the headline, summary, and verification metadata.

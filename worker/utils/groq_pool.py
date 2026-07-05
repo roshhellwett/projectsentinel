@@ -66,7 +66,7 @@ def safe_model_limits(model: str) -> tuple[int, int, int]:
 
 def _build_model_limits_map() -> dict[str, tuple[int, int, int]]:
 
-    used = set(VERIFY_MODEL_CHAIN) | set(WRITE_MODEL_CHAIN) | set(GROQ_MODEL_LIMITS)
+    used = set(VERIFY_MODEL_CHAIN) | set(WRITE_MODEL_CHAIN)
     return {m: safe_model_limits(m) for m in used}
 
 def _load_groq_keys() -> list[tuple[int, str]]:
@@ -100,9 +100,11 @@ def _env_chain(chain_var: str, head_var: str, default: list[str]) -> list[str]:
     head = (os.getenv(head_var) or "").strip()
     if not head:
         return list(default)
+    seen = {head}
     out = [head]
     for m in default:
-        if m != head:
+        if m != head and m not in seen:
+            seen.add(m)
             out.append(m)
     return out
 

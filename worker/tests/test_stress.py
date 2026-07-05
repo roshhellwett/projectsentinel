@@ -335,10 +335,11 @@ class TestPipelineRapidRuns:
 
     def test_10_rapid_pipeline_runs(self):
         from cache.shared_cache import cache as global_cache
-        from scheduler.jobs import run_pipeline
+        from scheduler.jobs import _pipeline_running, run_pipeline
 
         for run_num in range(10):
             global_cache.reset_state()
+            _pipeline_running.clear()
 
             with (
                 patch("scheduler.jobs._record_run_start", return_value=f"rapid_run{run_num}"),
@@ -395,8 +396,9 @@ class TestPipelineRapidRuns:
                 mock_rss.close.assert_called_once()
 
     def test_concurrent_main_and_supplementary(self):
-        from scheduler.jobs import run_pipeline
+        from scheduler.jobs import _pipeline_running, run_pipeline
         from cache.shared_cache import cache as global_cache
+        _pipeline_running.clear()
 
         def run_main():
             global_cache.reset_state()

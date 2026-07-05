@@ -262,7 +262,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 </p>
               )}
 
-              <div id="search-results" role="listbox" aria-label="Search results" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div id="search-results" role="list" aria-label="Search results" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {results.map((post) => (
                   <NewsCard
                     key={post.id}

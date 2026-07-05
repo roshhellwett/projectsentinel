@@ -1,8 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
-import { Post } from '@/types';
+import { Post, PostsCursorResponse } from '@/types';
 
 const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment', 'education']);
 const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
+
+/** Lightweight column projection for feed lists (excludes heavy JSONB fields). */
+const FEED_COLUMNS = '*';
+
+/** Full column projection for detail views. */
+const DETAIL_COLUMNS = '*';
 
 let supabaseServerInstance: ReturnType<typeof createClient> | null = null;
 
@@ -45,6 +51,63 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
   throw lastError;
 }
 
+/**
+ * Fetch posts using cursor-based pagination.
+ * @param cursor ISO timestamp of the last post's published_at (exclusive). Omit for the first page.
+ * @param limit Max results (default 20, max 50).
+ * @param category Optional category filter.
+ */
+export async function fetchPostsCursor(
+  cursor?: string,
+  limit: number = 20,
+  category?: string
+): Promise<PostsCursorResponse> {
+  const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
+  const fetchLimit = safeLimit + 1;
+
+  return withRetry(async () => {
+    let query = getSupabaseServer()
+      .from('posts')
+      .select(FEED_COLUMNS, { count: 'estimated' })
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(fetchLimit);
+
+    if (category && category !== 'all' && VALID_CATEGORIES.has(category)) {
+      query = query.eq('category', category);
+    }
+
+    if (cursor) {
+      query = query.lt('published_at', cursor);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      if (error.message?.includes('Requested range not satisfiable')) {
+        return { posts: [], nextCursor: null, hasMore: false };
+      }
+      throw new Error(`fetchPostsCursor error: ${error.message}`);
+    }
+
+    const posts = (data || []) as Post[];
+    const hasMore = posts.length >= fetchLimit;
+
+    if (hasMore) {
+      posts.pop();
+    }
+
+    const nextCursor = hasMore && posts.length > 0
+      ? posts[posts.length - 1].published_at
+      : null;
+
+    return { posts, nextCursor, hasMore };
+  });
+}
+
+/**
+ * Legacy offset-based pagination (kept for backward compatibility).
+ */
 export async function fetchPosts(
   page: number = 1,
   limit: number = 20,
@@ -58,7 +121,7 @@ export async function fetchPosts(
   return withRetry(async () => {
     let query = getSupabaseServer()
       .from('posts')
-      .select('*', { count: 'exact' })
+      .select(FEED_COLUMNS, { count: 'estimated' })
       .eq('status', 'published');
 
     if (category && category !== 'all' && VALID_CATEGORIES.has(category)) {
@@ -93,7 +156,7 @@ export async function fetchPostById(id: string): Promise<Post | null> {
   return withRetry(async () => {
     const { data, error } = await getSupabaseServer()
       .from('posts')
-      .select('*')
+      .select(DETAIL_COLUMNS)
       .eq('id', id)
       .single();
 
@@ -111,7 +174,7 @@ export async function fetchLatestPost(): Promise<Post | null> {
   return withRetry(async () => {
     const { data, error } = await getSupabaseServer()
       .from('posts')
-      .select('*')
+      .select(FEED_COLUMNS)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
       .limit(1)
@@ -171,7 +234,7 @@ export async function searchPosts(
 
   const { data, error, count } = await getSupabaseServer()
     .from('posts')
-    .select('*', { count: 'exact' })
+    .select(FEED_COLUMNS, { count: 'estimated' })
     .eq('status', 'published')
     .or(`headline.fts(english).${ftsTerm},summary.fts(english).${ftsTerm}`)
     .order('published_at', { ascending: false })
@@ -182,7 +245,7 @@ export async function searchPosts(
     const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
     const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
       .from('posts')
-      .select('*', { count: 'exact' })
+      .select(FEED_COLUMNS, { count: 'estimated' })
       .eq('status', 'published')
       .ilike('headline', `%${escapedForIlike}%`)
       .order('published_at', { ascending: false })

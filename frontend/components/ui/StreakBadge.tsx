@@ -22,26 +22,26 @@ export function StreakBadge({
   let tierName = 'Warmup';
   let tierColor = 'text-streak';
   let bgColor = 'bg-streak/10 border-streak/20';
-  let shadowGlow = 'shadow-[0_0_12px_rgb(245,158,11/0.25)]';
+  let shadowGlow = 'shadow-[0_0_12px_rgba(245,158,11,0.25)]';
   let Icon = Flame;
 
   if (streak >= 30) {
     tierName = 'Legendary';
     tierColor = 'text-purple-400 dark:text-purple-300';
     bgColor = 'bg-gradient-to-r from-purple-500/15 via-pink-500/15 to-amber-500/15 border-purple-500/40';
-    shadowGlow = 'shadow-[0_0_24px_rgb(168,85,247/0.3)]';
+    shadowGlow = 'shadow-[0_0_24px_rgba(168,85,247,0.3)]';
     Icon = Trophy;
   } else if (streak >= 14) {
     tierName = 'Epic';
     tierColor = 'text-pink-500 dark:text-pink-400';
     bgColor = 'bg-pink-500/15 border-pink-500/30';
-    shadowGlow = 'shadow-[0_0_18px_rgb(236,72,153/0.3)]';
+    shadowGlow = 'shadow-[0_0_18px_rgba(236,72,153,0.3)]';
     Icon = Award;
   } else if (streak >= 7) {
     tierName = 'On Fire';
     tierColor = 'text-orange-500 dark:text-orange-400';
     bgColor = 'bg-orange-500/15 border-orange-500/30';
-    shadowGlow = 'shadow-[0_0_15px_rgb(249,115,22/0.3)]';
+    shadowGlow = 'shadow-[0_0_15px_rgba(249,115,22,0.3)]';
     Icon = Sparkles;
   }
 

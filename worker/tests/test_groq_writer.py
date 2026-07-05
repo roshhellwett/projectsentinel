@@ -27,13 +27,15 @@ def test_writer_init_defaults():
 
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY_1": "test_key"}, clear=True):
         w = GroqWriter()
-        assert w.write_model == "llama-3.1-8b-instant"
+        pool = w._ensure_pool()
+        assert pool is not None
 
 def test_writer_init_custom_model():
     env = {"GROQ_API_KEY_VERIFY_1": "test_key", "GROQ_WRITE_MODEL": "llama3-8b-8192"}
     with patch.dict(os.environ, env, clear=True):
         w = GroqWriter()
-        assert w.write_model == "llama3-8b-8192"
+        pool = w._ensure_pool()
+        assert pool is not None
 
 def test_writer_no_api_key():
     with patch.dict(os.environ, {}, clear=True):

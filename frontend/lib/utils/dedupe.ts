@@ -20,7 +20,6 @@ function stableKey(article: Post): string {
 }
 
 export function dedupe(articles: Post[]): Post[] {
-  const before = articles.length;
   const seenIds = new Set<string>();
   const seenHeads = new Map<string, Post>();
   const result: Post[] = [];
@@ -31,15 +30,6 @@ export function dedupe(articles: Post[]): Post[] {
     seenIds.add(a.id);
     seenHeads.set(key, a);
     result.push(a);
-  }
-  const removed = before - result.length;
-
-  if (removed > 0 && process.env.NODE_ENV === 'development') {
-    const seen = new Map<string, number>();
-    for (const a of articles) {
-      const key = stableKey(a);
-      seen.set(key, (seen.get(key) || 0) + 1);
-    }
   }
 
   return result;

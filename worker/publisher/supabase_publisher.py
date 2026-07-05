@@ -22,7 +22,7 @@ _NORMALIZE_RE = re.compile(r"[^\w\s]")
 
 def _normalize_headline(text: str) -> str:
 
-    return _NORMALIZE_RE.sub("", text.lower()).replace(" ", "")
+    return _NORMALIZE_RE.sub("", text.lower()).strip()
 
 # Register cache key at module load time
 cache.register(PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL)

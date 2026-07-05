@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { fetchPosts } from '@/lib/supabase/server';
+import { fetchPostsCursor } from '@/lib/supabase/server';
 import { InfiniteFeed, FeedSkeleton } from '@/components/news/InfiniteFeed';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
@@ -62,9 +62,9 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 }
 
 async function CategoryGrid({ slug }: { slug: string }) {
-  const { posts, count } = await fetchPosts(1, 20, slug);
+  const { posts, hasMore } = await fetchPostsCursor(undefined, 20, slug);
 
-  return <InfiniteFeed initialPosts={posts} initialCount={count} category={slug} />;
+  return <InfiniteFeed initialPosts={posts} hasInitialMore={hasMore} category={slug} />;
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

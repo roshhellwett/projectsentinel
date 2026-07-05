@@ -70,6 +70,7 @@ def main():
                 print(f"SUCCESS! {new_posts} new post(s) published!")
                 print(f"Total posts: {current_count}")
                 print(f"{'#' * 60}")
+                initial_count = current_count
                 break
             else:
                 print("\nNo new posts published yet.")

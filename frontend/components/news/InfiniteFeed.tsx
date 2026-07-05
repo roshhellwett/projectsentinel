@@ -29,7 +29,7 @@ const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
-  initialCount: number;
+  hasInitialMore: boolean;
   category?: string;
   pageSize?: number;
   excludeIds?: string[];
@@ -66,7 +66,7 @@ export function FeedSkeleton() {
 
 export function InfiniteFeed({
   initialPosts,
-  initialCount,
+  hasInitialMore,
   category,
   pageSize = DEFAULT_PAGE_SIZE,
   excludeIds,
@@ -74,7 +74,7 @@ export function InfiniteFeed({
 
   const { posts, setPosts, loading, exhausted, freshIds, loadMore } = useInfiniteFeed({
     initialPosts,
-    initialCount,
+    hasInitialMore,
     category,
     pageSize,
     excludeIds,

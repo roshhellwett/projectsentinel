@@ -11,9 +11,11 @@
 
 import contextlib
 import os
+import threading
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
+from difflib import SequenceMatcher
 
 from archiver.old_post_archiver import OldPostArchiver
 from cache.keys import FACTCHECK_INTERVAL, FACTCHECK_LAST_RUN
@@ -25,7 +27,6 @@ from fetcher.newsapi_fetcher import NewsAPIFetcher
 from fetcher.rss_fetcher import RSSFetcher
 from logger.pipeline_logger import PipelineLogger
 from publisher.supabase_publisher import SupabasePublisher
-from rate_limiter.limiter import RateLimitExceededError
 from sources.blocked_domains import is_blocked_domain
 from utils.groq_pool import get_groq_pool, get_verify_model_chain
 from verifier.cross_source_checker import CrossSourceChecker
@@ -36,6 +37,8 @@ from writer.groq_writer import GroqWriter
 from writer.post_builder import PostBuilder
 
 cache.register(FACTCHECK_LAST_RUN, FACTCHECK_INTERVAL)
+
+_pipeline_running = threading.Event()
 
 
 def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
@@ -114,6 +117,13 @@ def _record_run_end(logger: PipelineLogger, run_id: str | None, duration: float,
         logger.log("PIPELINE", f"Could not record pipeline run completion: {_e}")
 
 def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -> None:
+
+    if _pipeline_running.is_set():
+        logger = PipelineLogger()
+        logger.log("PIPELINE", "Pipeline already running, skipping concurrent call")
+        return
+
+    _pipeline_running.set()
 
     logger = PipelineLogger()
     mode = "supplementary" if supplementary_only else ("archive" if archive_only else "full")
@@ -221,9 +231,9 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 try:
                     new_fact_checks = factcheck_fetcher.update_known_false_claims()
                     logger.log("FACTCHECK", f"Updated {new_fact_checks} known false claims")
+                    cache.set(FACTCHECK_LAST_RUN, True)
                 except Exception as e:
                     logger.log("FACTCHECK_ERROR", f"Fact-check update failed (non-fatal): {str(e)}")
-                cache.set(FACTCHECK_LAST_RUN, True)
             else:
                 logger.log("FACTCHECK", "Skipping fact-check fetch (last run < 1h ago)")
 
@@ -313,7 +323,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
         logger.log("CROSS_SOURCE", f"{len(verified_groups)} article groups with 2+ sources")
 
-        from difflib import SequenceMatcher
         unique_groups: list[list[dict]] = []
         seen_rep_headlines_lower: list[str] = []
         _processed_hashes: set[str] = set()
@@ -378,8 +387,9 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             try:
                 try:
                     verification = groq_verifier.verify(group)
-                except (RateLimitExceededError, AllKeysExhaustedError) as budget_err:
+                except AllKeysExhaustedError as budget_err:
                     logger.log("AI_BUDGET", f"Groq budget exhausted — stopping AI processing: {budget_err}")
+                    _batch_mark(group)
                     _dead_letter.append(group)
                     break
                 except Exception as groq_err:
@@ -415,11 +425,12 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                         )
                         headline = writing["headline"]
                         summary = writing["summary"]
-                    except (RateLimitExceededError, AllKeysExhaustedError) as budget_err:
+                    except AllKeysExhaustedError as budget_err:
                         logger.log(
                             "AI_BUDGET",
                             f"Groq writer budget exhausted — stopping AI processing: {budget_err}",
                         )
+                        _batch_mark(group)
                         _dead_letter.append(group)
                         break
                     except Exception as write_err:
@@ -478,5 +489,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         _record_run_end(logger, run_id, duration, {**stats, "error": str(e)})
         raise
     finally:
+        _pipeline_running.clear()
         with contextlib.suppress(Exception):
             GroqVerifier.save_pool_stats()

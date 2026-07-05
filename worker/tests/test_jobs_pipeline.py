@@ -3,10 +3,12 @@ from unittest.mock import MagicMock, patch, ANY
 
 import pytest
 from cache.shared_cache import cache
+from scheduler.jobs import _pipeline_running
 
 
 def setup_function():
     cache.reset_state()
+    _pipeline_running.clear()
 
 
 def test_dead_letter_on_budget_exhaust():

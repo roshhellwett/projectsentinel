@@ -91,6 +91,7 @@ class GNewsFetcher:
                 response = self.session.get(self.API_URL, params=params, timeout=30)
 
                 if response.status_code == 429:
+                    pool.record_429(slot_idx, retry_after=60)
                     pool.mark_exhausted(slot_idx)
                     rotations += 1
                     self.logger.log(

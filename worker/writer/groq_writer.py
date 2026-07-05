@@ -44,7 +44,6 @@ class GroqWriter:
 
     def __init__(self):
         self.logger = PipelineLogger()
-        self.write_model = os.getenv("GROQ_WRITE_MODEL", "llama-3.1-8b-instant")
 
     @classmethod
     def _ensure_pool(cls) -> KeyPool | None:
@@ -223,11 +222,9 @@ class GroqWriter:
                 self.logger.log("GROQ_WRITE_ERROR", f"Unexpected error: {str(e)}")
                 raise
 
-        try:
-            pool.pick(estimated_tokens=self.EST_TOKENS_PER_CALL, model=model)
-        except AllKeysExhaustedError:
-            raise
-        raise Exception("Max retries exceeded for Groq writer")
+        if pool.has_available(model=model):
+            raise Exception("Max retries exceeded for Groq writer")
+        raise AllKeysExhaustedError(f"All keys exhausted on '{model}' after max retries")
 
     def _extract_429_wait(self, response: requests.Response) -> int:
 
@@ -242,12 +239,12 @@ class GroqWriter:
             return 6 * 3600
         return 0
 
-    def _extract_retry_delay(self, error_str: str) -> int:
+    def _extract_retry_delay(self, error_str: str, attempt: int = 0) -> int:
 
         match = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.IGNORECASE)
         if match:
             return int(float(match.group(1))) + 2
-        return self.RETRY_DELAY
+        return self.RETRY_DELAY * (attempt + 1)
 
     def _build_prompt(self, key_facts: list[str], category: str) -> str:
 

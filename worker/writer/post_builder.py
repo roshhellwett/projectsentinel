@@ -47,7 +47,6 @@ DOMAIN_TO_NAME: dict[str, str] = {
     "dnaindia.com": "DNA India",
     "mid-day.com": "Mid-Day",
     "bollywoodhungama.com": "Bollywood Hungama",
-    "pinkvilla.com": "Pinkvilla",
     "filmfare.com": "Filmfare",
 }
 

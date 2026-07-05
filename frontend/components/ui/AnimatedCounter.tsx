@@ -9,13 +9,17 @@ interface AnimatedCounterProps {
 }
 
 export function AnimatedCounter({ value, duration = 1100, className }: AnimatedCounterProps) {
-  const [display, setDisplay] = useState(0);
-  const displayRef = useRef(0);
+  const [hydrated, setHydrated] = useState(false);
+  const [display, setDisplay] = useState(value);
+  const displayRef = useRef(value);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number | null>(null);
   const fromRef = useRef(0);
 
+  useEffect(() => { setHydrated(true); }, []);
+
   useEffect(() => {
+    if (!hydrated) return;
     const target = Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0;
     if (target === displayRef.current) return;
     
@@ -42,7 +46,7 @@ export function AnimatedCounter({ value, duration = 1100, className }: AnimatedC
     return () => {
       if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current);
     };
-  }, [value, duration]);
+  }, [value, duration, hydrated]);
 
   return (
     <span className={className} suppressHydrationWarning>

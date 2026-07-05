@@ -54,12 +54,16 @@ def reset_client() -> None:
         if old is not None:
             for attr in ("postgrest", "storage", "auth", "realtime"):
                 inner = getattr(old, attr, None)
-                close = getattr(inner, "aclose", None) or getattr(inner, "close", None)
-                if callable(close):
-                    try:
-                        result = close()
-                        if hasattr(result, "close"):
-                            with contextlib.suppress(Exception):
-                                result.close()
-                    except Exception:
-                        pass
+                if inner is None:
+                    continue
+                for method_name in ("aclose", "close"):
+                    close = getattr(inner, method_name, None)
+                    if callable(close):
+                        try:
+                            result = close()
+                            if hasattr(result, "close"):
+                                with contextlib.suppress(Exception):
+                                    result.close()
+                        except Exception:
+                            pass
+                        break

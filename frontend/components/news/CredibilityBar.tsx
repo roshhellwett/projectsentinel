@@ -47,7 +47,7 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
 
       <div className="relative w-full flex items-center">
         <div
-          className={cn('w-full rounded-full overflow-hidden bg-ink/[0.08]', compact ? 'h-1.5' : 'h-2')}
+          className={cn('w-full rounded-full overflow-hidden', compact ? 'h-1.5' : 'h-2')}
           style={{ background: 'linear-gradient(to right, #ef4444 0%, #ea580c 25%, #eab308 50%, #84cc16 75%, #22c55e 100%)' }}
         >
           <div
