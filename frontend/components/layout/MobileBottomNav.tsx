@@ -140,10 +140,10 @@ export function MobileBottomNav() {
           </div>
         )}
         <div
-          className="relative border-t border-rule/40 bg-[#fcfaf7]/98 dark:bg-[#121218]/98 backdrop-saturate-[1.4] select-none touch-action-manipulation"
+          className="relative border-t border-rule/50 bg-[#ffffff]/80 dark:bg-[#101016]/80 backdrop-blur-2xl backdrop-saturate-[1.8] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none touch-action-manipulation transition-all duration-300"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
+          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
           <div className="flex items-center justify-around px-2 pt-1.5 pb-2">
             {TABS.map((tab) => {
               const active = isActive(tab.id, tab.href);
@@ -152,15 +152,15 @@ export function MobileBottomNav() {
 
               const inner = (
                 <motion.div
-                  whileTap={reducedMotion ? undefined : { scale: 0.84 }}
-                  transition={{ type: 'spring', stiffness: 600, damping: 28 }}
+                  whileTap={reducedMotion ? undefined : { scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                   className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl min-w-[52px]"
                 >
                   {active && (
                     <motion.div
                       layoutId="bottom-nav-pill"
-                      className="absolute inset-x-1.5 bottom-1 top-1 rounded-xl bg-paper dark:bg-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] border border-rule/50"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      className="absolute inset-x-1 bottom-1 top-1 rounded-2xl bg-accent/15 dark:bg-accent/20 border border-accent/30 shadow-[0_2px_12px_rgba(var(--accent),0.15)]"
+                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
                     />
                   )}
                   <Icon

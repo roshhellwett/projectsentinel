@@ -134,7 +134,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       data-read={isRead ? 'true' : 'false'}
       className={cn(
         'group relative isolate flex flex-col h-full cursor-pointer transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
-        'bg-white dark:bg-[#181822] md:bg-white/40 md:dark:bg-white/5 md:backdrop-blur-xl border border-rule/80 dark:border-white/10 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] overflow-hidden',
+        'bg-[#ffffff] dark:bg-[#13131c] hover:bg-[#faf9f6] dark:hover:bg-[#1a1a26] border border-rule dark:border-white/15 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] overflow-hidden',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         'transform-gpu backface-hidden select-none touch-action-manipulation',
         isRead && 'opacity-70 saturate-[0.7]',
@@ -144,25 +144,30 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
     >
       {/* Category accent gradient line & ambient background */}
       <div
-        className="absolute top-0 left-0 right-0 h-[3px]"
+        className="absolute top-0 left-0 right-0 h-1.5 transition-all duration-300 group-hover:h-2"
         style={{ background: theme.cssGradient }}
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 opacity-[0.04] transition-opacity duration-500 group-hover:opacity-[0.08] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] transition-opacity duration-500 group-hover:opacity-[0.1] pointer-events-none"
         style={{ background: `radial-gradient(circle at 0% 0%, ${theme.gradientFrom}, transparent 70%)` }}
         aria-hidden="true"
       />
+      
+      {/* Subtle read indicator ribbon */}
+      {isRead && (
+        <div className="absolute top-3 right-3 z-20 px-2 py-0.5 rounded-full bg-rule/80 text-[10px] font-bold tracking-wider uppercase text-muted backdrop-blur-sm">
+          {t('feed.read')}
+        </div>
+      )}
 
-      {/* Hover gradient glow overlay */}
-      <div className="card-hover-glow" aria-hidden="true" />
-
+      {/* Main card content */}
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex flex-wrap items-center gap-1.5 min-w-0 pt-0.5">
             {/* Category pill with color */}
             <span
-              className="inline-flex items-center gap-1 px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.06em] rounded-md border"
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.06em] rounded-full border shadow-2xs"
               style={theme.pill}
             >
               <CategoryIcon name={theme.icon} className="w-3 h-3 opacity-80" strokeWidth={2.2} aria-hidden="true" />
@@ -170,7 +175,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
             </span>
 
             {smartPill && (
-              <span className={`inline-flex items-center gap-1 px-2 py-[3px] text-[9px] font-extrabold uppercase tracking-[0.08em] rounded-md shadow-sm ${smartPill.colorClass}`}>
+              <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[9.5px] font-extrabold uppercase tracking-[0.08em] rounded-full shadow-2xs ${smartPill.colorClass}`}>
                 {smartPill.icon ? (
                   <span className="text-[10px] leading-none">{smartPill.icon}</span>
                 ) : (
@@ -185,7 +190,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 px-2 py-[3px] bg-red-600/10 hover:bg-red-600/20 text-red-600 dark:text-red-400 text-[9.5px] font-bold uppercase tracking-[0.06em] rounded-md transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-600/10 hover:bg-red-600/20 text-red-600 dark:text-red-400 text-[9.5px] font-extrabold uppercase tracking-[0.06em] rounded-full transition-colors"
               title="Search video on YouTube"
               aria-label={`Search video for ${post.headline} on YouTube`}
             >
