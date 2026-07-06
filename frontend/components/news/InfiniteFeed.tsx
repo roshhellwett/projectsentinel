@@ -96,9 +96,9 @@ const FeedItem = memo(function FeedItem({
     />
   );
 
-  if (index >= 8) {
+  if (index >= 6) {
     return (
-      <div className="feed-card-shell h-full rounded-xl transition-[transform,box-shadow,opacity] duration-200 transform-gpu select-none touch-action-manipulation" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}>
+      <div className="feed-card-shell h-full rounded-xl transition-opacity duration-200 transform-gpu select-none touch-action-manipulation">
         {content}
       </div>
     );
@@ -106,16 +106,14 @@ const FeedItem = memo(function FeedItem({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        type: 'spring',
-        stiffness: 400,
-        damping: 32,
-        delay: index * 0.03,
+        duration: 0.2,
+        ease: 'easeOut',
+        delay: Math.min(index, 4) * 0.03,
       }}
-      className="feed-card-shell h-full rounded-xl transition-[transform,box-shadow,opacity] duration-200 transform-gpu select-none touch-action-manipulation"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}
+      className="feed-card-shell h-full rounded-xl transition-opacity duration-200 transform-gpu select-none touch-action-manipulation"
     >
       {content}
     </motion.div>

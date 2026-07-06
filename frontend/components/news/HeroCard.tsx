@@ -35,7 +35,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
-        className="block relative overflow-hidden rounded-2xl border border-rule/60 shadow-hero hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.15)] transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/70 md:backdrop-blur-2xl md:backdrop-saturate-[1.4] transform-gpu backface-hidden select-none touch-action-manipulation"
+        className="block relative overflow-hidden rounded-2xl border border-rule/60 shadow-hero hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.15)] transition-transform duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/70 md:backdrop-blur-2xl md:backdrop-saturate-[1.4] transform-gpu backface-hidden select-none touch-action-manipulation"
       >
         {/* Category accent gradient bar — thicker, more prominent */}
         <div

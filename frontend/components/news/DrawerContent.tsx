@@ -45,8 +45,8 @@ interface DrawerContentProps {
 }
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 400, damping: 32 } }
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }
 };
 
 export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
@@ -57,14 +57,14 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
       "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full overscroll-contain px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-7 lg:px-10 lg:pt-12 lg:pb-12 flex flex-col touch-action-pan-y transform-gpu",
       post.status === 'retracted' && "opacity-50"
     )}>
-      {/* Decorative background blobs for premium feel */}
-      <div className="absolute top-0 right-[-20%] w-[60%] h-64 bg-accent/10 blur-[100px] rounded-full pointer-events-none" />
-      <div className="absolute top-[30%] left-[-20%] w-[50%] h-64 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
+      {/* Decorative background blobs for premium feel — desktop only to prevent mobile GPU blur thrashing */}
+      <div className="hidden md:block absolute top-0 right-[-20%] w-[60%] h-64 bg-accent/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="hidden md:block absolute top-[30%] left-[-20%] w-[50%] h-64 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
       <motion.div
         initial="hidden"
         animate="visible"
-        variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+        variants={{ visible: { transition: { staggerChildren: 0.03 } } }}
         className="relative z-10 flex flex-col flex-1"
       >
         {post.status === 'corrected' && (
@@ -95,7 +95,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           variants={itemVariants}
           className="mb-8 relative group"
         >
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-accent/20 to-transparent rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
+          <div className="hidden md:block absolute -inset-0.5 bg-gradient-to-br from-accent/20 to-transparent rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
           <div className="relative rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-5 lg:p-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-rule/50 pt-4">

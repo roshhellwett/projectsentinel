@@ -156,7 +156,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
             initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
-            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', damping: 34, stiffness: 420, mass: 0.8 }}
+            transition={reducedMotion ? { duration: 0.15 } : (canDrag ? { duration: 0.25, ease: [0.32, 0.72, 0, 1] } : { type: 'spring', damping: 34, stiffness: 420, mass: 0.8 })}
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />
 
