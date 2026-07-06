@@ -1,23 +1,12 @@
 import type { MetadataRoute } from 'next';
-import { fetchPosts } from '@/lib/supabase/server';
+import { fetchSitemapArticles } from '@/lib/supabase/server';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
 
 export const revalidate = 3600;
 
 async function fetchArticleUrls(): Promise<{ id: string; published_at: string; category: string }[]> {
   try {
-    const PAGE_SIZE = 50;
-    const MAX_PAGES = 20;
-    const collected: { id: string; published_at: string; category: string }[] = [];
-    for (let page = 1; page <= MAX_PAGES; page++) {
-      const { posts, count } = await fetchPosts(page, PAGE_SIZE);
-      if (!posts.length) break;
-      for (const p of posts) {
-        collected.push({ id: p.id, published_at: p.published_at, category: p.category });
-      }
-      if (collected.length >= count) break;
-    }
-    return collected;
+    return await fetchSitemapArticles();
   } catch {
     return [];
   }

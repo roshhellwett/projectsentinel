@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Post } from '@/types';
-import { getSupabaseServer } from '@/lib/supabase/server';
+import { getSupabaseServer, withRetry } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,19 +32,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data, error } = await getSupabaseServer()
-      .from('posts')
-      .select('*')
-      .in('id', valid);
+    const data = await withRetry(async () => {
+      const { data: res, error } = await getSupabaseServer()
+        .from('posts')
+        .select('*')
+        .in('id', valid);
 
-    if (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Batch fetch error:', error.message);
+      if (error) {
+        throw new Error(`Batch fetch error: ${error.message}`);
       }
-      return NextResponse.json({ error: 'Failed to fetch batch posts' }, { status: 500 });
-    }
+      return res as Post[];
+    });
 
-    const byId = new Map((data as Post[]).map((p) => [p.id, p]));
+    const byId = new Map((data || []).map((p) => [p.id, p]));
     const ordered = valid.map((id) => byId.get(id)).filter(Boolean) as Post[];
 
     return NextResponse.json({ posts: ordered }, {
@@ -54,6 +54,9 @@ export async function POST(request: Request) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Batch route exception:', err);
     }
-    return NextResponse.json({ error: 'Failed to fetch batch posts' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch batch posts' },
+      { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+    );
   }
 }

@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch posts' },
-      { status: 500, headers: CACHE_HEADERS },
+      { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } },
     );
   }
 }

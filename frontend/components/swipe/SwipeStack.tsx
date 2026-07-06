@@ -79,11 +79,14 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   );
 
   const drawerPostRef = useRef(drawerPost);
-  drawerPostRef.current = drawerPost;
   const showBreakRef = useRef(showBreak);
-  showBreakRef.current = showBreak;
   const handleSwipeRef = useRef(handleSwipe);
-  handleSwipeRef.current = handleSwipe;
+
+  useEffect(() => {
+    drawerPostRef.current = drawerPost;
+    showBreakRef.current = showBreak;
+    handleSwipeRef.current = handleSwipe;
+  }, [drawerPost, showBreak, handleSwipe]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

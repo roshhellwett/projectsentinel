@@ -27,22 +27,26 @@ export function useInfiniteFeed({
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
 
   const excludeIdsRef = useRef(excludeIds ? new Set(excludeIds) : undefined);
-  excludeIdsRef.current = excludeIds ? new Set(excludeIds) : undefined;
   const loadingRef = useRef(false);
   const flashTimersRef = useRef<Set<number>>(new Set());
   const postsRef = useRef(posts);
-  postsRef.current = posts;
   const cursorRef = useRef(cursor);
-  cursorRef.current = cursor;
   const exhaustedRef = useRef(exhausted);
-  exhaustedRef.current = exhausted;
   const categoryRef = useRef(category);
-  categoryRef.current = category;
   const loadMoreRef = useRef<() => void>(() => {});
   const pageSizeRef = useRef(pageSize);
-  pageSizeRef.current = pageSize;
   const mountedRef = useRef(true);
-  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  useEffect(() => {
+    excludeIdsRef.current = excludeIds ? new Set(excludeIds) : undefined;
+    postsRef.current = posts;
+    cursorRef.current = cursor;
+    exhaustedRef.current = exhausted;
+    categoryRef.current = category;
+    pageSizeRef.current = pageSize;
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, [excludeIds, posts, cursor, exhausted, category, pageSize]);
 
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;

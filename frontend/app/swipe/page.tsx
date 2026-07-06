@@ -5,6 +5,7 @@ import { dedupe } from '@/lib/utils/dedupe';
 import { SwipeStack } from '@/components/swipe/SwipeStack';
 import { DesktopRedirect } from '@/components/swipe/DesktopRedirect';
 import { PageShell } from '@/components/layout/PageShell';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'Swipe — India Verified',
@@ -29,7 +30,9 @@ export default async function SwipePage() {
           </h1>
           <p className="text-[11px] text-muted mt-0.5">One story at a time. Tap to read full.</p>
         </header>
-        <SwipeStack initialPosts={deduped} />
+        <ErrorBoundary>
+          <SwipeStack initialPosts={deduped} />
+        </ErrorBoundary>
       </main>
 
       <div className="hidden md:flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] px-4">

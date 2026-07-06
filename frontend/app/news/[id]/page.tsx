@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
     };
   }
 
-  const ogImage = ((post as unknown as Record<string, unknown>).image_url as string) || `${siteUrl}/opengraph-image.png`;
+  const ogImage = post.video_thumbnail || `${siteUrl}/opengraph-image.png`;
 
   return {
     title: post.headline,

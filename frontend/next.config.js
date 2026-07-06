@@ -29,6 +29,18 @@ const nextConfig = {
         hostname: 'www.google.com',
         pathname: '/s2/favicons',
       },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ytimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.youtube.com',
+      },
     ],
     // Cache images aggressively
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
@@ -51,12 +63,12 @@ const nextConfig = {
     const supabaseHostRaw = supabaseHost;
     const csp = [
       "default-src 'self'",
-      `connect-src 'self' https://${supabaseHostRaw} https://*.supabase.co https://www.googletagmanager.com https://*.google-analytics.com`,
+      `connect-src 'self' https://${supabaseHostRaw} https://*.supabase.co wss://*.supabase.co https://www.googletagmanager.com https://*.google-analytics.com`,
       "script-src 'self' https://www.googletagmanager.com https://*.google-analytics.com 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: blob: https://${supabaseHostRaw} https://*.supabase.co https://www.google.com https://*.googleusercontent.com https://www.googletagmanager.com",
-      "frame-src 'self' https://www.googletagmanager.com",
+      "font-src 'self' https://fonts.gstatic.com https://*.perplexity.ai",
+      `img-src 'self' data: blob: https://${supabaseHostRaw} https://*.supabase.co https://www.google.com https://*.googleusercontent.com https://www.googletagmanager.com https://i.ytimg.com https://*.ytimg.com https://*.youtube.com`,
+      "frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.youtube-nocookie.com",
       "manifest-src 'self'",
       "base-uri 'self'",
       "form-action 'self'",

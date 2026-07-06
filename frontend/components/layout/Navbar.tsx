@@ -6,12 +6,15 @@ import { usePathname } from 'next/navigation';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { Search, Github, Menu, X, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SearchBar } from '@/components/ui/SearchBar';
+import dynamic from 'next/dynamic';
 import { LiveClock } from '@/components/layout/LiveClock';
+
+const SearchBar = dynamic(() => import('@/components/ui/SearchBar').then(m => m.SearchBar), { ssr: false });
 import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
 import { LastRefreshed } from '@/components/layout/LastRefreshed';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageFilter } from '@/components/layout/LanguageFilter';
+import { InstallAppButton } from '@/components/layout/InstallAppButton';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { useI18n } from '@/lib/i18n/i18n-shared';
@@ -158,6 +161,9 @@ export function Navbar() {
               </button>
 
               <ThemeToggle />
+              <div className="hidden lg:block">
+                <InstallAppButton />
+              </div>
 
               <a
                 href={REPO_URL}
@@ -250,6 +256,9 @@ export function Navbar() {
                   <LanguageFilter />
                 </div>
                 <LiveClock variant="menu" />
+                <div className="w-full flex justify-center">
+                  <InstallAppButton />
+                </div>
                 <a
                   href={REPO_URL}
                   target="_blank"

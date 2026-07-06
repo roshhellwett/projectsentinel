@@ -30,7 +30,7 @@ export function DrawerHeader({
   const haptic = useHapticFeedback();
 
   return (
-    <header className={`relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-paper/60 backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/50 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
+    <header className={`relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-transparent border-b border-white/30 dark:border-white/10 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
       {/* Gradient Category Header Bar across exact top */}
       <div
         className="w-full h-[3px] flex-shrink-0 transition-all duration-500"

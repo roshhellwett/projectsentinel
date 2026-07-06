@@ -110,10 +110,12 @@ export function useSwipeQueue({
     [hideRead, excludeReadIds],
   );
 
-  filterIdsRef.current = filterIds;
-  pageRef.current = page;
-  exhaustedRef.current = exhausted;
-  historyRef.current = history;
+  useEffect(() => {
+    filterIdsRef.current = filterIds;
+    pageRef.current = page;
+    exhaustedRef.current = exhausted;
+    historyRef.current = history;
+  }, [filterIds, page, exhausted, history]);
 
   useEffect(() => {
     seenRef.current = loadSeenWithinDays(2);
@@ -178,10 +180,6 @@ export function useSwipeQueue({
 
   const refill = useCallback(async () => {
     if (fetchingRef.current || exhaustedRef.current) return;
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      setHasError(true);
-      return;
-    }
     fetchingRef.current = true;
     setIsFetching(true);
     try {

@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Post, PostsCursorResponse } from '@/types';
 
@@ -34,7 +35,7 @@ export function getSupabaseServer() {
 }
 
 // Exponential backoff with jitter — 500ms * 2^attempt + random 0–30% jitter
-async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
@@ -108,11 +109,11 @@ export async function fetchPostsCursor(
 /**
  * Legacy offset-based pagination (kept for backward compatibility).
  */
-export async function fetchPosts(
+export const fetchPosts = cache(async (
   page: number = 1,
   limit: number = 20,
   category?: string
-): Promise<{ posts: Post[]; count: number }> {
+): Promise<{ posts: Post[]; count: number }> => {
   const safePage = Math.max(1, Math.floor(page || 1));
   const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
   const start = (safePage - 1) * safeLimit;
@@ -144,11 +145,11 @@ export async function fetchPosts(
 
     return { posts: data as Post[], count: count || 0 };
   });
-}
+});
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export async function fetchPostById(id: string): Promise<Post | null> {
+export const fetchPostById = cache(async (id: string): Promise<Post | null> => {
   if (!UUID_RE.test(id)) {
     return null;
   }
@@ -168,9 +169,9 @@ export async function fetchPostById(id: string): Promise<Post | null> {
 
     return data as Post;
   }).catch(() => null);
-}
+});
 
-export async function fetchLatestPost(): Promise<Post | null> {
+export const fetchLatestPost = cache(async (): Promise<Post | null> => {
   return withRetry(async () => {
     const { data, error } = await getSupabaseServer()
       .from('posts')
@@ -183,7 +184,7 @@ export async function fetchLatestPost(): Promise<Post | null> {
     if (error) return null;
     return data as Post;
   }).catch(() => null);
-}
+});
 
 export async function updatePostStatus(
   id: string,
@@ -232,45 +233,62 @@ export async function searchPosts(
 
   if (!ftsTerm) return { posts: [], count: 0 };
 
-  const { data, error, count } = await getSupabaseServer()
-    .from('posts')
-    .select(FEED_COLUMNS, { count: 'estimated' })
-    .eq('status', 'published')
-    .or(`headline.fts(english).${ftsTerm},summary.fts(english).${ftsTerm}`)
-    .order('published_at', { ascending: false })
-    .limit(safeLimit);
-
-  if (error) {
-
-    const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
-    const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
+  return withRetry(async () => {
+    const { data, error, count } = await getSupabaseServer()
       .from('posts')
       .select(FEED_COLUMNS, { count: 'estimated' })
       .eq('status', 'published')
-      .ilike('headline', `%${escapedForIlike}%`)
+      .or(`headline.fts(english).${ftsTerm},summary.fts(english).${ftsTerm}`)
       .order('published_at', { ascending: false })
       .limit(safeLimit);
 
-    if (fallbackErr) return { posts: [], count: 0 };
-    return { posts: (fallback || []) as Post[], count: fallbackCount || 0 };
-  }
+    if (error) {
+      const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
+      const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
+        .from('posts')
+        .select(FEED_COLUMNS, { count: 'estimated' })
+        .eq('status', 'published')
+        .ilike('headline', `%${escapedForIlike}%`)
+        .order('published_at', { ascending: false })
+        .limit(safeLimit);
 
-  return { posts: (data || []) as Post[], count: count || 0 };
+      if (fallbackErr) return { posts: [], count: 0 };
+      return { posts: (fallback || []) as Post[], count: fallbackCount || 0 };
+    }
+
+    return { posts: (data || []) as Post[], count: count || 0 };
+  }).catch(() => ({ posts: [], count: 0 }));
 }
 
 export async function fetchAllPosts(): Promise<Post[]> {
-  const { data, error } = await getSupabaseServer()
-    .from('posts')
-    .select('*')
-    .order('published_at', { ascending: false })
-    .limit(500);
+  return withRetry(async () => {
+    const { data, error } = await getSupabaseServer()
+      .from('posts')
+      .select('*')
+      .order('published_at', { ascending: false })
+      .limit(500);
 
-  if (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error(`fetchAllPosts error: ${error.message}`);
+    if (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`fetchAllPosts error: ${error.message}`);
+      }
+      return [];
     }
-    return [];
-  }
 
-  return (data || []) as Post[];
+    return (data || []) as Post[];
+  }).catch(() => []);
 }
+
+export const fetchSitemapArticles = cache(async (): Promise<{ id: string; published_at: string; category: string }[]> => {
+  return withRetry(async () => {
+    const { data, error } = await getSupabaseServer()
+      .from('posts')
+      .select('id, published_at, category')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(1000);
+
+    if (error) return [];
+    return (data || []) as { id: string; published_at: string; category: string }[];
+  }).catch(() => []);
+});

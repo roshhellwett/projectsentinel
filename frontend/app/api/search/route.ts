@@ -21,6 +21,9 @@ export async function GET(request: Request) {
       headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120' }
     });
   } catch {
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Search failed' },
+      { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+    );
   }
 }

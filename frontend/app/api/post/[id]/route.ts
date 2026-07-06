@@ -16,7 +16,7 @@ export async function GET(
     if (!post) {
       return NextResponse.json(
         { error: 'Post not found' },
-        { status: 404 }
+        { status: 404, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       );
     }
     return NextResponse.json({ post }, {
@@ -27,7 +27,7 @@ export async function GET(
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch post' },
-      { status: 500 }
+      { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
     );
   }
 }

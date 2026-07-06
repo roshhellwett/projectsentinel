@@ -41,14 +41,14 @@ export async function POST(request: Request) {
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { success: false, error: 'Too many attempts. Please wait before trying again.' },
-        { status: 429 }
+        { status: 429, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       );
     }
 
     if (!ADMIN_PASSWORD) {
       return NextResponse.json(
         { success: false, error: 'Admin password not configured' },
-        { status: 500 }
+        { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       );
     }
 
@@ -57,14 +57,14 @@ export async function POST(request: Request) {
     if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { success: false, error: 'Invalid password' },
-        { status: 401 }
+        { status: 401, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       );
     }
 
     if (!ADMIN_SECRET) {
       return NextResponse.json(
         { success: false, error: 'Admin secret not configured' },
-        { status: 500 }
+        { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       );
     }
 
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { success: false, error: 'Authentication failed' },
-      { status: 500 }
+      { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
     );
   }
 }

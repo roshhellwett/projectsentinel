@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useEffect, useRef, useCallback } from 'react';
-import { ShieldCheck, Globe, BookOpen, Share2 } from 'lucide-react';
+import { ShieldCheck, Globe, BookOpen, Share2, Youtube } from 'lucide-react';
 import { Post, Source } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { truncateWords } from '@/lib/utils/truncate';
@@ -21,6 +21,21 @@ function estimateReadMinutes(text: string | null | undefined): number {
   if (!text) return 1;
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 220));
+}
+
+function getSmartYouTubeSearchUrl(headline: string, language: string | null | undefined = 'en'): string {
+  if (!headline) return 'https://www.youtube.com/';
+  // Strip common clickbait/breaking news prefixes
+  let clean = headline.replace(/^(watch|breaking( news)?|live|exclusive|update|alert|just in)[\s:|-]+/i, '').trim();
+  // Strip trailing publisher attributions like "- The Hindu" or "| Times of India"
+  clean = clean.replace(/\s*[-|]\s*[A-Z][a-zA-Z\s]+$/, '').trim();
+  // Limit to core keywords to prevent overly strict YouTube exact matching
+  const words = clean.split(/\s+/).filter(Boolean);
+  const coreKeywords = words.slice(0, 10).join(' ');
+  // Inject localized news suffix to bias YouTube towards actual news coverage
+  const newsSuffix = language === 'hi' ? 'news hindi' : (language === 'bn' ? 'news bengali' : (language === 'mr' ? 'news marathi' : 'news'));
+  const query = `${coreKeywords} ${newsSuffix}`.trim();
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
 
 function getSiteUrl(): string {
@@ -53,15 +68,46 @@ interface NewsCardProps {
   wasRecentlyOpened?: boolean;
 }
 
-function isBreaking(post: Post): boolean {
+interface SmartPill {
+  label: string;
+  icon?: string;
+  colorClass: string;
+  dotColor: string;
+}
+
+function getSmartLivePill(post: Post): SmartPill | null {
   const ageMs = Date.now() - new Date(post.published_at).getTime();
-  return ageMs < 90 * 60 * 1000 && post.credibility_score >= 80;
+  const isRecent = ageMs < 120 * 60 * 1000; // 2 hours
+  const isSuperRecent = ageMs < 45 * 60 * 1000; // 45 mins
+  const headline = (post.headline || '').toLowerCase();
+
+  if (headline.includes('live:') || headline.includes('live update')) {
+    return { label: 'LIVE', icon: '🔴', colorClass: 'bg-red-500 text-white', dotColor: 'bg-white' };
+  }
+
+  if (headline.includes('breaking') || headline.includes('alert:')) {
+    return { label: 'BREAKING', icon: '⚡', colorClass: 'bg-amber-500 text-black', dotColor: 'bg-black' };
+  }
+
+  if (isSuperRecent && post.credibility_score >= 80) {
+    return { label: 'JUST IN', colorClass: 'bg-blue-500 text-white', dotColor: 'bg-white' };
+  }
+
+  if (isRecent && post.credibility_score >= 85) {
+    return { label: 'DEVELOPING', colorClass: 'bg-orange-500 text-white', dotColor: 'bg-white' };
+  }
+  
+  if (isRecent && post.credibility_score >= 90) {
+     return { label: 'HOT', icon: '🔥', colorClass: 'bg-rose-500 text-white', dotColor: 'bg-white' };
+  }
+
+  return null;
 }
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRecentlyOpened = false }: NewsCardProps) => {
   const haptic = useHapticFeedback();
   const { t } = useI18n();
-  const breaking = isBreaking(post);
+  const smartPill = getSmartLivePill(post);
   const theme = getCategoryTheme(post.category);
   const topSources = (post.sources ?? []).slice(0, 4);
   const sourcesTotal = post.source_count ?? topSources.length;
@@ -87,18 +133,23 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       aria-label={`Read article: ${post.headline}`}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'group relative isolate flex flex-col h-full cursor-pointer transition-transform duration-150 ease-out active:scale-[0.98]',
-        'premium-card',
+        'group relative isolate flex flex-col h-full cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
+        'bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] overflow-hidden',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         isRead && 'opacity-70 saturate-[0.7]',
-        isNew && 'new-post-ring',
+        isNew && 'ring-2 ring-accent/50 shadow-[0_0_15px_rgba(var(--accent),0.3)]',
         'contain-layout'
       )}
     >
-      {/* Category accent gradient line */}
+      {/* Category accent gradient line & ambient background */}
       <div
-        className="category-accent-line"
+        className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: theme.cssGradient }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 opacity-[0.04] transition-opacity duration-500 group-hover:opacity-[0.08] pointer-events-none"
+        style={{ background: `radial-gradient(circle at 0% 0%, ${theme.gradientFrom}, transparent 70%)` }}
         aria-hidden="true"
       />
 
@@ -106,49 +157,63 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       <div className="card-hover-glow" aria-hidden="true" />
 
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2.5 flex-wrap min-w-0">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex flex-wrap items-center gap-1.5 min-w-0 pt-0.5">
             {/* Category pill with color */}
             <span
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-full border"
+              className="inline-flex items-center gap-1 px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.06em] rounded-md border"
               style={theme.pill}
             >
-              <CategoryIcon name={theme.icon} className="w-3 h-3" strokeWidth={2.2} aria-hidden="true" />
+              <CategoryIcon name={theme.icon} className="w-3 h-3 opacity-80" strokeWidth={2.2} aria-hidden="true" />
               {theme.label}
             </span>
 
-            {breaking && (
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-like text-white text-[10px] font-extrabold uppercase tracking-[0.12em] rounded-full animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                {t('card.live')}
+            {smartPill && (
+              <span className={`inline-flex items-center gap-1 px-2 py-[3px] text-[9px] font-extrabold uppercase tracking-[0.08em] rounded-md shadow-sm ${smartPill.colorClass}`}>
+                {smartPill.icon ? (
+                  <span className="text-[10px] leading-none">{smartPill.icon}</span>
+                ) : (
+                  <span className={`w-1.5 h-1.5 rounded-full ${smartPill.dotColor}`} />
+                )}
+                {smartPill.label}
               </span>
             )}
 
-            {post.content_type === 'video' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-600/10 text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase tracking-[0.08em] rounded-full">
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                {t('card.video')}
-              </span>
-            )}
+            <a
+              href={getSmartYouTubeSearchUrl(post.headline, post.language)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 px-2 py-[3px] bg-red-600/10 hover:bg-red-600/20 text-red-600 dark:text-red-400 text-[9.5px] font-bold uppercase tracking-[0.06em] rounded-md transition-colors"
+              title="Search video on YouTube"
+              aria-label={`Search video for ${post.headline} on YouTube`}
+            >
+              <Youtube className="w-3 h-3" />
+              YOUTUBE
+            </a>
 
             <span
-              className="inline-flex items-center gap-1 text-[11px] text-muted font-medium"
+              className="inline-flex items-center text-[10.5px] text-muted font-medium ml-1"
               suppressHydrationWarning
             >
               <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
             </span>
           </div>
 
-          {/* Score ring — prominent position */}
-          <ScoreRing score={post.credibility_score} compact />
+          <div className="flex-shrink-0">
+            {/* Score ring — prominent position */}
+            <ScoreRing score={post.credibility_score} compact />
+          </div>
         </div>
 
-        <h3 className="font-display text-[18px] sm:text-[19px] md:text-[20px] font-bold leading-[1.24] tracking-[-0.018em] text-ink line-clamp-3 mb-2.5 transition-colors duration-200 group-hover:text-accent">
+
+
+        <h3 className="font-display text-[19px] sm:text-[20.5px] md:text-[22px] font-bold leading-[1.22] tracking-[-0.02em] text-ink line-clamp-4 mb-3 transition-colors duration-200 group-hover:text-accent drop-shadow-sm">
           {post.headline}
         </h3>
 
-        <p className="text-[13px] sm:text-[13.5px] text-muted leading-relaxed line-clamp-2 mb-5">
-          {truncateWords(post.summary, 22)}
+        <p className="text-[13.5px] sm:text-[14px] text-muted/90 leading-[1.6] line-clamp-2 mb-6">
+          {truncateWords(post.summary, 24)}
         </p>
 
         <div className="mt-auto pt-4 border-t border-rule/60">

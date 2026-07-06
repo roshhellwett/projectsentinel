@@ -3,10 +3,12 @@
 import { useState, useCallback } from 'react';
 import { Post } from '@/types';
 import { NewsCard } from './NewsCard';
-import { NewsDrawer } from './NewsDrawer';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
+import dynamic from 'next/dynamic';
+
+const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
 
 interface SearchResultsGridProps {
   posts: Post[];

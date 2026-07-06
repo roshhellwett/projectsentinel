@@ -28,10 +28,13 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
   const dragControls = useDragControls();
   const y = useMotionValue(0);
   const [canDrag, setCanDrag] = useState(false);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 1023px)');
@@ -140,7 +143,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
                 y.set(0);
               }
             }}
-            className={`fixed ${Z_INDEX.drawerPanel} bg-paper/60 lg:bg-paper/65 backdrop-blur-2xl backdrop-saturate-[1.4] border-l border-rule shadow-paper-lift lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
+            className={`fixed ${Z_INDEX.drawerPanel} bg-white/40 dark:bg-black/40 backdrop-blur-[40px] backdrop-saturate-[1.8] border-l border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
             initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}

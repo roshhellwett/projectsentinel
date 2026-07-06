@@ -6,15 +6,18 @@ import { Bookmark, ArrowLeft, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
-import { NewsDrawer } from '@/components/news/NewsDrawer';
 import { FeedSkeleton } from '@/components/news/InfiniteFeed';
 import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
 import { showToast } from '@/lib/utils/toast';
 import { PageShell } from '@/components/layout/PageShell';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import dynamic from 'next/dynamic';
+
+const NewsDrawer = dynamic(() => import('@/components/news/NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { useI18n } from '@/lib/i18n/i18n-shared';
+import { cachedFetch } from '@/lib/utils/fetchCache';
 
 export default function SavedPage() {
   const { t } = useI18n();
@@ -46,17 +49,14 @@ export default function SavedPage() {
     setLoading(true);
     setError(null);
 
-    fetch('/api/posts/batch/', {
+    cachedFetch<{ posts: Post[] }>('/api/posts/batch/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: idList }),
       signal: controller.signal,
+      cacheTtl: 300_000,
     })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load saved');
-        return res.json();
-      })
-      .then((data: { posts: Post[] }) => {
+      .then((data) => {
         setPosts(Array.isArray(data.posts) ? data.posts : []);
         setLoading(false);
       })
@@ -67,7 +67,7 @@ export default function SavedPage() {
       });
 
     return () => controller.abort();
-  }, [idList]);
+  }, [idList, t]);
 
   const handleOpen = (post: Post) => {
     markRead(post.id);

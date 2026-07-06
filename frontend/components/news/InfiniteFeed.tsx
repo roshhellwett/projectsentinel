@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
 import { NewsCard } from './NewsCard';
-import { NewsDrawer } from './NewsDrawer';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { DEFAULT_PAGE_SIZE } from '@/lib/config/constants';
 import { useInfiniteFeed } from '@/lib/hooks/useInfiniteFeed';
@@ -14,7 +13,10 @@ import { useReadPosts } from '@/lib/utils/readPosts';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 import { EngagementCounter } from '@/components/ui/EngagementCounter';
-import { MilestoneCelebration } from '@/components/ui/MilestoneCelebration';
+import dynamic from 'next/dynamic';
+
+const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
+const MilestoneCelebration = dynamic(() => import('@/components/ui/MilestoneCelebration').then(m => m.MilestoneCelebration), { ssr: false });
 
 
 const MILESTONE_LABELS: Record<number, string> = {
@@ -65,6 +67,50 @@ export function FeedSkeleton() {
   );
 }
 
+const FeedItem = memo(function FeedItem({
+  post,
+  index,
+  isNew,
+  isRead,
+  wasRecentlyOpened,
+  onCardClick,
+}: {
+  post: Post;
+  index: number;
+  isNew: boolean;
+  isRead: boolean;
+  wasRecentlyOpened: boolean;
+  onCardClick: (post: Post) => void;
+}) {
+  const handleClick = useCallback(() => {
+    onCardClick(post);
+  }, [onCardClick, post]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-40px 0px' }}
+      transition={{
+        type: 'spring',
+        stiffness: 350,
+        damping: 28,
+        mass: 0.7,
+        delay: Math.min(index * 0.03, 0.2),
+      }}
+      className="feed-card-shell h-full rounded-xl transition-all"
+    >
+      <NewsCard
+        post={post}
+        onClick={handleClick}
+        isNew={isNew}
+        isRead={isRead}
+        wasRecentlyOpened={wasRecentlyOpened}
+      />
+    </motion.div>
+  );
+});
+
 export function InfiniteFeed({
   initialPosts,
   hasInitialMore,
@@ -105,6 +151,16 @@ export function InfiniteFeed({
     recordRead();
     setSelectedPost(post);
   }, [markRead, recordRead]);
+
+  const handleCardClick = useCallback((post: Post) => {
+    setLastOpenedId(post.id);
+    if (openedTimerRef.current) clearTimeout(openedTimerRef.current);
+    openedTimerRef.current = setTimeout(() => {
+      openedTimerRef.current = null;
+      setLastOpenedId(null);
+    }, 1100);
+    handleOpen(post);
+  }, [handleOpen]);
 
   const handleCardKeyDown = useCallback((e: React.KeyboardEvent, post: Post) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -175,40 +231,17 @@ export function InfiniteFeed({
         ref={gridRef}
         className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch"
       >
-        {posts.map((post, index) => {
-          return (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20, scale: 0.97 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, margin: '-40px 0px' }}
-              transition={{
-                type: 'spring',
-                stiffness: 350,
-                damping: 28,
-                mass: 0.7,
-                delay: Math.min(index * 0.03, 0.2),
-              }}
-              className="feed-card-shell h-full rounded-xl transition-all"
-            >
-              <NewsCard
-                post={post}
-                onClick={() => {
-                  setLastOpenedId(post.id);
-                  if (openedTimerRef.current) clearTimeout(openedTimerRef.current);
-                  openedTimerRef.current = setTimeout(() => {
-                    openedTimerRef.current = null;
-                    setLastOpenedId(null);
-                  }, 1100);
-                  handleOpen(post);
-                }}
-                isNew={freshIds.has(post.id)}
-                isRead={readMap.has(post.id)}
-                wasRecentlyOpened={lastOpenedId === post.id}
-              />
-            </motion.div>
-          );
-        })}
+        {posts.map((post, index) => (
+          <FeedItem
+            key={post.id}
+            post={post}
+            index={index}
+            isNew={freshIds.has(post.id)}
+            isRead={readMap.has(post.id)}
+            wasRecentlyOpened={lastOpenedId === post.id}
+            onCardClick={handleCardClick}
+          />
+        ))}
       </motion.div>
 
       {loading && (

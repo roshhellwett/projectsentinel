@@ -13,7 +13,10 @@ export function useIntersectionObserver({
 }: UseIntersectionObserverProps) {
   const ref = useRef<HTMLDivElement>(null);
   const onIntersectRef = useRef(onIntersect);
-  onIntersectRef.current = onIntersect;
+
+  useEffect(() => {
+    onIntersectRef.current = onIntersect;
+  }, [onIntersect]);
 
   useEffect(() => {
     const el = ref.current;
