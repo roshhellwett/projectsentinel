@@ -29,7 +29,7 @@ function safeRead(key: string): string[] {
   }
 }
 
-function pruneStaleSeenKeys(): void {
+export function pruneStaleSeenKeys(): void {
   if (typeof window === 'undefined') return;
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - KEEP_DAYS);
@@ -43,8 +43,7 @@ function pruneStaleSeenKeys(): void {
       if (Number.isFinite(parsed.getTime()) && parsed < cutoff) toDelete.push(k);
     }
     toDelete.forEach((k) => safeRemove(k));
-  } catch {
-      }
+  } catch {}
 }
 
 let hasPruned = false;

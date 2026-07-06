@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 
-
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
@@ -15,12 +14,22 @@ interface BeforeInstallPromptEvent extends Event {
 export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true)) {
+    if (typeof window === 'undefined') return;
+
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    setIsStandalone(standalone);
+    if (standalone) {
       setIsInstallable(false);
       return;
     }
+
+    const ua = window.navigator.userAgent.toLowerCase();
+    const ios = /iphone|ipad|ipod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+    setIsIOS(ios && !standalone);
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -29,9 +38,9 @@ export function usePWAInstall() {
     };
 
     const handleAppInstalled = () => {
-      
       setDeferredPrompt(null);
       setIsInstallable(false);
+      setIsStandalone(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -44,23 +53,20 @@ export function usePWAInstall() {
   }, []);
 
   const promptInstall = useCallback(async () => {
-    if (!deferredPrompt) {
-      return;
-    }
-
+    if (!deferredPrompt) return;
     try {
       await deferredPrompt.prompt();
       const choiceResult = await deferredPrompt.userChoice;
       if (choiceResult.outcome === 'accepted') {
         setIsInstallable(false);
       }
-    } catch (err) {
-      
+    } catch {
+      // ignore prompt errors
     } finally {
       setDeferredPrompt(null);
       setIsInstallable(false);
     }
   }, [deferredPrompt]);
 
-  return { isInstallable, promptInstall };
+  return { isInstallable, isIOS, isStandalone, promptInstall };
 }

@@ -21,12 +21,24 @@ function readStored(): Theme | null {
 
 function applyTheme(theme: Theme) {
   if (typeof document === 'undefined') return;
-  document.documentElement.classList.toggle('dark', theme === 'dark');
+  const root = document.documentElement;
+  const css = document.createElement('style');
+  css.appendChild(document.createTextNode('* { transition: none !important; animation: none !important; }'));
+  document.head.appendChild(css);
+
+  root.classList.toggle('dark', theme === 'dark');
+  root.style.colorScheme = theme;
+
   const tags = document.querySelectorAll('meta[name="theme-color"]');
   tags.forEach((t) => {
     t.setAttribute('content', theme === 'dark' ? '#1e1c18' : '#e1d7c2');
     t.removeAttribute('media');
   });
+
+  window.getComputedStyle(root).opacity;
+  setTimeout(() => {
+    if (css.parentNode) document.head.removeChild(css);
+  }, 30);
 }
 
 export function ThemeToggle({ className = '' }: { className?: string }) {

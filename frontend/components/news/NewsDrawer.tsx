@@ -10,7 +10,7 @@ import { DrawerHeader } from './DrawerHeader';
 import { DrawerContent } from './DrawerContent';
 import { DrawerFooter } from './DrawerFooter';
 import { formatDate } from '@/lib/utils/formatDate';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { lockBodyScroll, unlockBodyScroll, forceUnlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
 interface NewsDrawerProps {
@@ -51,11 +51,18 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
   }, []);
 
   const isOpen = post !== null;
+  const postId = post?.id;
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      forceUnlockBodyScroll();
+      document.body.classList.remove('article-overlay-open');
+      return;
+    }
 
-    previousFocusRef.current = document.activeElement as HTMLElement;
+    if (!previousFocusRef.current) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+    }
     lockBodyScroll();
     document.body.classList.add('article-overlay-open');
     const focusTimer = window.setTimeout(() => drawerRef.current?.focus(), 0);
@@ -70,9 +77,12 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
       document.removeEventListener('keydown', handleEscape);
       document.body.classList.remove('article-overlay-open');
       unlockBodyScroll();
-      previousFocusRef.current?.focus();
+      if (!isOpen && previousFocusRef.current) {
+        previousFocusRef.current.focus();
+        previousFocusRef.current = null;
+      }
     };
-  }, [isOpen]);
+  }, [isOpen, postId]);
 
   const handleTabKey = useCallback((e: React.KeyboardEvent) => {
     if (e.key !== 'Tab' || !drawerRef.current) return;
@@ -111,7 +121,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
     <AnimatePresence>
       {post && (
         <>
-
           <motion.div
             className={`fixed inset-0 bg-ink/30 dark:bg-ink/50 backdrop-filter backdrop-blur-sm ${Z_INDEX.modalBackdrop}`}
             onClick={onClose}
@@ -119,7 +128,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: reducedMotion ? 0.1 : 0.2, ease: 'easeOut' }}
           />
 
           <motion.div
@@ -143,13 +152,12 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
                 y.set(0);
               }
             }}
-            className={`fixed ${Z_INDEX.drawerPanel} bg-white/40 dark:bg-black/40 backdrop-blur-[40px] backdrop-saturate-[1.8] border-l border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
+            className={`fixed ${Z_INDEX.drawerPanel} bg-white/60 dark:bg-black/60 backdrop-blur-xl md:backdrop-blur-[32px] backdrop-saturate-[1.5] border-l border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
             initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
-            transition={reducedMotion ? { duration: 0.2 } : { type: 'spring', damping: 28, stiffness: 380, mass: 0.7 }}
+            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', damping: 28, stiffness: 380, mass: 0.7 }}
           >
-
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />
 
             <div
@@ -177,7 +185,6 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
               post={post} 
               siteUrl={siteUrl} 
             />
-
           </motion.div>
         </>
       )}

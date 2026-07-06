@@ -3,7 +3,7 @@ import { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
 import { subscribeToPosts } from '@/lib/supabase/client';
 import { DEFAULT_PAGE_SIZE } from '@/lib/config/constants';
-import { cachedFetch, invalidatePostsCache } from '@/lib/utils/fetchCache';
+import { cachedFetch } from '@/lib/utils/fetchCache';
 
 interface UseInfiniteFeedProps {
   initialPosts: Post[];
@@ -33,10 +33,11 @@ export function useInfiniteFeed({
   const cursorRef = useRef(cursor);
   const exhaustedRef = useRef(exhausted);
   const categoryRef = useRef(category);
-  const loadMoreRef = useRef<() => void>(() => {});
   const pageSizeRef = useRef(pageSize);
   const mountedRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Sync refs and reset when category or initialPosts change
   useEffect(() => {
     excludeIdsRef.current = excludeIds ? new Set(excludeIds) : undefined;
     postsRef.current = posts;
@@ -45,8 +46,23 @@ export function useInfiniteFeed({
     categoryRef.current = category;
     pageSizeRef.current = pageSize;
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [excludeIds, posts, cursor, exhausted, category, pageSize]);
+
+  // When initialPosts change (e.g. category switch), reset feed state
+  useEffect(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setPosts(dedupe(initialPosts));
+    setCursor(null);
+    setExhausted(!hasInitialMore);
+    setLoading(false);
+    loadingRef.current = false;
+  }, [initialPosts, hasInitialMore, category]);
 
   const flashFresh = useCallback((ids: string[]) => {
     if (ids.length === 0) return;
@@ -70,6 +86,13 @@ export function useInfiniteFeed({
     if (loadingRef.current || exhaustedRef.current) return;
     loadingRef.current = true;
     setLoading(true);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const params = new URLSearchParams({ limit: String(pageSizeRef.current) });
       if (cursorRef.current) params.set('cursor', cursorRef.current);
@@ -77,10 +100,10 @@ export function useInfiniteFeed({
       
       const payload = await cachedFetch<{ posts: Post[]; nextCursor: string | null; hasMore: boolean }>(
         `/api/posts/?${params.toString()}`,
-        { cacheTtl: 15_000 },
+        { cacheTtl: 15_000, signal: controller.signal },
       );
 
-      if (mountedRef.current) {
+      if (mountedRef.current && !controller.signal.aborted) {
         setPosts((prev) => {
           const existing = new Set(prev.map((p) => p.id));
           const excluded = excludeIdsRef.current;
@@ -96,17 +119,17 @@ export function useInfiniteFeed({
         }
       }
     } catch (err) {
-      console.error('Failed to load more posts', err);
+      if ((err as { name?: string })?.name !== 'AbortError') {
+        console.error('Failed to load more posts', err);
+      }
     } finally {
-      if (mountedRef.current) {
+      if (mountedRef.current && abortControllerRef.current === controller) {
         setLoading(false);
         loadingRef.current = false;
+        abortControllerRef.current = null;
       }
     }
   }, []);
-
-  loadMoreRef.current = loadMore;
-
 
   const incomingBufferRef = useRef<Post[]>([]);
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -115,7 +138,7 @@ export function useInfiniteFeed({
     flushTimerRef.current = null;
     const incoming = incomingBufferRef.current;
     incomingBufferRef.current = [];
-    if (incoming.length === 0) return;
+    if (incoming.length === 0 || !mountedRef.current) return;
 
     const existing = new Set(postsRef.current.map((p) => p.id));
     const excluded = excludeIdsRef.current;
@@ -151,42 +174,25 @@ export function useInfiniteFeed({
   }, [flushIncoming]);
 
   useEffect(() => {
-    let sub: { unsubscribe: () => void } | null = null;
-
-    const connect = () => {
-      if (sub) {
-        try { sub.unsubscribe(); } catch { /* ignore */ }
-        sub = null;
-      }
-      try {
-        sub = subscribeToPosts((post) => {
-          processIncomingPosts([post]);
-        });
-      } catch {
-      }
-    };
-
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') connect();
-    };
-
-    const timers = flashTimersRef.current;
-    connect();
-    document.addEventListener('visibilitychange', onVisible);
+    const flashTimers = flashTimersRef.current;
+    const sub = subscribeToPosts((post) => {
+      processIncomingPosts([post]);
+    });
 
     return () => {
-      document.removeEventListener('visibilitychange', onVisible);
-      if (sub) {
-        try { sub.unsubscribe(); } catch { /* ignore */ }
-      }
+      try { sub.unsubscribe(); } catch { /* ignore */ }
       if (flushTimerRef.current !== null) {
         clearTimeout(flushTimerRef.current);
         flushTimerRef.current = null;
       }
-      for (const tid of timers) {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      for (const tid of flashTimers) {
         clearTimeout(tid);
       }
-      timers.clear();
+      flashTimers.clear();
     };
   }, [processIncomingPosts]);
 

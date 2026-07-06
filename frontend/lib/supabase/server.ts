@@ -5,11 +5,11 @@ import { Post, PostsCursorResponse } from '@/types';
 const VALID_CATEGORIES = new Set(['politics', 'business', 'sports', 'crime', 'science', 'health', 'tech', 'world', 'entertainment', 'education']);
 const VALID_STATUSES = new Set(['published', 'corrected', 'retracted']);
 
-/** Lightweight column projection for feed lists (excludes heavy JSONB fields). */
-const FEED_COLUMNS = '*';
+/** Lightweight column projection for feed lists (excludes heavy unneeded fields/vectors). */
+const FEED_COLUMNS = 'id, headline, summary, category, credibility_score, credibility_reason, source_count, sources, fact_check_flags, status, correction_note, published_at, updated_at, language, content_type, video_url, video_thumbnail';
 
 /** Full column projection for detail views. */
-const DETAIL_COLUMNS = '*';
+const DETAIL_COLUMNS = 'id, headline, summary, category, credibility_score, credibility_reason, source_count, sources, fact_check_flags, status, correction_note, published_at, updated_at, language, content_type, video_url, video_thumbnail';
 
 let supabaseServerInstance: ReturnType<typeof createClient> | null = null;
 
@@ -264,7 +264,7 @@ export async function fetchAllPosts(): Promise<Post[]> {
   return withRetry(async () => {
     const { data, error } = await getSupabaseServer()
       .from('posts')
-      .select('*')
+      .select(FEED_COLUMNS)
       .order('published_at', { ascending: false })
       .limit(500);
 

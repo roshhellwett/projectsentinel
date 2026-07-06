@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchPostsCursor } from '@/lib/supabase/server';
+import { getServerCache, setServerCache } from '@/lib/api/serverCache';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,9 +15,17 @@ export async function GET(request: Request) {
   const limit = Math.min(50, Math.max(1, Number.isFinite(rawLimit) ? rawLimit : 20));
   const category = searchParams.get('category') || undefined;
 
+  const cacheKey = `posts:cursor=${cursor || 'null'}:limit=${limit}:cat=${category || 'all'}`;
+  const cached = getServerCache<{ posts: unknown[]; nextCursor: string | null; hasMore: boolean }>(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached, { headers: CACHE_HEADERS });
+  }
+
   try {
     const { posts, nextCursor, hasMore } = await fetchPostsCursor(cursor, limit, category);
-    return NextResponse.json({ posts, nextCursor, hasMore }, { headers: CACHE_HEADERS });
+    const payload = { posts, nextCursor, hasMore };
+    setServerCache(cacheKey, payload, 15_000); // 15s server memory TTL
+    return NextResponse.json(payload, { headers: CACHE_HEADERS });
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch posts' },

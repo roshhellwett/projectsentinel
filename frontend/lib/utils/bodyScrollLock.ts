@@ -11,7 +11,8 @@ function emit(): void {
     try {
       fn(locked);
     } catch {
-          }
+      // ignore listener errors
+    }
   }
 }
 
@@ -37,6 +38,18 @@ export function unlockBodyScroll(): void {
   if (lockCount === 0) return;
   lockCount -= 1;
   if (lockCount === 0) {
+    document.body.style.overflow = previousOverflow ?? '';
+    document.body.style.paddingRight = previousPaddingRight ?? '';
+    previousOverflow = null;
+    previousPaddingRight = null;
+    emit();
+  }
+}
+
+export function forceUnlockBodyScroll(): void {
+  if (typeof document === 'undefined') return;
+  if (lockCount > 0 || document.body.style.overflow === 'hidden') {
+    lockCount = 0;
     document.body.style.overflow = previousOverflow ?? '';
     document.body.style.paddingRight = previousPaddingRight ?? '';
     previousOverflow = null;

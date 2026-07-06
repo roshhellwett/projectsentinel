@@ -1,16 +1,29 @@
 import { fetchPosts } from '@/lib/supabase/server';
+import { getServerCache, setServerCache } from '@/lib/api/serverCache';
 
 export const revalidate = 900; 
 
 export async function GET() {
+  const cacheKey = 'rss_feed_xml';
+  const cachedRss = getServerCache<string>(cacheKey);
+  if (cachedRss) {
+    return new Response(cachedRss, {
+      headers: {
+        'Content-Type': 'application/rss+xml; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
+        'X-Cache': 'HIT',
+      },
+    });
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
   const { posts } = await fetchPosts(1, 50);
 
   function escapeCdata(value: string): string {
-    return value.replace(/]]>/g, ']]]]><![CDATA[>');
+    return (value || '').replace(/]]>/g, ']]]]><![CDATA[>');
   }
 
-  const items = posts.map((post) => `
+  const items = (posts || []).map((post) => `
     <item>
       <title><![CDATA[${escapeCdata(post.headline)}]]></title>
       <description><![CDATA[${escapeCdata(post.summary)}]]></description>
@@ -42,10 +55,15 @@ ${items}
   </channel>
 </rss>`;
 
+  if (posts && posts.length > 0) {
+    setServerCache(cacheKey, rss, 900_000); // 15 min TTL
+  }
+
   return new Response(rss, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
       'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
+      'X-Cache': 'MISS',
     },
   });
 }

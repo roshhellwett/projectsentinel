@@ -36,8 +36,23 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   });
 
   const [drag, setDrag] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const lastDragRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
   const { stats, showBreak, setShowBreak, trackSwipe, sessionCards } = useSwipeTracking();
+
+  const handleDragProgress = useCallback((newDrag: { x: number; y: number }) => {
+    if (newDrag.x === 0 && newDrag.y === 0) {
+      lastDragRef.current = { x: 0, y: 0 };
+      setDrag({ x: 0, y: 0 });
+      return;
+    }
+    const dx = Math.abs(newDrag.x - lastDragRef.current.x);
+    const dy = Math.abs(newDrag.y - lastDragRef.current.y);
+    if (dx > 3 || dy > 3) {
+      lastDragRef.current = newDrag;
+      setDrag(newDrag);
+    }
+  }, []);
 
   const queueRef = useRef(queue);
   queueRef.current = queue;
@@ -47,6 +62,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       const q = queueRef.current;
       if (direction === 'down' || direction === 'left') {
         q.rewind();
+        lastDragRef.current = { x: 0, y: 0 };
         setDrag({ x: 0, y: 0 });
         return;
       }
@@ -55,6 +71,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       trackSwipe(post);
 
       q.advance(post, direction, false);
+      lastDragRef.current = { x: 0, y: 0 };
       setDrag({ x: 0, y: 0 });
     },
     [trackSwipe],
@@ -178,7 +195,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
                     canRewind={isFront ? queue.canRewind : false}
                     onSwipe={isFront ? handleSwipe : undefined}
                     onTap={isFront ? handleTap : undefined}
-                    onDragProgress={isFront ? setDrag : undefined}
+                    onDragProgress={isFront ? handleDragProgress : undefined}
                   />
                 );
               })}

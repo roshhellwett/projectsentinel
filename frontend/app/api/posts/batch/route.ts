@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Post } from '@/types';
 import { getSupabaseServer, withRetry } from '@/lib/supabase/server';
+import { getServerCache, setServerCache } from '@/lib/api/serverCache';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ posts: [] });
   }
 
+  const sortedIds = [...valid].sort().join(',');
+  const cacheKey = `batch:${sortedIds}`;
+  const cached = getServerCache<{ posts: Post[] }>(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached, {
+      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120' }
+    });
+  }
+
   try {
     const data = await withRetry(async () => {
       const { data: res, error } = await getSupabaseServer()
@@ -46,9 +56,12 @@ export async function POST(request: Request) {
 
     const byId = new Map((data || []).map((p) => [p.id, p]));
     const ordered = valid.map((id) => byId.get(id)).filter(Boolean) as Post[];
+    const payload = { posts: ordered };
 
-    return NextResponse.json({ posts: ordered }, {
-      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+    setServerCache(cacheKey, payload, 20_000); // 20s TTL for batch fetches
+
+    return NextResponse.json(payload, {
+      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120' }
     });
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {

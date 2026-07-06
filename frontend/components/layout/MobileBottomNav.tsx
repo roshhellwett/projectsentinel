@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
-import { Home, Search, LayoutGrid, Bookmark, Layers } from 'lucide-react';
+import { Home, Search, LayoutGrid, Bookmark, Layers, Download } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
-import { cn } from '@/lib/utils/cn';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { StreakBadge } from '@/components/ui/StreakBadge';
+import { usePWAInstall } from '@/lib/hooks/usePWAInstall';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, key: 'nav.home' },
@@ -27,6 +27,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useI18n();
   const { streak } = useDailyReadCount();
+  const { isInstallable, isIOS, isStandalone, promptInstall } = usePWAInstall();
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
 
@@ -55,7 +56,6 @@ export function MobileBottomNav() {
 
   return (
     <>
-
       <AnimatePresence>
         {topicsOpen && (
           <motion.div
@@ -74,36 +74,53 @@ export function MobileBottomNav() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
               transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 420, damping: 30, mass: 0.75 }}
-              className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper/80 backdrop-blur-2xl backdrop-saturate-[1.3] border border-rule/60 shadow-card-lg will-change-transform transform-gpu"
+              className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper/90 dark:bg-black/90 backdrop-blur-2xl backdrop-saturate-[1.3] border border-rule/60 shadow-card-lg will-change-transform transform-gpu"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
-            <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
-            <div className="p-4 pb-5">
-              <p className="text-[10px] font-bold text-accent uppercase tracking-[0.18em] mb-3 px-1">
-                Browse Topics
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {CATEGORIES.map((cat) => {
-                  const active = pathname === `/category/${cat.slug}/`;
-                  return (
-                    <Link
-                      key={cat.slug}
-                      href={`/category/${cat.slug}/`}
-                      prefetch={true}
-                      onClick={closeTopics}
-                      className={`flex items-center justify-center px-3 py-3 rounded text-center text-[12px] font-semibold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                        active
-                          ? 'bg-ink text-paper border border-ink'
-                          : 'bg-paper text-ink border border-rule hover:border-ink'
-                      }`}
+              <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
+              <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
+                <p className="text-[10px] font-bold text-accent uppercase tracking-[0.18em] mb-3 px-1">
+                  Browse Topics
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {CATEGORIES.map((cat) => {
+                    const active = pathname === `/category/${cat.slug}/`;
+                    return (
+                      <Link
+                        key={cat.slug}
+                        href={`/category/${cat.slug}/`}
+                        prefetch={true}
+                        onClick={closeTopics}
+                        className={`flex items-center justify-center px-3 py-3 rounded text-center text-[12px] font-semibold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                          active
+                            ? 'bg-ink text-paper border border-ink'
+                            : 'bg-paper dark:bg-white/5 text-ink border border-rule hover:border-ink'
+                        }`}
+                      >
+                        {t(`nav.${cat.slug}`)}
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {!isStandalone && (isInstallable || isIOS) && (
+                  <div className="mt-4 pt-3 border-t border-rule/40">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeTopics();
+                        if (isInstallable) void promptInstall();
+                        else if (isIOS) alert('To install Zenith PWA on iPhone/iPad: Tap the Share button in Safari and select "Add to Home Screen".');
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-accent text-paper font-bold text-xs rounded-xl shadow-sm transition-transform active:scale-95"
                     >
-                      {t(`nav.${cat.slug}`)}
-                    </Link>
-                  );
-                })}
+                      <Download className="w-4 h-4" />
+                      {isIOS ? 'Install PWA on iPhone / iPad' : 'Install Zenith App'}
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -123,7 +140,7 @@ export function MobileBottomNav() {
           </div>
         )}
         <div
-          className="relative border-t border-rule/40 bg-paper/65 backdrop-blur-2xl backdrop-saturate-[1.4]"
+          className="relative border-t border-rule/40 bg-paper/65 dark:bg-black/65 backdrop-blur-2xl backdrop-saturate-[1.4]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
@@ -142,7 +159,7 @@ export function MobileBottomNav() {
                   {active && (
                     <motion.div
                       layoutId="bottom-nav-pill"
-                      className="absolute inset-x-1.5 bottom-1 top-1 rounded-xl bg-paper shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] border border-rule/50"
+                      className="absolute inset-x-1.5 bottom-1 top-1 rounded-xl bg-paper dark:bg-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] border border-rule/50"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
                   )}

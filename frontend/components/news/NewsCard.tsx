@@ -140,6 +140,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
         isNew && 'ring-2 ring-accent/50 shadow-[0_0_15px_rgba(var(--accent),0.3)]',
         'contain-layout'
       )}
+      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}
     >
       {/* Category accent gradient line & ambient background */}
       <div

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Post } from '@/types';
 import { CategoryTag } from '@/components/news/CategoryTag';
 import { CredibilityBadge } from '@/components/news/CredibilityBadge';
@@ -12,10 +12,15 @@ interface PostTableProps {
 }
 
 export function PostTable({ posts }: PostTableProps) {
+  const [items, setItems] = useState<Post[]>(posts || []);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [correctionType, setCorrectionType] = useState<'corrected' | 'retracted'>('corrected');
 
-  if (!posts || posts.length === 0) {
+  useEffect(() => {
+    setItems(posts || []);
+  }, [posts]);
+
+  if (!items || items.length === 0) {
     return <p className="py-8 text-center text-muted font-medium">No posts found.</p>;
   }
 
@@ -34,7 +39,7 @@ export function PostTable({ posts }: PostTableProps) {
             </tr>
           </thead>
           <tbody>
-            {posts.map((post) => (
+            {items.map((post) => (
               <tr key={post.id} className="border-b border-rule hover:bg-paper-2 transition-colors">
                 <td className="py-3 px-4">
                   <a
@@ -95,6 +100,9 @@ export function PostTable({ posts }: PostTableProps) {
           post={selectedPost}
           type={correctionType}
           onClose={() => setSelectedPost(null)}
+          onSuccess={(updated) => {
+            setItems((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+          }}
         />
       )}
     </>

@@ -5,28 +5,34 @@ import type { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
 import { loadSeenWithinDays, unmarkSeen } from '@/lib/utils/seenSet';
 import { cachedFetch } from '@/lib/utils/fetchCache';
+import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 
 const READ_KEY = 'iv:readPosts:v1';
-
-import { safeRead } from '@/lib/utils/safeStorage';
-
-function loadReadIdsSync(): Set<string> {
-  try {
-    const raw = safeRead(READ_KEY);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? new Set(parsed.filter((x) => typeof x === 'string')) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
 const SWIPE_PAGE_SIZE = 25;
 const PREFETCH_THRESHOLD = 10;
 const HISTORY_MAX = 25;
 const SEEN_PREFIX = 'iv:swipe:seen:';
 const MAX_REFILL_FAILURES = 3;
 const REFILL_BACKOFF_MS = [1500, 4000, 10000] as const;
+
+function loadReadIdsSync(): Set<string> {
+  try {
+    const raw = safeRead(READ_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Set();
+    const ids = parsed.filter((x) => typeof x === 'string');
+    // If over 500 read items, trim oldest half to prevent quota inflation
+    if (ids.length > 500) {
+      const trimmed = ids.slice(ids.length - 250);
+      try { safeWrite(READ_KEY, JSON.stringify(trimmed)); } catch {}
+      return new Set(trimmed);
+    }
+    return new Set(ids);
+  } catch {
+    return new Set();
+  }
+}
 
 export interface HistoryEntry {
   post: Post;
@@ -72,6 +78,7 @@ export function useSwipeQueue({
   const fetchingRef = useRef(false);
   const failureCountRef = useRef<number>(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const pageRef = useRef(page);
   const exhaustedRef = useRef(exhausted);
   const filterIdsRef = useRef<(posts: Post[]) => Post[]>(() => []);
@@ -80,18 +87,20 @@ export function useSwipeQueue({
 
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+    };
   }, []);
-
-
-
 
   const refreshSeenFromDisk = useCallback(() => {
     seenRef.current = loadSeenWithinDays(2);
     setQueue((prev) => prev.filter((p) => !seenRef.current.has(p.id)));
   }, []);
-
-
 
   const filterIds = useCallback(
     (posts: Post[]): Post[] => {
@@ -130,18 +139,7 @@ export function useSwipeQueue({
     );
     setQueue(cleaned);
     setHydrated(true);
-    
-    
   }, [hideRead, initialPosts]);
-
-
-  useEffect(() => {
-    return () => {
-      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
-    };
-  }, []);
-
-
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -160,8 +158,6 @@ export function useSwipeQueue({
     return () => window.removeEventListener('storage', onStorage);
   }, [refreshSeenFromDisk, hideRead]);
 
-
-
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const onVisible = () => {
@@ -176,19 +172,24 @@ export function useSwipeQueue({
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [refreshSeenFromDisk, hideRead]);
 
-
-
   const refill = useCallback(async () => {
-    if (fetchingRef.current || exhaustedRef.current) return;
+    if (fetchingRef.current || exhaustedRef.current || !mountedRef.current) return;
     fetchingRef.current = true;
     setIsFetching(true);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const nextPage = pageRef.current + 1;
       const params = new URLSearchParams({
         page: String(nextPage),
         limit: String(SWIPE_PAGE_SIZE),
       });
-      const controller = new AbortController();
+      
       const timeoutId = setTimeout(() => controller.abort(), 12_000);
       let payload: { posts: Post[]; count?: number };
       try {
@@ -199,35 +200,42 @@ export function useSwipeQueue({
       } finally {
         clearTimeout(timeoutId);
       }
-      const incoming = filterIdsRef.current(payload.posts ?? []);
-      setQueue((prev) => {
-        const existing = new Set(prev.map((p) => p.id));
-        const toAppend = incoming.filter((p) => !existing.has(p.id));
-        return dedupe([...prev, ...toAppend]);
-      });
-      setPage(nextPage);
-      if ((payload.posts?.length ?? 0) < SWIPE_PAGE_SIZE) setExhausted(true);
-      failureCountRef.current = 0;
-      setHasError(false);
-    } catch {
+
+      if (mountedRef.current && !controller.signal.aborted) {
+        const incoming = filterIdsRef.current(payload.posts ?? []);
+        setQueue((prev) => {
+          const existing = new Set(prev.map((p) => p.id));
+          const toAppend = incoming.filter((p) => !existing.has(p.id));
+          return dedupe([...prev, ...toAppend]);
+        });
+        setPage(nextPage);
+        if ((payload.posts?.length ?? 0) < SWIPE_PAGE_SIZE) setExhausted(true);
+        failureCountRef.current = 0;
+        setHasError(false);
+      }
+    } catch (err) {
+      if ((err as { name?: string })?.name === 'AbortError') return;
       failureCountRef.current += 1;
       if (failureCountRef.current >= MAX_REFILL_FAILURES) {
-        setHasError(true);
+        if (mountedRef.current) setHasError(true);
       } else {
         const delay = REFILL_BACKOFF_MS[Math.min(failureCountRef.current - 1, REFILL_BACKOFF_MS.length - 1)];
 
         retryTimerRef.current = setTimeout(() => {
           retryTimerRef.current = null;
           fetchingRef.current = false;
-          setIsFetching(false);
-          void refill();
+          if (mountedRef.current) {
+            setIsFetching(false);
+            void refill();
+          }
         }, delay);
         return;
       }
     } finally {
-      if (!retryTimerRef.current && mountedRef.current) {
+      if (!retryTimerRef.current && mountedRef.current && abortControllerRef.current === controller) {
         setIsFetching(false);
         fetchingRef.current = false;
+        abortControllerRef.current = null;
       }
     }
   }, []);
@@ -237,12 +245,15 @@ export function useSwipeQueue({
       clearTimeout(retryTimerRef.current);
       retryTimerRef.current = null;
     }
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
     failureCountRef.current = 0;
     setHasError(false);
     fetchingRef.current = false;
     await refill();
   }, [refill]);
-
 
   const queueLenRef = useRef(queue.length);
   queueLenRef.current = queue.length;
@@ -259,10 +270,7 @@ export function useSwipeQueue({
     setQueue((prev) => {
       if (prev.length === 0) return prev;
       const front = prev[0];
-      if (front.id !== post.id) {
-
-        return prev;
-      }
+      if (front.id !== post.id) return prev;
       return prev.slice(1);
     });
     setHistory((prev) => {
@@ -272,17 +280,12 @@ export function useSwipeQueue({
     });
   }, []);
 
-
-
-
   const rewind = useCallback((): HistoryEntry | null => {
     const hist = historyRef.current;
     if (hist.length === 0) return null;
 
     const entry = hist[0];
-
     setHistory((prev) => prev.slice(1));
-
     unmarkSeen(entry.post.id);
     setQueue((prev) => {
       if (prev.length === 0 || prev[0]?.id !== entry.post.id) {

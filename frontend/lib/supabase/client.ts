@@ -19,7 +19,7 @@ export function getSupabaseBrowserClient() {
       },
       realtime: {
         params: {
-          eventsPerSecond: 10,
+          eventsPerSecond: 5, // Limit events per second to conserve free tier quota
         },
       },
     });
@@ -27,48 +27,137 @@ export function getSupabaseBrowserClient() {
   return browserClient;
 }
 
-let subscriptionCounter = 0;
+type PostCallback = (post: Post) => void;
 
-export function subscribeToPosts(callback: (post: Post) => void) {
-  const supabase = getSupabaseBrowserClient();
-  const channelName = `posts-live-${++subscriptionCounter}`;
+class SharedRealtimeManager {
+  private listeners = new Set<PostCallback>();
+  private channel: ReturnType<ReturnType<typeof createBrowserClient>['channel']> | null = null;
+  private isPaused = false;
+  private visibilityHandler: (() => void) | null = null;
+  private networkHandler: (() => void) | null = null;
 
-  const channel = supabase
-    .channel(channelName)
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'posts',
-        filter: 'status=eq.published',
+  public subscribe(callback: PostCallback) {
+    this.listeners.add(callback);
+    this.setupListeners();
+    this.evaluateConnection();
+
+    return {
+      unsubscribe: () => {
+        this.listeners.delete(callback);
+        if (this.listeners.size === 0) {
+          this.teardownConnection();
+          this.removeListeners();
+        }
       },
-      (payload) => {
-        callback(payload.new as Post);
-      },
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'posts',
-        filter: 'status=eq.published',
-      },
-      (payload) => {
-        callback(payload.new as Post);
-      },
-    )
-    .subscribe((status, err) => {
-      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-        console.warn('[realtime] Subscription error:', status, err);
+    };
+  }
+
+  private setupListeners() {
+    if (typeof window === 'undefined' || this.visibilityHandler) return;
+
+    this.visibilityHandler = () => {
+      if (document.visibilityState === 'hidden') {
+        this.isPaused = true;
+        this.teardownConnection();
+      } else if (document.visibilityState === 'visible') {
+        this.isPaused = false;
+        this.evaluateConnection();
       }
-    });
+    };
 
-  return {
-    unsubscribe: () => {
-      supabase.removeChannel(channel);
-    },
-  };
+    this.networkHandler = () => {
+      if (!navigator.onLine) {
+        this.isPaused = true;
+        this.teardownConnection();
+      } else {
+        this.isPaused = false;
+        this.evaluateConnection();
+      }
+    };
+
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+    window.addEventListener('offline', this.networkHandler);
+    window.addEventListener('online', this.networkHandler);
+  }
+
+  private removeListeners() {
+    if (typeof window === 'undefined' || !this.visibilityHandler) return;
+    document.removeEventListener('visibilitychange', this.visibilityHandler);
+    if (this.networkHandler) {
+      window.removeEventListener('offline', this.networkHandler);
+      window.removeEventListener('online', this.networkHandler);
+    }
+    this.visibilityHandler = null;
+    this.networkHandler = null;
+  }
+
+  private evaluateConnection() {
+    if (typeof window !== 'undefined' && (!navigator.onLine || document.visibilityState === 'hidden')) {
+      return;
+    }
+    if (this.isPaused || this.listeners.size === 0 || this.channel) {
+      return;
+    }
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      this.channel = supabase
+        .channel('posts-live-singleton')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'posts',
+            filter: 'status=eq.published',
+          },
+          (payload) => {
+            const newPost = payload.new as Post;
+            this.listeners.forEach((cb) => {
+              try { cb(newPost); } catch { /* ignore listener error */ }
+            });
+          },
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'posts',
+            filter: 'status=eq.published',
+          },
+          (payload) => {
+            const updatedPost = payload.new as Post;
+            this.listeners.forEach((cb) => {
+              try { cb(updatedPost); } catch { /* ignore listener error */ }
+            });
+          },
+        )
+        .subscribe((status, err) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn('[realtime] Singleton subscription error:', status, err);
+          }
+        });
+    } catch (err) {
+      console.warn('[realtime] Failed to connect channel:', err);
+    }
+  }
+
+  private teardownConnection() {
+    if (this.channel) {
+      try {
+        const supabase = getSupabaseBrowserClient();
+        supabase.removeChannel(this.channel);
+      } catch {
+        // ignore removal errors
+      }
+      this.channel = null;
+    }
+  }
 }
 
+const sharedManager = new SharedRealtimeManager();
+
+export function subscribeToPosts(callback: (post: Post) => void) {
+  return sharedManager.subscribe(callback);
+}

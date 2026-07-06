@@ -1,6 +1,6 @@
 'use client';
 
-function panicFreeLocalStorage(): void {
+export function pruneAllOfflineStorage(): void {
   if (typeof window === 'undefined') return;
   const toDelete: string[] = [];
   const swipePrefix = 'iv:swipe:';
@@ -15,19 +15,42 @@ function panicFreeLocalStorage(): void {
 
   for (let i = 0; i < window.localStorage.length; i++) {
     const k = window.localStorage.key(i);
-    if (!k) continue;
-    if (!k.startsWith(swipePrefix)) continue;
+    if (!k || !k.startsWith('iv:')) continue;
 
-    const dateMatch = k.match(/(\d{4}-\d{2}-\d{2})$/);
-    if (dateMatch && !validDates.has(dateMatch[1])) {
-      toDelete.push(k);
+    if (k.startsWith(swipePrefix)) {
+      const dateMatch = k.match(/(\d{4}-\d{2}-\d{2})$/);
+      if (dateMatch && !validDates.has(dateMatch[1])) {
+        toDelete.push(k);
+      }
+    } else {
+      try {
+        const val = window.localStorage.getItem(k);
+        if (val && val.startsWith('[') && val.endsWith(']')) {
+          JSON.parse(val);
+        }
+      } catch {
+        toDelete.push(k);
+      }
     }
   }
-  
-  
+
   toDelete.forEach((k) => {
-    try { window.localStorage.removeItem(k); } catch {  }
+    try { window.localStorage.removeItem(k); } catch {}
   });
+
+  try {
+    const readRaw = window.localStorage.getItem('iv:readPosts:v1');
+    if (readRaw) {
+      const arr = JSON.parse(readRaw);
+      if (Array.isArray(arr) && arr.length > 200) {
+        window.localStorage.setItem('iv:readPosts:v1', JSON.stringify(arr.slice(-200)));
+      }
+    }
+  } catch {}
+}
+
+function panicFreeLocalStorage(): void {
+  pruneAllOfflineStorage();
 }
 
 export function safeWrite(key: string, value: unknown): void {
@@ -60,7 +83,5 @@ export function safeRemove(key: string): void {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.removeItem(key);
-  } catch {
-    
-  }
+  } catch {}
 }

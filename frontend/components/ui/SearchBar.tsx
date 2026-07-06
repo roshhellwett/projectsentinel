@@ -9,6 +9,7 @@ import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { cachedFetch } from '@/lib/utils/fetchCache';
 
 interface SearchBarProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   useEffect(() => {
     if (!isOpen) return;
     const q = query.trim();
-    if (!q) {
+    if (!q || q.length < 2) {
       setResults([]);
       setResultCount(0);
       setIsLoading(false);
@@ -41,24 +42,22 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
     const timer = window.setTimeout(() => {
       setIsLoading(true);
       setError(null);
-      fetch(`/api/search/?q=${encodeURIComponent(q)}&limit=10`, {
+      cachedFetch<{ posts?: Post[]; count?: number }>(`/api/search/?q=${encodeURIComponent(q)}&limit=10`, {
         signal: controller.signal,
+        cacheTtl: 30_000, // 30s client memory TTL for search queries
       })
-        .then((res) => {
-          if (!res.ok) throw new Error('search failed');
-          return res.json();
-        })
-        .then((payload: { posts?: Post[]; count?: number }) => {
+        .then((payload) => {
+          if (controller.signal.aborted) return;
           setResults(payload.posts || []);
           setResultCount(typeof payload.count === 'number' ? payload.count : (payload.posts?.length ?? 0));
           setIsLoading(false);
         })
         .catch((err) => {
-          if (err.name === 'AbortError') return;
-          setError('Search failed');
+          if (err?.name === 'AbortError' || controller.signal.aborted) return;
+          setError('Search failed. Check connection.');
           setIsLoading(false);
         });
-    }, 350);
+    }, 300); // 300ms debounce
 
     return () => {
       controller.abort();
@@ -167,7 +166,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-           className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-paper/70 backdrop-blur-2xl backdrop-saturate-[1.3] will-change-opacity`}
+          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-paper/80 dark:bg-black/80 backdrop-blur-2xl backdrop-saturate-[1.3] will-change-opacity`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -199,78 +198,88 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               className="relative max-w-3xl mx-auto mb-8"
               onSubmit={(e) => {
                 e.preventDefault();
-                const q = query.trim();
-                if (!q) return;
-
-                onClose();
-                router.push(`/search/?q=${encodeURIComponent(q)}`);
               }}
+              role="search"
             >
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted pointer-events-none" />
-              <input
-                ref={inputRef}
-                id="search-input"
-                type="search"
-                role="combobox"
-                aria-expanded={results.length > 0}
-                aria-controls="search-results"
-                aria-autocomplete="list"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search verified stories... (press Enter for full search)"
-                className="w-full pl-12 pr-12 py-3.5 bg-paper/50 border-2 border-rule-strong rounded-xl text-ink placeholder-subtle focus:outline-none focus:border-accent focus:bg-paper transition-all duration-300 shadow-sm"
-                aria-label="Search verified stories"
-              />
-              <AnimatePresence>
-                {query.length > 0 && (
-                  <motion.button
+              <div className="relative flex items-center">
+                <Search className="absolute left-4 w-5 h-5 text-muted pointer-events-none" />
+                <input
+                  ref={inputRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search verified news, topics, keywords..."
+                  className="w-full pl-12 pr-12 py-4 bg-paper-2 text-ink rounded-xl border border-rule focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all text-base font-medium shadow-inner placeholder:text-muted"
+                  aria-label="Search query"
+                  aria-controls="search-results"
+                />
+                {query && (
+                  <button
                     type="button"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.15 }}
                     onClick={() => {
                       setQuery('');
                       inputRef.current?.focus();
                     }}
-                    aria-label="Clear search"
-                    className="tap-target min-w-[44px] min-h-[44px] absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted hover:text-ink hover:bg-paper-2 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex items-center justify-center"
+                    className="absolute right-3 p-1.5 text-muted hover:text-ink rounded-full transition-colors"
+                    aria-label="Clear search query"
                   >
                     <X className="w-4 h-4" />
-                  </motion.button>
+                  </button>
                 )}
-              </AnimatePresence>
+              </div>
             </form>
 
-            <div className="max-w-4xl mx-auto">
+            <div id="search-results" className="max-w-3xl mx-auto" aria-live="polite">
               {isLoading && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-[190px] rounded-md" />
+                <div className="space-y-4">
+                  {[1, 2, 3].map((n) => (
+                    <div key={n} className="p-4 border border-rule rounded-xl bg-paper">
+                      <Skeleton className="h-4 w-1/4 mb-3" />
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
                   ))}
                 </div>
               )}
+
               {error && (
-                <p className="text-center text-red-500 py-8">{error}</p>
-              )}
-              {query.trim() && !isLoading && !error && (
-                <p className="text-sm text-muted mb-4">
-                  {resultCount === 0
-                    ? <>No matches for &quot;<span className="text-ink font-medium">{query}</span>&quot;. Press Enter to broaden.</>
-                    : <><span className="text-ink font-medium tabular-nums">{resultCount}</span> {resultCount === 1 ? 'match' : 'matches'} for &quot;<span className="text-ink font-medium">{query}</span>&quot;{resultCount > results.length ? <> — showing top {results.length}</> : null}</>
-                  }
-                </p>
+                <div className="text-center py-12 px-4 border border-red-500/20 bg-red-500/5 rounded-xl">
+                  <p className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">{error}</p>
+                  <button
+                    type="button"
+                    onClick={() => setQuery((q) => q + ' ')}
+                    className="px-4 py-2 bg-ink text-paper text-xs font-bold rounded-lg shadow-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
               )}
 
-              <div id="search-results" role="list" aria-label="Search results" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {results.map((post) => (
-                  <NewsCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => handleSelect(post)}
-                  />
-                ))}
-              </div>
+              {!isLoading && !error && query.trim().length >= 2 && results.length === 0 && (
+                <div className="text-center py-16 px-4">
+                  <p className="text-base font-semibold text-ink mb-1">No verified stories found</p>
+                  <p className="text-sm text-muted">Try searching for different keywords or broader topics.</p>
+                </div>
+              )}
+
+              {!isLoading && !error && results.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-muted uppercase tracking-wider mb-4 px-1">
+                    Found {resultCount} verified {resultCount === 1 ? 'story' : 'stories'}
+                  </p>
+                  <div className="space-y-4">
+                    {results.map((post) => (
+                      <div
+                        key={post.id}
+                        onClick={() => handleSelect(post)}
+                        className="cursor-pointer transition-transform duration-200 hover:-translate-y-0.5"
+                      >
+                        <NewsCard post={post} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </motion.div>

@@ -130,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem('iv-theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');var tags=document.querySelectorAll('meta[name="theme-color"]');tags.forEach(function(t){    t.setAttribute('content',d?'#1e1c18':'#e1d7c2');t.removeAttribute('media');});}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem('iv-theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');document.documentElement.style.colorScheme=d?'dark':'light';var tags=document.querySelectorAll('meta[name="theme-color"]');tags.forEach(function(t){t.setAttribute('content',d?'#1e1c18':'#e1d7c2');t.removeAttribute('media');});}catch(e){}})();`,
           }}
         />
         {supabaseOrigin && (

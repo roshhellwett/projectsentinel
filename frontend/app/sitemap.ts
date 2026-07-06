@@ -1,12 +1,21 @@
 import type { MetadataRoute } from 'next';
 import { fetchSitemapArticles } from '@/lib/supabase/server';
 import { CATEGORY_SLUGS } from '@/lib/constants/categories';
+import { getServerCache, setServerCache } from '@/lib/api/serverCache';
 
 export const revalidate = 3600;
 
 async function fetchArticleUrls(): Promise<{ id: string; published_at: string; category: string }[]> {
+  const cacheKey = 'sitemap_articles_list';
+  const cached = getServerCache<{ id: string; published_at: string; category: string }[]>(cacheKey);
+  if (cached) return cached;
+
   try {
-    return await fetchSitemapArticles();
+    const articles = await fetchSitemapArticles();
+    if (articles && articles.length > 0) {
+      setServerCache(cacheKey, articles, 3600_000);
+    }
+    return articles || [];
   } catch {
     return [];
   }
@@ -25,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   const dynamicCategorySet = new Set(CATEGORY_SLUGS);
   articles.forEach(a => {
-    if (a.category) dynamicCategorySet.add(a.category as any);
+    if (a.category) dynamicCategorySet.add(a.category.trim().toLowerCase() as any);
   });
   
   const categoryRoutes: MetadataRoute.Sitemap = Array.from(dynamicCategorySet).map((category) => ({

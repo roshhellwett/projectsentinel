@@ -5,14 +5,17 @@ import { AlertCircle, FileText, Send, X } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { Post } from '@/types';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { invalidatePostsCache } from '@/lib/utils/fetchCache';
+import { showToast } from '@/lib/utils/toast';
 
 interface CorrectionFormProps {
   post: Post;
   type: 'corrected' | 'retracted';
   onClose: () => void;
+  onSuccess?: (updatedPost: Post) => void;
 }
 
-export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
+export function CorrectionForm({ post, type, onClose, onSuccess }: CorrectionFormProps) {
   const [note, setNote] = useState(post.correction_note || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +57,15 @@ export function CorrectionForm({ post, type, onClose }: CorrectionFormProps) {
       });
 
       if (response.ok) {
-        window.location.reload();
+        invalidatePostsCache();
+        showToast(`Article marked as ${type}`, 'success');
+        const updatedPost: Post = { ...post, status: type, correction_note: note };
+        if (onSuccess) {
+          onSuccess(updatedPost);
+        } else {
+          window.location.reload();
+        }
+        onClose();
       } else {
         const payload = await response.json().catch(() => ({}));
         setError(payload?.error || `Request failed (${response.status})`);

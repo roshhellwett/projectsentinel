@@ -95,11 +95,20 @@ export function ShareButtons({
       const textArea = document.createElement('textarea');
       textArea.value = url;
       textArea.style.position = 'fixed';
-      textArea.style.left = '-9999px';
-      textArea.style.opacity = '0';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.width = '2em';
+      textArea.style.height = '2em';
+      textArea.style.padding = '0';
+      textArea.style.border = 'none';
+      textArea.style.outline = 'none';
+      textArea.style.boxShadow = 'none';
+      textArea.style.background = 'transparent';
+      textArea.setAttribute('readonly', '');
       document.body.appendChild(textArea);
       try {
-        textArea.select();
+        textArea.focus();
+        textArea.setSelectionRange(0, textArea.value.length);
         document.execCommand('copy');
         setCopied(true);
         showToast('Link copied to clipboard', 'success');
@@ -116,15 +125,14 @@ export function ShareButtons({
   const handleShareClick = useCallback(async () => {
     haptic.medium();
     if (typeof navigator !== 'undefined' && navigator.share && (isInline || isSheet || window.innerWidth < 768)) {
-      try {
-        await navigator.share({
-          title: headline,
-          text: headline,
-          url: url,
-        });
-        return;
-      } catch (err) {
-        if ((err as Error).name === 'AbortError') return;
+      const shareData = { title: headline, text: headline, url };
+      if (!navigator.canShare || navigator.canShare(shareData)) {
+        try {
+          await navigator.share(shareData);
+          return;
+        } catch (err) {
+          if ((err as Error)?.name === 'AbortError') return;
+        }
       }
     }
     setShowMenu((v) => !v);

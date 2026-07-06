@@ -86,27 +86,38 @@ const FeedItem = memo(function FeedItem({
     onCardClick(post);
   }, [onCardClick, post]);
 
+  const content = (
+    <NewsCard
+      post={post}
+      onClick={handleClick}
+      isNew={isNew}
+      isRead={isRead}
+      wasRecentlyOpened={wasRecentlyOpened}
+    />
+  );
+
+  if (index >= 8) {
+    return (
+      <div className="feed-card-shell h-full rounded-xl transition-all" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}>
+        {content}
+      </div>
+    );
+  }
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-40px 0px' }}
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
         type: 'spring',
-        stiffness: 350,
-        damping: 28,
-        mass: 0.7,
-        delay: Math.min(index * 0.03, 0.2),
+        stiffness: 380,
+        damping: 30,
+        delay: index * 0.04,
       }}
       className="feed-card-shell h-full rounded-xl transition-all"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}
     >
-      <NewsCard
-        post={post}
-        onClick={handleClick}
-        isNew={isNew}
-        isRead={isRead}
-        wasRecentlyOpened={wasRecentlyOpened}
-      />
+      {content}
     </motion.div>
   );
 });

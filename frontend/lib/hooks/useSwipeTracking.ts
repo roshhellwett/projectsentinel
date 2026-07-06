@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Post } from '@/types';
 import { getHostname } from '@/lib/utils/getHostname';
+import { pruneStaleSeenKeys } from '@/lib/utils/seenSet';
 import {
   bumpStreak,
   getCardsToday,
@@ -35,6 +36,7 @@ export function useSwipeTracking() {
 
   useEffect(() => {
     pruneStaleStatsKeys();
+    pruneStaleSeenKeys();
     bumpStreak();
     refreshStats();
 

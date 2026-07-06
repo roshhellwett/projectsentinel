@@ -48,7 +48,7 @@ const SourceFavicon = memo(function SourceFavicon({ url }: { url: string }) {
   );
 });
 
-export function SourceLinks({ sources }: SourceLinksProps) {
+export const SourceLinks = memo(function SourceLinks({ sources }: SourceLinksProps) {
   const { t } = useI18n();
   if (!sources || sources.length === 0) {
     return <p className="text-sm text-muted">{t('drawer.no_sources')}</p>;
@@ -59,7 +59,7 @@ export function SourceLinks({ sources }: SourceLinksProps) {
       {sources.map((source, index) => {
         const label = getSourceLabel(source);
         return (
-          <li key={source.url || index}>
+          <li key={`${source.url || 'src'}-${index}`}>
             <a
               href={source.url}
               target="_blank"
@@ -76,4 +76,4 @@ export function SourceLinks({ sources }: SourceLinksProps) {
       })}
     </ul>
   );
-}
+});

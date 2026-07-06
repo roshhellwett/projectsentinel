@@ -189,9 +189,22 @@ export function SwipeCard({
       dragY.set(0);
       return;
     }
-    const unsubX = dragX.on('change', (xv) => onDragProgress?.({ x: xv, y: dragY.get() }));
-    const unsubY = dragY.on('change', (yv) => onDragProgress?.({ x: dragX.get(), y: yv }));
-    return () => { unsubX(); unsubY(); };
+    if (!onDragProgress) return;
+    let rafId: number | null = null;
+    const notify = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        onDragProgress({ x: dragX.get(), y: dragY.get() });
+      });
+    };
+    const unsubX = dragX.on('change', notify);
+    const unsubY = dragY.on('change', notify);
+    return () => {
+      unsubX();
+      unsubY();
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [interactive, onDragProgress, dragX, dragY]);
 
   const handleDragEnd = useCallback((_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
@@ -208,10 +221,6 @@ export function SwipeCard({
     onSwipe?.(dir, post);
   }, [interactive, canRewind, onDragProgress, onSwipe, post]);
 
-  const isClient = typeof window !== 'undefined';
-  const winW = isClient ? window.innerWidth : 500;
-  const winH = isClient ? window.innerHeight : 800;
-
   return (
     <motion.div
       custom={{ depth, exitDir }}
@@ -227,10 +236,12 @@ export function SwipeCard({
         }),
         exit: ({ exitDir }) => {
           const transition = { duration: reducedMotion ? 0 : 0.3, ease: 'easeOut' as const };
-          if (exitDir === 'up') return { y: -winH, opacity: 0, transition };
-          if (exitDir === 'down') return { y: winH, opacity: 0, transition };
-          if (exitDir === 'left') return { x: -winW, rotate: -20, opacity: 0, transition };
-          if (exitDir === 'right') return { x: winW, rotate: 20, opacity: 0, transition };
+          const w = typeof window !== 'undefined' ? window.innerWidth : 500;
+          const h = typeof window !== 'undefined' ? window.innerHeight : 800;
+          if (exitDir === 'up') return { y: -h, opacity: 0, transition };
+          if (exitDir === 'down') return { y: h, opacity: 0, transition };
+          if (exitDir === 'left') return { x: -w, rotate: -20, opacity: 0, transition };
+          if (exitDir === 'right') return { x: w, rotate: 20, opacity: 0, transition };
           return { opacity: 0, scale: 0.8, transition: { duration: 0.2 } };
         }
       }}
@@ -239,10 +250,10 @@ export function SwipeCard({
       exit="exit"
       className="w-full touch-none select-none will-change-transform transform-gpu origin-top"
       style={{ x: dragX, y: dragY, rotate, zIndex: style.z }}
-      drag={interactive && !exiting}
-      dragConstraints={!canRewind ? { left: 0, bottom: 0 } : undefined}
-      dragDirectionLock={true}
-      dragElastic={0.4}
+      drag={interactive && !exiting ? true : false}
+      dragConstraints={interactive && !exiting ? (!canRewind ? { left: 0, bottom: 0 } : undefined) : undefined}
+      dragDirectionLock={interactive ? true : undefined}
+      dragElastic={interactive ? 0.4 : undefined}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       aria-hidden={depth !== 0}

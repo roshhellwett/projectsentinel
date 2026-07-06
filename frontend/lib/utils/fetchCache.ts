@@ -9,16 +9,61 @@ interface CacheEntry {
 const cache = new Map<string, CacheEntry>();
 const DEFAULT_TTL = 30_000;
 const FALLBACK_TTL = 24 * 60 * 60 * 1000; // 24 hours fallback window
+const MAX_MEMORY_ITEMS = 100;
+const STORAGE_PREFIX = 'zenith_cache_';
 
 function getCacheKey(url: string, method: string, body?: unknown): string {
   if (body) return `${method}:${url}:${JSON.stringify(body)}`;
   return `${method}:${url}`;
 }
 
+function pruneLocalStorage(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const keys: { key: string; timestamp: number }[] = [];
+    const now = Date.now();
+
+    for (let i = window.localStorage.length - 1; i >= 0; i--) {
+      const k = window.localStorage.key(i);
+      if (k && k.startsWith(STORAGE_PREFIX)) {
+        try {
+          const item = window.localStorage.getItem(k);
+          if (item) {
+            const entry = JSON.parse(item) as CacheEntry;
+            if (now - entry.timestamp > FALLBACK_TTL) {
+              window.localStorage.removeItem(k);
+            } else {
+              keys.push({ key: k, timestamp: entry.timestamp });
+            }
+          }
+        } catch {
+          window.localStorage.removeItem(k);
+        }
+      }
+    }
+
+    // If still over 50 items in localStorage, sort by timestamp and evict the oldest 20%
+    if (keys.length > 50) {
+      keys.sort((a, b) => a.timestamp - b.timestamp);
+      const toRemove = Math.floor(keys.length * 0.2);
+      for (let i = 0; i < toRemove; i++) {
+        window.localStorage.removeItem(keys[i].key);
+      }
+    }
+  } catch {
+    // Ignore access errors
+  }
+}
+
+// Run initial cleanup once in browser environment
+if (typeof window !== 'undefined') {
+  setTimeout(pruneLocalStorage, 2000);
+}
+
 function getFromLocalStorage<T>(key: string): CacheEntry | null {
   if (typeof window === 'undefined') return null;
   try {
-    const item = window.localStorage.getItem(`zenith_cache_${key}`);
+    const item = window.localStorage.getItem(`${STORAGE_PREFIX}${key}`);
     if (!item) return null;
     return JSON.parse(item) as CacheEntry;
   } catch {
@@ -29,9 +74,17 @@ function getFromLocalStorage<T>(key: string): CacheEntry | null {
 function saveToLocalStorage(key: string, entry: CacheEntry): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(`zenith_cache_${key}`, JSON.stringify(entry));
-  } catch {
-    // Ignore storage quota errors
+    window.localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(entry));
+  } catch (err) {
+    // Check if storage quota exceeded
+    if (err instanceof DOMException && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+      pruneLocalStorage();
+      try {
+        window.localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(entry));
+      } catch {
+        // If still failing after prune, ignore
+      }
+    }
   }
 }
 
@@ -52,7 +105,7 @@ function getCached<T>(key: string, allowStale = false): T | null {
   if (allowStale && age > FALLBACK_TTL) {
     cache.delete(key);
     if (typeof window !== 'undefined') {
-      try { window.localStorage.removeItem(`zenith_cache_${key}`); } catch {}
+      try { window.localStorage.removeItem(`${STORAGE_PREFIX}${key}`); } catch {}
     }
     return null;
   }
@@ -60,13 +113,10 @@ function getCached<T>(key: string, allowStale = false): T | null {
 }
 
 function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
-  if (cache.size > 100) {
+  if (cache.size >= MAX_MEMORY_ITEMS) {
     const oldest = cache.entries().next().value;
     if (oldest) {
       cache.delete(oldest[0]);
-      if (typeof window !== 'undefined') {
-        try { window.localStorage.removeItem(`zenith_cache_${oldest[0]}`); } catch {}
-      }
     }
   }
   const entry = { data, timestamp: Date.now(), ttl };
@@ -83,7 +133,7 @@ function clearCache(pattern?: string): void {
       try {
         for (let i = window.localStorage.length - 1; i >= 0; i--) {
           const k = window.localStorage.key(i);
-          if (k?.startsWith('zenith_cache_')) window.localStorage.removeItem(k);
+          if (k?.startsWith(STORAGE_PREFIX)) window.localStorage.removeItem(k);
         }
       } catch {}
     }
@@ -93,7 +143,7 @@ function clearCache(pattern?: string): void {
     if (key.includes(pattern)) {
       cache.delete(key);
       if (typeof window !== 'undefined') {
-        try { window.localStorage.removeItem(`zenith_cache_${key}`); } catch {}
+        try { window.localStorage.removeItem(`${STORAGE_PREFIX}${key}`); } catch {}
       }
     }
   }
@@ -102,6 +152,11 @@ function clearCache(pattern?: string): void {
 const inflight = new Map<string, Promise<unknown>>();
 
 async function fetchWithRetry<T>(url: string, options?: RequestInit, retries = 2, delayMs = 600): Promise<T> {
+  // If offline immediately fail to trigger fallback without waiting
+  if (typeof window !== 'undefined' && !navigator.onLine) {
+    throw new Error('Device is offline');
+  }
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const res = await fetch(url, { ...options, cache: options?.cache || 'no-store' });
@@ -114,7 +169,7 @@ async function fetchWithRetry<T>(url: string, options?: RequestInit, retries = 2
       }
       return await res.json();
     } catch (err) {
-      if (attempt < retries) {
+      if (attempt < retries && (typeof window === 'undefined' || navigator.onLine)) {
         await new Promise((r) => setTimeout(r, delayMs * Math.pow(2, attempt)));
         continue;
       }
@@ -133,7 +188,9 @@ export async function cachedFetch<T>(
   const cacheKey = getCacheKey(url, method, options?.body);
 
   if (shouldCache) {
-    const cached = getCached<T>(cacheKey, false);
+    // When offline, immediately allow stale data even if TTL expired (up to FALLBACK_TTL)
+    const isOffline = typeof window !== 'undefined' && !navigator.onLine;
+    const cached = getCached<T>(cacheKey, isOffline);
     if (cached !== null) return cached;
 
     const existing = inflight.get(cacheKey);
@@ -151,7 +208,7 @@ export async function cachedFetch<T>(
       if (shouldCache) {
         const staleFallback = getCached<T>(cacheKey, true);
         if (staleFallback !== null) {
-          console.warn(`[Fetch Fallback] Serving stale data for ${url} due to network error:`, err);
+          console.warn(`[Fetch Fallback] Serving stale data for ${url} due to network error/offline:`, err);
           return staleFallback;
         }
       }

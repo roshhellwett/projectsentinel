@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchPostById, updatePostStatus } from '@/lib/supabase/server';
 import { verifyAdminAuth } from '@/lib/api/auth';
+import { getServerCache, setServerCache, invalidateServerCache } from '@/lib/api/serverCache';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const cacheKey = `post:${id}`;
+    const cached = getServerCache<{ post: unknown }>(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached, {
+        headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' }
+      });
+    }
+
     const post = await fetchPostById(id);
     if (!post) {
       return NextResponse.json(
@@ -19,7 +28,10 @@ export async function GET(
         { status: 404, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       );
     }
-    return NextResponse.json({ post }, {
+    const payload = { post };
+    setServerCache(cacheKey, payload, 30_000); // 30s TTL for single post
+
+    return NextResponse.json(payload, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
       }
@@ -50,6 +62,12 @@ export async function PATCH(
 
     const normalizedNote = correction_note === '' ? null : correction_note;
     await updatePostStatus(id, status, normalizedNote);
+    
+    // Invalidate server caches when post is updated
+    invalidateServerCache(`post:${id}`);
+    invalidateServerCache('posts:');
+    invalidateServerCache('batch:');
+
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
