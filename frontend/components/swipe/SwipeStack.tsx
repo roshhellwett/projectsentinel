@@ -48,7 +48,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
     }
     const dx = Math.abs(newDrag.x - lastDragRef.current.x);
     const dy = Math.abs(newDrag.y - lastDragRef.current.y);
-    if (dx > 3 || dy > 3) {
+    if (dx > 6 || dy > 6) {
       lastDragRef.current = newDrag;
       setDrag(newDrag);
     }

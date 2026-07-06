@@ -35,11 +35,11 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
-        className="block relative overflow-hidden rounded-2xl border border-rule/60 shadow-hero hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.15)] transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-paper/70 backdrop-blur-2xl backdrop-saturate-[1.4]"
+        className="block relative overflow-hidden rounded-2xl border border-rule/60 shadow-hero hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.15)] transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/70 md:backdrop-blur-2xl md:backdrop-saturate-[1.4] transform-gpu backface-hidden select-none touch-action-manipulation"
       >
         {/* Category accent gradient bar — thicker, more prominent */}
         <div
-          className="absolute top-0 left-0 right-0 h-1 z-20 transition-all duration-500 group-hover/hero:h-1.5"
+          className="absolute top-0 left-0 right-0 h-1 z-20 transition-all duration-300 group-hover/hero:h-1.5"
           style={{ background: theme.cssGradient }}
           aria-hidden="true"
         />
@@ -64,7 +64,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Category Pill */}
               <span
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] rounded-full border backdrop-blur-md"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] rounded-full border md:backdrop-blur-md bg-white/90 dark:bg-black/90 md:bg-transparent"
                 style={theme.pill}
               >
                 <CategoryIcon name={theme.icon} className="w-3.5 h-3.5" strokeWidth={2.2} aria-hidden="true" />
@@ -79,14 +79,14 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
                 </span>
               )}
 
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted bg-paper/80 px-2.5 py-1 rounded-full border border-rule/50 backdrop-blur-md shadow-sm">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted bg-paper/95 md:bg-paper/80 px-2.5 py-1 rounded-full border border-rule/50 md:backdrop-blur-md shadow-sm">
                 <Clock className="w-3.5 h-3.5" />
                 <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
               </span>
             </div>
 
             {/* Prominent Score Ring */}
-            <div className="flex items-center gap-2.5 bg-paper/85 backdrop-blur-md px-3.5 py-2 rounded-full border border-rule/50 shadow-glass">
+            <div className="flex items-center gap-2.5 bg-paper/95 md:bg-paper/85 md:backdrop-blur-md px-3.5 py-2 rounded-full border border-rule/50 shadow-glass">
               <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted hidden sm:inline">Credibility</span>
               <ScoreRing score={post.credibility_score} size={40} strokeWidth={3.5} compact />
             </div>
@@ -103,7 +103,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
             </p>
 
             {firstHost && (
-              <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted bg-paper/80 border border-rule/50 px-4 py-2.5 rounded-xl backdrop-blur-md shadow-sm">
+              <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted bg-paper/95 md:bg-paper/80 border border-rule/50 px-4 py-2.5 rounded-xl md:backdrop-blur-md shadow-sm">
                 <Radio className="w-3.5 h-3.5 text-accent" />
                 <span className="font-bold uppercase tracking-[0.15em] text-accent">First reported by</span>
                 <span className="font-bold text-ink">{firstHost}</span>

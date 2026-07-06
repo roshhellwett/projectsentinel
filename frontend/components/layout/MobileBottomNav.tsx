@@ -140,7 +140,7 @@ export function MobileBottomNav() {
           </div>
         )}
         <div
-          className="relative border-t border-rule/40 bg-paper/65 dark:bg-black/65 backdrop-blur-2xl backdrop-saturate-[1.4]"
+          className="relative border-t border-rule/40 bg-[#fcfaf7]/98 dark:bg-[#121218]/98 backdrop-saturate-[1.4] select-none touch-action-manipulation"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />

@@ -98,7 +98,7 @@ const FeedItem = memo(function FeedItem({
 
   if (index >= 8) {
     return (
-      <div className="feed-card-shell h-full rounded-xl transition-all" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}>
+      <div className="feed-card-shell h-full rounded-xl transition-[transform,box-shadow,opacity] duration-200 transform-gpu select-none touch-action-manipulation" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}>
         {content}
       </div>
     );
@@ -110,11 +110,11 @@ const FeedItem = memo(function FeedItem({
       animate={{ opacity: 1, y: 0 }}
       transition={{
         type: 'spring',
-        stiffness: 380,
-        damping: 30,
-        delay: index * 0.04,
+        stiffness: 400,
+        damping: 32,
+        delay: index * 0.03,
       }}
-      className="feed-card-shell h-full rounded-xl transition-all"
+      className="feed-card-shell h-full rounded-xl transition-[transform,box-shadow,opacity] duration-200 transform-gpu select-none touch-action-manipulation"
       style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}
     >
       {content}
@@ -240,7 +240,7 @@ export function InfiniteFeed({
 
       <motion.div
         ref={gridRef}
-        className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch"
+        className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch transform-gpu touch-action-pan-y"
       >
         {posts.map((post, index) => (
           <FeedItem

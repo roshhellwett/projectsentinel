@@ -232,16 +232,16 @@ export function SwipeCard({
           scale: depth === 0 ? 1 : (depth === 1 ? 0.95 : 0.90),
           opacity: depth === 0 ? 1 : (depth === 1 ? 0.8 : 0.5),
           zIndex: depth === 0 ? 30 : (depth === 1 ? 20 : 10),
-          transition: { type: 'spring', stiffness: 350, damping: 28, mass: 0.8 }
+          transition: { type: 'spring', stiffness: 420, damping: 34, mass: 0.8 }
         }),
         exit: ({ exitDir }) => {
-          const transition = { duration: reducedMotion ? 0 : 0.3, ease: 'easeOut' as const };
+          const transition = { duration: reducedMotion ? 0 : 0.25, ease: [0.32, 0.72, 0, 1] as const };
           const w = typeof window !== 'undefined' ? window.innerWidth : 500;
           const h = typeof window !== 'undefined' ? window.innerHeight : 800;
           if (exitDir === 'up') return { y: -h, opacity: 0, transition };
           if (exitDir === 'down') return { y: h, opacity: 0, transition };
-          if (exitDir === 'left') return { x: -w, rotate: -20, opacity: 0, transition };
-          if (exitDir === 'right') return { x: w, rotate: 20, opacity: 0, transition };
+          if (exitDir === 'left') return { x: -w, rotate: -15, opacity: 0, transition };
+          if (exitDir === 'right') return { x: w, rotate: 15, opacity: 0, transition };
           return { opacity: 0, scale: 0.8, transition: { duration: 0.2 } };
         }
       }}
@@ -253,7 +253,7 @@ export function SwipeCard({
       drag={interactive && !exiting ? true : false}
       dragConstraints={interactive && !exiting ? (!canRewind ? { left: 0, bottom: 0 } : undefined) : undefined}
       dragDirectionLock={interactive ? true : undefined}
-      dragElastic={interactive ? 0.4 : undefined}
+      dragElastic={interactive ? 0.25 : undefined}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       aria-hidden={depth !== 0}

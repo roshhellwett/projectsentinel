@@ -32,7 +32,7 @@ export function MastheadClient({ avgScore, verifiedToday }: MastheadClientProps)
   return (
     <section
       aria-label="Today's stats masthead"
-      className="relative my-6 sm:my-8 p-7 sm:p-9 rounded-2xl bg-paper/70 backdrop-blur-2xl backdrop-saturate-[1.3] border border-rule/60 shadow-card overflow-hidden"
+      className="relative my-6 sm:my-8 p-7 sm:p-9 rounded-2xl bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/70 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] border border-rule/60 shadow-card overflow-hidden transform-gpu"
     >
       <div
         className="absolute -right-24 -top-24 w-96 h-96 rounded-full opacity-[0.07] dark:opacity-[0.12] blur-3xl pointer-events-none"
@@ -65,7 +65,7 @@ export function MastheadClient({ avgScore, verifiedToday }: MastheadClientProps)
         </div>
 
         <div className="flex flex-col sm:flex-row lg:flex-col gap-3 justify-end flex-shrink-0">
-          <div className="flex items-center justify-between sm:justify-start gap-5 p-4 rounded-xl bg-paper-2/70 border border-rule/60 shadow-sm backdrop-blur-xl backdrop-saturate-[1.3]">
+          <div className="flex items-center justify-between sm:justify-start gap-5 p-4 rounded-xl bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/70 border border-rule/60 shadow-sm md:backdrop-blur-xl md:backdrop-saturate-[1.3]">
             <div className="flex items-center gap-3">
               <span className="p-2.5 rounded-xl bg-cred-high/10 text-cred-high">
                 <ShieldCheck className="w-5 h-5" strokeWidth={2} />
@@ -93,7 +93,7 @@ export function MastheadClient({ avgScore, verifiedToday }: MastheadClientProps)
           </div>
 
           <div className="self-end sm:self-auto w-full sm:w-auto">
-            <LiveClock variant="hero" className="w-full bg-paper-2/70 rounded-xl border border-rule/60 px-4 py-2.5 shadow-sm backdrop-blur-xl backdrop-saturate-[1.3]" />
+            <LiveClock variant="hero" className="w-full bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/70 rounded-xl border border-rule/60 px-4 py-2.5 shadow-sm md:backdrop-blur-xl md:backdrop-saturate-[1.3]" />
           </div>
         </div>
       </div>

@@ -133,14 +133,15 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       aria-label={`Read article: ${post.headline}`}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'group relative isolate flex flex-col h-full cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
+        'group relative isolate flex flex-col h-full cursor-pointer transition-[transform,box-shadow,border-color,background-color] duration-250 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
         'bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] overflow-hidden',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
+        'transform-gpu backface-hidden select-none touch-action-manipulation',
         isRead && 'opacity-70 saturate-[0.7]',
         isNew && 'ring-2 ring-accent/50 shadow-[0_0_15px_rgba(var(--accent),0.3)]',
         'contain-layout'
       )}
-      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}
+      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px', willChange: 'transform' }}
     >
       {/* Category accent gradient line & ambient background */}
       <div

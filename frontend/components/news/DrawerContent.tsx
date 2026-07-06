@@ -46,7 +46,7 @@ interface DrawerContentProps {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 400, damping: 32 } }
 };
 
 export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
@@ -54,7 +54,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
 
   return (
     <article className={cn(
-      "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-7 lg:px-10 lg:pt-12 lg:pb-12 flex flex-col",
+      "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-7 lg:px-10 lg:pt-12 lg:pb-12 flex flex-col touch-action-pan-y transform-gpu",
       post.status === 'retracted' && "opacity-50"
     )}>
       {/* Decorative background blobs for premium feel */}
@@ -96,7 +96,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           className="mb-8 relative group"
         >
           <div className="absolute -inset-0.5 bg-gradient-to-br from-accent/20 to-transparent rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
-          <div className="relative rounded-2xl border border-white/30 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-md p-5 lg:p-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+          <div className="relative rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-5 lg:p-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-rule/50 pt-4">
               <div className="flex items-center gap-1.5">
@@ -131,7 +131,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
         </motion.div>
 
         <motion.div variants={itemVariants} className="mb-8">
-          <div className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-md p-6 lg:p-7 shadow-[0_4px_30px_rgba(0,0,0,0.1)] relative overflow-hidden group transition-all hover:bg-white/30 dark:hover:bg-black/30">
+          <div className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-6 lg:p-7 shadow-[0_4px_30px_rgba(0,0,0,0.1)] relative overflow-hidden group transition-all hover:bg-white/30 dark:hover:bg-black/30">
             {/* Accent Line inside the card to fix the floating bug */}
             <div className="absolute top-0 left-0 w-[4px] h-full bg-gradient-to-b from-accent to-accent/30" />
 
@@ -156,7 +156,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
 
         <motion.div
           variants={itemVariants}
-          className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-md p-5 lg:p-6 mb-8 relative overflow-hidden group hover:border-white/40 dark:hover:border-white/20 transition-colors shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
+          className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-5 lg:p-6 mb-8 relative overflow-hidden group hover:border-white/40 dark:hover:border-white/20 transition-colors shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
         >
           <div className="absolute top-0 left-0 w-1 h-full bg-accent/80 transition-all group-hover:bg-accent" />
           <h3 className={cn(typographyStyles.sectionHeading, "mb-3 flex items-center gap-2 text-ink")}>

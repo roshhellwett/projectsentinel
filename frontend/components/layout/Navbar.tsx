@@ -78,7 +78,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/70 supports-[backdrop-filter]:bg-paper/30 backdrop-filter backdrop-blur-2xl backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-[#fcfaf7]/98 dark:bg-[#121218]/98 md:bg-paper/70 md:supports-[backdrop-filter]:bg-paper/30 md:backdrop-filter md:backdrop-blur-2xl md:backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm transform-gpu select-none`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />

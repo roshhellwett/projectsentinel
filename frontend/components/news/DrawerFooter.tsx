@@ -11,7 +11,7 @@ interface DrawerFooterProps {
 
 export function DrawerFooter({ post, siteUrl }: DrawerFooterProps) {
   return (
-    <footer className={`relative ${Z_INDEX.cardOverlay} flex-shrink-0 border-t border-white/30 dark:border-white/10 bg-transparent px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 sm:px-3.5 sm:pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pt-3.5 lg:px-4 lg:py-3`}>
+    <footer className={`relative ${Z_INDEX.cardOverlay} flex-shrink-0 border-t border-white/30 dark:border-white/10 bg-transparent px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 sm:px-3.5 sm:pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pt-3.5 lg:px-4 lg:py-3 transform-gpu select-none touch-action-manipulation`}>
       <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-2 lg:gap-2.5">
         <BookmarkButton
           postId={post.id}

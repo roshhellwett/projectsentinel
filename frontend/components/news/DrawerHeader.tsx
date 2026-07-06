@@ -33,7 +33,7 @@ export function DrawerHeader({
     <header className={`relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-transparent border-b border-white/30 dark:border-white/10 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
       {/* Gradient Category Header Bar across exact top */}
       <div
-        className="w-full h-[3px] flex-shrink-0 transition-all duration-500"
+        className="w-full h-[3px] flex-shrink-0 transition-opacity duration-300 transform-gpu"
         style={{ background: theme.cssGradient, boxShadow: `0 1px 8px ${theme.gradientFrom}33` }}
         aria-hidden="true"
       />
@@ -53,13 +53,13 @@ export function DrawerHeader({
         <div className="flex items-center gap-1.5">
           {/* Swipe / Story Navigation Buttons */}
           {(onPrev || onNext) && (
-            <div className="flex items-center gap-1 mr-2 bg-paper-2/70 p-1 rounded-xl border border-rule/50 shadow-sm backdrop-blur-xl">
+            <div className="flex items-center gap-1 mr-2 bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/70 p-1 rounded-xl border border-rule/50 shadow-sm md:backdrop-blur-xl select-none">
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.88 }}
                 onClick={() => { haptic.light(); onPrev?.(); }}
                 disabled={!onPrev}
-                className="p-1.5 rounded-lg text-ink hover:bg-paper disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                className="p-1.5 rounded-lg text-ink hover:bg-paper disabled:opacity-30 disabled:pointer-events-none transition-colors touch-action-manipulation"
                 aria-label="Previous story"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -69,7 +69,7 @@ export function DrawerHeader({
                 whileTap={{ scale: 0.88 }}
                 onClick={() => { haptic.light(); onNext?.(); }}
                 disabled={!onNext}
-                className="p-1.5 rounded-lg text-ink hover:bg-paper disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                className="p-1.5 rounded-lg text-ink hover:bg-paper disabled:opacity-30 disabled:pointer-events-none transition-colors touch-action-manipulation"
                 aria-label="Next story"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -81,7 +81,7 @@ export function DrawerHeader({
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={() => { haptic.light(); onClose(); }}
-            className="tap-target min-w-[44px] min-h-[44px] p-2 hover:bg-paper-2 rounded-xl border border-transparent hover:border-rule transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0 flex items-center justify-center"
+            className="tap-target min-w-[44px] min-h-[44px] p-2 hover:bg-paper-2 rounded-xl border border-transparent hover:border-rule transition-[background-color,border-color,color,transform] duration-150 transform-gpu touch-action-manipulation select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0 flex items-center justify-center"
             aria-label="Close article"
           >
             <X className="w-5 h-5 text-muted hover:text-ink transition-colors" />

@@ -166,7 +166,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-paper/80 dark:bg-black/80 backdrop-blur-2xl backdrop-saturate-[1.3] will-change-opacity`}
+          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-[#fcfaf7]/98 dark:bg-[#121218]/98 md:bg-paper/80 md:dark:bg-black/80 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] will-change-opacity transform-gpu select-none`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -187,7 +187,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="tap-target p-2 hover:bg-paper-2 rounded transition-all hover-lift duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target p-2 hover:bg-paper-2 rounded transition-[background-color,transform] duration-150 transform-gpu touch-action-manipulation select-none hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Close search"
               >
                 <X className="w-6 h-6 text-muted" />
@@ -220,7 +220,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                       setQuery('');
                       inputRef.current?.focus();
                     }}
-                    className="absolute right-3 p-1.5 text-muted hover:text-ink rounded-full transition-colors"
+                    className="absolute right-3 p-1.5 text-muted hover:text-ink rounded-full transition-colors touch-action-manipulation"
                     aria-label="Clear search query"
                   >
                     <X className="w-4 h-4" />
@@ -248,7 +248,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                   <button
                     type="button"
                     onClick={() => setQuery((q) => q + ' ')}
-                    className="px-4 py-2 bg-ink text-paper text-xs font-bold rounded-lg shadow-sm"
+                    className="px-4 py-2 bg-ink text-paper text-xs font-bold rounded-lg shadow-sm touch-action-manipulation"
                   >
                     Retry
                   </button>
@@ -272,7 +272,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                       <div
                         key={post.id}
                         onClick={() => handleSelect(post)}
-                        className="cursor-pointer transition-transform duration-200 hover:-translate-y-0.5"
+                        className="cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 transform-gpu touch-action-manipulation select-none"
                       >
                         <NewsCard post={post} />
                       </div>
