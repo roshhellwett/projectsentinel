@@ -210,7 +210,7 @@ export function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
               transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 450, damping: 28, mass: 0.7 }}
-              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/80 backdrop-blur-2xl backdrop-saturate-[1.4] border-l border-rule shadow-paper-lift flex flex-col will-change-transform transform-gpu`}
+              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-[#fcfaf7] dark:bg-[#121218] border-l border-rule shadow-paper-lift flex flex-col transform-gpu overflow-x-hidden`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',

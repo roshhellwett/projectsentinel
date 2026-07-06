@@ -156,7 +156,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased`}
+        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased overflow-x-hidden w-full max-w-full relative`}
       >
         {gtmId && (
           <noscript>

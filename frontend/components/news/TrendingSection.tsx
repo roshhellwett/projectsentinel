@@ -116,7 +116,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                   href={`/news/${post.id}/`}
                   onClick={() => haptic.light()}
                   data-read={read ? 'true' : 'false'}
-                  className={`group relative ${Z_INDEX.content} flex flex-col justify-between h-full p-5 rounded-2xl bg-paper border border-rule/60 shadow-card hover:shadow-card-lg hover:border-accent/30 transition-all duration-400 overflow-hidden ${read ? 'opacity-60 saturate-[0.75]' : ''}`}
+                  className={`group relative ${Z_INDEX.content} flex flex-col justify-between h-full p-5 rounded-2xl bg-paper border border-rule/60 shadow-card hover:shadow-card-lg hover:border-accent/30 transition-all duration-400 overflow-hidden w-full max-w-full ${read ? 'opacity-60 saturate-[0.75]' : ''}`}
                   aria-label={`${post.headline} (Rank ${rank})`}
                 >
                   {/* Category accent bar */}

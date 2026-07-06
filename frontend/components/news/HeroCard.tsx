@@ -30,7 +30,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
       initial={{ opacity: 0, scale: 0.96, y: reducedMotion ? 0 : 24 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="relative group [perspective:1200px]"
+      className="relative group [perspective:1200px] w-full max-w-full overflow-hidden"
     >
       <Link
         href={`/news/${post.id}/`}

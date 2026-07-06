@@ -134,14 +134,14 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       data-read={isRead ? 'true' : 'false'}
       className={cn(
         'group relative isolate flex flex-col h-full cursor-pointer transition-[transform,box-shadow,border-color,background-color] duration-250 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
-        'bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] overflow-hidden',
+        'bg-white dark:bg-[#181822] md:bg-white/40 md:dark:bg-white/5 md:backdrop-blur-xl border border-rule/80 dark:border-white/10 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] overflow-hidden',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         'transform-gpu backface-hidden select-none touch-action-manipulation',
         isRead && 'opacity-70 saturate-[0.7]',
         isNew && 'ring-2 ring-accent/50 shadow-[0_0_15px_rgba(var(--accent),0.3)]',
         'contain-layout'
       )}
-      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px', willChange: 'transform' }}
+      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 340px' }}
     >
       {/* Category accent gradient line & ambient background */}
       <div
@@ -256,7 +256,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
 
       {/* Read overlay badge */}
       {isRead && (
-        <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cred-high/15 text-cred-high text-[10px] font-bold backdrop-blur-sm">
+        <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cred-high/15 text-cred-high text-[10px] font-bold md:backdrop-blur-sm">
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           {t('card.read')}
         </div>

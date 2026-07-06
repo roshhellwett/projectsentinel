@@ -91,7 +91,15 @@ html {
   scroll-behavior: smooth;
   background-color: rgb(var(--c-paper));
   text-rendering: optimizeLegibility;
-  scrollbar-gutter: stable;
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+@media (min-width: 1024px) {
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 
 html.dark {
@@ -119,6 +127,12 @@ html.dark {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    position: relative;
+    margin: 0;
+    padding: 0;
   }
 
   body::before {
@@ -173,7 +187,6 @@ html.dark {
     box-shadow 350ms var(--ease-apple),
     transform 350ms var(--ease-apple);
   transform: translateZ(0);
-  will-change: transform;
 }
 
 /* --- Glassmorphism background & blur --- */
@@ -202,9 +215,14 @@ html.dark {
 @media (max-width: 1023px) {
   .glass,
   .premium-card,
-  .news-card-wrap {
+  .news-card-wrap,
+  [class*="backdrop-blur"] {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+  .glass,
+  .premium-card,
+  .news-card-wrap {
     background: rgb(var(--c-paper) / 0.98) !important;
   }
   .dark .glass,

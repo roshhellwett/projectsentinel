@@ -90,7 +90,7 @@ export function BookmarkButton({
         aria-label={saved ? 'Remove from saved' : 'Save for later'}
         className={cn(
           buttonVariants({ variant: saved ? 'secondary' : 'outline' }),
-          'relative tap-target gap-2 px-4 py-2 hover-lift will-change-transform transform-gpu rounded-xl font-bold shadow-sm',
+          'relative tap-target gap-2 px-4 py-2 hover-lift transform-gpu rounded-xl font-bold shadow-sm',
           saved
             ? 'bg-like/10 border-like text-like hover:bg-like/15 shadow-glow-like'
             : 'text-muted border-rule hover:border-ink hover:bg-paper-2 hover:text-ink',
@@ -135,7 +135,7 @@ export function BookmarkButton({
       aria-pressed={saved}
       aria-label={saved ? 'Remove from saved' : 'Save for later'}
       className={cn(
-        'group relative tap-target min-w-[44px] min-h-[44px] flex items-center justify-center touch-polish p-2 -m-2 rounded-full transition-colors duration-200 will-change-transform transform-gpu',
+        'group relative tap-target min-w-[44px] min-h-[44px] flex items-center justify-center touch-polish p-2 -m-2 rounded-full transition-colors duration-200 transform-gpu',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
         saved
           ? 'text-like animate-reward-pulse'

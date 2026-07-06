@@ -122,7 +122,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
       {post && (
         <>
           <motion.div
-            className={`fixed inset-0 bg-ink/60 dark:bg-black/70 ${Z_INDEX.modalBackdrop} transform-gpu will-change-opacity`}
+            className={`fixed inset-0 bg-ink/60 dark:bg-black/70 ${Z_INDEX.modalBackdrop} transform-gpu`}
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -152,7 +152,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
                 y.set(0);
               }
             }}
-            className={`fixed ${Z_INDEX.drawerPanel} bg-[#fcfaf7] dark:bg-[#121218] md:bg-white/85 md:dark:bg-black/85 md:backdrop-blur-[24px] border-l border-rule shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col will-change-transform transform-gpu`}
+            className={`fixed ${Z_INDEX.drawerPanel} bg-[#fcfaf7] dark:bg-[#121218] md:bg-white/85 md:dark:bg-black/85 md:backdrop-blur-[24px] border-l border-rule shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col transform-gpu`}
             initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}

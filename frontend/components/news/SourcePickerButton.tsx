@@ -173,7 +173,7 @@ export function SourcePickerButton({
           ref={menuRef}
           role="menu"
           tabIndex={-1}
-          className={`${Z_INDEX.popover} rounded border border-rule-strong bg-paper p-2 shadow-paper-lift will-change-transform will-change-opacity transform-gpu`}
+          className={`${Z_INDEX.popover} rounded border border-rule-strong bg-paper p-2 shadow-paper-lift transform-gpu overflow-hidden`}
           style={{
             ...((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties),
             transformOrigin: isSheet && isMobile ? 'bottom center' : (isSheet ? 'bottom right' : 'bottom left')

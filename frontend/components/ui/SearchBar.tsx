@@ -166,7 +166,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-[#fcfaf7]/98 dark:bg-[#121218]/98 md:bg-paper/80 md:dark:bg-black/80 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] will-change-opacity transform-gpu select-none`}
+          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-[#fcfaf7] dark:bg-[#121218] md:bg-paper/80 md:dark:bg-black/80 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] transform-gpu select-none overflow-x-hidden w-full max-w-full touch-action-manipulation`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -177,7 +177,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : -10, scale: reducedMotion ? 1 : 0.98 }}
             transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
-            className="container mx-auto px-4 py-8 md:py-10 will-change-transform transform-gpu"
+            className="container mx-auto px-4 py-8 md:py-10 transform-gpu"
           >
             <div className="flex items-center justify-between mb-8">
               <div>

@@ -54,7 +54,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
 
   return (
     <article className={cn(
-      "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overscroll-contain px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-7 lg:px-10 lg:pt-12 lg:pb-12 flex flex-col touch-action-pan-y transform-gpu",
+      "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full overscroll-contain px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-7 lg:px-10 lg:pt-12 lg:pb-12 flex flex-col touch-action-pan-y transform-gpu",
       post.status === 'retracted' && "opacity-50"
     )}>
       {/* Decorative background blobs for premium feel */}

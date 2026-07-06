@@ -32,7 +32,7 @@ export function MastheadClient({ avgScore, verifiedToday }: MastheadClientProps)
   return (
     <section
       aria-label="Today's stats masthead"
-      className="relative my-6 sm:my-8 p-7 sm:p-9 rounded-2xl bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/70 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] border border-rule/60 shadow-card overflow-hidden transform-gpu"
+      className="relative my-6 sm:my-8 p-7 sm:p-9 rounded-2xl bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/70 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] border border-rule/60 shadow-card overflow-hidden w-full max-w-full transform-gpu"
     >
       <div
         className="absolute -right-24 -top-24 w-96 h-96 rounded-full opacity-[0.07] dark:opacity-[0.12] blur-3xl pointer-events-none"
