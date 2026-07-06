@@ -7,7 +7,7 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
-const DEFAULT_TTL = 30_000;
+const DEFAULT_TTL = 60_000;
 const FALLBACK_TTL = 24 * 60 * 60 * 1000; // 24 hours fallback window
 const MAX_MEMORY_ITEMS = 100;
 const STORAGE_PREFIX = 'zenith_cache_';
@@ -121,7 +121,7 @@ function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
   }
   const entry = { data, timestamp: Date.now(), ttl };
   cache.set(key, entry);
-  if (key.includes('/api/posts/') || key.includes('/api/post/')) {
+  if (key.startsWith('GET:')) {
     saveToLocalStorage(key, entry);
   }
 }

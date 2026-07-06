@@ -195,7 +195,7 @@ export function useSwipeQueue({
       try {
         payload = await cachedFetch<{ posts: Post[]; count?: number }>(
           `/api/posts/?${params.toString()}`,
-          { signal: controller.signal, cacheTtl: 10_000 },
+          { signal: controller.signal, cacheTtl: 60_000 },
         );
       } finally {
         clearTimeout(timeoutId);

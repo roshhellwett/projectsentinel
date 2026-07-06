@@ -100,7 +100,7 @@ export function useInfiniteFeed({
       
       const payload = await cachedFetch<{ posts: Post[]; nextCursor: string | null; hasMore: boolean }>(
         `/api/posts/?${params.toString()}`,
-        { cacheTtl: 15_000, signal: controller.signal },
+        { cacheTtl: 60_000, signal: controller.signal },
       );
 
       if (mountedRef.current && !controller.signal.aborted) {

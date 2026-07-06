@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useRef } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 
 interface SwipeBreakPromptProps {
   cardsThisSession: number;
@@ -13,14 +14,32 @@ interface SwipeBreakPromptProps {
 export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: SwipeBreakPromptProps) {
   const autoTimerRef = useRef<number | null>(null);
   const onSnoozeRef = useRef(onSnooze);
+  const onContinueRef = useRef(onContinue);
+  const primaryBtnRef = useRef<HTMLButtonElement>(null);
   onSnoozeRef.current = onSnooze;
+  onContinueRef.current = onContinue;
 
   useEffect(() => {
+    lockBodyScroll();
+    const focusTimer = window.setTimeout(() => primaryBtnRef.current?.focus(), 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+        onContinueRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     autoTimerRef.current = window.setTimeout(() => {
       onSnoozeRef.current();
     }, 60000);
+
     return () => {
       if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+      window.clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      unlockBodyScroll();
     };
   }, []);
 
@@ -54,6 +73,7 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
           </p>
           <div className="flex flex-col gap-2">
             <button
+              ref={primaryBtnRef}
               type="button"
               onClick={() => {
                 if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);

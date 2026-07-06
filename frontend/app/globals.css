@@ -94,6 +94,7 @@ html {
   overflow-x: hidden !important;
   max-width: 100vw !important;
   width: 100% !important;
+  overscroll-behavior-x: none !important;
 }
 
 @media (min-width: 1024px) {
@@ -115,6 +116,7 @@ html.dark {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    overscroll-behavior-x: none !important;
   }
 
   body {
@@ -127,6 +129,7 @@ html.dark {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
+    overscroll-behavior-x: none !important;
     overflow-x: hidden !important;
     max-width: 100vw !important;
     width: 100% !important;
@@ -173,61 +176,58 @@ html.dark {
   }
 }
 
-.glass,
-.premium-card,
-.news-card-wrap {
+.glass {
   position: relative;
   border: 1px solid rgb(var(--c-rule));
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow:
-    0 1px 3px rgb(var(--c-shadow) / 0.04),
-    0 4px 12px rgb(var(--c-shadow) / 0.03);
+    0 4px 20px rgb(var(--c-shadow) / 0.05);
   transition:
     border-color 250ms var(--ease-apple),
     box-shadow 350ms var(--ease-apple),
     transform 350ms var(--ease-apple);
   transform: translateZ(0);
-}
-
-/* --- Glassmorphism background & blur --- */
-.glass {
-  background: rgb(var(--c-paper) / 0.62);
+  background: rgb(var(--c-paper) / 0.75);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
 
 .premium-card,
 .news-card-wrap {
-  background: rgb(var(--c-paper) / 0.72);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  position: relative;
+  border: 1px solid rgb(var(--c-rule));
+  border-radius: 24px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.06);
+  transition:
+    border-color 250ms var(--ease-apple),
+    box-shadow 350ms var(--ease-apple),
+    transform 350ms var(--ease-apple);
+  transform: translateZ(0);
+  background: #ffffff;
 }
 
 .dark .glass {
-  background: rgb(var(--c-paper) / 0.35);
+  background: rgb(var(--c-paper) / 0.45);
 }
 
 .dark .premium-card,
 .dark .news-card-wrap {
-  background: rgb(var(--c-paper) / 0.50);
+  background: #13131c;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 1023px) {
   .glass,
-  .premium-card,
-  .news-card-wrap,
   [class*="backdrop-blur"] {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-  .glass,
-  .premium-card,
-  .news-card-wrap {
+  .glass {
     background: rgb(var(--c-paper) / 0.98) !important;
   }
-  .dark .glass,
-  .dark .premium-card,
-  .dark .news-card-wrap {
+  .dark .glass {
     background: rgb(var(--c-paper) / 0.95) !important;
   }
 }

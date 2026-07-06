@@ -5,7 +5,7 @@ import { getServerCache, setServerCache } from '@/lib/api/serverCache';
 export const dynamic = 'force-dynamic';
 
 const CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
 } as const;
 
 export async function GET(request: Request) {
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
 
   try {
     const result = await searchPosts(q, limit);
-    setServerCache(cacheKey, result, 30_000); // 30s server memory TTL for search
+    setServerCache(cacheKey, result, 60_000); // 60s server memory TTL for search
     return NextResponse.json(result, { headers: CACHE_HEADERS });
   } catch {
     return NextResponse.json(

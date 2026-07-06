@@ -157,7 +157,7 @@ const nextConfig = {
 
   experimental: {
     // Optimize for production
-    optimizePackageImports: ['lucide-react', '@supabase/ssr'],
+    optimizePackageImports: ['lucide-react', '@supabase/ssr', 'framer-motion', 'clsx'],
   },
 };
 

@@ -4,7 +4,7 @@ interface ServerCacheEntry {
 }
 
 const serverCache = new Map<string, ServerCacheEntry>();
-const MAX_SERVER_CACHE_KEYS = 200;
+const MAX_SERVER_CACHE_KEYS = 500;
 
 export function getServerCache<T>(key: string): T | null {
   const entry = serverCache.get(key);
@@ -16,7 +16,7 @@ export function getServerCache<T>(key: string): T | null {
   return entry.data as T;
 }
 
-export function setServerCache(key: string, data: unknown, ttlMs = 15_000): void {
+export function setServerCache(key: string, data: unknown, ttlMs = 60_000): void {
   if (serverCache.size >= MAX_SERVER_CACHE_KEYS) {
     const oldestKey = serverCache.keys().next().value;
     if (oldestKey) serverCache.delete(oldestKey);

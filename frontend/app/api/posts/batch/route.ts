@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   const cached = getServerCache<{ posts: Post[] }>(cacheKey);
   if (cached) {
     return NextResponse.json(cached, {
-      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120' }
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' }
     });
   }
 
@@ -58,10 +58,10 @@ export async function POST(request: Request) {
     const ordered = valid.map((id) => byId.get(id)).filter(Boolean) as Post[];
     const payload = { posts: ordered };
 
-    setServerCache(cacheKey, payload, 20_000); // 20s TTL for batch fetches
+    setServerCache(cacheKey, payload, 60_000); // 60s TTL for batch fetches
 
     return NextResponse.json(payload, {
-      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120' }
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' }
     });
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {

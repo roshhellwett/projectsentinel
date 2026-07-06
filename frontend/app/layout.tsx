@@ -13,6 +13,8 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   weight: ['300', '400', '500', '600', '700'],
+  adjustFontFallback: true,
+  preload: true,
 });
 
 const playfair = Playfair_Display({
@@ -21,12 +23,16 @@ const playfair = Playfair_Display({
   display: 'swap',
   weight: ['400', '500', '600', '700', '800'],
   style: ['normal', 'italic'],
+  adjustFontFallback: true,
+  preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
   display: 'swap',
+  adjustFontFallback: true,
+  preload: true,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';

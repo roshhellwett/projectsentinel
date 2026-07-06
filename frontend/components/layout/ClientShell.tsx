@@ -20,7 +20,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
       <NewsBackground />
       <I18nProvider>
         <Navbar />
-        <main id="main" className="flex-1 w-full" tabIndex={-1}>
+        <main id="main" className="flex-1 w-full max-w-full overflow-x-hidden" tabIndex={-1}>
           {children}
         </main>
         <Footer />
