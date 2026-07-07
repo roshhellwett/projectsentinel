@@ -3,7 +3,7 @@ import { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
 import { subscribeToPosts } from '@/lib/supabase/client';
 import { DEFAULT_PAGE_SIZE } from '@/lib/config/constants';
-import { cachedFetch } from '@/lib/utils/fetchCache';
+import { cachedFetch, invalidatePostsCache } from '@/lib/utils/fetchCache';
 
 interface UseInfiniteFeedProps {
   initialPosts: Post[];
@@ -199,6 +199,83 @@ export function useInfiniteFeed({
         clearTimeout(tid);
       }
       flashTimers.clear();
+    };
+  }, [processIncomingPosts]);
+
+  // ─── Periodic polling for latest news ──────────────────────────────
+  // Uses a lightweight check endpoint first (~50 byte response) and only
+  // fetches full post data when new content exists — minimising egress.
+  useEffect(() => {
+    let mounted = true;
+    let pollTimer: ReturnType<typeof setTimeout> | null = null;
+
+    async function pollLatest() {
+      if (!mounted) return;
+      if (typeof document !== 'undefined' && document.hidden) {
+        pollTimer = setTimeout(pollLatest, 60_000);
+        return;
+      }
+
+      const latestPost = postsRef.current[0];
+      const since = latestPost?.id;
+      if (!since) {
+        pollTimer = setTimeout(pollLatest, 60_000);
+        return;
+      }
+
+      try {
+        // 1. Lightweight check — no post data, just a boolean
+        const checkRes = await fetch(`/api/posts/check?since=${since}&_cb=${Date.now()}`);
+        if (!checkRes.ok) { pollTimer = setTimeout(pollLatest, 60_000); return; }
+        const { hasNew } = await checkRes.json();
+        if (!hasNew) { pollTimer = setTimeout(pollLatest, 60_000); return; }
+
+        // 2. Only fetch full post data when new content exists
+        invalidatePostsCache();
+        const params = new URLSearchParams({
+          limit: '5',
+          _cb: String(Date.now()),
+          _poll: '1',
+        });
+
+        const payload = await cachedFetch<{ posts: Post[] }>(
+          `/api/posts/?${params.toString()}`,
+          { cacheTtl: 0 },
+        );
+
+        if (!mounted) return;
+        const incoming = (payload.posts ?? []).filter(
+          (p) => !postsRef.current.some((existing) => existing.id === p.id),
+        );
+        if (incoming.length > 0) {
+          processIncomingPosts(incoming);
+        }
+      } catch {
+        // Silently retry on next interval
+      }
+
+      if (mounted) {
+        pollTimer = setTimeout(pollLatest, 60_000);
+      }
+    }
+
+    pollTimer = setTimeout(pollLatest, 8_000);
+
+    const onVisibility = () => {
+      if (typeof document !== 'undefined' && !document.hidden && pollTimer === null) {
+        pollLatest();
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibility);
+    }
+
+    return () => {
+      mounted = false;
+      if (pollTimer !== null) clearTimeout(pollTimer);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibility);
+      }
     };
   }, [processIncomingPosts]);
 

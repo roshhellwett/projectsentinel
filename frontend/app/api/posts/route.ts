@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   const rawLimit = Number.parseInt(searchParams.get('limit') || '20', 10);
   const limit = Math.min(50, Math.max(1, Number.isFinite(rawLimit) ? rawLimit : 20));
   const category = searchParams.get('category') || undefined;
-  const bypass = searchParams.get('_cb') !== null; // cache-bust param for realtime
+  const bypass = searchParams.get('_cb') !== null || searchParams.get('_poll') !== null; // cache-bust param for realtime/polling
 
   const cacheKey = `posts:cursor=${cursor || 'null'}:limit=${limit}:cat=${category || 'all'}`;
 

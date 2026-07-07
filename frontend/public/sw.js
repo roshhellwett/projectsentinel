@@ -35,10 +35,22 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin/')) return;
   if (url.pathname.match(/\.(map|json)$/)) return;
 
+  // HTML pages: always go to network, use cache only when offline
+  if (request.headers.get('Accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(request).catch(() =>
+        caches.match(request).then((cached) =>
+          cached || caches.match('/offline'),
+        ),
+      ),
+    );
+    return;
+  }
+
+  // Static assets: network-first with cache fallback
   event.respondWith(
     fetch(request)
       .then((response) => {
-        // Cache successful non-API responses
         if (response.ok || response.status === 304) {
           const clone = response.clone();
           caches.open(CACHE).then((cache) => {
@@ -47,15 +59,11 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => {
-        // Offline fallback
-        return caches.match(request).then((cached) => {
+      .catch(() =>
+        caches.match(request).then((cached) => {
           if (cached) return cached;
-          if (request.headers.get('Accept')?.includes('text/html')) {
-            return caches.match('/offline');
-          }
           return new Response('', { status: 503 });
-        });
-      }),
+        }),
+      ),
   );
 });
