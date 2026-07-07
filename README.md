@@ -6,7 +6,7 @@
 
 # INDIA VERIFIED
 
-An AI-powered, fully automated Indian news aggregator that cross-references stories across multiple trusted sources before publishing. Zero human intervention. No ads. No bias.
+AI-powered Indian news aggregator that cross-references stories across multiple trusted sources before publishing. The whole pipeline runs on its own — fetch, verify, write, publish.
 
 ---
 
