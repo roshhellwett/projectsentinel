@@ -17,7 +17,7 @@ import dynamic from 'next/dynamic';
 
 const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), {
   ssr: false,
-  loading: () => <div className="fixed inset-0 bg-paper/80 backdrop-blur-sm z-50 animate-fade-in" aria-hidden="true" />,
+  loading: () => <div className="fixed inset-0 bg-paper md:bg-paper/80 md:backdrop-blur-sm z-50 animate-fade-in" aria-hidden="true" />,
 });
 const MilestoneCelebration = dynamic(() => import('@/components/ui/MilestoneCelebration').then(m => m.MilestoneCelebration), {
   ssr: false,
@@ -177,6 +177,13 @@ export function InfiniteFeed({
     handleOpen(post);
   }, [handleOpen]);
 
+  const handleCardClickRef = useRef(handleCardClick);
+  handleCardClickRef.current = handleCardClick;
+
+  const stableOnCardClick = useCallback((post: Post) => {
+    handleCardClickRef.current(post);
+  }, []);
+
   const handleCardKeyDown = useCallback((e: React.KeyboardEvent, post: Post) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -254,7 +261,7 @@ export function InfiniteFeed({
             isNew={freshIds.has(post.id)}
             isRead={readMap.has(post.id)}
             wasRecentlyOpened={lastOpenedId === post.id}
-            onCardClick={handleCardClick}
+            onCardClick={stableOnCardClick}
           />
         ))}
       </motion.div>

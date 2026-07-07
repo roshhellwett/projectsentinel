@@ -2,7 +2,7 @@
 
 import { ArrowRight, ArrowDown, ArrowUp, Undo2 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, useMotionValueEvent, type MotionValue } from 'framer-motion';
+import { motion, useTransform, useMotionValue, useMotionValueEvent, type MotionValue } from 'framer-motion';
 import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
@@ -28,41 +28,19 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
     setHasSeen(safeRead(SEEN_KEY) === 'true');
   }, []);
 
-  const [nextRight, setNextRight] = useState(0);
-  const [prevLeft, setPrevLeft] = useState(0);
-  const [nextUp, setNextUp] = useState(0);
-  const [prevDown, setPrevDown] = useState(0);
-
   const lastSeenCheck = useRef(0);
 
-  const updateOpa = useRef(() => {
-    const x = dragX.get();
-    const y = dragY.get();
-    const ax = Math.abs(x);
-    const ay = Math.abs(y);
-    const hd = ax > ay;
-    setNextRight(hd && x > 0 ? clamp01(x / TRIGGER) : 0);
-    setPrevLeft(hd && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0);
-    setNextUp(!hd && y < 0 ? clamp01(-y / TRIGGER) : 0);
-    setPrevDown(!hd && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0);
-
-    if (!hasSeen && lastSeenCheck.current < Date.now() - 500) {
-      const max = Math.max(
-        hd && x > 0 ? clamp01(x / TRIGGER) : 0,
-        hd && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0,
-        !hd && y < 0 ? clamp01(-y / TRIGGER) : 0,
-        !hd && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0,
-      );
-      if (max > 0.6) {
-        lastSeenCheck.current = Date.now();
-        safeWrite(SEEN_KEY, true);
-        setHasSeen(true);
-      }
+  const checkSeen = (val: number) => {
+    if (hasSeen) return;
+    if (Math.abs(val) > TRIGGER * 0.6 && lastSeenCheck.current < Date.now() - 500) {
+      lastSeenCheck.current = Date.now();
+      safeWrite(SEEN_KEY, true);
+      setHasSeen(true);
     }
-  });
+  };
 
-  useMotionValueEvent(dragX, 'change', () => { updateOpa.current(); });
-  useMotionValueEvent(dragY, 'change', () => { updateOpa.current(); });
+  useMotionValueEvent(dragX, 'change', checkSeen);
+  useMotionValueEvent(dragY, 'change', checkSeen);
 
   if (hasSeen) return null;
 
@@ -71,30 +49,36 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
       <Badge
         label="Next"
         icon={<ArrowRight className="w-4 h-4" />}
-        opacity={nextRight}
+        dragVal={dragX}
+        range={[0, TRIGGER]}
         position="right"
         accent="border-accent text-accent bg-paper"
       />
       <Badge
         label="Previous"
         icon={<Undo2 className="w-4 h-4" />}
-        opacity={prevLeft}
+        dragVal={dragX}
+        range={[0, -TRIGGER]}
         position="left"
         accent="border-rule-strong text-ink bg-paper"
+        disabled={!canRewind}
       />
       <Badge
         label="Next"
         icon={<ArrowUp className="w-4 h-4" />}
-        opacity={nextUp}
+        dragVal={dragY}
+        range={[0, -TRIGGER]}
         position="top"
         accent="border-accent text-accent bg-paper"
       />
       <Badge
         label="Previous"
         icon={<ArrowDown className="w-4 h-4" />}
-        opacity={prevDown}
+        dragVal={dragY}
+        range={[0, TRIGGER]}
         position="bottom"
         accent="border-rule-strong text-ink bg-paper"
+        disabled={!canRewind}
       />
     </motion.div>
   );
@@ -112,27 +96,31 @@ const POSITION_STYLE: Record<BadgePosition, React.CSSProperties> = {
 function Badge({
   label,
   icon,
-  opacity,
+  dragVal,
+  range,
   position,
   accent,
+  disabled = false,
 }: {
   label: string;
   icon: React.ReactNode;
-  opacity: number;
+  dragVal: MotionValue<number>;
+  range: [number, number];
   position: BadgePosition;
   accent: string;
+  disabled?: boolean;
 }) {
-  if (opacity <= 0.02) return null;
+  const opacity = useTransform(dragVal, range, [0, disabled ? 0 : 1]);
+  const scale = useTransform(opacity, [0, 1], [0.9, 1]);
   const base = POSITION_STYLE[position];
-  const scale = 0.9 + opacity * 0.1;
-  const composedTransform = `${base.transform ?? ''} scale(${scale})`.trim();
+
   return (
-    <div
+    <motion.div
       className={`absolute inline-flex items-center gap-2 px-3 py-1.5 border-2 rounded-md text-[11px] font-bold uppercase tracking-[0.18em] shadow-paper-lift will-change-transform transform-gpu ${accent}`}
-      style={{ ...base, transform: composedTransform, opacity }}
+      style={{ ...base, opacity, scale }}
     >
       {icon}
       <span>{label}</span>
-    </div>
+    </motion.div>
   );
 }

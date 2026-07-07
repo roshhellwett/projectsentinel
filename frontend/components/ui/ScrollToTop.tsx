@@ -6,12 +6,17 @@ import { Z_INDEX } from '@/lib/theme/zIndex';
 
 export function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
   const tickingRef = useRef(false);
 
   const handleScroll = useCallback(() => {
     if (!tickingRef.current) {
       requestAnimationFrame(() => {
-        setIsVisible(window.scrollY > 500);
+        const next = window.scrollY > 500;
+        if (next !== isVisibleRef.current) {
+          isVisibleRef.current = next;
+          setIsVisible(next);
+        }
         tickingRef.current = false;
       });
       tickingRef.current = true;

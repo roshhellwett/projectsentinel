@@ -184,7 +184,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
       <div className="relative w-full overscroll-x-contain">
         <div className="relative grid w-full max-w-md mx-auto px-4 [&>*]:[grid-area:1/1]">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             {visible
               .slice()
               .reverse()

@@ -1,15 +1,14 @@
 'use client';
 
 import { Z_INDEX } from '@/lib/theme/zIndex';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ReadingProgressProps {
-
   targetSelector?: string;
 }
 
 export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
   const tickingRef = useRef(false);
 
   useEffect(() => {
@@ -35,7 +34,13 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
       }
 
       const ratio = Math.max(0, Math.min(1, scrolled / total));
-      setProgress(ratio);
+      const visible = ratio > 0.005 && ratio < 0.995;
+
+      if (barRef.current) {
+        barRef.current.style.transform = `scaleX(${ratio})`;
+        barRef.current.style.opacity = visible ? '1' : '0';
+        barRef.current.style.willChange = visible ? 'transform, opacity' : 'auto';
+      }
     };
 
     const onScroll = () => {
@@ -56,23 +61,21 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
     };
   }, [targetSelector]);
 
-  const visible = progress > 0.005 && progress < 0.995;
-
   return (
     <div
       aria-hidden="true"
       className={`fixed inset-x-0 ${Z_INDEX.readingProgress} h-[2px] pointer-events-none`}
       style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
     >
-        <div
-          className="h-full origin-left transition-opacity duration-300"
-          style={{
-            transform: `scaleX(${progress})`,
-            opacity: visible ? 1 : 0,
-            background: 'linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))',
-            boxShadow: '0 0 12px rgb(var(--c-accent) / 0.55)',
-            willChange: visible ? 'transform' : 'auto',
-          }}
+      <div
+        ref={barRef}
+        className="h-full origin-left transition-opacity duration-300 transform-gpu"
+        style={{
+          transform: 'scaleX(0)',
+          opacity: 0,
+          background: 'linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))',
+          boxShadow: '0 0 12px rgb(var(--c-accent) / 0.55)',
+        }}
       />
     </div>
   );

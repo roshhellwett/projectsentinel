@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Clock, ShieldCheck, Flame, Radio } from 'lucide-react';
 import { Post } from '@/types';
@@ -15,7 +16,7 @@ interface HeroCardProps {
   badge?: 'breaking' | 'trending' | null;
 }
 
-export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
+export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
   const haptic = useHapticFeedback();
   const theme = getCategoryTheme(post.category);
 
@@ -24,7 +25,10 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
   const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
 
   return (
-    <div className="relative group [perspective:1200px] w-full max-w-full overflow-hidden animate-page-enter">
+    <div 
+      className="relative group [perspective:1200px] w-full max-w-full overflow-hidden animate-page-enter"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 420px' }}
+    >
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
@@ -128,4 +132,4 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
       </Link>
     </div>
   );
-}
+});

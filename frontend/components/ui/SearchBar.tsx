@@ -10,6 +10,7 @@ import { NewsCard } from '@/components/news/NewsCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { cachedFetch } from '@/lib/utils/fetchCache';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 interface SearchBarProps {
   isOpen: boolean;
@@ -72,34 +73,33 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       return;
     }
 
-    previousFocusRef.current = document.activeElement as HTMLElement;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !e.defaultPrevented) onClose();
-    };
-
-    document.addEventListener('keydown', handleEscape);
+    previousFocusRef.current = (document.activeElement as HTMLElement) || null;
     lockBodyScroll();
 
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEscape);
+
+    const timer = window.setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('keydown', handleEscape);
+      window.clearTimeout(timer);
       unlockBodyScroll();
     };
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!isOpen) return;
-    const id = window.setTimeout(() => inputRef.current?.focus(), 80);
-    return () => window.clearTimeout(id);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) return;
-    setQuery('');
-    setResults([]);
-    setResultCount(0);
-    setError(null);
-    setIsLoading(false);
+    if (!isOpen) {
+      setQuery('');
+      setResults([]);
+      setResultCount(0);
+      setError(null);
+      setIsLoading(false);
+    }
   }, [isOpen]);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -176,8 +176,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             initial={{ opacity: 0, y: reducedMotion ? 0 : -20, scale: reducedMotion ? 1 : 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : -10, scale: reducedMotion ? 1 : 0.98 }}
-            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 400, damping: 32, mass: 0.8 }}
-            className="container mx-auto px-4 py-8 md:py-10 transform-gpu"
+            transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.sheet}
+            className="container mx-auto px-4 py-8 md:py-10 transform-gpu will-change-transform"
           >
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -185,7 +185,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 <h2 className="font-display text-3xl md:text-5xl font-bold text-ink tracking-[-0.03em]">Search</h2>
               </div>
               <motion.button
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.95 }}
+                transition={IOS_SPRING.snappy}
                 onClick={onClose}
                 className="tap-target p-2 hover:bg-paper-2 rounded transition-[background-color,transform] duration-150 transform-gpu touch-action-manipulation select-none hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Close search"

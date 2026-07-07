@@ -64,7 +64,7 @@ export function OfflineBanner() {
           style={{ top: 'env(safe-area-inset-top, 0px)' }}
           className={`fixed inset-x-0 top-0 ${Z_INDEX.offlineBanner} flex justify-center p-2 pointer-events-none`}
         >
-          <div className="bg-ink dark:bg-paper text-paper dark:text-ink px-4 py-2 rounded-full shadow-2xl border border-white/10 dark:border-black/10 flex items-center gap-3 text-[13px] font-semibold tracking-wide pointer-events-auto backdrop-blur-xl">
+          <div className="bg-ink dark:bg-paper text-paper dark:text-ink px-4 py-2 rounded-full shadow-2xl border border-white/10 dark:border-black/10 flex items-center gap-3 text-[13px] font-semibold tracking-wide pointer-events-auto md:backdrop-blur-xl">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>

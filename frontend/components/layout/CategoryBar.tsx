@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 const ALL_CATEGORIES = [{ slug: 'all', label: 'All' }, ...CATEGORIES.map((c) => ({ slug: c.slug, label: c.label }))];
 
@@ -36,7 +37,9 @@ export function CategoryBar() {
 
     if (Math.abs(container.scrollLeft - target) < 4) return;
 
-    container.scrollTo({ left: target, behavior: 'smooth' });
+    requestAnimationFrame(() => {
+      container.scrollTo({ left: target, behavior: 'smooth' });
+    });
   }, [currentCategory]);
 
   return (
@@ -61,7 +64,7 @@ export function CategoryBar() {
                 ref={isActive ? activeRef : undefined}
                 role="tab"
                 aria-selected={isActive}
-                className={`relative flex items-center px-4 py-3.5 text-[13px] font-semibold tracking-wide whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent touch-polish rounded-sm snap-center ${
+                className={`relative flex items-center px-4 py-3.5 text-[13px] font-semibold tracking-wide whitespace-nowrap transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent touch-polish rounded-sm snap-center ${
                   isActive ? 'text-ink' : 'text-muted hover:text-ink hover:bg-paper-2/60'
                 }`}
               >
@@ -69,8 +72,8 @@ export function CategoryBar() {
                 {isActive && (
                   <motion.span
                     layoutId="activeCategoryRule"
-                    className="absolute left-3 right-3 -bottom-[1px] h-[2px] bg-accent rounded-full"
-                    transition={{ type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
+                    className="absolute left-3 right-3 -bottom-[1px] h-[2px] bg-accent rounded-full will-change-transform transform-gpu"
+                    transition={IOS_SPRING.pill}
                   />
                 )}
               </Link>

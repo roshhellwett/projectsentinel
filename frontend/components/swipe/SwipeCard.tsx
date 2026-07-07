@@ -9,6 +9,7 @@ import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { summaryToBullets } from '@/lib/utils/summaryToBullets';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { IOS_SPRING } from '@/lib/theme/animations';
 import { getHostname } from '@/lib/utils/getHostname';
 import { CredibilityBar } from '@/components/news/CredibilityBar';
 import { SourcePickerButton } from '@/components/news/SourcePickerButton';
@@ -232,10 +233,10 @@ export function SwipeCard({
           scale: depth === 0 ? 1 : (depth === 1 ? 0.95 : 0.90),
           opacity: depth === 0 ? 1 : (depth === 1 ? 0.8 : 0.5),
           zIndex: depth === 0 ? 30 : (depth === 1 ? 20 : 10),
-          transition: { type: 'spring', stiffness: 420, damping: 34, mass: 0.8 }
+          transition: IOS_SPRING.snappy
         }),
         exit: ({ exitDir }) => {
-          const transition = { duration: reducedMotion ? 0 : 0.25, ease: [0.32, 0.72, 0, 1] as const };
+          const transition = { duration: reducedMotion ? 0 : 0.22, ease: [0.32, 0.72, 0, 1] as const };
           const w = typeof window !== 'undefined' ? window.innerWidth : 500;
           const h = typeof window !== 'undefined' ? window.innerHeight : 800;
           if (exitDir === 'up') return { y: -h, opacity: 0, transition };
@@ -248,12 +249,10 @@ export function SwipeCard({
       initial="initial"
       animate="animate"
       exit="exit"
-      className="w-full touch-none select-none transform-gpu origin-top"
+      className="w-full touch-none select-none transform-gpu origin-top will-change-transform"
       style={{ x: dragX, y: dragY, rotate, zIndex: style.z }}
       drag={interactive && !exiting ? true : false}
-      dragConstraints={interactive && !exiting ? (!canRewind ? { left: 0, bottom: 0 } : undefined) : undefined}
-      dragDirectionLock={interactive ? true : undefined}
-      dragElastic={interactive ? 0.25 : undefined}
+      dragElastic={interactive ? 0.65 : undefined}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       aria-hidden={depth !== 0}

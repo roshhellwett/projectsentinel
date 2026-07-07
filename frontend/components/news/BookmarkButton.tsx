@@ -9,6 +9,7 @@ import { buttonVariants } from '@/components/ui/Button';
 import { cn } from '@/lib/utils/cn';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 function Particle({ index }: { index: number }) {
   const angle = (index / 6) * 360;
@@ -82,9 +83,9 @@ export function BookmarkButton({
     return (
       <motion.button
         type="button"
-        whileTap={reducedMotion ? undefined : { scale: 0.92 }}
+        whileTap={reducedMotion ? undefined : { scale: 0.94 }}
         whileHover={reducedMotion ? undefined : { scale: 1.02 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+        transition={IOS_SPRING.snappy}
         onClick={handleClick}
         aria-pressed={saved}
         aria-label={saved ? 'Remove from saved' : 'Save for later'}
@@ -109,9 +110,9 @@ export function BookmarkButton({
 
         <motion.span
           key={saved ? 'saved' : 'unsaved'}
-          initial={reducedMotion ? {} : { scale: 0.5, rotate: -20 }}
+          initial={reducedMotion ? {} : { scale: 0.6, rotate: -15 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+          transition={IOS_SPRING.snappy}
           className="flex items-center gap-2"
         >
           {saved ? (
@@ -128,9 +129,9 @@ export function BookmarkButton({
   return (
     <motion.button
       type="button"
-      whileTap={reducedMotion ? undefined : { scale: 0.88 }}
-      whileHover={reducedMotion ? undefined : { scale: 1.08 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.9 }}
+      whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+      transition={IOS_SPRING.snappy}
       onClick={handleClick}
       aria-pressed={saved}
       aria-label={saved ? 'Remove from saved' : 'Save for later'}
@@ -157,7 +158,7 @@ export function BookmarkButton({
         key={saved ? 'icon-saved' : 'icon-unsaved'}
         initial={reducedMotion ? {} : { scale: 0.6 }}
         animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+        transition={IOS_SPRING.snappy}
       >
         {saved ? (
           <BookmarkCheck className="w-4 h-4 text-like fill-like/20" strokeWidth={2.5} />

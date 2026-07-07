@@ -1,12 +1,13 @@
 'use client';
 
 import { Z_INDEX } from '@/lib/theme/zIndex';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, X } from 'lucide-react';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 interface NextStoryPromptProps {
   posts: Post[];
@@ -17,6 +18,7 @@ interface NextStoryPromptProps {
 export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#related-news' }: NextStoryPromptProps) {
   const next = posts.find((p) => p.id !== currentPostId);
   const [visible, setVisible] = useState(false);
+  const visibleRef = useRef(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -50,7 +52,11 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
 
         const reachedReadingEnd = scrolled > docHeight * 0.55;
         const nearBottom = remaining < 240;
-        setVisible(reachedReadingEnd && !blockedByRelated && !nearBottom);
+        const nextVal = reachedReadingEnd && !blockedByRelated && !nearBottom;
+        if (nextVal !== visibleRef.current) {
+          visibleRef.current = nextVal;
+          setVisible(nextVal);
+        }
         ticking = false;
       });
     };
@@ -83,8 +89,8 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
           initial={{ opacity: 0, y: 28, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.85 }}
-          className={`fixed left-1/2 -translate-x-1/2 ${Z_INDEX.cookieConsent} w-[min(94vw,32rem)]`}
+          transition={IOS_SPRING.sheet}
+          className={`fixed left-1/2 -translate-x-1/2 ${Z_INDEX.cookieConsent} w-[min(94vw,32rem)] will-change-transform transform-gpu`}
           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}
         >
           <div className="relative">

@@ -37,7 +37,7 @@ export function ConnectionStatus() {
             transition={{ type: 'spring', stiffness: 360, damping: 28 }}
             role="status"
             aria-live="polite"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-cred-mid/40 bg-paper/90 backdrop-blur-xl shadow-paper-lift"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-cred-mid/40 bg-paper md:bg-paper/90 md:backdrop-blur-xl shadow-paper-lift"
             title="You are currently offline. Showing cached content."
           >
             <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-cred-mid flex-shrink-0">
@@ -59,7 +59,7 @@ export function ConnectionStatus() {
             transition={{ type: 'spring', stiffness: 360, damping: 28 }}
             role="status"
             aria-live="polite"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-green-500/40 bg-paper/90 backdrop-blur-xl shadow-paper-lift"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-green-500/40 bg-paper md:bg-paper/90 md:backdrop-blur-xl shadow-paper-lift"
           >
             <span className="inline-flex w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
             <Wifi className="w-3 h-3 text-green-500" aria-hidden="true" />

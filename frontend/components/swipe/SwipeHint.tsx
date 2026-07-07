@@ -41,7 +41,7 @@ export function SwipeHint() {
           <button
             type="button"
             onClick={close}
-            className="absolute inset-0 bg-ink/45 backdrop-blur-[2px] cursor-pointer"
+            className="absolute inset-0 bg-ink/65 cursor-pointer"
             aria-label="Dismiss tutorial"
           />
 

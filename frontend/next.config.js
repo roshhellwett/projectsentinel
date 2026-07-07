@@ -144,30 +144,35 @@ const nextConfig = {
           name: 'react',
           priority: 20,
           reuseExistingChunk: true,
+          chunks: 'all',
         },
         framer: {
           test: /[\\/]node_modules[\\/](framer-motion|motion)[\\/]/,
           name: 'framer',
           priority: 15,
           reuseExistingChunk: true,
+          chunks: 'all',
         },
         supabase: {
           test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
           name: 'supabase',
           priority: 12,
           reuseExistingChunk: true,
+          chunks: 'all',
         },
         ui: {
           test: /[\\/]node_modules[\\/](lucide-react|class-variance-authority|clsx|tailwind-merge)[\\/]/,
           name: 'ui-vendors',
           priority: 8,
           reuseExistingChunk: true,
+          chunks: 'all',
         },
         'radix-ui': {
           test: /[\\/]node_modules[\\/](@radix-ui)[\\/]/,
           name: 'radix-ui',
           priority: 6,
           reuseExistingChunk: true,
+          chunks: 'all',
         },
       };
     }
@@ -175,7 +180,7 @@ const nextConfig = {
   },
 
   experimental: {
-    optimizePackageImports: ['lucide-react', '@supabase/ssr', 'framer-motion', 'clsx', 'class-variance-authority', 'jose', 'tailwind-merge'],
+    optimizePackageImports: ['lucide-react', '@supabase/ssr', '@supabase/supabase-js', 'framer-motion', 'clsx', 'class-variance-authority', 'jose', 'tailwind-merge', '@radix-ui/react-slot'],
     scrollRestoration: true,
     optimisticClientCache: true,
   },

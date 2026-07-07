@@ -132,6 +132,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       }}
       aria-label={`Read article: ${post.headline}`}
       data-read={isRead ? 'true' : 'false'}
+      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 380px' }}
       className={cn(
         'group relative isolate flex flex-col h-full cursor-pointer transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
         'bg-[#ffffff] dark:bg-[#13131c] hover:bg-[#faf9f6] dark:hover:bg-[#1a1a26] border border-rule dark:border-white/15 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] overflow-hidden',

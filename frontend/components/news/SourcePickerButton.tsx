@@ -91,16 +91,23 @@ export function SourcePickerButton({
     }
   }, [open]);
 
+  const tickingRef = useRef(false);
+
   const updateCoords = useCallback(() => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setCoords({
-        top: rect.top,
-        left: rect.left,
-        bottom: window.innerHeight - rect.top,
-        width: rect.width,
-      });
-    }
+    if (tickingRef.current) return;
+    tickingRef.current = true;
+    requestAnimationFrame(() => {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setCoords({
+          top: rect.top,
+          left: rect.left,
+          bottom: window.innerHeight - rect.top,
+          width: rect.width,
+        });
+      }
+      tickingRef.current = false;
+    });
   }, []);
 
   useEffect(() => {

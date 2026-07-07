@@ -56,7 +56,7 @@ const RAW_QUOTES = [
 
 const QUOTES: ParsedQuote[] = RAW_QUOTES.map(parseQuote);
 
-const DISPLAY_MS = 6000;
+const DISPLAY_MS = 18000;
 const FADE_MS = 1000;
 
 /**
@@ -95,7 +95,8 @@ export function NewsBackground() {
 
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none contain-layout"
+      style={{ transform: 'translate3d(0,0,0)' }}
       aria-hidden="true"
     >
       <div
@@ -132,10 +133,11 @@ export function NewsBackground() {
         style={{ top: '22%' }}
       >
         <div
-          className="text-center max-w-3xl px-6 transition-opacity duration-[2000ms] ease-out"
-          style={{ opacity: fadedIn ? 1 : 0 }}
+          className="text-center max-w-3xl px-6 transition-opacity duration-[1500ms] ease-out transform-gpu"
+          style={{ opacity: fadedIn ? 1 : 0, transform: 'translate3d(0,0,0)', willChange: 'opacity' }}
         >
           <p className="font-serif italic text-[clamp(1.1rem,2.2vw,2rem)] leading-[1.5] text-ink font-normal"
+
             style={{ color: 'rgb(var(--c-ink) / 0.05)' }}
           >
             &ldquo;{quote.text}&rdquo;

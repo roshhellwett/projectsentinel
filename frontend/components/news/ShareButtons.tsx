@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 import { showToast } from '@/lib/utils/toast';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 interface ShareButtonsProps {
   headline: string;
@@ -144,6 +145,7 @@ export function ShareButtons({
         ref={buttonRef}
         type="button"
         whileTap={reducedMotion ? undefined : { scale: 0.94 }}
+        transition={IOS_SPRING.snappy}
         onClick={handleShareClick}
         className={cn(
           'tap-target inline-flex items-center gap-2 px-3.5 py-2 rounded bg-paper border border-rule text-muted hover:text-ink hover:border-ink transition-all hover-lift text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
@@ -177,7 +179,7 @@ export function ShareButtons({
             initial={{ opacity: 0, y: reducedMotion ? 0 : -6, scale: reducedMotion ? 1 : 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : -4, scale: reducedMotion ? 1 : 0.96 }}
-            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 28, mass: 0.8 }}
+            transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.sheet}
           >
             <div className="grid grid-cols-2 gap-1.5 mb-2 pb-2 border-b border-rule">
               {SHARE_PLATFORMS.map((platform) => (

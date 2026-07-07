@@ -32,11 +32,29 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
 
+  const canScrollLeftRef = useRef(false);
+  const canScrollRightRef = useRef(true);
+  const tickingRef = useRef(false);
+
   const updateScrollState = useCallback(() => {
-    const el = carouselRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 8);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 8);
+    if (tickingRef.current) return;
+    tickingRef.current = true;
+    requestAnimationFrame(() => {
+      const el = carouselRef.current;
+      if (el) {
+        const left = el.scrollLeft > 8;
+        const right = el.scrollLeft < el.scrollWidth - el.clientWidth - 8;
+        if (left !== canScrollLeftRef.current) {
+          canScrollLeftRef.current = left;
+          setCanScrollLeft(left);
+        }
+        if (right !== canScrollRightRef.current) {
+          canScrollRightRef.current = right;
+          setCanScrollRight(right);
+        }
+      }
+      tickingRef.current = false;
+    });
   }, []);
 
   useEffect(() => {
@@ -116,7 +134,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                   href={`/news/${post.id}/`}
                   onClick={() => haptic.light()}
                   data-read={read ? 'true' : 'false'}
-                  className={`group relative ${Z_INDEX.content} flex flex-col justify-between h-full p-5 rounded-2xl bg-paper border border-rule/60 shadow-card hover:shadow-card-lg hover:border-accent/30 transition-all duration-400 overflow-hidden w-full max-w-full ${read ? 'opacity-60 saturate-[0.75]' : ''}`}
+                  className={`group relative ${Z_INDEX.content} flex flex-col justify-between h-full p-5 rounded-2xl bg-paper border border-rule/60 shadow-card hover:shadow-card-lg hover:border-accent/30 transition-[box-shadow,border-color,transform] duration-300 overflow-hidden w-full max-w-full ${read ? 'opacity-60 saturate-[0.75]' : ''}`}
                   aria-label={`${post.headline} (Rank ${rank})`}
                 >
                   {/* Category accent bar */}

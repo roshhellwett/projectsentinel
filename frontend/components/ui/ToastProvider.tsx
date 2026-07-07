@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { BookmarkCheck, BookmarkMinus, Share2, CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useToasts } from '@/lib/utils/toast';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 export function ToastProvider() {
   const reducedMotion = useReducedMotion();
@@ -27,8 +28,8 @@ export function ToastProvider() {
             initial={{ opacity: 0, y: reducedMotion ? 0 : 24, scale: reducedMotion ? 1 : 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] } }}
-            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 500, damping: 30, mass: 0.6 }}
-            className="flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper rounded-full shadow-paper-lift backdrop-blur-md will-change-transform transform-gpu"
+            transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.snappy}
+            className="flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper rounded-full shadow-paper-lift md:backdrop-blur-md will-change-transform transform-gpu"
           >
             {toast.icon === 'bookmark' && <BookmarkCheck className="w-4 h-4 text-paper/80" strokeWidth={2.5} />}
             {toast.icon === 'bookmark-off' && <BookmarkMinus className="w-4 h-4 text-paper/80" strokeWidth={2.5} />}

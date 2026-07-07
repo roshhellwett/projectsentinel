@@ -13,6 +13,7 @@ import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { StreakBadge } from '@/components/ui/StreakBadge';
 import { usePWAInstall } from '@/lib/hooks/usePWAInstall';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 const TABS = [
   { id: 'home', href: '/', icon: Home, key: 'nav.home' },
@@ -67,13 +68,13 @@ export function MobileBottomNav() {
             transition={{ duration: 0.18 }}
             className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay}`}
           >
-            <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={closeTopics} />
+            <div className="absolute inset-0 bg-ink/60" onClick={closeTopics} />
             <motion.div
               key="topics-sheet-inner"
               initial={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
-              transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 420, damping: 30, mass: 0.75 }}
+              transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.sheet}
               className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper dark:bg-black border border-rule/60 shadow-card-lg transform-gpu"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
@@ -128,7 +129,7 @@ export function MobileBottomNav() {
       <motion.nav
         initial={false}
         animate={{ y: hideForOverlay ? '100%' : '0%', opacity: hideForOverlay ? 0 : 1 }}
-        transition={{ type: 'spring', stiffness: 450, damping: 30, mass: 0.7 }}
+        transition={IOS_SPRING.snappy}
         className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transform-gpu`}
         aria-hidden={hideForOverlay ? 'true' : 'false'}
         aria-label="Mobile navigation"
@@ -136,11 +137,11 @@ export function MobileBottomNav() {
       >
         {streak > 0 && (
           <div className="absolute -top-11 right-3 z-20">
-            <StreakBadge streak={streak} size="sm" className="shadow-card bg-paper/70 backdrop-blur-xl" />
+            <StreakBadge streak={streak} size="sm" className="shadow-card bg-paper md:bg-paper/70 md:backdrop-blur-xl" />
           </div>
         )}
         <div
-          className="relative border-t border-rule/50 bg-[#ffffff]/80 dark:bg-[#101016]/80 backdrop-blur-2xl backdrop-saturate-[1.8] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none touch-action-manipulation transition-all duration-300"
+          className="relative border-t border-rule/50 bg-[#ffffff]/98 dark:bg-[#101016]/98 md:bg-[#ffffff]/80 md:dark:bg-[#101016]/80 md:backdrop-blur-2xl md:backdrop-saturate-[1.8] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none touch-action-manipulation transition-transform duration-300"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
@@ -153,14 +154,14 @@ export function MobileBottomNav() {
               const inner = (
                 <motion.div
                   whileTap={reducedMotion ? undefined : { scale: 0.88 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                  transition={IOS_SPRING.snappy}
                   className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl min-w-[52px]"
                 >
                   {active && (
                     <motion.div
                       layoutId="bottom-nav-pill"
-                      className="absolute inset-x-1 bottom-1 top-1 rounded-2xl bg-accent/15 dark:bg-accent/20 border border-accent/30 shadow-[0_2px_12px_rgba(var(--accent),0.15)]"
-                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                      className="absolute inset-x-1 bottom-1 top-1 rounded-2xl bg-accent/15 dark:bg-accent/20 border border-accent/30 shadow-[0_2px_12px_rgba(var(--accent),0.15)] will-change-transform transform-gpu"
+                      transition={IOS_SPRING.pill}
                     />
                   )}
                   <Icon

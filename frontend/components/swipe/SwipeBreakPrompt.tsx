@@ -56,7 +56,7 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
           if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
           onContinue();
         }}
-        className="absolute inset-0 bg-ink/55 backdrop-blur-[2px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="absolute inset-0 bg-ink/75 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-label="Dismiss break prompt"
       />
       <div className="relative w-full max-w-sm premium-card overflow-hidden">

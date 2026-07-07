@@ -20,6 +20,7 @@ import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { StreakBadge } from '@/components/ui/StreakBadge';
+import { IOS_SPRING } from '@/lib/theme/animations';
 
 const NAV_LINKS = [
   { href: '/category/politics/',   labelKey: 'nav.politics' },
@@ -200,7 +201,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className={`lg:hidden fixed inset-0 ${Z_INDEX.modalBackdrop} bg-ink/40 backdrop-blur-[2px]`}
+              className={`lg:hidden fixed inset-0 ${Z_INDEX.modalBackdrop} bg-ink/60`}
               onClick={() => setIsMobileOpen(false)}
             />
             <motion.aside
@@ -209,8 +210,8 @@ export function Navbar() {
               initial={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
-              transition={reducedMotion ? { duration: 0.18 } : { type: 'spring', stiffness: 450, damping: 28, mass: 0.7 }}
-              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-[#fcfaf7] dark:bg-[#121218] border-l border-rule shadow-paper-lift flex flex-col transform-gpu overflow-x-hidden`}
+              transition={reducedMotion ? { duration: 0.18 } : IOS_SPRING.sheet}
+              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-[#fcfaf7] dark:bg-[#121218] border-l border-rule shadow-paper-lift flex flex-col transform-gpu overflow-x-hidden will-change-transform`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',

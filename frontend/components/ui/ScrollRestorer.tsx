@@ -45,8 +45,14 @@ export function ScrollRestorer() {
   const scrollTrackerRef = useRef<number>(0);
 
   useEffect(() => {
+    let ticking = false;
     const trackScroll = () => {
-      scrollTrackerRef.current = window.scrollY;
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        scrollTrackerRef.current = window.scrollY;
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', trackScroll, { passive: true });
     return () => window.removeEventListener('scroll', trackScroll);
