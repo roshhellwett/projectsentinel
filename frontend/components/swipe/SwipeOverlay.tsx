@@ -1,12 +1,14 @@
 'use client';
 
 import { ArrowRight, ArrowDown, ArrowUp, Undo2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useMotionValueEvent, type MotionValue } from 'framer-motion';
 import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
 interface SwipeOverlayProps {
-  drag: { x: number; y: number };
+  dragX: MotionValue<number>;
+  dragY: MotionValue<number>;
   canRewind?: boolean;
 }
 
@@ -19,65 +21,82 @@ function clamp01(n: number): number {
   return n;
 }
 
-export function SwipeOverlay({ drag, canRewind = true }: SwipeOverlayProps) {
+export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayProps) {
   const [hasSeen, setHasSeen] = useState(false);
 
   useEffect(() => {
     setHasSeen(safeRead(SEEN_KEY) === 'true');
   }, []);
 
-  const { x, y } = drag;
-  const ax = Math.abs(x);
-  const ay = Math.abs(y);
-  const horizontalDominant = ax > ay;
+  const [nextRight, setNextRight] = useState(0);
+  const [prevLeft, setPrevLeft] = useState(0);
+  const [nextUp, setNextUp] = useState(0);
+  const [prevDown, setPrevDown] = useState(0);
 
-  const opaNextRight = horizontalDominant && x > 0  ? clamp01(x / TRIGGER) : 0;
-  const opaPrevLeft  = horizontalDominant && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0;
-  const opaNextUp    = !horizontalDominant && y < 0 ? clamp01(-y / TRIGGER) : 0;
-  const opaPrevDown  = !horizontalDominant && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0;
+  const lastSeenCheck = useRef(0);
 
-  useEffect(() => {
-    if (!hasSeen && Math.max(opaNextRight, opaPrevLeft, opaNextUp, opaPrevDown) > 0.6) {
-      safeWrite(SEEN_KEY, true);
-      const timer = setTimeout(() => setHasSeen(true), 2000);
-      return () => clearTimeout(timer);
+  const updateOpa = useRef(() => {
+    const x = dragX.get();
+    const y = dragY.get();
+    const ax = Math.abs(x);
+    const ay = Math.abs(y);
+    const hd = ax > ay;
+    setNextRight(hd && x > 0 ? clamp01(x / TRIGGER) : 0);
+    setPrevLeft(hd && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0);
+    setNextUp(!hd && y < 0 ? clamp01(-y / TRIGGER) : 0);
+    setPrevDown(!hd && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0);
+
+    if (!hasSeen && lastSeenCheck.current < Date.now() - 500) {
+      const max = Math.max(
+        hd && x > 0 ? clamp01(x / TRIGGER) : 0,
+        hd && x < 0 && canRewind ? clamp01(-x / TRIGGER) : 0,
+        !hd && y < 0 ? clamp01(-y / TRIGGER) : 0,
+        !hd && y > 0 && canRewind ? clamp01(y / TRIGGER) : 0,
+      );
+      if (max > 0.6) {
+        lastSeenCheck.current = Date.now();
+        safeWrite(SEEN_KEY, true);
+        setHasSeen(true);
+      }
     }
-    return undefined;
-  }, [hasSeen, opaNextRight, opaPrevLeft, opaNextUp, opaPrevDown]);
+  });
+
+  useMotionValueEvent(dragX, 'change', () => { updateOpa.current(); });
+  useMotionValueEvent(dragY, 'change', () => { updateOpa.current(); });
 
   if (hasSeen) return null;
 
   return (
-    <div className={`pointer-events-none absolute inset-0 ${Z_INDEX.dropdown}`}>
+    <motion.div className={`pointer-events-none absolute inset-0 ${Z_INDEX.dropdown} touch-action-manipulation`}>
       <Badge
         label="Next"
         icon={<ArrowRight className="w-4 h-4" />}
-        opacity={opaNextRight}
+        opacity={nextRight}
         position="right"
         accent="border-accent text-accent bg-paper"
       />
       <Badge
         label="Previous"
         icon={<Undo2 className="w-4 h-4" />}
-        opacity={opaPrevLeft}
+        opacity={prevLeft}
         position="left"
         accent="border-rule-strong text-ink bg-paper"
       />
       <Badge
         label="Next"
         icon={<ArrowUp className="w-4 h-4" />}
-        opacity={opaNextUp}
+        opacity={nextUp}
         position="top"
         accent="border-accent text-accent bg-paper"
       />
       <Badge
         label="Previous"
         icon={<ArrowDown className="w-4 h-4" />}
-        opacity={opaPrevDown}
+        opacity={prevDown}
         position="bottom"
         accent="border-rule-strong text-ink bg-paper"
       />
-    </div>
+    </motion.div>
   );
 }
 

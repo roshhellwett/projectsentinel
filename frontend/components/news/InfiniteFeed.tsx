@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, memo } from 'react';
+import { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { dedupe } from '@/lib/utils/dedupe';
@@ -15,8 +15,14 @@ import { useI18n } from '@/lib/i18n/i18n-shared';
 import { EngagementCounter } from '@/components/ui/EngagementCounter';
 import dynamic from 'next/dynamic';
 
-const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
-const MilestoneCelebration = dynamic(() => import('@/components/ui/MilestoneCelebration').then(m => m.MilestoneCelebration), { ssr: false });
+const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 bg-paper/80 backdrop-blur-sm z-50 animate-fade-in" aria-hidden="true" />,
+});
+const MilestoneCelebration = dynamic(() => import('@/components/ui/MilestoneCelebration').then(m => m.MilestoneCelebration), {
+  ssr: false,
+  loading: () => null,
+});
 
 
 const MILESTONE_LABELS: Record<number, string> = {
@@ -149,7 +155,7 @@ export function InfiniteFeed({
 
   const sentinelRef = useIntersectionObserver({
     onIntersect: () => loadMoreRef.current(),
-    rootMargin: '800px 0px',
+    rootMargin: '400px 0px',
     enabled: !loading && !exhausted
   });
 
@@ -185,10 +191,10 @@ export function InfiniteFeed({
   }, [handleOpen]);
 
   const readMap = readIds;
-  const readCount = posts.filter((p) => readMap.has(p.id)).length;
-  const nextMilestone = [5, 10, 15, 25, 50, 100].find((m) => m > dailyCount) ?? 100;
-  const progressPct = Math.min(100, (dailyCount / nextMilestone) * 100);
-  const streakLabel = STREAK_MILESTONES.slice().reverse().find((s) => streak >= s);
+  const readCount = useMemo(() => posts.filter((p) => readMap.has(p.id)).length, [posts, readMap]);
+  const nextMilestone = useMemo(() => [5, 10, 15, 25, 50, 100].find((m) => m > dailyCount) ?? 100, [dailyCount]);
+  const progressPct = useMemo(() => Math.min(100, (dailyCount / nextMilestone) * 100), [dailyCount, nextMilestone]);
+  const streakLabel = useMemo(() => STREAK_MILESTONES.slice().reverse().find((s) => streak >= s), [streak]);
 
   if (posts.length === 0) {
     return (

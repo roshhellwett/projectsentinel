@@ -114,7 +114,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
             exit={{ opacity: 0, rotate: reducedMotion ? 0 : 90, scale: reducedMotion ? 1 : 0.5 }}
             transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 450, damping: 25, mass: 0.6 }}
-            className="will-change-transform will-change-opacity transform-gpu flex items-center justify-center"
+            className="transform-gpu flex items-center justify-center"
           >
             <Icon className="w-[18px] h-[18px]" strokeWidth={1.8} />
           </motion.div>

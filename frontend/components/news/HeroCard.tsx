@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Clock, ShieldCheck, Flame, Radio } from 'lucide-react';
 import { Post } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
@@ -17,7 +16,6 @@ interface HeroCardProps {
 }
 
 export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
-  const reducedMotion = useReducedMotion();
   const haptic = useHapticFeedback();
   const theme = getCategoryTheme(post.category);
 
@@ -26,12 +24,7 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
   const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.96, y: reducedMotion ? 0 : 24 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="relative group [perspective:1200px] w-full max-w-full overflow-hidden"
-    >
+    <div className="relative group [perspective:1200px] w-full max-w-full overflow-hidden animate-page-enter">
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
@@ -133,6 +126,6 @@ export function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }

@@ -5,23 +5,26 @@ import Script from 'next/script';
 import './globals.css';
 import dynamic from 'next/dynamic';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
 
 const ClientShell = dynamic(() => import('@/components/layout/ClientShell'));
 
+// Load only the font weights actually used in the app
 const inter = Inter({
   variable: '--font-sans',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
   adjustFontFallback: true,
   preload: true,
+  fallback: ['system-ui', '-apple-system', 'sans-serif'],
 });
 
 const playfair = Playfair_Display({
   variable: '--font-display',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '600', '700'],
   style: ['normal', 'italic'],
   adjustFontFallback: true,
   preload: true,
@@ -31,6 +34,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
   display: 'swap',
+  weight: ['400', '500'],
   adjustFontFallback: true,
   preload: true,
 });
@@ -147,8 +151,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
         <link rel="preconnect" href="https://www.google.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://www.google.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="prefetch" href="/" as="document" />
+        <link rel="modulepreload" href="/manifest.webmanifest" as="fetch" crossOrigin="" />
 
 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdToString(websiteJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdToString(organizationJsonLd()) }}
+        />
         {gtmId && (
           <Script id="gtm-script" strategy="afterInteractive">
             {`
@@ -160,9 +176,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `}
           </Script>
         )}
+        <Script id="sw-register" strategy="afterInteractive">
+          {`if('serviceWorker'in navigator&&'https:'===location.protocol){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});});}`}
+        </Script>
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased overflow-x-hidden w-full max-w-full relative`}
+        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans bg-paper text-ink min-h-screen flex flex-col antialiased w-full relative`}
       >
         {gtmId && (
           <noscript>

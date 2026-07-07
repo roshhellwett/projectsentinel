@@ -34,6 +34,7 @@ export function useInfiniteFeed({
   const exhaustedRef = useRef(exhausted);
   const categoryRef = useRef(category);
   const pageSizeRef = useRef(pageSize);
+  const initialPostsLenRef = useRef(initialPosts.length);
   const mountedRef = useRef(true);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -45,11 +46,12 @@ export function useInfiniteFeed({
     exhaustedRef.current = exhausted;
     categoryRef.current = category;
     pageSizeRef.current = pageSize;
+    initialPostsLenRef.current = initialPosts.length;
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };
-  }, [excludeIds, posts, cursor, exhausted, category, pageSize]);
+  }, [excludeIds, posts, cursor, exhausted, category, pageSize, initialPosts.length]);
 
   // When initialPosts change (e.g. category switch), reset feed state
   useEffect(() => {
@@ -97,6 +99,10 @@ export function useInfiniteFeed({
       const params = new URLSearchParams({ limit: String(pageSizeRef.current) });
       if (cursorRef.current) params.set('cursor', cursorRef.current);
       if (categoryRef.current) params.set('category', categoryRef.current);
+      // Add cache-bust param when no cursor (initial load after realtime update)
+      if (!cursorRef.current && postsRef.current.length > initialPostsLenRef.current) {
+        params.set('_cb', String(Date.now()));
+      }
       
       const payload = await cachedFetch<{ posts: Post[]; nextCursor: string | null; hasMore: boolean }>(
         `/api/posts/?${params.toString()}`,

@@ -4,23 +4,52 @@ import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
 import { WifiOff, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Z_INDEX } from '@/lib/theme/zIndex';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+
+const POLL_INTERVAL = 5000;
 
 export function OfflineBanner() {
   const { isOnline } = useNetworkStatus();
   const [retrying, setRetrying] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-poll when offline to detect reconnection
+  useEffect(() => {
+    if (!isOnline && !pollRef.current) {
+      pollRef.current = setInterval(async () => {
+        try {
+          const res = await fetch('/api/posts/?limit=1', { cache: 'no-store', signal: AbortSignal.timeout(3000) });
+          if (res.ok || navigator.onLine) {
+            window.location.reload();
+          }
+        } catch {
+          // still offline
+        }
+      }, POLL_INTERVAL);
+    }
+    if (isOnline && pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
+  }, [isOnline]);
 
   const handleRetry = useCallback(async () => {
     setRetrying(true);
     try {
-      const res = await fetch('/api/posts/?limit=1', { cache: 'no-store' });
+      const res = await fetch('/api/posts/?limit=1', { cache: 'no-store', signal: AbortSignal.timeout(3000) });
       if (res.ok || navigator.onLine) {
         window.location.reload();
       }
     } catch {
       // still offline
     } finally {
-      setTimeout(() => setRetrying(false), 800);
+      setRetrying(false);
     }
   }, []);
 
@@ -41,7 +70,7 @@ export function OfflineBanner() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
             </span>
             <WifiOff className="w-4 h-4 text-amber-500 flex-shrink-0" />
-            <span>You are currently offline. Showing cached stories.</span>
+            <span>Offline — showing cached stories</span>
             <button
               type="button"
               onClick={handleRetry}

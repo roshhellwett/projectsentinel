@@ -35,6 +35,9 @@ class SharedRealtimeManager {
   private isPaused = false;
   private visibilityHandler: (() => void) | null = null;
   private networkHandler: (() => void) | null = null;
+  private reconnectAttempts = 0;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private maxReconnectDelay = 30000;
 
   public subscribe(callback: PostCallback) {
     this.listeners.add(callback);
@@ -47,6 +50,7 @@ class SharedRealtimeManager {
         if (this.listeners.size === 0) {
           this.teardownConnection();
           this.removeListeners();
+          this.clearReconnectTimer();
         }
       },
     };
@@ -61,6 +65,7 @@ class SharedRealtimeManager {
         this.teardownConnection();
       } else if (document.visibilityState === 'visible') {
         this.isPaused = false;
+        this.reconnectAttempts = 0; // Reset on visibility change
         this.evaluateConnection();
       }
     };
@@ -71,6 +76,7 @@ class SharedRealtimeManager {
         this.teardownConnection();
       } else {
         this.isPaused = false;
+        this.reconnectAttempts = 0; // Reset on reconnect
         this.evaluateConnection();
       }
     };
@@ -89,6 +95,13 @@ class SharedRealtimeManager {
     }
     this.visibilityHandler = null;
     this.networkHandler = null;
+  }
+
+  private clearReconnectTimer() {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
   }
 
   private evaluateConnection() {
@@ -136,6 +149,17 @@ class SharedRealtimeManager {
         .subscribe((status, err) => {
           if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             console.warn('[realtime] Singleton subscription error:', status, err);
+            this.teardownConnection();
+            // Exponential backoff reconnection
+            this.clearReconnectTimer();
+            const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), this.maxReconnectDelay);
+            this.reconnectAttempts++;
+            this.reconnectTimer = setTimeout(() => {
+              this.reconnectTimer = null;
+              this.evaluateConnection();
+            }, delay);
+          } else if (status === 'SUBSCRIBED') {
+            this.reconnectAttempts = 0;
           }
         });
     } catch (err) {

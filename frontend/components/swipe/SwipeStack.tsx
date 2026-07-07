@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, useMotionValue } from 'framer-motion';
 import type { Post } from '@/types';
 import { SwipeCard, type SwipeDirection } from './SwipeCard';
 import { SwipeOverlay } from './SwipeOverlay';
@@ -35,7 +35,8 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
     hideRead: true,
   });
 
-  const [drag, setDrag] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
   const lastDragRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
   const { stats, showBreak, setShowBreak, trackSwipe, sessionCards } = useSwipeTracking();
@@ -43,16 +44,18 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   const handleDragProgress = useCallback((newDrag: { x: number; y: number }) => {
     if (newDrag.x === 0 && newDrag.y === 0) {
       lastDragRef.current = { x: 0, y: 0 };
-      setDrag({ x: 0, y: 0 });
+      dragX.set(0);
+      dragY.set(0);
       return;
     }
     const dx = Math.abs(newDrag.x - lastDragRef.current.x);
     const dy = Math.abs(newDrag.y - lastDragRef.current.y);
     if (dx > 6 || dy > 6) {
       lastDragRef.current = newDrag;
-      setDrag(newDrag);
+      dragX.set(newDrag.x);
+      dragY.set(newDrag.y);
     }
-  }, []);
+  }, [dragX, dragY]);
 
   const queueRef = useRef(queue);
   queueRef.current = queue;
@@ -63,7 +66,8 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       if (direction === 'down' || direction === 'left') {
         q.rewind();
         lastDragRef.current = { x: 0, y: 0 };
-        setDrag({ x: 0, y: 0 });
+        dragX.set(0);
+        dragY.set(0);
         return;
       }
 
@@ -72,9 +76,10 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
 
       q.advance(post, direction, false);
       lastDragRef.current = { x: 0, y: 0 };
-      setDrag({ x: 0, y: 0 });
+      dragX.set(0);
+      dragY.set(0);
     },
-    [trackSwipe],
+    [trackSwipe, dragX, dragY],
   );
 
   const handleTap = useCallback(
@@ -200,7 +205,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
                 );
               })}
           </AnimatePresence>
-          <SwipeOverlay drag={drag} canRewind={queue.canRewind} />
+          <SwipeOverlay dragX={dragX} dragY={dragY} canRewind={queue.canRewind} />
         </div>
       </div>
 

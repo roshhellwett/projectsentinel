@@ -113,10 +113,14 @@ function getCached<T>(key: string, allowStale = false): T | null {
 }
 
 function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
+  // Evict 20% oldest entries when at capacity (batch eviction is more efficient)
   if (cache.size >= MAX_MEMORY_ITEMS) {
-    const oldest = cache.entries().next().value;
-    if (oldest) {
-      cache.delete(oldest[0]);
+    const entries = [...cache.entries()];
+    // Sort by timestamp ascending to get oldest first
+    entries.sort((a, b) => (a[1]?.timestamp ?? 0) - (b[1]?.timestamp ?? 0));
+    const toEvict = Math.max(1, Math.floor(entries.length * 0.2));
+    for (let i = 0; i < toEvict; i++) {
+      cache.delete(entries[i][0]);
     }
   }
   const entry = { data, timestamp: Date.now(), ttl };

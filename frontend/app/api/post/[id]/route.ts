@@ -44,10 +44,18 @@ export async function GET(
   }
 }
 
+function isJsonContentType(request: Request): boolean {
+  return request.headers.get('content-type')?.startsWith('application/json') === true;
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isJsonContentType(request)) {
+    return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 415 });
+  }
+
   const authError = await verifyAdminAuth(request);
   if (authError) return authError;
 

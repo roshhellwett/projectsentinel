@@ -35,17 +35,20 @@ export function getSupabaseServer() {
 }
 
 // Exponential backoff with jitter — 500ms * 2^attempt + random 0–30% jitter
-export async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, retries = 3, signal?: AbortSignal): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
       return await fn();
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') throw err;
       lastError = err;
       if (attempt < retries - 1) {
         const baseDelay = 2 ** attempt * 500;
         const jitter = Math.random() * baseDelay * 0.3;
         await new Promise((resolve) => setTimeout(resolve, baseDelay + jitter));
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
       }
     }
   }
@@ -54,9 +57,7 @@ export async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T
 
 /**
  * Fetch posts using cursor-based pagination.
- * @param cursor ISO timestamp of the last post's published_at (exclusive). Omit for the first page.
- * @param limit Max results (default 20, max 50).
- * @param category Optional category filter.
+ * Uses lightweight queries to minimize free-tier Supabase usage.
  */
 export async function fetchPostsCursor(
   cursor?: string,
@@ -69,7 +70,7 @@ export async function fetchPostsCursor(
   return withRetry(async () => {
     let query = getSupabaseServer()
       .from('posts')
-      .select(FEED_COLUMNS, { count: 'estimated' })
+      .select(FEED_COLUMNS)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
       .limit(fetchLimit);
@@ -85,10 +86,7 @@ export async function fetchPostsCursor(
     const { data, error } = await query;
 
     if (error) {
-      if (error.message?.includes('Requested range not satisfiable')) {
-        return { posts: [], nextCursor: null, hasMore: false };
-      }
-      throw new Error(`fetchPostsCursor error: ${error.message}`);
+      return { posts: [], nextCursor: null, hasMore: false };
     }
 
     const posts = (data || []) as Post[];

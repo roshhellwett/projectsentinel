@@ -32,9 +32,7 @@ export function ScoreRing({
   compact = false,
 }: ScoreRingProps) {
   const clamped = clampScore(score);
-  const color = getScoreHex(clamped);
   const label = getScoreLabel(clamped);
-  const isHigh = clamped >= 85;
   const rawId = useId();
   const gradientId = `grad-${rawId.replace(/:/g, '')}`;
   const [gradFrom, gradTo] = getGradientColors(clamped);
@@ -47,7 +45,7 @@ export function ScoreRing({
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setAnimated(true); observer.disconnect(); } },
-      { threshold: 0.5 }
+      { threshold: 0.1 }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -61,18 +59,18 @@ export function ScoreRing({
 
   return (
     <div
-      className={cn('inline-flex items-center gap-2', className)}
+      className={cn('inline-flex items-center gap-2 flex-shrink-0', className)}
       role="img"
       aria-label={`Credibility score: ${clamped} out of 100, ${label}`}
     >
-      <div className="relative" style={{ width: ringSize, height: ringSize }}>
+      <div className="relative flex-shrink-0" style={{ width: ringSize, height: ringSize }}>
         <svg
           width={ringSize}
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
-          className="-rotate-90"
+          className="-rotate-90 overflow-visible"
+          aria-hidden="true"
         >
-          {/* Gradient definition for high scores */}
           <defs>
             <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor={gradFrom} />
@@ -80,7 +78,6 @@ export function ScoreRing({
             </linearGradient>
           </defs>
 
-          {/* Track — subtle */}
           <circle
             cx={ringSize / 2}
             cy={ringSize / 2}
@@ -91,7 +88,6 @@ export function ScoreRing({
             strokeOpacity={0.35}
           />
 
-          {/* Fill — uses gradient for premium look */}
           <circle
             ref={ref}
             cx={ringSize / 2}
@@ -107,12 +103,12 @@ export function ScoreRing({
           />
         </svg>
 
-        {/* Center number */}
         <span 
           className={cn(
-            'absolute inset-0 flex items-center justify-center font-bold tabular-nums text-ink leading-none',
+            'absolute inset-0 flex items-center justify-center font-bold tabular-nums text-ink leading-none pointer-events-none',
             compact ? 'text-[10px]' : 'text-[13px]'
           )}
+          aria-hidden="true"
         >
           {clamped}
         </span>

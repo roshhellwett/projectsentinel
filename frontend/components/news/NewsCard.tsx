@@ -137,7 +137,6 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
         'bg-[#ffffff] dark:bg-[#13131c] hover:bg-[#faf9f6] dark:hover:bg-[#1a1a26] border border-rule dark:border-white/15 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] overflow-hidden',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         'transform-gpu backface-hidden select-none touch-action-manipulation',
-        isRead && 'opacity-70 saturate-[0.7]',
         isNew && 'ring-2 ring-accent/50 shadow-[0_0_15px_rgba(var(--accent),0.3)]',
         'contain-layout'
       )}
@@ -154,13 +153,6 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
         aria-hidden="true"
       />
       
-      {/* Subtle read indicator ribbon */}
-      {isRead && (
-        <div className="absolute top-3 right-3 z-20 px-2 py-0.5 rounded-full bg-rule/80 text-[10px] font-bold tracking-wider uppercase text-muted backdrop-blur-sm">
-          {t('feed.read')}
-        </div>
-      )}
-
       {/* Main card content */}
       <div className="relative z-10 flex flex-col flex-1 p-5 md:p-6">
         <div className="flex items-start justify-between gap-3 mb-3">

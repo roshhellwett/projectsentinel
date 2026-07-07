@@ -12,7 +12,6 @@ import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { typographyStyles } from '@/lib/theme/typography';
 import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
-import { motion, Variants } from 'framer-motion';
 
 const SourceFaviconChip = memo(function SourceFaviconChip({ source }: { source: Source }) {
   const [errored, setErrored] = useState(false);
@@ -44,11 +43,6 @@ interface DrawerContentProps {
   onSelectRelated?: (post: Post) => void;
 }
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }
-};
-
 export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
   const { t } = useI18n();
 
@@ -61,39 +55,29 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
       <div className="hidden md:block absolute top-0 right-[-20%] w-[60%] h-64 bg-accent/10 blur-[100px] rounded-full pointer-events-none" />
       <div className="hidden md:block absolute top-[30%] left-[-20%] w-[50%] h-64 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={{ visible: { transition: { staggerChildren: 0.03 } } }}
-        className="relative z-10 flex flex-col flex-1"
-      >
+      <div className="relative z-10 flex flex-col flex-1 stagger-entry">
         {post.status === 'corrected' && (
-          <motion.div variants={itemVariants}>
+          <div>
             <CorrectionsNotice type="corrected" note={post.correction_note} />
-          </motion.div>
+          </div>
         )}
         {post.status === 'retracted' && (
-          <motion.div variants={itemVariants}>
+          <div>
             <CorrectionsNotice type="retracted" note={post.correction_note} />
-          </motion.div>
+          </div>
         )}
 
-        <motion.h2
-          variants={itemVariants}
-          className={cn(typographyStyles.drawer.headline, "mb-5 drop-shadow-sm")}
-        >
+        <h2 className={cn(typographyStyles.drawer.headline, "mb-5 drop-shadow-sm")}>
           {post.headline}
-        </motion.h2>
+        </h2>
 
         {post.language && post.language !== 'en' && (
-          <motion.div variants={itemVariants} className="mb-5">
+          <div className="mb-5">
             <LanguageBadge language={post.language} />
-          </motion.div>
+          </div>
         )}
 
-        <motion.div
-          variants={itemVariants}
-          className="mb-8 relative group"
+        <div className="mb-8 relative group"
         >
           <div className="hidden md:block absolute -inset-0.5 bg-gradient-to-br from-accent/20 to-transparent rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
           <div className="relative rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-5 lg:p-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
@@ -128,9 +112,9 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div variants={itemVariants} className="mb-8">
+        <div className="mb-8">
           <div className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-6 lg:p-7 shadow-[0_4px_30px_rgba(0,0,0,0.1)] relative overflow-hidden group transition-all hover:bg-white/30 dark:hover:bg-black/30">
             {/* Accent Line inside the card to fix the floating bug */}
             <div className="absolute top-0 left-0 w-[4px] h-full bg-gradient-to-b from-accent to-accent/30" />
@@ -152,11 +136,9 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={itemVariants}
-          className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-5 lg:p-6 mb-8 relative overflow-hidden group hover:border-white/40 dark:hover:border-white/20 transition-colors shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
+        <div className="rounded-2xl border border-white/30 dark:border-white/10 bg-white/85 dark:bg-black/85 md:bg-white/20 md:dark:bg-black/20 md:backdrop-blur-md p-5 lg:p-6 mb-8 relative overflow-hidden group hover:border-white/40 dark:hover:border-white/20 transition-colors shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
         >
           <div className="absolute top-0 left-0 w-1 h-full bg-accent/80 transition-all group-hover:bg-accent" />
           <h3 className={cn(typographyStyles.sectionHeading, "mb-3 flex items-center gap-2 text-ink")}>
@@ -166,17 +148,17 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           <p className="text-[15px] text-ink-soft leading-relaxed">
             {post.credibility_reason}
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={itemVariants} className="mb-10">
+        <div className="mb-10">
           <h3 className={cn(typographyStyles.sectionHeading, "mb-4 flex items-center gap-2")}>
             <ExternalLink className="w-4 h-4 text-muted" />
             {t('drawer.original_sources')}
           </h3>
           <SourceLinks sources={post.sources} />
-        </motion.div>
+        </div>
 
-        <motion.div variants={itemVariants} className="mt-auto pt-8 flex flex-col items-center text-center pb-4">
+        <div className="mt-auto pt-8 flex flex-col items-center text-center pb-4">
           <div className="flex items-center gap-3 mb-4 opacity-50">
             <span className="block w-12 h-px bg-gradient-to-r from-transparent to-rule-strong" />
             <span className="block w-1.5 h-1.5 rounded-full bg-muted" />
@@ -185,14 +167,14 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           <span className="font-display text-[10px] font-bold uppercase tracking-[0.3em] text-muted/60">
             {t('drawer.end_of_story')}
           </span>
-        </motion.div>
+        </div>
 
         {onSelectRelated && (
-          <motion.div variants={itemVariants}>
+          <div>
             <DrawerRelated currentPost={post} onSelect={onSelectRelated} />
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
     </article>
   );
 }

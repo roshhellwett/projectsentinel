@@ -128,8 +128,8 @@ export function BookmarkButton({
   return (
     <motion.button
       type="button"
-      whileTap={reducedMotion ? undefined : { scale: 0.75 }}
-      whileHover={reducedMotion ? undefined : { scale: 1.15 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.88 }}
+      whileHover={reducedMotion ? undefined : { scale: 1.08 }}
       transition={{ type: 'spring', stiffness: 500, damping: 18 }}
       onClick={handleClick}
       aria-pressed={saved}
