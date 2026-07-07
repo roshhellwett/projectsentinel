@@ -166,7 +166,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Search articles"
-          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-[#fcfaf7] dark:bg-[#121218] md:bg-paper/80 md:dark:bg-black/80 md:backdrop-blur-2xl md:backdrop-saturate-[1.3] transform-gpu select-none overflow-x-hidden w-full max-w-full touch-action-manipulation`}
+          className={`fixed inset-0 ${Z_INDEX.popover} overflow-y-auto bg-[#fcfaf7] dark:bg-[#121218] md:bg-paper/70 md:dark:bg-black/70 md:supports-[backdrop-filter]:bg-paper/40 md:dark:supports-[backdrop-filter]:bg-black/40 md:backdrop-filter md:backdrop-blur-2xl md:backdrop-saturate-[1.4] transform-gpu select-none overflow-x-hidden w-full max-w-full touch-action-manipulation`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -156,7 +156,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             {post.headline}
           </h1>
 
-          <div className="mb-10 rounded-2xl border border-rule/50 bg-paper-2/60 backdrop-blur-sm p-5 sm:p-6 shadow-sm">
+          <div className="mb-10 rounded-2xl border border-rule/50 glass-sm p-5 sm:p-6 shadow-sm">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-5 flex flex-col gap-4 border-t border-rule pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
@@ -183,7 +183,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <aside className="md:col-span-2 relative premium-card p-5 sm:p-8">
+          <aside className="md:col-span-2 relative premium-card p-5 sm:p-8 glass-hover-trigger">
             <span aria-hidden="true" className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full" />
             <h2 className="font-display flex items-center gap-2 text-xl font-bold text-ink mb-4">
               <ShieldCheck className="w-5 h-5 text-accent" strokeWidth={2.2} />
@@ -203,7 +203,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
         </div>
 
-        <div className="premium-card bg-paper-2/60 backdrop-blur-sm p-7 mb-12 shadow-sm border-rule/50">
+        <div className="premium-card glass-sm p-7 mb-12 shadow-sm border-rule/50">
           <h3 className="text-[11px] font-bold text-accent mb-5 uppercase tracking-[0.18em] text-center">
             How this story was built
           </h3>

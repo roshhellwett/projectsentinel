@@ -29,7 +29,7 @@ export function ToastProvider() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] } }}
             transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.snappy}
-            className="flex items-center gap-2.5 px-4 py-2.5 bg-ink text-paper rounded-full shadow-paper-lift md:backdrop-blur-md will-change-transform transform-gpu"
+            className="flex items-center gap-2.5 px-4 py-2.5 bg-ink/92 text-paper rounded-full shadow-paper-lift backdrop-blur-md will-change-transform transform-gpu"
           >
             {toast.icon === 'bookmark' && <BookmarkCheck className="w-4 h-4 text-paper/80" strokeWidth={2.5} />}
             {toast.icon === 'bookmark-off' && <BookmarkMinus className="w-4 h-4 text-paper/80" strokeWidth={2.5} />}

@@ -99,6 +99,10 @@ export function NewsBackground() {
       style={{ transform: 'translate3d(0,0,0)' }}
       aria-hidden="true"
     >
+      {/* Ambient blur overlay for depth */}
+      <div className="absolute -top-40 -right-40 w-[60vw] h-[60vh] bg-gradient-to-br from-accent/2 to-transparent blur-3xl rounded-full" />
+      <div className="absolute -bottom-40 -left-40 w-[50vw] h-[50vh] bg-gradient-to-tr from-glow-to/2 to-transparent blur-3xl rounded-full" />
+
       <div
         className="absolute inset-0 opacity-[0.48] dark:opacity-[0.32]"
         style={{

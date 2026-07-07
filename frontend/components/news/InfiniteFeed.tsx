@@ -46,7 +46,7 @@ interface InfiniteFeedProps {
 
 export function FeedSkeleton() {
   return (
-    <div className="premium-card animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3" aria-hidden="true">
+    <div className="premium-card animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3 rounded-[24px] overflow-hidden" aria-hidden="true">
       <div className="flex items-center gap-3">
         <div className="h-3 w-16 rounded-full bg-rule/60" />
         <div className="h-3 w-12 rounded-full bg-rule/40" />

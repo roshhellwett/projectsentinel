@@ -79,7 +79,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-[#fcfaf7]/98 dark:bg-[#121218]/98 md:bg-paper/70 md:supports-[backdrop-filter]:bg-paper/30 md:backdrop-filter md:backdrop-blur-2xl md:backdrop-saturate-[1.4] border-b border-rule/60 transition-colors shadow-sm transform-gpu select-none`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-[#fcfaf7] dark:bg-[#121218] md:bg-paper/60 md:supports-[backdrop-filter]:bg-paper/25 md:backdrop-filter md:backdrop-blur-2xl md:backdrop-saturate-[1.5] border-b border-rule/50 transition-colors shadow-sm transform-gpu select-none`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
@@ -211,7 +211,7 @@ export function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: reducedMotion ? 0 : '100%', opacity: 0 }}
               transition={reducedMotion ? { duration: 0.18 } : IOS_SPRING.sheet}
-              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-[#fcfaf7] dark:bg-[#121218] border-l border-rule shadow-paper-lift flex flex-col transform-gpu overflow-x-hidden will-change-transform`}
+              className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm md:bg-[#fcfaf7]/80 md:dark:bg-[#121218]/80 md:backdrop-blur-2xl bg-[#fcfaf7] dark:bg-[#121218] border-l border-rule shadow-paper-lift flex flex-col transform-gpu overflow-x-hidden will-change-transform`}
               style={{
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',

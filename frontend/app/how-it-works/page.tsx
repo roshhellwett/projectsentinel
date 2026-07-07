@@ -147,7 +147,7 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="premium-card premium-card-hover group flex gap-5 p-6 rounded-md transition-all duration-300">
+            <div className="premium-card premium-card-hover glass-hover-trigger group flex gap-5 p-6 rounded-md transition-all duration-300">
               <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
                 <step.icon className="w-6 h-6 text-accent" />
               </div>

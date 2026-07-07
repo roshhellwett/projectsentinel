@@ -177,7 +177,7 @@ export default function SavedPage() {
 
       {confirmingClear && (
         <div className={`fixed inset-0 ${Z_INDEX.modalBackdrop} flex items-center justify-center px-4`}>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setConfirmingClear(false)} />
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-md" onClick={() => setConfirmingClear(false)} />
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}

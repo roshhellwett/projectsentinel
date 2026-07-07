@@ -32,7 +32,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
-        className="block relative overflow-hidden rounded-3xl border border-rule dark:border-white/15 shadow-[0_6px_28px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_28px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.18)] transition-transform duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-[#ffffff] dark:bg-[#13131c] transform-gpu backface-hidden select-none touch-action-manipulation"
+        className="block relative overflow-hidden rounded-3xl border border-rule dark:border-white/15 shadow-[0_6px_28px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_28px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.18)] transition-[transform,box-shadow,border-color] duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-[#ffffff] dark:bg-[#13131c] transform-gpu backface-hidden select-none touch-action-manipulation"
       >
         {/* Category accent gradient bar — thicker, more prominent */}
         <div
@@ -61,7 +61,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Category Pill */}
               <span
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] rounded-full border md:backdrop-blur-md bg-white/90 dark:bg-black/90 md:bg-transparent"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] rounded-full border backdrop-blur-sm bg-white/80 dark:bg-black/80"
                 style={theme.pill}
               >
                 <CategoryIcon name={theme.icon} className="w-3.5 h-3.5" strokeWidth={2.2} aria-hidden="true" />
@@ -76,14 +76,14 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
                 </span>
               )}
 
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted bg-paper/95 md:bg-paper/80 px-2.5 py-1 rounded-full border border-rule/50 md:backdrop-blur-md shadow-sm">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted glass-sm px-2.5 py-1 rounded-full shadow-sm">
                 <Clock className="w-3.5 h-3.5" />
                 <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
               </span>
             </div>
 
             {/* Prominent Score Ring */}
-            <div className="flex items-center gap-2.5 bg-paper/95 md:bg-paper/85 md:backdrop-blur-md px-3.5 py-2 rounded-full border border-rule/50 shadow-glass">
+            <div className="flex items-center gap-2.5 glass-sm px-3.5 py-2 rounded-full shadow-glass">
               <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted hidden sm:inline">Credibility</span>
               <ScoreRing score={post.credibility_score} size={40} strokeWidth={3.5} compact />
             </div>
@@ -100,7 +100,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
             </p>
 
             {firstHost && (
-              <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted bg-paper/95 md:bg-paper/80 border border-rule/50 px-4 py-2.5 rounded-xl md:backdrop-blur-md shadow-sm">
+              <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted glass-sm px-4 py-2.5 rounded-xl shadow-sm">
                 <Radio className="w-3.5 h-3.5 text-accent" />
                 <span className="font-bold uppercase tracking-[0.15em] text-accent">First reported by</span>
                 <span className="font-bold text-ink">{firstHost}</span>

@@ -63,7 +63,7 @@ export default function Error({ error, reset }: ErrorProps) {
         </button>
         
         {showDetails && (
-          <div className="mt-4 p-4 rounded-md bg-paper-2 border border-rule text-left overflow-x-auto">
+          <div className="mt-4 p-4 rounded-md glass-sm text-left overflow-x-auto">
             <p className="text-sm font-mono font-semibold text-ink mb-2">Error digest: {error.digest || 'N/A'}</p>
             <p className="text-xs font-mono text-muted whitespace-pre-wrap break-all">
               {error.message || 'Unknown error occurred'}

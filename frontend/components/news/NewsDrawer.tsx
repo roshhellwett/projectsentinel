@@ -123,7 +123,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
       {post && (
         <>
           <motion.div
-            className={`fixed inset-0 bg-ink/60 dark:bg-black/70 ${Z_INDEX.modalBackdrop} transform-gpu`}
+            className={`fixed inset-0 bg-ink/60 dark:bg-black/70 backdrop-blur-sm ${Z_INDEX.modalBackdrop} transform-gpu`}
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}

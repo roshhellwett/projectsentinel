@@ -134,7 +134,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
       data-read={isRead ? 'true' : 'false'}
       style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 380px' }}
       className={cn(
-        'group relative isolate flex flex-col h-full cursor-pointer transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
+        'group relative isolate flex flex-col h-full cursor-pointer transition-[transform,box-shadow,border-color,background] duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] active:scale-[0.98]',
         'bg-[#ffffff] dark:bg-[#13131c] hover:bg-[#faf9f6] dark:hover:bg-[#1a1a26] border border-rule dark:border-white/15 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] overflow-hidden',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper',
         'transform-gpu backface-hidden select-none touch-action-manipulation',
@@ -253,7 +253,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false, wasRe
 
       {/* Read overlay badge */}
       {isRead && (
-        <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cred-high/15 text-cred-high text-[10px] font-bold md:backdrop-blur-sm">
+        <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cred-high/15 text-cred-high text-[10px] font-bold backdrop-blur-sm">
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           {t('card.read')}
         </div>

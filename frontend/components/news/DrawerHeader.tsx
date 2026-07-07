@@ -53,7 +53,7 @@ export function DrawerHeader({
         <div className="flex items-center gap-1.5">
           {/* Swipe / Story Navigation Buttons */}
           {(onPrev || onNext) && (
-            <div className="flex items-center gap-1 mr-2 bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/70 p-1 rounded-xl border border-rule/50 shadow-sm md:backdrop-blur-xl select-none">
+            <div className="flex items-center gap-1 mr-2 bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/60 md:dark:bg-paper-tint/40 p-1 rounded-xl border border-rule/40 shadow-sm md:backdrop-blur-xl select-none">
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.88 }}

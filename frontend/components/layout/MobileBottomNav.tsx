@@ -75,7 +75,7 @@ export function MobileBottomNav() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
               transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.sheet}
-              className="absolute left-3 right-3 rounded-2xl overflow-hidden bg-paper dark:bg-black border border-rule/60 shadow-card-lg transform-gpu"
+              className="absolute left-3 right-3 rounded-2xl overflow-hidden md:bg-paper/85 md:dark:bg-black/85 md:backdrop-blur-2xl bg-paper dark:bg-black border border-rule/60 shadow-card-lg transform-gpu"
               style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
@@ -141,7 +141,7 @@ export function MobileBottomNav() {
           </div>
         )}
         <div
-          className="relative border-t border-rule/50 bg-[#ffffff]/98 dark:bg-[#101016]/98 md:bg-[#ffffff]/80 md:dark:bg-[#101016]/80 md:backdrop-blur-2xl md:backdrop-saturate-[1.8] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none touch-action-manipulation transition-transform duration-300"
+          className="relative border-t border-rule/50 bg-[#ffffff] dark:bg-[#101016] md:bg-[#ffffff]/70 md:dark:bg-[#101016]/70 md:supports-[backdrop-filter]:bg-[#ffffff]/40 md:dark:supports-[backdrop-filter]:bg-[#101016]/40 md:backdrop-filter md:backdrop-blur-2xl md:backdrop-saturate-[1.8] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none touch-action-manipulation transition-transform duration-300"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />

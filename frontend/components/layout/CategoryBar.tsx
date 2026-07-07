@@ -44,13 +44,13 @@ export function CategoryBar() {
 
   return (
     <nav
-      className="relative -mx-4 px-4 border-y border-rule bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/50 md:backdrop-blur-xl md:backdrop-saturate-[1.2] transform-gpu select-none"
+      className="relative -mx-4 px-4 border-y border-rule bg-[#fcfaf7] dark:bg-[#15151e] md:bg-paper/40 md:supports-[backdrop-filter]:bg-paper/20 md:backdrop-filter md:backdrop-blur-xl md:backdrop-saturate-[1.3] transform-gpu select-none"
       role="tablist"
       aria-label={t('category.aria_label')}
     >
 
-      <div className={`absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-paper to-transparent pointer-events-none`} />
-      <div className={`absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-paper to-transparent pointer-events-none`} />
+      <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-paper via-paper/80 to-transparent pointer-events-none z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-paper via-paper/80 to-transparent pointer-events-none z-10" />
 
       <div ref={scrollRef} className="overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-action-pan-x overscroll-x-contain">
         <div className="flex items-stretch min-w-max">

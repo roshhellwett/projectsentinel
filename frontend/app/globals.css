@@ -169,22 +169,147 @@ html.dark {
   }
 }
 
-.glass {
+/* ============================================================
+   Glass & Backdrop Blur Design System
+   Multi-tier frosted glass with performance-first constraints.
+   ============================================================ */
+
+@layer components {
+
+/* -- Base glass mixin (applied via classes below) -- */
+
+.glass,
+.glass-sm,
+.glass-md,
+.glass-lg,
+.glass-xl,
+.glass-2xl {
   position: relative;
   border: 1px solid rgb(var(--c-rule));
-  border-radius: 20px;
-  box-shadow:
-    0 4px 20px rgb(var(--c-shadow) / 0.05);
   transition:
     border-color 250ms var(--ease-apple),
     box-shadow 350ms var(--ease-apple),
-    transform 350ms var(--ease-apple);
+    transform 350ms var(--ease-apple),
+    background 350ms var(--ease-apple);
   transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* -- Subtle — for badges, pills, small overlays -- */
+.glass-sm {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgb(var(--c-shadow) / 0.04);
+  background: rgb(var(--c-paper-tint) / 0.85);
+  backdrop-filter: blur(8px) saturate(1.3);
+  -webkit-backdrop-filter: blur(8px) saturate(1.3);
+}
+
+/* -- Medium — for cards, small panels -- */
+.glass-md {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgb(var(--c-shadow) / 0.05);
+  background: rgb(var(--c-paper) / 0.82);
+  backdrop-filter: blur(16px) saturate(1.35);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+}
+
+/* -- Large — existing .glass, for navbars, category bars -- */
+.glass,
+.glass-lg {
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgb(var(--c-shadow) / 0.05);
   background: rgb(var(--c-paper) / 0.75);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
 
+/* -- XL — for overlays, search modals -- */
+.glass-xl {
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgb(var(--c-shadow) / 0.08);
+  background: rgb(var(--c-paper) / 0.70);
+  backdrop-filter: blur(32px) saturate(1.45);
+  -webkit-backdrop-filter: blur(32px) saturate(1.45);
+}
+
+/* -- 2XL — maximum blur for fullscreen overlays -- */
+.glass-2xl {
+  border-radius: 28px;
+  box-shadow: 0 12px 48px rgb(var(--c-shadow) / 0.10);
+  background: rgb(var(--c-paper) / 0.60);
+  backdrop-filter: blur(48px) saturate(1.5);
+  -webkit-backdrop-filter: blur(48px) saturate(1.5);
+}
+
+/* -- Dark overrides for all glass tiers -- */
+.dark .glass-sm { background: rgb(var(--c-paper-tint) / 0.55); }
+.dark .glass-md { background: rgb(var(--c-paper) / 0.50); }
+.dark .glass,
+.dark .glass-lg { background: rgb(var(--c-paper) / 0.45); }
+.dark .glass-xl { background: rgb(var(--c-paper) / 0.40); }
+.dark .glass-2xl { background: rgb(var(--c-paper) / 0.35); }
+
+/* -- Performance: disable heavy backdrop-filter on mobile/touch -- */
+@media (max-width: 1023px) {
+  .glass,
+  .glass-sm,
+  .glass-md,
+  .glass-lg,
+  .glass-xl,
+  .glass-2xl,
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .glass-sm { background: rgb(var(--c-paper-tint) / 0.98) !important; }
+  .glass-md { background: rgb(var(--c-paper) / 0.98) !important; }
+  .glass,
+  .glass-lg { background: rgb(var(--c-paper) / 0.98) !important; }
+  .glass-xl { background: rgb(var(--c-paper) / 0.97) !important; }
+  .glass-2xl { background: rgb(var(--c-paper) / 0.96) !important; }
+  .dark .glass-sm { background: rgb(var(--c-paper-tint) / 0.92) !important; }
+  .dark .glass-md { background: rgb(var(--c-paper) / 0.92) !important; }
+  .dark .glass,
+  .dark .glass-lg { background: rgb(var(--c-paper) / 0.92) !important; }
+  .dark .glass-xl { background: rgb(var(--c-paper) / 0.90) !important; }
+  .dark .glass-2xl { background: rgb(var(--c-paper) / 0.88) !important; }
+}
+
+}
+
+/* -- Ambient blur background for decorative use -- */
+.ambient-blur {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateZ(0);
+}
+.ambient-blur::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% -10%, rgb(var(--c-accent) / 0.06), transparent 60%);
+}
+
+/* -- Staggered glass-in glass hover effect -- */
+@media (hover: hover) {
+  .glass-hover-trigger:hover .glass-hover-target {
+    background: rgb(var(--c-paper-tint) / 0.90);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    border-color: rgb(var(--c-accent) / 0.20);
+  }
+  .glass-hover-trigger:hover .glass-hover-target-dark {
+    background: rgb(var(--c-paper-tint) / 0.40);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    border-color: rgb(var(--c-accent) / 0.25);
+  }
+}
+
+/* -- Legacy aliases (backward compat) -- */
 .premium-card,
 .news-card-wrap {
   position: relative;
@@ -200,29 +325,11 @@ html.dark {
   background: #ffffff;
 }
 
-.dark .glass {
-  background: rgb(var(--c-paper) / 0.45);
-}
-
 .dark .premium-card,
 .dark .news-card-wrap {
   background: #13131c;
   border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-}
-
-@media (max-width: 1023px) {
-  .glass,
-  [class*="backdrop-blur"] {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  .glass {
-    background: rgb(var(--c-paper) / 0.98) !important;
-  }
-  .dark .glass {
-    background: rgb(var(--c-paper) / 0.95) !important;
-  }
 }
 
 @keyframes cardGlow {

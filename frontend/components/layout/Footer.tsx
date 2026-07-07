@@ -50,9 +50,10 @@ export function Footer() {
   return (
     <footer className="relative mt-auto bg-paper-2 border-t border-rule/40 overflow-x-hidden w-full max-w-full">
 
-      {/* Premium gradient divider */}
+      {/* Premium gradient divider with enhanced blur */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent/20 to-transparent blur-sm" aria-hidden="true" />
+      <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-transparent via-accent/20 to-transparent blur-md" aria-hidden="true" />
+      <div className="absolute -top-4 inset-x-[20%] h-8 bg-gradient-to-r from-transparent via-accent/3 to-transparent blur-2xl" aria-hidden="true" />
 
       <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-12 pb-10">
 
