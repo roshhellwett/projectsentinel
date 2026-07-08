@@ -172,13 +172,10 @@ body::before {
 
   .paper-card {
     position: relative;
-    background: rgba(234, 230, 222, 0.55);
-    border: 1px solid rgb(var(--c-rule) / 0.5);
+    background-color: rgb(var(--c-paper-2));
+    border: 1px solid rgb(var(--c-rule));
     border-radius: 6px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    will-change: backdrop-filter;
-    transform: translateZ(0);
+    overflow: hidden;
   }
   .paper-card::after {
     content: '';
@@ -390,9 +387,6 @@ body::before {
 
 @keyframes entranceFade { 0% { opacity: 0; } 100% { opacity: 1; } }
 .animate-entrance { animation: entranceFade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-@keyframes entranceSlide { 0% { transform: translateY(12px); } 100% { transform: translateY(0); } }
-.animate-entrance-slide { animation: entranceSlide 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @keyframes shimmer { 0% { transform: translateX(-100%) translateZ(0); } 100% { transform: translateX(100%) translateZ(0); } }
 .animate-shimmer {
