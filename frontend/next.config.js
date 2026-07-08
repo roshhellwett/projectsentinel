@@ -14,16 +14,24 @@ try {
   // leave empty — will be validated at request time
 }
 
+const supabaseConnectSources = supabaseHost
+  ? [`https://${supabaseHost}`, 'https://*.supabase.co', 'wss://*.supabase.co']
+  : ['https://*.supabase.co', 'wss://*.supabase.co'];
+
+const supabaseImageSources = supabaseHost
+  ? [`https://${supabaseHost}`, 'https://*.supabase.co']
+  : ['https://*.supabase.co'];
+
 const nextConfig = {
   // ─────────────────────────────────────────────────────────────────────
   // Image Optimization
   // ─────────────────────────────────────────────────────────────────────
   images: {
     remotePatterns: [
-      {
+      ...(supabaseHost ? [{
         protocol: 'https',
         hostname: supabaseHost,
-      },
+      }] : []),
       {
         protocol: 'https',
         hostname: 'www.google.com',
@@ -63,14 +71,13 @@ const nextConfig = {
   // Security Headers & Caching
   // ─────────────────────────────────────────────────────────────────────
   async headers() {
-    const supabaseHostRaw = supabaseHost;
     const csp = [
       "default-src 'self'",
-      `connect-src 'self' https://${supabaseHostRaw} https://*.supabase.co wss://*.supabase.co https://www.googletagmanager.com https://*.google-analytics.com`,
+      `connect-src 'self' ${supabaseConnectSources.join(' ')} https://www.googletagmanager.com https://*.google-analytics.com`,
       "script-src 'self' https://www.googletagmanager.com https://*.google-analytics.com 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com https://*.perplexity.ai",
-      `img-src 'self' data: blob: https://${supabaseHostRaw} https://*.supabase.co https://www.google.com https://*.googleusercontent.com https://www.googletagmanager.com https://i.ytimg.com https://*.ytimg.com https://*.youtube.com`,
+      `img-src 'self' data: blob: ${supabaseImageSources.join(' ')} https://www.google.com https://*.googleusercontent.com https://www.googletagmanager.com https://i.ytimg.com https://*.ytimg.com https://*.youtube.com`,
       "frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.youtube-nocookie.com",
           "manifest-src 'self'",
           "base-uri 'self'",
@@ -118,7 +125,11 @@ const nextConfig = {
   // ─────────────────────────────────────────────────────────────────────
   async redirects() {
     return [
-      // Redirect old URLs if any migration paths needed
+      {
+        source: '/category/technology',
+        destination: '/category/tech',
+        permanent: true,
+      },
     ];
   },
 

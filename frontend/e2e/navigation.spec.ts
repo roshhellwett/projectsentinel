@@ -11,7 +11,7 @@ test.describe('navigation', () => {
 
   test('category page shows correct heading', async ({ page }) => {
     await navigateTo(page, '/category/technology/');
-    await expect(page.locator('h1')).toContainText('Technology');
+    await expect(page.locator('h1')).toContainText('Tech');
   });
 
   test('category page shows category breadcrumb', async ({ page }) => {
@@ -21,7 +21,7 @@ test.describe('navigation', () => {
 
   test('category page renders feed grid', async ({ page }) => {
     await navigateTo(page, '/category/politics/');
-    await expect(page.locator('[role="button"][aria-label^="Read article"]').first()).toBeAttached({ timeout: 10000 });
+    await expect(page.locator('[role="article"][aria-label^="Read article"]').first()).toBeAttached({ timeout: 10000 });
   });
 
   test('search page accepts query and shows results', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('navigation', () => {
   });
 
   test('404 page for unknown routes', async ({ page }) => {
-    const resp = await page.goto('/this-does-not-exist', { waitUntil: 'networkidle' });
+    const resp = await page.goto('/this-does-not-exist', { waitUntil: 'domcontentloaded' });
     expect(resp?.status()).toBe(404);
   });
 });

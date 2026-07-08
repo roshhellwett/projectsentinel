@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CategoryTag } from './CategoryTag';
 import { formatDate } from '@/lib/utils/formatDate';
 import { Z_INDEX } from '@/lib/theme/zIndex';
@@ -21,7 +21,6 @@ interface DrawerHeaderProps {
 export function DrawerHeader({
   category,
   publishedAt,
-  onClose,
   score = 92,
   onNext,
   onPrev,
@@ -30,30 +29,30 @@ export function DrawerHeader({
   const haptic = useHapticFeedback();
 
   return (
-    <header className={`relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-transparent border-b border-white/30 dark:border-white/10 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
+    <header className={`pointer-events-none relative ${Z_INDEX.content} flex flex-col rounded-t-none bg-transparent border-b border-white/30 dark:border-white/10 flex-shrink-0 sm:px-6 lg:rounded-none lg:px-7`}>
       {/* Gradient Category Header Bar across exact top */}
       <div
-        className="w-full h-[3px] flex-shrink-0 transition-opacity duration-300 transform-gpu"
+        className="pointer-events-none w-full h-[3px] flex-shrink-0 transition-opacity duration-300 transform-gpu"
         style={{ background: theme.cssGradient, boxShadow: `0 1px 8px ${theme.gradientFrom}33` }}
         aria-hidden="true"
       />
 
-      <div className="flex items-center justify-between gap-3 px-5 py-3.5 sm:px-6">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="pointer-events-none flex items-center justify-between gap-2 px-5 py-3.5 pr-20 sm:px-6 sm:pr-20">
+        <div className="pointer-events-auto flex flex-1 items-center gap-2 min-w-0">
           <CategoryTag category={category} />
           <span className="text-xs text-muted truncate font-medium hidden sm:inline">{formatDate(publishedAt)}</span>
 
           {/* Circular Reading/Credibility Progress Ring */}
-          <div className="flex items-center gap-1.5 pl-2 border-l border-rule/60">
+          <div className="hidden min-[380px]:flex items-center gap-1.5 pl-2 border-l border-rule/60">
             <ScoreRing score={score} size={30} strokeWidth={2.8} compact />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Verified</span>
+            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-wider text-muted">Verified</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="pointer-events-auto relative z-20 flex flex-shrink-0 items-center gap-1.5">
           {/* Swipe / Story Navigation Buttons */}
           {(onPrev || onNext) && (
-            <div className="flex items-center gap-1 mr-2 bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/60 md:dark:bg-paper-tint/40 p-1 rounded-xl border border-rule/40 shadow-sm md:backdrop-blur-xl select-none">
+            <div className="flex items-center gap-1 bg-[#f2f0eb] dark:bg-[#1c1c28] md:bg-paper-2/60 md:dark:bg-paper-tint/40 p-1 rounded-xl border border-rule/40 shadow-sm md:backdrop-blur-xl select-none">
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.88 }}
@@ -76,16 +75,6 @@ export function DrawerHeader({
               </motion.button>
             </div>
           )}
-
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.88 }}
-            onClick={() => { haptic.light(); onClose(); }}
-            className="tap-target min-w-[44px] min-h-[44px] p-2 hover:bg-paper-2 rounded-xl border border-transparent hover:border-rule transition-[background-color,border-color,color,transform] duration-150 transform-gpu touch-action-manipulation select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0 flex items-center justify-center"
-            aria-label="Close article"
-          >
-            <X className="w-5 h-5 text-muted hover:text-ink transition-colors" />
-          </motion.button>
         </div>
       </div>
     </header>

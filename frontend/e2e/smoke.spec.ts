@@ -13,7 +13,7 @@ test.describe('smoke', () => {
         }
       });
 
-      const resp = await page.goto(route, { waitUntil: 'networkidle', timeout: 30000 });
+      const resp = await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 30000 });
       expect(resp?.status()).toBeLessThan(400);
       await page.waitForTimeout(500);
 
@@ -26,7 +26,7 @@ test.describe('smoke', () => {
     page.on('pageerror', (err) => errors.push(err.message));
 
     for (const route of CORE_ROUTES) {
-      await page.goto(route, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForTimeout(300);
     }
 

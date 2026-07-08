@@ -153,7 +153,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
                 animate(y, 0, IOS_SPRING.sheet);
               }
             }}
-            className={`fixed ${Z_INDEX.drawerPanel} bg-[#fcfaf7] dark:bg-[#121218] md:bg-white/85 md:dark:bg-black/85 md:backdrop-blur-[24px] border-l border-rule shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col transform-gpu will-change-transform`}
+            className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-[#fcfaf7] dark:bg-[#121218] md:bg-white/85 md:dark:bg-black/85 md:backdrop-blur-[24px] border-l border-rule shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:max-h-none lg:w-[min(520px,38vw)] 2xl:w-[min(540px,30vw)] top-0 bottom-0 left-0 right-0 h-dynamic max-h-none rounded-none overflow-hidden flex flex-col transform-gpu will-change-transform`}
             initial={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : (canDrag ? '100%' : 0), x: reducedMotion ? 0 : (canDrag ? 0 : '100%') }}
@@ -162,7 +162,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent lg:h-full lg:w-[2px] lg:left-0 lg:right-auto lg:top-0 lg:bottom-0 lg:bg-gradient-to-b" />
 
             <div
-              className="lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none"
+              className="pointer-events-auto lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none"
               onPointerDown={(e) => dragControls.start(e)}
             >
               <div className="w-10 h-1 rounded-full bg-rule-strong" />
@@ -177,16 +177,30 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
               onPrev={onPrev}
             />
 
-            <DrawerContent 
-              post={post} 
-              onSelectRelated={onSelectRelated} 
-            />
+            <div className="pointer-events-auto min-h-0 flex-1 flex flex-col">
+              <DrawerContent
+                post={post}
+                onSelectRelated={onSelectRelated}
+              />
+            </div>
 
-            <DrawerFooter 
-              post={post} 
-              siteUrl={siteUrl} 
-            />
+            <div className="pointer-events-auto">
+              <DrawerFooter
+                post={post}
+                siteUrl={siteUrl}
+              />
+            </div>
           </motion.div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ zIndex: 9999 }}
+            className="fixed right-4 top-4 tap-target min-w-[44px] min-h-[44px] p-2 bg-[#fcfaf7]/90 dark:bg-[#121218]/90 hover:bg-paper-2 rounded-xl border border-transparent hover:border-rule transition-[background-color,border-color,transform] duration-150 transform-gpu touch-action-manipulation select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex items-center justify-center"
+            aria-label="Close article"
+          >
+            <X className="w-5 h-5 text-muted hover:text-ink transition-colors" />
+          </button>
         </>
       )}
     </AnimatePresence>,

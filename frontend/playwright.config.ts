@@ -21,20 +21,13 @@ export default defineConfig({
     },
     {
       name: 'mobile',
-      use: { ...devices['iPhone 13'] },
+      use: { ...devices['Pixel 5'] },
     },
   ],
-  webServer: process.env.CI
-    ? {
-        command: 'npm run build && npm run start',
-        url: BASE_URL,
-        reuseExistingServer: false,
-        timeout: 120_000,
-      }
-    : {
-        command: 'npm run dev',
-        url: BASE_URL,
-        reuseExistingServer: true,
-        timeout: 30_000,
-      },
+  webServer: {
+    command: 'npm run build && npm run start',
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
 });
