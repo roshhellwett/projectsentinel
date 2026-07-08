@@ -7,6 +7,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { I18nProvider } from '@/lib/i18n/context';
 import { NewsBackground } from '@/components/layout/NewsBackground';
 import dynamic from 'next/dynamic';
+import { PageEntrance } from '@/components/layout/PageEntrance';
 
 const ScrollToTop = dynamic(() => import('@/components/ui/ScrollToTop').then(m => m.ScrollToTop), { ssr: false });
 const KeyboardShortcuts = dynamic(() => import('@/components/ui/KeyboardShortcuts').then(m => m.KeyboardShortcuts), { ssr: false });
@@ -20,11 +21,13 @@ export default function ClientShell({ children }: { children: ReactNode }) {
       <NewsBackground />
       <I18nProvider>
         <Navbar />
-        <main id="main" className="flex-1 w-full max-w-full overflow-x-hidden" tabIndex={-1}>
-          {children}
-        </main>
-        <Footer />
-        <MobileBottomNav />
+        <PageEntrance>
+          <main id="main" className="flex-1 w-full max-w-full overflow-x-hidden" tabIndex={-1}>
+            {children}
+          </main>
+          <Footer />
+          <MobileBottomNav />
+        </PageEntrance>
       </I18nProvider>
       <ScrollToTop />
       <KeyboardShortcuts />

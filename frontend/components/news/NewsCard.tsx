@@ -17,11 +17,10 @@ function ShieldIcon() {
   );
 }
 
-function YoutubeIcon() {
+function YoutubeIcon({ className }: { className?: string }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="2" y="5" width="20" height="14" rx="3" />
-      <path d="M10 9l6 4-6 4z" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
     </svg>
   );
 }
@@ -64,10 +63,9 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
     e.stopPropagation();
     e.preventDefault();
     haptic.light();
-    if (post.video_url) {
-      window.open(post.video_url, '_blank', 'noopener,noreferrer');
-    }
-  }, [haptic, post.video_url]);
+    const query = encodeURIComponent(`${post.headline} latest news`);
+    window.open(`https://www.youtube.com/results?search_query=${query}&sp=CAI%3D`, '_blank', 'noopener,noreferrer');
+  }, [haptic, post.headline]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -99,17 +97,17 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         </span>
       )}
 
-      <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 min-h-[20px]">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
-          <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+      <div className="flex items-start justify-between gap-1.5 sm:gap-3 mb-1.5 sm:mb-2 min-h-[18px] sm:min-h-[20px]">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-2 min-w-0">
+          <span className="font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
             {post.category}
           </span>
           <span className="text-ink-soft/40" aria-hidden="true">·</span>
-          <span className="font-mono text-[9px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+          <span className="font-mono text-[8px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
           {smartLabel && (
             <span
               className={cn(
-                'font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase',
+                'font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase',
                 smartLabel.priority >= 3 ? 'text-red-600' : 'text-ink'
               )}
             >
@@ -117,42 +115,40 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
           <VerificationStamp score={post.credibility_score} xsmall />
         </div>
       </div>
 
-      <h3 className="font-body font-bold text-[15px] sm:text-[17px] leading-[1.25] tracking-[-0.01em] text-ink line-clamp-3 mb-1.5 flex-shrink-0">
+      <h3 className="font-body font-bold text-[14px] sm:text-[17px] leading-[1.2] sm:leading-[1.25] tracking-[-0.01em] text-ink line-clamp-3 mb-1 sm:mb-1.5 flex-shrink-0">
         {post.headline}
       </h3>
 
-      <p className="font-body text-[12px] sm:text-[13px] leading-[1.5] sm:leading-[1.55] text-ink-soft line-clamp-2 mb-3 sm:mb-[14px] flex-shrink-0">
-        {truncateWords(post.summary, 22)}
+      <p className="font-body text-[11px] sm:text-[13px] leading-[1.4] sm:leading-[1.55] text-ink-soft line-clamp-2 mb-2 sm:mb-[14px] flex-shrink-0">
+        {truncateWords(post.summary, 20)}
       </p>
 
-      <div className="flex items-center justify-between gap-2 mt-auto pt-2.5 sm:pt-3 border-t border-rule/60">
-        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-          <span className="inline-flex items-center gap-1 font-body text-[10px] sm:text-[11px] text-ink-soft shrink-0">
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2 mt-auto pt-2 sm:pt-3 border-t border-rule/60">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+          <span className="inline-flex items-center gap-1 font-body text-[9px] sm:text-[11px] text-ink-soft shrink-0">
             <ShieldIcon />
             {sourcesCount} {sourcesCount === 1 ? 'source' : 'sources'}
           </span>
-          {isVideo && post.video_url && (
-            <button
-              type="button"
-              onClick={handleYoutubeClick}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-amber-500/20 text-amber-600 bg-amber-50/50 hover:bg-amber-100/60 active:bg-amber-200/60 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded-[3px] transition-colors shrink-0"
-              aria-label={`Watch on YouTube: ${post.headline}`}
-            >
-              <YoutubeIcon />
-              YouTube
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleYoutubeClick}
+            className="inline-flex items-center gap-1 px-1 sm:px-1.5 py-0.5 border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded-[3px] transition-colors shrink-0"
+            aria-label={`Search YouTube: ${post.headline}`}
+          >
+            <YoutubeIcon className="text-ink" />
+            YouTube
+          </button>
         </div>
         <BookmarkButton postId={post.id} variant="icon" />
       </div>
 
       {isRead && (
-        <span className="font-body text-[10px] sm:text-[11px] text-ink-soft/60 mt-1.5">Read</span>
+        <span className="font-body text-[9px] sm:text-[11px] text-ink-soft/60 mt-1 sm:mt-1.5">Read</span>
       )}
     </div>
   );

@@ -58,15 +58,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="relative min-h-screen">
       <PageShell>
-        <header className="mb-10 pb-8 border-b border-rule">
-          <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
-          <p className="editorial-kicker mb-3">
+        <header className="mb-6 sm:mb-10 pb-6 sm:pb-8 border-b border-rule">
+          <span aria-hidden="true" className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-3 sm:mb-5" />
+          <p className="editorial-kicker mb-2 sm:mb-3">
             {query ? 'Search Results' : 'Search'}
           </p>
-          <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-3 leading-[1.05]">
+          <h1 className="font-display text-xl sm:text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-2 sm:mb-3 leading-[1.05]">
             {query ? query : 'Find verified news'}
           </h1>
-          <p className="text-sm text-muted">
+          <p className="text-xs sm:text-sm text-muted">
             Browse calm, verified coverage from the India Verified archive.
           </p>
         </header>

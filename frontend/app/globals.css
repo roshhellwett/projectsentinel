@@ -334,6 +334,8 @@ body::before {
   .min-touch { min-height: 44px; min-width: 44px; }
   .min-touch-48 { min-height: 48px; min-width: 48px; }
 
+  .tap-target { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+
   .content-padding { padding-left: max(1rem, env(safe-area-inset-left, 0px)); padding-right: max(1rem, env(safe-area-inset-right, 0px)); }
   @media (min-width: 640px) { .content-padding { padding-left: max(1.5rem, env(safe-area-inset-left, 0px)); padding-right: max(1.5rem, env(safe-area-inset-right, 0px)); } }
   @media (min-width: 1024px) { .content-padding { padding-left: max(2.5rem, env(safe-area-inset-left, 0px)); padding-right: max(2.5rem, env(safe-area-inset-right, 0px)); } }
@@ -362,6 +364,9 @@ body::before {
 
 @keyframes slideUp { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
 .animate-slide-up { animation: slideUp 0.3s ease-out both; }
+
+@keyframes entranceFade { 0% { opacity: 0; } 100% { opacity: 1; } }
+.animate-entrance { animation: entranceFade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @keyframes shimmer { 0% { transform: translateX(-100%) translateZ(0); } 100% { transform: translateX(100%) translateZ(0); } }
 .animate-shimmer {

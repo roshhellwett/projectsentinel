@@ -112,13 +112,13 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   if (trending.length === 0) return null;
 
   return (
-      <section aria-label="Trending stories" className="mb-8 sm:mb-10">
-        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
-          <h2 className="font-body font-bold text-lg sm:text-xl text-ink">
+      <section aria-label="Trending stories" className="mb-6 sm:mb-10">
+        <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5">
+          <h2 className="font-body font-bold text-base sm:text-xl text-ink">
             Trending stories
           </h2>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            <span className="font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
               Top {trending.length} verified
             </span>
             <div className="hidden sm:flex items-center gap-1">
@@ -155,7 +155,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
                 <div
                   key={post.id}
-                  className="flex-shrink-0 w-[260px] sm:w-[300px] md:w-[315px] snap-start animate-slide-up"
+                  className="flex-shrink-0 w-[75vw] sm:w-[300px] md:w-[315px] snap-start animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div

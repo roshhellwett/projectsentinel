@@ -86,14 +86,14 @@ export default function SavedPage() {
           {t('saved.back')}
         </Link>
 
-        <div className="animate-slide-up mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
+        <div className="animate-slide-up mb-6 sm:mb-10 pb-5 sm:pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span aria-hidden="true" className="block w-10 h-[2px] bg-accent rounded-full mb-4 sm:mb-5" />
-            <p className="editorial-kicker mb-2 sm:mb-3">{t('saved.your_list')}</p>
-            <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink mb-2 sm:mb-3 leading-[1.05]">
+            <span aria-hidden="true" className="block w-10 h-[2px] bg-accent rounded-full mb-3 sm:mb-5" />
+            <p className="editorial-kicker mb-1.5 sm:mb-3">{t('saved.your_list')}</p>
+            <h1 className="font-display text-xl sm:text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink mb-1.5 sm:mb-3 leading-[1.05]">
               {t('saved.page_title')}
             </h1>
-            <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
+            <p className="text-xs sm:text-sm md:text-base text-muted max-w-xl leading-relaxed">
               {t('saved.page_desc')}
             </p>
           </div>

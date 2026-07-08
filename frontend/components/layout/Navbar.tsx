@@ -173,7 +173,7 @@ export function Navbar() {
             </nav>
 
             <div className="flex items-center gap-0.5 sm:gap-1 lg:gap-2">
-              <div className="hidden xs:inline sm:inline md:inline">
+              <div className="hidden sm:inline">
                 <LastRefreshed />
               </div>
               <ConnectionStatus />

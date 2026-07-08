@@ -93,7 +93,7 @@ const PIPELINE_STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl">
+    <div className="relative px-4 sm:px-6 lg:px-10 pb-24 md:pb-20 py-8 sm:py-12 max-w-5xl mx-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -130,21 +130,21 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <div className="text-center mb-16 pb-10 border-b border-rule">
-        <span aria-hidden="true" className="block w-12 h-[2px] bg-accent mb-5 mx-auto" />
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 text-accent text-sm font-semibold rounded-full mb-6 border border-accent/20">
-          <Zap className="w-4 h-4" />
+      <div className="text-center mb-10 sm:mb-16 pb-8 sm:pb-10 border-b border-rule">
+        <span aria-hidden="true" className="block w-10 sm:w-12 h-[2px] bg-accent mb-4 sm:mb-5 mx-auto" />
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-accent/10 text-accent text-xs sm:text-sm font-semibold rounded-full mb-4 sm:mb-6 border border-accent/20">
+          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           Fully Automated
         </div>
-        <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-5 text-ink leading-[1.05] tracking-tight">
+        <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-bold mb-3 sm:mb-5 text-ink leading-[1.05] tracking-tight">
           How India <span className="text-accent">Verified</span> works
         </h1>
-        <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
           Every story goes through a rigorous 7-step AI verification pipeline before reaching you.
         </p>
       </div>
 
-      <div className="space-y-3 mb-20">
+      <div className="space-y-3 mb-12 sm:mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
             <div className="np-card group flex gap-4 sm:gap-5 p-4 sm:p-6 transition-all duration-300">
@@ -171,16 +171,16 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="np-card p-5 sm:p-8 md:p-10 mb-10 sm:mb-12">
-        <h2 className="font-display text-xl sm:text-2xl font-bold mb-3 text-ink tracking-tight">Trusted sources</h2>
-        <p className="text-muted mb-5 sm:mb-6">
+      <div className="np-card p-4 sm:p-8 md:p-10 mb-8 sm:mb-12">
+        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">Trusted sources</h2>
+        <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6">
           We only pull from established Indian news organizations with editorial standards.
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {TRUSTED_SOURCES.map(source => (
             <span
               key={source}
-              className="px-3 py-1.5 bg-paper border border-rule rounded text-xs sm:text-sm font-medium text-ink hover:border-ink transition-colors"
+              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-paper border border-rule rounded text-[11px] sm:text-sm font-medium text-ink hover:border-ink transition-colors"
             >
               {source}
             </span>
@@ -188,9 +188,9 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="mb-10 sm:mb-12">
-        <h2 className="font-display text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-ink tracking-tight">Credibility scoring</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+      <div className="mb-8 sm:mb-12">
+        <h2 className="font-display text-lg sm:text-2xl font-bold mb-3 sm:mb-6 text-ink tracking-tight">Credibility scoring</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
           <ScoreCard
             range="90-100"
             label="High Credibility"
@@ -215,12 +215,12 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="np-card text-center p-6 sm:p-10">
-        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-4 sm:mb-5">
-          <Github className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
+      <div className="np-card text-center p-5 sm:p-10">
+        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-3 sm:mb-5">
+          <Github className="w-5 h-5 sm:w-8 sm:h-8 text-ink" />
         </div>
-        <h2 className="font-display text-xl sm:text-2xl font-bold mb-3 text-ink tracking-tight">Open source</h2>
-        <p className="text-muted mb-5 sm:mb-6 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
+        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">Open source</h2>
+        <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6 max-w-md mx-auto leading-relaxed">
           The entire codebase is public. Anyone can audit how we work, suggest improvements, or run their own instance.
         </p>
         <a
@@ -229,7 +229,7 @@ export default function HowItWorksPage() {
           rel="noopener noreferrer"
           className="tap-target min-h-[44px] inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-ink hover:bg-ink/90 text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
         >
-          <Github className="w-5 h-5" />
+          <Github className="w-4 h-4 sm:w-5 sm:h-5" />
           View on GitHub
         </a>
       </div>

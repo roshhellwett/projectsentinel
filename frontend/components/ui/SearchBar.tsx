@@ -181,12 +181,12 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       aria-label="Search articles"
       className="fixed inset-0 z-[100] overflow-y-auto bg-paper select-none overflow-x-hidden w-full max-w-full touch-manipulation"
     >
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-10">
-        <div className="flex items-center justify-between mb-6 sm:mb-8">
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-ink">Search</h2>
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8 md:py-10">
+        <div className="flex items-center justify-between mb-4 sm:mb-8">
+          <h2 className="font-display text-xl sm:text-3xl md:text-4xl text-ink">Search</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-paper-2 transition-colors min-touch"
+            className="p-2 hover:bg-paper-2 transition-colors tap-target"
             aria-label="Close search"
           >
             <CloseIcon />
@@ -194,14 +194,14 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
         </div>
 
         <form
-          className="relative mb-8"
+          className="relative mb-6 sm:mb-8"
           onSubmit={(e) => {
             e.preventDefault();
           }}
           role="search"
         >
           <div className="relative flex items-center">
-            <span className="absolute left-4 text-muted pointer-events-none">
+            <span className="absolute left-3 sm:left-4 text-muted pointer-events-none">
               <SearchIcon />
             </span>
             <input
@@ -210,7 +210,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search verified news, topics, keywords..."
-              className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-paper-2 text-ink border border-rule focus:border-ink outline-none transition-all font-body placeholder:text-muted text-sm sm:text-base"
+              className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper-2 text-ink border border-rule focus:border-ink outline-none transition-all font-body placeholder:text-muted text-sm sm:text-base"
               aria-label="Search query"
               aria-controls="search-results"
             />
@@ -221,7 +221,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                   setQuery('');
                   inputRef.current?.focus();
                 }}
-                className="absolute right-3 p-1.5 text-muted hover:text-ink transition-colors"
+                className="absolute right-2 sm:right-3 p-1.5 text-muted hover:text-ink transition-colors"
                 aria-label="Clear search query"
               >
                 <CloseIcon />

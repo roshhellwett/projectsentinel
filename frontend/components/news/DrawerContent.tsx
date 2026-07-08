@@ -21,7 +21,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
 
   return (
     <article className={cn(
-      "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full overscroll-contain px-4 pb-4 pt-3 sm:px-8 sm:pb-10 sm:pt-5 lg:px-10 lg:pt-6 lg:pb-14 flex flex-col",
+      "article-drawer-scroll relative z-10 flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full overscroll-contain px-3 pb-3 pt-2 sm:px-8 sm:pb-10 sm:pt-5 lg:px-10 lg:pt-6 lg:pb-14 flex flex-col",
       post.status === 'retracted' && "opacity-50"
     )}>
       <div className="flex flex-col flex-1 max-w-3xl">

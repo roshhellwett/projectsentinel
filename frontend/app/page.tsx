@@ -41,7 +41,7 @@ async function HeroSection() {
   if (!heroPost) return null;
 
   return (
-    <div id="latest" className="mb-10 scroll-mt-24">
+    <div id="latest" className="mb-6 sm:mb-10 scroll-mt-24">
       <HeroCard post={heroPost} badge="breaking" />
     </div>
   );
@@ -73,12 +73,12 @@ async function TrendingAndFeedSection() {
   return (
     <>
       {trendingPosts.length > 0 && (
-        <div className="mb-10">
+        <div className="mb-6 sm:mb-10">
           <TrendingSection posts={trendingPosts} />
         </div>
       )}
 
-      <section aria-label="Latest verified news" className="mt-10">
+      <section aria-label="Latest verified news" className="mt-6 sm:mt-10">
         <FeedSectionHeader />
         <InfiniteFeed
           initialPosts={feedPosts}
@@ -124,7 +124,7 @@ export default function HomePage() {
         }}
       />
 
-      <div className="relative z-10 px-4 sm:px-6 lg:px-10 pb-20 max-w-[1600px] mx-auto">
+      <div className="relative z-10 px-3 sm:px-6 lg:px-10 pb-24 max-w-[1600px] mx-auto">
         <Suspense fallback={<div className="h-24 animate-pulse border border-rule bg-paper-2 rounded-[8px] mb-10" />}>
           <MastheadSection />
         </Suspense>
@@ -143,12 +143,12 @@ export default function HomePage() {
 
 function HeroCardSkeleton() {
   return (
-    <div className="mb-10 animate-shimmer h-80 flex flex-col justify-end p-8 border border-rule rounded-[8px]">
-      <div className="space-y-3 max-w-2xl">
-        <div className="h-4 w-20 bg-rule/60 border border-rule" />
-        <div className="h-8 w-full bg-rule/50 border border-rule" />
-        <div className="h-8 w-3/4 bg-rule/40 border border-rule" />
-        <div className="h-4 w-1/2 bg-rule/30 border border-rule" />
+    <div className="mb-6 sm:mb-10 animate-shimmer h-48 sm:h-80 flex flex-col justify-end p-4 sm:p-8 border border-rule rounded-[8px]">
+      <div className="space-y-2 sm:space-y-3 max-w-2xl">
+        <div className="h-3 sm:h-4 w-16 sm:w-20 bg-rule/60 border border-rule" />
+        <div className="h-6 sm:h-8 w-full bg-rule/50 border border-rule" />
+        <div className="h-6 sm:h-8 w-3/4 bg-rule/40 border border-rule" />
+        <div className="h-3 sm:h-4 w-1/2 bg-rule/30 border border-rule" />
       </div>
     </div>
   );

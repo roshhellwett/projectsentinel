@@ -169,12 +169,12 @@ export function InfiniteFeed({
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 sm:py-24 px-4 text-center">
-        <svg className="w-10 h-10 sm:w-12 sm:h-12 text-muted mb-3 sm:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <div className="flex flex-col items-center justify-center py-12 sm:py-24 px-4 text-center">
+        <svg className="w-8 h-8 sm:w-12 sm:h-12 text-muted mb-2 sm:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
         </svg>
-        <h3 className="font-body font-bold text-base sm:text-lg text-ink mb-1">{t('feed.no_news_title')}</h3>
-        <p className="font-body text-sm text-ink-soft max-w-sm">
+        <h3 className="font-body font-bold text-sm sm:text-lg text-ink mb-1">{t('feed.no_news_title')}</h3>
+        <p className="font-body text-xs sm:text-sm text-ink-soft max-w-sm">
           {t('feed.no_news_desc')}
         </p>
       </div>
@@ -184,12 +184,12 @@ export function InfiniteFeed({
   return (
     <>
       <ErrorBoundary>
-        <div className="flex items-center justify-between gap-3 mb-6">
-          <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+        <div className="flex items-center justify-between gap-3 mb-3 sm:mb-6">
+          <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
             {dailyCount} read today
           </span>
           {readCount > 0 && (
-            <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
               {readCount} / {posts.length} read
             </span>
           )}

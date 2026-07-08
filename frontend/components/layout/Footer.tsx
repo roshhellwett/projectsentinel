@@ -74,7 +74,7 @@ export function Footer() {
                   </span>
                 </span>
               </Link>
-              <p className="mt-2 sm:mt-3 text-sm text-ink-soft leading-relaxed max-w-md">
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-ink-soft leading-relaxed max-w-md">
                 {t('footer.description')}
               </p>
             </div>
@@ -102,10 +102,10 @@ export function Footer() {
             </div>
           </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-y-6 sm:gap-y-8 gap-x-6 sm:gap-x-10 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-y-5 sm:gap-y-8 gap-x-4 sm:gap-x-10 mb-6 sm:mb-8">
           <div>
-            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.news')}</h3>
-            <ul className="space-y-3 sm:space-y-2.5">
+            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">{t('footer.news')}</h3>
+            <ul className="space-y-2 sm:space-y-2.5">
               {NEWS_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -120,8 +120,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.about')}</h3>
-            <ul className="space-y-3 sm:space-y-2.5">
+            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">{t('footer.about')}</h3>
+            <ul className="space-y-2 sm:space-y-2.5">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -136,8 +136,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.legal')}</h3>
-            <ul className="space-y-3 sm:space-y-2.5">
+            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">{t('footer.legal')}</h3>
+            <ul className="space-y-2 sm:space-y-2.5">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -152,8 +152,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.transparency')}</h3>
-            <ul className="space-y-3 sm:space-y-2.5">
+            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">{t('footer.transparency')}</h3>
+            <ul className="space-y-2 sm:space-y-2.5">
               <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
                 <span className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
                 <span>No advertising or sponsored content</span>
@@ -174,9 +174,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-rule">
-          <p className="text-[11px] sm:text-xs text-muted leading-relaxed">
-            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-[11px] sm:text-xs">
+        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-2 sm:gap-4 pt-3 sm:pt-6 border-t border-rule">
+          <p className="text-[10px] sm:text-xs text-muted leading-relaxed">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-[10px] sm:text-xs">
               <span className="font-semibold text-ink-soft">{t('footer.built_in_india')}</span>
             </span>
             <span aria-hidden="true" className="mx-1 text-rule">·</span>
@@ -190,7 +190,7 @@ export function Footer() {
               Roshhellwett
             </a>
           </p>
-          <p className="text-[11px] sm:text-xs text-muted leading-relaxed" suppressHydrationWarning>
+          <p className="text-[10px] sm:text-xs text-muted leading-relaxed" suppressHydrationWarning>
             &copy; {year} India Verified. MIT licence.
           </p>
         </div>

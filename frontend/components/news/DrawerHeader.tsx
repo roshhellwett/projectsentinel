@@ -24,10 +24,10 @@ export function DrawerHeader({
 
   return (
     <header className="pointer-events-none relative flex flex-col flex-shrink-0 border-b border-rule">
-      <div className="pointer-events-none flex items-center justify-between gap-2 px-5 py-3 sm:px-6">
-        <div className="pointer-events-auto flex flex-1 items-center gap-2.5 min-w-0">
+      <div className="pointer-events-none flex items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-3">
+        <div className="pointer-events-auto flex flex-1 items-center gap-2 sm:gap-2.5 min-w-0">
           <CategoryTag category={category} />
-          <span className="np-dateline hidden sm:inline">{formatDate(publishedAt)}</span>
+          <span className="np-dateline hidden sm:inline rounded-md bg-paper-2 px-2 py-0.5 text-[11px] font-medium text-muted">{formatDate(publishedAt)}</span>
         </div>
 
         <div className="pointer-events-auto relative z-20 flex flex-shrink-0 items-center gap-1.5">

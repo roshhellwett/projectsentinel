@@ -163,7 +163,7 @@ export function MobileBottomNav() {
               const isTopics = tab.id === 'topics';
 
               const inner = (
-                <div className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[56px] active:scale-95 transition-transform duration-100 min-touch">
+                <div className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-1.5 sm:px-3 py-1.5 sm:py-2 min-w-[48px] sm:min-w-[56px] active:scale-95 transition-transform duration-100 min-touch">
                   <Icon />
                   <span className={`text-[10px] sm:text-xs leading-none ${active ? 'text-ink font-semibold' : 'text-muted'}`}>
                     {t(tab.key)}
