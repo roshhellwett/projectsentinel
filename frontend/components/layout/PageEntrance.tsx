@@ -10,7 +10,7 @@ export function PageEntrance({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className={mounted ? 'animate-entrance' : ''} style={{ opacity: 0 }}>
+    <div className={mounted ? 'animate-entrance-slide' : ''}>
       {children}
     </div>
   );
