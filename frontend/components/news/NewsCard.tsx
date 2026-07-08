@@ -84,7 +84,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       aria-label={`${isVideo ? 'Video: ' : 'Read article: '}${post.headline}`}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'group relative cursor-pointer select-none touch-manipulation border border-rule bg-paper-2 rounded-[6px] p-3 sm:p-4 flex flex-col h-full transition-all duration-200',
+        'group relative cursor-pointer select-none touch-manipulation paper-card p-3 sm:p-4 flex flex-col h-full transition-all duration-200',
         'hover:shadow-[0_2px_8px_rgb(var(--c-ink)/0.08)] hover:border-ink/20',
         'focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:outline-none',
         isNew && 'border-l-[3px] border-ink',
