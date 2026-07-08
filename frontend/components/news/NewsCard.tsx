@@ -20,7 +20,7 @@ function ShieldIcon() {
 function YoutubeIcon({ className }: { className?: string }) {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
-      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 [...]
     </svg>
   );
 }
@@ -88,12 +88,20 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         'hover:shadow-[0_2px_8px_rgb(var(--c-ink)/0.08)] hover:border-ink/20',
         'focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:outline-none',
         isNew && 'border-l-[3px] border-ink',
-        isVideo && 'border-amber-500/10'
+        isVideo && 'border-amber-500/10 backdrop-blur-sm'
       )}
+      style={isVideo ? { backdropFilter: 'blur(12px)' } : undefined}
     >
       {isVideo && (
         <span className="absolute top-0 right-0 w-16 h-16 overflow-hidden pointer-events-none">
-          <span className="absolute top-[-4px] right-[-16px] w-[50px] h-[22px] bg-amber-500/10 rotate-45" />
+          <span 
+            className="absolute top-[-4px] right-[-16px] w-[50px] h-[22px] bg-amber-500/10 rotate-45" 
+            style={{ 
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              backgroundColor: 'rgba(217, 119, 6, 0.15)'
+            }}
+          />
         </span>
       )}
 
@@ -137,7 +145,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           <button
             type="button"
             onClick={handleYoutubeClick}
-            className="inline-flex items-center gap-1 px-1 sm:px-1.5 py-0.5 border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded-[3px] transition-colors shrink-0"
+            className="inline-flex items-center gap-1 px-1 sm:px-1.5 py-0.5 border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold t[...]
             aria-label={`Search YouTube: ${post.headline}`}
           >
             <YoutubeIcon className="text-ink" />
