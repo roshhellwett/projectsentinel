@@ -2,14 +2,36 @@
 
 import { memo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Clock, ShieldCheck, Flame, Radio } from 'lucide-react';
 import { Post } from '@/types';
 import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { getHostname } from '@/lib/utils/getHostname';
-import { ScoreRing } from './ScoreRing';
-import { getCategoryTheme } from '@/lib/theme/categoryTheme';
-import { CategoryIcon } from './CategoryIcon';
+import { VerificationStamp } from '@/components/ui/VerificationStamp';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+
+function ArrowRight() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="5" width="20" height="14" rx="3" />
+      <path d="M10 9l6 4-6 4z" />
+    </svg>
+  );
+}
 
 interface HeroCardProps {
   post: Post;
@@ -18,116 +40,81 @@ interface HeroCardProps {
 
 export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
   const haptic = useHapticFeedback();
-  const theme = getCategoryTheme(post.category);
+  const isVideo = post.content_type === 'video';
 
   const firstSource = (post.sources ?? [])[0];
   const firstHost = firstSource ? getHostname(firstSource.url) : '';
   const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
 
   return (
-    <div 
-      className="relative group [perspective:1200px] w-full max-w-full overflow-hidden animate-page-enter"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 420px' }}
-    >
+    <div className="w-full max-w-full border border-rule bg-paper-2 rounded-[8px] p-6 md:p-8 relative overflow-hidden" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 300px' }}>
+      <div className="absolute -bottom-8 -right-8 w-48 h-48 opacity-[0.04] pointer-events-none select-none" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="text-ink w-full h-full">
+          <path d="M30 170c30-20 60-50 80-90 10-20 15-40 15-40s-5 15-10 25c-15 30-40 55-70 70" />
+          <path d="M130 170c30-20 60-50 80-90 10-20 15-40 15-40s-5 15-10 25c-15 30-40 55-70 70" />
+          <path d="M80 30c0 0 20 40 20 70 0 15-5 25-5 25" />
+          <path d="M30 30h140" />
+          <path d="M30 50h140" />
+          <path d="M30 70h100" />
+          <path d="M150 70h20" opacity="0.5" />
+          <path d="M30 90h80" opacity="0.3" />
+          <path d="M30 110h60" opacity="0.2" />
+          <path d="M30 130h40" opacity="0.15" />
+          <circle cx="170" cy="40" r="3" />
+          <circle cx="170" cy="40" r="8" opacity="0.3" />
+        </svg>
+      </div>
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
-        className="block relative overflow-hidden rounded-3xl border border-rule dark:border-white/15 shadow-[0_6px_28px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_28px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_48px_rgb(var(--c-accent)/0.18)] transition-[transform,box-shadow,border-color] duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group/hero bg-[#ffffff] dark:bg-[#13131c] transform-gpu backface-hidden select-none touch-action-manipulation"
+        className="block group"
       >
-        {/* Category accent gradient bar — thicker, more prominent */}
-        <div
-          className="absolute top-0 left-0 right-0 h-1 z-20 transition-all duration-300 group-hover/hero:h-1.5"
-          style={{ background: theme.cssGradient }}
-          aria-hidden="true"
-        />
-
-        {/* Immersive ambient backdrop — dual radial gradient */}
-        <div 
-          className="absolute inset-0 opacity-[0.12] dark:opacity-[0.20] transition-opacity duration-700 group-hover/hero:opacity-[0.22] dark:group-hover/hero:opacity-[0.32]"
-          style={{ 
-            background: `radial-gradient(ellipse at 75% 15%, ${theme.gradientFrom}, transparent 65%), radial-gradient(ellipse at 25% 85%, ${theme.gradientTo}, transparent 65%)` 
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Subtle ambient gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/5 dark:from-white/5 dark:to-black/20 pointer-events-none z-10"
-          aria-hidden="true"
-        />
-
-        <div className="relative z-10 p-7 sm:p-9 md:p-11 lg:p-14 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] lg:min-h-[440px]">
-          {/* Top Header Row */}
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              {/* Category Pill */}
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] rounded-full border backdrop-blur-sm bg-white/80 dark:bg-black/80"
-                style={theme.pill}
-              >
-                <CategoryIcon name={theme.icon} className="w-3.5 h-3.5" strokeWidth={2.2} aria-hidden="true" />
-                {theme.label}
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+              {post.category}
+            </span>
+            <span className="w-px h-3 bg-rule" />
+            <span className="font-mono text-[11px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+            {isVideo && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/15 text-ink-soft font-body text-[10px] font-bold tracking-wider uppercase">
+                <YoutubeIcon />
+                Video
               </span>
-
-              {/* Live / Breaking Badge */}
-              {badge && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-like text-white text-[11px] font-extrabold uppercase tracking-[0.12em] rounded-full shadow-glow-like animate-pulse">
-                  <Flame className="w-3.5 h-3.5" strokeWidth={2.5} />
-                  {badge === 'breaking' ? 'Breaking Story' : 'Top Trending'}
-                </span>
-              )}
-
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted glass-sm px-2.5 py-1 rounded-full shadow-sm">
-                <Clock className="w-3.5 h-3.5" />
-                <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
-              </span>
-            </div>
-
-            {/* Prominent Score Ring */}
-            <div className="flex items-center gap-2.5 glass-sm px-3.5 py-2 rounded-full shadow-glass">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted hidden sm:inline">Credibility</span>
-              <ScoreRing score={post.credibility_score} size={40} strokeWidth={3.5} compact />
-            </div>
-          </div>
-
-          {/* Center Content Row */}
-          <div className="my-8 max-w-4xl">
-            <h2 className="font-display font-bold text-ink leading-[1.06] tracking-[-0.03em] mb-5 text-[clamp(1.85rem,4vw,3.5rem)] group-hover/hero:text-accent transition-colors duration-300">
-              {post.headline}
-            </h2>
-
-            <p className="text-sm sm:text-base md:text-lg text-ink-soft leading-[1.7] line-clamp-3 max-w-3xl mb-7">
-              {post.summary}
-            </p>
-
-            {firstHost && (
-              <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted glass-sm px-4 py-2.5 rounded-xl shadow-sm">
-                <Radio className="w-3.5 h-3.5 text-accent" />
-                <span className="font-bold uppercase tracking-[0.15em] text-accent">First reported by</span>
-                <span className="font-bold text-ink">{firstHost}</span>
-                {otherSourceCount > 0 && (
-                  <>
-                    <span className="text-rule-strong">&middot;</span>
-                    <span>
-                      verified by <span className="font-bold text-ink">{otherSourceCount}</span> other publications
-                    </span>
-                  </>
-                )}
-              </div>
             )}
           </div>
+          <VerificationStamp score={post.credibility_score} compact />
+        </div>
 
-          {/* Bottom Call to Action Row */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-rule/40">
-            <div className="flex items-center gap-2 text-xs font-bold text-muted">
-              <ShieldCheck className="w-4 h-4 text-cred-high" />
-              <span>Cross-referenced &amp; AI fact-checked across <strong className="text-ink">{post.source_count || 1}</strong> sources</span>
-            </div>
+        {badge && (
+          <span className="inline-block font-body text-xs font-bold tracking-wider uppercase text-ink mb-4">
+            {badge === 'breaking' ? 'Breaking Story' : 'Top Story'}
+          </span>
+        )}
 
-            <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-accent text-paper text-sm font-bold tracking-wide rounded-xl shadow-md transition-all duration-400 group-hover/hero:bg-accent-hover group-hover/hero:gap-3.5 group-hover/hero:shadow-card-glow group-hover/hero:scale-[1.02]">
-              <span>Read Full Story</span>
-              <ArrowRight className="h-4 w-4 transition-transform duration-400 group-hover/hero:translate-x-1.5" />
-            </span>
-          </div>
+        <h2 className="font-body font-[800] text-ink leading-[1.08] tracking-[-0.02em] mb-3 text-[clamp(1.4rem,3.2vw,2.2rem)]">
+          {post.headline}
+        </h2>
+
+        <p className="font-body text-[14px] text-ink-soft leading-[1.6] line-clamp-3 max-w-3xl mb-4">
+          {post.summary}
+        </p>
+
+        {firstHost && (
+          <p className="font-body text-[12px] text-ink-soft mb-4">
+            First reported by <span className="font-semibold text-ink">{firstHost}</span>
+            {otherSourceCount > 0 && <> · verified by {otherSourceCount} other sources</>}
+          </p>
+        )}
+
+        <div className="flex items-center justify-between pt-4 border-t border-rule">
+          <span className="font-body text-[11px] text-ink-soft flex items-center gap-1.5">
+            <ShieldIcon />
+            {post.source_count || 1} sources
+          </span>
+          <span className="inline-flex items-center gap-1 text-xs text-ink-soft group-hover:text-ink transition-colors font-body font-semibold">
+            Read article <ArrowRight />
+          </span>
         </div>
       </Link>
     </div>

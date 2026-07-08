@@ -2,16 +2,53 @@
 
 import Link from 'next/link';
 import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Check, Flame, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 import { Post } from '@/types';
-import { ScoreRing } from './ScoreRing';
-import { CategoryIcon } from './CategoryIcon';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { VerificationStamp } from '@/components/ui/VerificationStamp';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+
+function YoutubeIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="5" width="20" height="14" rx="3" />
+      <path d="M10 9l6 4-6 4z" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
+function ArrowLeft() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14 6l-7 7 7 7" />
+    </svg>
+  );
+}
+
+function ArrowRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10 6l7 7-7 7" />
+    </svg>
+  );
+}
+
+function RankBadge({ rank }: { rank: number }) {
+  return (
+    <span className="flex items-center justify-center w-7 h-7 border border-ink text-ink font-mono text-xs">
+      #{rank}
+    </span>
+  );
+}
 
 interface TrendingSectionProps {
   posts: Post[];
@@ -77,34 +114,29 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   return (
     <section aria-label="Trending stories" className="mb-10">
       <div className="flex items-center justify-between gap-3 mb-5">
-        <h2 className="flex items-center gap-2.5 font-display text-lg sm:text-xl font-bold text-ink">
-          <span className="inline-flex items-center justify-center p-1.5 rounded-lg bg-like/10 text-like">
-            <Flame className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.2} />
-          </span>
-          <span>Trending Stories</span>
+        <h2 className="font-body font-bold text-xl text-ink">
+          Trending stories
         </h2>
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-muted uppercase tracking-[0.12em]">
-            <Sparkles className="w-3.5 h-3.5 text-streak" strokeWidth={2} />
-            <span>Top {trending.length} verified</span>
+          <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            Top {trending.length} verified
           </span>
-          {/* Desktop navigation arrows */}
           <div className="hidden sm:flex items-center gap-1">
             <button
               onClick={() => scrollBy('left')}
               disabled={!canScrollLeft}
-              className="p-1.5 rounded-lg border border-rule/60 text-muted hover:text-ink hover:border-rule-strong disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 hover:bg-paper-2"
+              className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px]"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ArrowLeft />
             </button>
             <button
               onClick={() => scrollBy('right')}
               disabled={!canScrollRight}
-              className="p-1.5 rounded-lg border border-rule/60 text-muted hover:text-ink hover:border-rule-strong disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 hover:bg-paper-2"
+              className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px]"
               aria-label="Scroll right"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ArrowRight />
             </button>
           </div>
         </div>
@@ -119,86 +151,66 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
           {trending.map((post, index) => {
             const read = hydrated && isRead(post.id);
             const rank = index + 1;
-            const theme = getCategoryTheme(post.category);
 
             return (
-              <motion.div
+              <div
                 key={post.id}
-                initial={{ opacity: 0, scale: 0.94, y: 16 }}
-                whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: true, margin: '-20px 0px' }}
-                transition={{ delay: index * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="flex-shrink-0 w-[275px] sm:w-[315px] snap-start"
+                className="flex-shrink-0 w-[275px] sm:w-[315px] snap-start animate-slide-up"
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <Link
-                  href={`/news/${post.id}/`}
-                  onClick={() => haptic.light()}
-                  data-read={read ? 'true' : 'false'}
-                  className={`group relative ${Z_INDEX.content} flex flex-col justify-between h-full p-5 rounded-2xl bg-paper border border-rule/60 shadow-card hover:shadow-card-lg hover:border-accent/30 hover:bg-paper-2/60 transition-[box-shadow,border-color,transform,background] duration-300 overflow-hidden w-full max-w-full ${read ? 'opacity-60 saturate-[0.75]' : ''}`}
-                  aria-label={`${post.headline} (Rank ${rank})`}
-                >
-                  {/* Category accent bar */}
                   <div
-                    className="absolute top-0 left-0 right-0 h-[3px] transition-all duration-300 group-hover:h-1"
-                    style={{ background: theme.cssGradient }}
-                    aria-hidden="true"
-                  />
-
-                  {/* Hover gradient glow */}
-                  <div className="card-hover-glow" aria-hidden="true" />
-
-                  {/* Huge watermark rank number */}
-                  <span
-                    className="absolute -right-2 -bottom-4 font-display font-black text-[80px] sm:text-[96px] leading-none text-ink/[0.04] dark:text-ink/[0.06] select-none pointer-events-none group-hover:scale-105 transition-transform duration-500"
-                    aria-hidden="true"
+                    data-read={read ? 'true' : 'false'}
+                    className={`ink-card flex flex-col justify-between h-full p-5 overflow-hidden w-full max-w-full ${read ? 'opacity-60' : ''}`}
                   >
-                    {String(rank).padStart(2, '0')}
-                  </span>
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2">
+                          <RankBadge rank={rank} />
+                          <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">
+                            {post.category}
+                          </span>
+                          {post.content_type === 'video' && (
+                            <span className="inline-flex items-center gap-1 px-1 py-0.5 border border-ink/15 text-ink-soft font-body text-[9px] font-bold tracking-wider uppercase">
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="2" y="5" width="20" height="14" rx="3" />
+                                <path d="M10 9l6 4-6 4z" />
+                              </svg>
+                              Video
+                            </span>
+                          )}
+                        </div>
 
-                  <div className="relative z-10">
-                    {/* Top Row: Rank badge + Category pill */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-ink text-paper font-mono text-[11px] font-bold shadow-sm">
-                          #{rank}
-                        </span>
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border"
-                          style={theme.pill}
-                        >
-                          <CategoryIcon name={theme.icon} className="w-2.5 h-2.5" strokeWidth={2.2} aria-hidden="true" />
-                          <span>{theme.label}</span>
-                        </span>
+                        {read && (
+                          <span className="inline-flex items-center gap-1 text-xs text-ink-soft font-body">
+                            <CheckIcon />
+                            Read
+                          </span>
+                        )}
                       </div>
 
-                      {read && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-cred-high bg-cred-high/10 px-2 py-0.5 rounded-full">
-                          <Check className="w-3 h-3" strokeWidth={3} />
-                          Read
-                        </span>
-                      )}
+                      <Link
+                        href={`/news/${post.id}/`}
+                        onClick={() => haptic.light()}
+                        aria-label={`${post.headline} (Rank ${rank})`}
+                      >
+                        <p className="font-body font-bold text-[15px] leading-[1.25] text-ink line-clamp-3 mb-4">
+                          {post.headline}
+                        </p>
+                      </Link>
                     </div>
 
-                    {/* Headline */}
-                    <p className="font-display font-bold text-[15px] sm:text-[16px] leading-[1.25] text-ink line-clamp-3 mb-4 group-hover:text-accent transition-colors duration-250">
-                      {post.headline}
-                    </p>
-                  </div>
-
-                  {/* Bottom Row: Score Ring + CTA */}
-                  <div className="flex items-center justify-between pt-3 border-t border-rule/50 mt-auto relative z-10">
-                    <div className="flex items-center gap-2">
-                      <ScoreRing score={post.credibility_score} size={32} strokeWidth={2.8} compact />
-                      <span className="text-[10px] font-bold text-muted uppercase tracking-[0.1em]">verified</span>
+                    <div className="flex items-center justify-between pt-3 border-t border-rule mt-auto relative z-10">
+                      <VerificationStamp score={post.credibility_score} xsmall />
+                      <Link
+                        href={`/news/${post.id}/`}
+                        onClick={() => haptic.light()}
+                        className="inline-flex items-center gap-1 font-body text-[11px] text-ink-soft hover:text-ink transition-colors"
+                      >
+                        Read <ArrowRight />
+                      </Link>
                     </div>
-
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-accent group-hover:translate-x-1 transition-transform duration-300">
-                      <span>Read</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </span>
                   </div>
-                </Link>
-              </motion.div>
+              </div>
             );
           })}
         </div>

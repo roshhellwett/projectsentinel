@@ -3,7 +3,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ExternalLink, Globe, Newspaper } from 'lucide-react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Source } from '@/types';
 import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
@@ -12,7 +11,7 @@ import { Z_INDEX } from '@/lib/theme/zIndex';
 
 interface SourcePickerButtonProps {
   sources: Source[];
-  label?: string;
+  label?: string | React.ReactNode;
   placement?: 'popover' | 'sheet';
   className?: string;
   buttonClassName?: string;
@@ -68,7 +67,6 @@ export function SourcePickerButton({
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const wasOpenRef = useRef(false);
-  const reducedMotion = useReducedMotion();
   
   const validSources = (sources ?? []).filter((source) => source.url);
   const disabled = validSources.length === 0;
@@ -151,8 +149,6 @@ export function SourcePickerButton({
 
   const isSheet = placement === 'sheet';
 
-  
-  
   const popoverStyle = {
     position: 'fixed' as const,
     bottom: coords.bottom + 8,
@@ -174,21 +170,14 @@ export function SourcePickerButton({
   };
 
   const portalContent = (
-    <AnimatePresence>
+    <>
       {open && (
-        <motion.div
+        <div
           ref={menuRef}
           role="menu"
           tabIndex={-1}
-          className={`${Z_INDEX.popover} rounded border border-rule-strong bg-paper p-2 shadow-paper-lift transform-gpu overflow-hidden`}
-          style={{
-            ...((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties),
-            transformOrigin: isSheet && isMobile ? 'bottom center' : (isSheet ? 'bottom right' : 'bottom left')
-          }}
-          initial={{ opacity: 0, y: reducedMotion ? 0 : 12, scale: reducedMotion ? 1 : 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: reducedMotion ? 0 : 8, scale: reducedMotion ? 1 : 0.96 }}
-          transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 450, damping: 30, mass: 0.6 }}
+          className={`${Z_INDEX.popover} animate-scale-in rounded border border-rule-strong bg-paper p-2 shadow-paper-lift transform-gpu overflow-hidden`}
+          style={((isSheet ? sheetStyle : popoverStyle) as React.CSSProperties)}
           onClick={(event) => {
             if (stopPropagation) event.stopPropagation();
           }}
@@ -221,31 +210,30 @@ export function SourcePickerButton({
               );
             })}
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 
   if (validSources.length === 1) {
     return (
-      <motion.a
+      <a
         href={validSources[0].url}
         target="_blank"
         rel="noopener noreferrer"
-        whileTap={{ scale: 0.96 }}
         onClick={(event: React.MouseEvent) => {
           if (stopPropagation) event.stopPropagation();
         }}
         className={cn(
           buttonVariants({ variant: 'outline' }),
-          'gap-2 font-semibold max-w-full hover:bg-ink hover:text-paper hover:border-ink',
+          'gap-2 font-semibold max-w-full hover:bg-ink hover:text-paper hover:border-ink active:scale-95 transition-all',
           placement === 'sheet' && 'w-full px-3 py-3',
           buttonClassName,
         )}
       >
         <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
         <span className="truncate">{label}</span>
-      </motion.a>
+      </a>
     );
   }
 
@@ -253,17 +241,16 @@ export function SourcePickerButton({
 
   return (
     <div className={cn('relative min-w-0', placement === 'sheet' && 'w-full', className)}>
-      <motion.button
+      <button
         ref={buttonRef}
         type="button"
-        whileTap={{ scale: disabled ? 1 : 0.96 }}
         onClick={toggle}
         disabled={disabled}
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
           buttonVariants({ variant: 'outline' }),
-          'gap-2 font-semibold max-w-full hover:bg-ink hover:text-paper hover:border-ink disabled:opacity-55',
+          'gap-2 font-semibold max-w-full hover:bg-ink hover:text-paper hover:border-ink disabled:opacity-55 active:scale-95 transition-all',
           placement === 'sheet' && 'w-full px-3 py-3',
           buttonClassName,
         )}
@@ -274,7 +261,7 @@ export function SourcePickerButton({
           <Newspaper className="h-4 w-4" />
         )}
         <span className="truncate">{label}</span>
-      </motion.button>
+      </button>
       
       {mounted && typeof document !== 'undefined' ? createPortal(portalContent, document.body) : null}
     </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
 import { CredibilityBadge } from './CredibilityBadge';
@@ -87,11 +86,10 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
       ) : (
         <ul className="space-y-2.5">
           {related.map((post, i) => (
-            <motion.li
+            <li
               key={post.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.04 * i, duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="animate-slide-up"
+              style={{ animationDelay: `${i * 40}ms`, animationFillMode: 'both' }}
             >
               <button
                 type="button"
@@ -112,7 +110,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
                   aria-hidden="true"
                 />
               </button>
-            </motion.li>
+            </li>
           ))}
         </ul>
       )}

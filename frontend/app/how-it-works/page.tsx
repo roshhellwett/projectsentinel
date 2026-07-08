@@ -68,7 +68,7 @@ const PIPELINE_STEPS = [
   {
     number: '05',
     title: 'AI Verification',
-    subtitle: 'Groq Llama 3.3 70B',
+    subtitle: 'AI Cross-Referencing',
     description: 'AI analyzes headlines and excerpts from confirming sources. It returns a credibility score (0-100), key facts, category, headline, and summary.',
     icon: CheckCircle,
     gradient: 'from-accent/40 via-accent/20 to-accent/5',
@@ -114,7 +114,7 @@ export default function HowItWorksPage() {
                 name: 'How does India Verified verify news?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'Stories must be confirmed by 2+ different trusted sources. Groq Llama 3.3 AI then analyzes headlines and excerpts, returning a credibility score.',
+                  text: 'Stories must be confirmed by 2+ different trusted sources. Cross-referencing AI then analyzes headlines and excerpts, returning a credibility score.',
                 },
               },
               {
@@ -147,7 +147,7 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="premium-card premium-card-hover glass-hover-trigger group flex gap-5 p-6 rounded-md transition-all duration-300">
+            <div className="np-card group flex gap-5 p-6 transition-all duration-300">
               <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
                 <step.icon className="w-6 h-6 text-accent" />
               </div>
@@ -171,7 +171,7 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="premium-card rounded-md p-8 md:p-10 mb-12">
+      <div className="np-card p-8 md:p-10 mb-12">
         <h2 className="font-display text-2xl font-bold mb-3 text-ink tracking-tight">Trusted sources</h2>
         <p className="text-muted mb-6">
           We only pull from established Indian news organizations with editorial standards.
@@ -215,7 +215,7 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="premium-card text-center rounded-md p-10">
+      <div className="np-card text-center p-10">
         <div className="w-16 h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-5">
           <Github className="w-8 h-8 text-ink" />
         </div>
@@ -251,7 +251,7 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`premium-card p-6 ${borderColor}`}>
+    <div className={`np-card p-6 ${borderColor}`}>
       <div className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}>
         {range}
       </div>

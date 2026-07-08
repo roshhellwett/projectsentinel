@@ -53,3 +53,5 @@ coverage/
 
 # Database backups
 db-backups/
+
+.early.coverage

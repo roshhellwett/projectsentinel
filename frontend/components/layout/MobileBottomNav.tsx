@@ -3,32 +3,78 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
-import { Home, Search, LayoutGrid, Bookmark, Layers, Download } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
-import { StreakBadge } from '@/components/ui/StreakBadge';
-import { usePWAInstall } from '@/lib/hooks/usePWAInstall';
-import { IOS_SPRING } from '@/lib/theme/animations';
+
+function HomeIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+  );
+}
+
+function SwipeIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M9 3v18M15 3v18" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M16.5 16.5L21 21" />
+    </svg>
+  );
+}
+
+function TopicsIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    </svg>
+  );
+}
+
+function BookmarkIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 4v16l-6-5-6 5V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1z" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17.5 6.5l-11 11M6.5 6.5l11 11" />
+    </svg>
+  );
+}
 
 const TABS = [
-  { id: 'home', href: '/', icon: Home, key: 'nav.home' },
-  { id: 'swipe', href: '/swipe/', icon: Layers, key: 'nav.swipe' },
-  { id: 'search', href: null, icon: Search, key: 'nav.search' },
-  { id: 'topics', href: null, icon: LayoutGrid, key: 'nav.topics' },
-  { id: 'saved', href: '/saved/', icon: Bookmark, key: 'nav.saved' },
+  { id: 'home', href: '/', icon: HomeIcon, key: 'nav.home' },
+  { id: 'swipe', href: '/swipe/', icon: SwipeIcon, key: 'nav.swipe' },
+  { id: 'search', href: null, icon: SearchIcon, key: 'nav.search' },
+  { id: 'topics', href: null, icon: TopicsIcon, key: 'nav.topics' },
+  { id: 'saved', href: '/saved/', icon: BookmarkIcon, key: 'nav.saved' },
 ] as const;
 
 export function MobileBottomNav() {
-  const reducedMotion = useReducedMotion();
   const pathname = usePathname();
   const { t } = useI18n();
   const { streak } = useDailyReadCount();
-  const { isInstallable, isIOS, isStandalone, promptInstall } = usePWAInstall();
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
 
@@ -57,94 +103,59 @@ export function MobileBottomNav() {
 
   return (
     <>
-      <AnimatePresence>
-        {topicsOpen && (
-          <motion.div
-            key="topics-sheet"
-            id="mobile-topics-sheet"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay}`}
+      {topicsOpen && (
+        <div
+          id="mobile-topics-sheet"
+          className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay} transition-opacity duration-200 ${
+            topicsOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
+          <div
+            className={`absolute left-3 right-3 bg-paper border border-rule transition-transform duration-300 ${
+              topicsOpen ? 'translate-y-0' : 'translate-y-full'
+            }`}
+            style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
           >
-            <div className="absolute inset-0 bg-ink/60" onClick={closeTopics} />
-            <motion.div
-              key="topics-sheet-inner"
-              initial={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: reducedMotion ? 0 : '100%', opacity: 0 }}
-              transition={reducedMotion ? { duration: 0.15 } : IOS_SPRING.sheet}
-              className="absolute left-3 right-3 rounded-2xl overflow-hidden md:bg-paper/85 md:dark:bg-black/85 md:backdrop-blur-2xl bg-paper dark:bg-black border border-rule/60 shadow-card-lg transform-gpu"
-              style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
-            >
-              <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
-              <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
-                <p className="text-[10px] font-bold text-accent uppercase tracking-[0.18em] mb-3 px-1">
-                  Browse Topics
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {CATEGORIES.map((cat) => {
-                    const active = pathname === `/category/${cat.slug}/`;
-                    return (
-                      <Link
-                        key={cat.slug}
-                        href={`/category/${cat.slug}/`}
-                        prefetch={true}
-                        onClick={closeTopics}
-                        className={`flex items-center justify-center px-3 py-3 rounded text-center text-[12px] font-semibold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                          active
-                            ? 'bg-ink text-paper border border-ink'
-                            : 'bg-paper dark:bg-white/5 text-ink border border-rule hover:border-ink'
-                        }`}
-                      >
-                        {t(`nav.${cat.slug}`)}
-                      </Link>
-                    );
-                  })}
-                </div>
-
-                {!isStandalone && (isInstallable || isIOS) && (
-                  <div className="mt-4 pt-3 border-t border-rule/40">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        closeTopics();
-                        if (isInstallable) void promptInstall();
-                        else if (isIOS) alert('To install Zenith PWA on iPhone/iPad: Tap the Share button in Safari and select "Add to Home Screen".');
-                      }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-accent text-paper font-bold text-xs rounded-xl shadow-sm transition-transform active:scale-95"
+            <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
+              <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-3 px-1">Browse Topics</p>
+              <div className="grid grid-cols-3 gap-2">
+                {CATEGORIES.map((cat) => {
+                  const active = pathname === `/category/${cat.slug}/`;
+                  return (
+                    <Link
+                      key={cat.slug}
+                      href={`/category/${cat.slug}/`}
+                      prefetch={true}
+                      onClick={closeTopics}
+                      className={`flex items-center justify-center px-3 py-3 text-center text-xs transition-colors ${
+                        active
+                          ? 'bg-ink text-paper border border-ink'
+                          : 'text-ink border border-rule hover:bg-paper-2'
+                      }`}
                     >
-                      <Download className="w-4 h-4" />
-                      {isIOS ? 'Install PWA on iPhone / iPad' : 'Install Zenith App'}
-                    </button>
-                  </div>
-                )}
+                      {t(`nav.${cat.slug}`)}
+                    </Link>
+                  );
+                })}
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <motion.nav
-        initial={false}
-        animate={{ y: hideForOverlay ? '100%' : '0%', opacity: hideForOverlay ? 0 : 1 }}
-        transition={IOS_SPRING.snappy}
-        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transform-gpu`}
+      <nav
+        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transition-transform duration-300 ${
+          hideForOverlay ? 'translate-y-full' : 'translate-y-0'
+        }`}
         aria-hidden={hideForOverlay ? 'true' : 'false'}
         aria-label="Mobile navigation"
         style={{ pointerEvents: hideForOverlay ? 'none' : 'auto' }}
       >
-        {streak > 0 && (
-          <div className="absolute -top-11 right-3 z-20">
-            <StreakBadge streak={streak} size="sm" className="shadow-card bg-paper md:bg-paper/70 md:backdrop-blur-xl" />
-          </div>
-        )}
         <div
-          className="relative border-t border-rule/50 bg-[#ffffff] dark:bg-[#101016] md:bg-[#ffffff]/70 md:dark:bg-[#101016]/70 md:supports-[backdrop-filter]:bg-[#ffffff]/40 md:dark:supports-[backdrop-filter]:bg-[#101016]/40 md:backdrop-filter md:backdrop-blur-2xl md:backdrop-saturate-[1.8] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none touch-action-manipulation transition-transform duration-300"
+          className="relative border-t border-rule bg-paper select-none touch-manipulation"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
           <div className="flex items-center justify-around px-2 pt-1.5 pb-2">
             {TABS.map((tab) => {
               const active = isActive(tab.id, tab.href);
@@ -152,32 +163,15 @@ export function MobileBottomNav() {
               const isTopics = tab.id === 'topics';
 
               const inner = (
-                <motion.div
-                  whileTap={reducedMotion ? undefined : { scale: 0.88 }}
-                  transition={IOS_SPRING.snappy}
-                  className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl min-w-[52px]"
-                >
-                  {active && (
-                    <motion.div
-                      layoutId="bottom-nav-pill"
-                      className="absolute inset-x-1 bottom-1 top-1 rounded-2xl bg-accent/15 dark:bg-accent/20 border border-accent/30 shadow-[0_2px_12px_rgba(var(--accent),0.15)] will-change-transform transform-gpu"
-                      transition={IOS_SPRING.pill}
-                    />
-                  )}
-                  <Icon
-                    className={`w-[22px] h-[22px] relative z-10 transition-colors duration-200 ${
-                      active ? 'text-accent' : 'text-muted'
-                    }`}
-                    strokeWidth={active ? 2.2 : 1.8}
-                  />
-                  <span
-                    className={`text-[10px] font-semibold relative z-10 transition-colors duration-200 leading-none ${
-                      active ? 'text-accent' : 'text-muted'
-                    }`}
-                  >
+                <div className="relative flex flex-col items-center gap-1 px-3 py-2 min-w-[52px] active:scale-95 transition-transform duration-100">
+                  <Icon />
+                  <span className={`text-xs leading-none ${active ? 'text-ink font-semibold' : 'text-muted'}`}>
                     {t(tab.key)}
                   </span>
-                </motion.div>
+                  {active && (
+                    <span className="absolute -top-1.5 inset-x-4 h-px bg-ink" />
+                  )}
+                </div>
               );
 
               if (isTopics) {
@@ -185,7 +179,7 @@ export function MobileBottomNav() {
                   <button
                     key={tab.id}
                     onClick={toggleTopics}
-                    className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                    className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                     aria-label="Browse topics"
                     aria-expanded={topicsOpen}
                     aria-controls="mobile-topics-sheet"
@@ -203,7 +197,7 @@ export function MobileBottomNav() {
                       window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
                     }}
                     aria-label="Open search"
-                    className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                    className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                   >
                     {inner}
                   </button>
@@ -216,7 +210,7 @@ export function MobileBottomNav() {
                   prefetch={true}
                   onClick={closeTopics}
                   aria-label={t(tab.key)}
-                  className="touch-polish rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                 >
                   {inner}
                 </Link>
@@ -224,7 +218,7 @@ export function MobileBottomNav() {
             })}
           </div>
         </div>
-      </motion.nav>
+      </nav>
     </>
   );
 }

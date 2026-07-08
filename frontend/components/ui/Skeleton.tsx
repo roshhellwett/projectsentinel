@@ -1,9 +1,12 @@
-interface SkeletonProps {
-  className?: string;
-}
+import { cn } from '@/lib/utils/cn';
 
-export function Skeleton({ className = '' }: SkeletonProps) {
+function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div aria-hidden="true" className={`animate-shimmer bg-paper-2 rounded ${className}`} />
+    <div
+      className={cn('animate-shimmer rounded-sm bg-paper-2 border border-rule', className)}
+      {...props}
+    />
   );
 }
+
+export { Skeleton };

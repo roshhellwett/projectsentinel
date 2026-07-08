@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowUp } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
 export function ScrollToTop() {
@@ -51,7 +50,7 @@ export function ScrollToTop() {
       `}
       aria-label="Scroll to top"
     >
-      <ArrowUp className="w-5 h-5" />
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
     </button>
   );
 }

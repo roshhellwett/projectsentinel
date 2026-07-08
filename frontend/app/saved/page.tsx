@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Bookmark, ArrowLeft, Trash2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 import { FeedSkeleton } from '@/components/news/InfiniteFeed';
@@ -87,12 +86,7 @@ export default function SavedPage() {
           {t('saved.back')}
         </Link>
 
-        <motion.header
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4"
-        >
+        <div className="animate-slide-up mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
           <div>
             <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
             <p className="editorial-kicker mb-3">{t('saved.your_list')}</p>
@@ -104,17 +98,16 @@ export default function SavedPage() {
             </p>
           </div>
           {idList.length > 0 && (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => setConfirmingClear(true)}
-              className="tap-target min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="tap-target min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded border border-rule-strong text-sm font-medium text-ink hover:border-ink hover:bg-paper-2 transition-all hover-lift active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label={t('saved.clear_all_aria')}
             >
               <Trash2 className="w-3.5 h-3.5" />
               {t('saved.clear_all')}
-            </motion.button>
+            </button>
           )}
-        </motion.header>
+        </div>
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
@@ -178,11 +171,8 @@ export default function SavedPage() {
       {confirmingClear && (
         <div className={`fixed inset-0 ${Z_INDEX.modalBackdrop} flex items-center justify-center px-4`}>
           <div className="absolute inset-0 bg-black/30 backdrop-blur-md" onClick={() => setConfirmingClear(false)} />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative bg-paper border border-rule-strong rounded-2xl p-6 w-full max-w-sm shadow-card-lg"
+          <div
+            className="animate-scale-in relative bg-paper-tint border border-rule p-6 w-full max-w-sm"
             role="alertdialog"
             aria-label={t('saved.confirm_aria')}
           >
@@ -208,7 +198,7 @@ export default function SavedPage() {
                 {t('saved.clear_all')}
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>

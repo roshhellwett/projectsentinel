@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { X, Keyboard } from 'lucide-react';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
@@ -18,7 +17,6 @@ const SHORTCUTS: Array<{ keys: string[]; description: string }> = [
 export const OPEN_SEARCH_EVENT = 'iv:open-search';
 
 export function KeyboardShortcuts() {
-  const reducedMotion = useReducedMotion();
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -124,31 +122,22 @@ export function KeyboardShortcuts() {
   }, [helpOpen, router]);
 
   return (
-    <AnimatePresence>
+    <>
       {helpOpen && (
         <>
-          <motion.div
-            key="kb-backdrop"
-            className={`fixed inset-0 ${Z_INDEX.shortcutBackdrop} bg-ink/50 md:bg-ink/30 md:backdrop-blur-lg`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+          <div
+            className={`animate-fade-in fixed inset-0 bg-ink/50 ${Z_INDEX.shortcutBackdrop}`}
             onClick={closeHelp}
             aria-hidden="true"
           />
-          <motion.div
-            key="kb-modal"
+          <div
             role="dialog"
             aria-modal="true"
             aria-label="Keyboard shortcuts"
-            className={`fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] right-4 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:right-6 ${Z_INDEX.shortcutWidget} w-[min(calc(100vw-2rem),22rem)] will-change-transform transform-gpu`}
-            initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.94, y: reducedMotion ? 0 : 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 12 }}
-            transition={reducedMotion ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 30 }}
+            className={`animate-scale-in fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] right-4 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:right-6 ${Z_INDEX.shortcutWidget}`}
+            style={{ width: 'min(calc(100vw-2rem),22rem)' }}
           >
-            <div className="premium-card rounded-2xl p-6 shadow-paper-lift">
+            <div className="card rounded-2xl p-6 shadow-paper-lift">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
@@ -193,9 +182,9 @@ export function KeyboardShortcuts() {
                 field.
               </p>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    </>
   );
 }

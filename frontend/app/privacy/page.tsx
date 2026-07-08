@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
         visits:
       </p>
       <ul>
-        <li>Light or dark theme choice</li>
+        <li>Theme preference</li>
         <li>Stories you have bookmarked (the &ldquo;Saved&rdquo; list)</li>
         <li>Recent search terms, so the search overlay can autocomplete</li>
         <li>Which stories you have already read, to dim them in the feed</li>

@@ -1,9 +1,32 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { WifiOff, Wifi } from 'lucide-react';
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
+
+function WifiOffIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="1" y1="1" x2="23" y2="23" />
+      <path d="M16.72 11.06A10.94 10.94 0 0119 12.55" />
+      <path d="M5 12.55a10.94 10.94 0 015.17-2.39" />
+      <path d="M10.71 5.05A16 16 0 0122.56 9" />
+      <path d="M1.42 9a15.91 15.91 0 014.7-2.88" />
+      <path d="M8.53 16.11a6 6 0 016.95 0" />
+      <line x1="12" y1="20" x2="12.01" y2="20" />
+    </svg>
+  );
+}
+
+function WifiIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12.55a11 11 0 0114.08 0" />
+      <path d="M1.42 9a16 16 0 0121.16 0" />
+      <path d="M8.53 16.11a6 6 0 016.95 0" />
+      <line x1="12" y1="20" x2="12.01" y2="20" />
+    </svg>
+  );
+}
 
 export function ConnectionStatus() {
   const { isOnline } = useNetworkStatus();
@@ -26,49 +49,33 @@ export function ConnectionStatus() {
   }, [isOnline]);
 
   return (
-    <div className="flex-shrink-0" aria-live="polite">
-      <AnimatePresence mode="wait">
-        {!isOnline && (
-          <motion.div
-            key="offline-pill"
-            initial={{ opacity: 0, y: -8, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-            role="status"
-            aria-live="polite"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-cred-mid/40 bg-paper md:bg-paper/90 md:backdrop-blur-xl shadow-paper-lift"
-            title="You are currently offline. Showing cached content."
-          >
-            <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-cred-mid flex-shrink-0">
-              <span className="absolute inset-0 rounded-full bg-cred-mid/55 animate-ping" aria-hidden="true" />
-            </span>
-            <WifiOff className="w-3 h-3 text-cred-mid" aria-hidden="true" />
-            <span className="text-[11px] font-semibold tracking-normal text-cred-mid whitespace-nowrap">
-              Offline — Cached
-            </span>
-          </motion.div>
-        )}
+    <div className="flex-shrink-0 relative" aria-live="polite">
+      {!isOnline && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper"
+          title="You are currently offline. Showing cached content."
+        >
+          <WifiOffIcon />
+          <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft whitespace-nowrap">
+            Offline
+          </span>
+        </div>
+      )}
 
-        {isOnline && showReconnected && (
-          <motion.div
-            key="online-pill"
-            initial={{ opacity: 0, y: -8, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-            role="status"
-            aria-live="polite"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-green-500/40 bg-paper md:bg-paper/90 md:backdrop-blur-xl shadow-paper-lift"
-          >
-            <span className="inline-flex w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
-            <Wifi className="w-3 h-3 text-green-500" aria-hidden="true" />
-            <span className="text-[11px] font-semibold tracking-normal text-green-500 whitespace-nowrap">
-              Back online!
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isOnline && showReconnected && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper"
+        >
+          <WifiIcon />
+          <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">
+            Back online
+          </span>
+        </div>
+      )}
     </div>
   );
 }

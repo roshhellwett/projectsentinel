@@ -3,7 +3,7 @@ export default function AdminLoading() {
     <div className="container mx-auto px-4 py-8 animate-pulse">
       <div className="h-8 w-48 bg-rule/60 rounded mb-8" />
 
-      <div className="premium-card p-6">
+      <div className="np-card p-6">
         <div className="h-6 w-24 bg-rule/60 rounded mb-4" />
 
         <div className="space-y-3">

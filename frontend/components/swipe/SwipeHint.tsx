@@ -3,11 +3,9 @@
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useState } from 'react';
 import { ArrowUp, Undo2, ArrowLeft, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { isHintDismissed, dismissHint } from '@/lib/utils/swipeStats';
 
 export function SwipeHint() {
-  const reducedMotion = useReducedMotion();
   const [show, setShow] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -26,14 +24,10 @@ export function SwipeHint() {
   };
 
   return (
-    <AnimatePresence>
+    <>
       {show && (
-        <motion.div
-          key="swipe-hint"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className={`fixed inset-0 ${Z_INDEX.prompts} flex items-end sm:items-center justify-center px-4 pb-24 pt-10`}
+        <div
+          className={`animate-fade-in fixed inset-0 flex items-end sm:items-center justify-center px-4 pb-24 pt-10 ${Z_INDEX.prompts}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="swipe-hint-title"
@@ -45,13 +39,7 @@ export function SwipeHint() {
             aria-label="Dismiss tutorial"
           />
 
-          <motion.div
-            initial={{ scale: 0.94, y: 24, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.94, y: 16, opacity: 0, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
-            transition={{ type: 'spring', stiffness: 360, damping: 32, mass: 0.8 }}
-            className="relative w-full max-w-sm bg-paper border border-rule-strong rounded-md shadow-paper-lift overflow-hidden"
-          >
+          <div className="animate-slide-up-in relative w-full max-w-sm bg-paper border border-rule-strong rounded-md shadow-paper-lift overflow-hidden">
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
             <div className="p-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-2">
@@ -65,10 +53,10 @@ export function SwipeHint() {
                 <li className="flex items-start gap-3">
                   <div className="flex gap-1">
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-accent text-accent rounded-md bg-paper shadow-sm">
-                      <motion.span animate={reducedMotion ? undefined : { y: [0, -4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}><ArrowUp className="w-3.5 h-3.5" /></motion.span>
+                      <span className="animate-bounce-y"><ArrowUp className="w-3.5 h-3.5" /></span>
                     </span>
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-accent text-accent rounded-md bg-paper shadow-sm">
-                      <motion.span animate={reducedMotion ? undefined : { x: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}><ArrowRight className="w-3.5 h-3.5" /></motion.span>
+                      <span className="animate-bounce-x" style={{ animationDelay: '0.2s' }}><ArrowRight className="w-3.5 h-3.5" /></span>
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
@@ -80,10 +68,10 @@ export function SwipeHint() {
                 <li className="flex items-start gap-3">
                   <div className="flex gap-1">
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-rule-strong text-ink rounded-md bg-paper shadow-sm">
-                      <motion.span animate={reducedMotion ? undefined : { y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}><Undo2 className="w-3.5 h-3.5" /></motion.span>
+                      <span className="animate-bounce-y" style={{ animationDelay: '0.4s' }}><Undo2 className="w-3.5 h-3.5" /></span>
                     </span>
                     <span className="inline-flex items-center justify-center w-8 h-8 border border-rule-strong text-ink rounded-md bg-paper shadow-sm">
-                      <motion.span animate={reducedMotion ? undefined : { x: [0, -4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}><ArrowLeft className="w-3.5 h-3.5" /></motion.span>
+                      <span className="animate-bounce-x" style={{ animationDelay: '0.6s' }}><ArrowLeft className="w-3.5 h-3.5" /></span>
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
@@ -105,11 +93,9 @@ export function SwipeHint() {
                 Got it
               </button>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
-
-

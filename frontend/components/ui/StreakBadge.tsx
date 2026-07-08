@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Flame, Sparkles, Trophy, Award } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
@@ -27,19 +26,19 @@ export function StreakBadge({
 
   if (streak >= 30) {
     tierName = 'Legendary';
-    tierColor = 'text-purple-400 dark:text-purple-300';
+    tierColor = 'text-purple-400';
     bgColor = 'bg-gradient-to-r from-purple-500/15 via-pink-500/15 to-amber-500/15 border-purple-500/40';
     shadowGlow = 'shadow-[0_0_24px_rgba(168,85,247,0.3)]';
     Icon = Trophy;
   } else if (streak >= 14) {
     tierName = 'Epic';
-    tierColor = 'text-pink-500 dark:text-pink-400';
+    tierColor = 'text-pink-500';
     bgColor = 'bg-pink-500/15 border-pink-500/30';
     shadowGlow = 'shadow-[0_0_18px_rgba(236,72,153,0.3)]';
     Icon = Award;
   } else if (streak >= 7) {
     tierName = 'On Fire';
-    tierColor = 'text-orange-500 dark:text-orange-400';
+    tierColor = 'text-orange-500';
     bgColor = 'bg-orange-500/15 border-orange-500/30';
     shadowGlow = 'shadow-[0_0_15px_rgba(249,115,22,0.3)]';
     Icon = Sparkles;
@@ -58,13 +57,10 @@ export function StreakBadge({
   }[size];
 
   return (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      whileHover={{ scale: 1.06 }}
-      whileTap={{ scale: 0.95 }}
+    <div
       className={cn(
-        'inline-flex items-center rounded-full border font-bold uppercase tracking-wider transition-all duration-300 select-none cursor-pointer',
+        'animate-scale-in inline-flex items-center rounded-full border font-bold uppercase tracking-wider transition-all duration-300 select-none cursor-pointer',
+        'hover:scale-105 active:scale-95',
         bgColor,
         tierColor,
         shadowGlow,
@@ -76,6 +72,6 @@ export function StreakBadge({
       <Icon className={iconSizes} strokeWidth={2.5} />
       <span className="tabular-nums font-extrabold">{streak}</span>
       {showLabel && <span>{streak === 1 ? 'Day' : 'Days'}</span>}
-    </motion.div>
+    </div>
   );
 }

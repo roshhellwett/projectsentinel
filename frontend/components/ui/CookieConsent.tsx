@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Info, X } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
@@ -49,27 +48,17 @@ export function CookieConsent() {
   }, []);
 
   return (
-    <AnimatePresence>
+    <>
       {open && (
-        <motion.div
+        <div
           ref={consentRef}
-          key="cookie-consent"
           role="dialog"
           aria-label="Cookie preferences"
           aria-modal="false"
-          initial={{ y: 24, opacity: 0, scale: 0.96 }}
-          animate={{ 
-            y: 0, opacity: 1, scale: 1,
-            transition: { type: 'spring', stiffness: 450, damping: 28, mass: 0.7 }
-          }}
-          exit={{ 
-            opacity: 0, scale: 0.96, y: 16,
-            transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] }
-          }}
-          className={`fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
+          className={`animate-slide-up-fade fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <div className="relative glass-lg border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">
+          <div className="card border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">
             <button
               type="button"
               onClick={reject}
@@ -110,8 +99,8 @@ export function CookieConsent() {
               </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

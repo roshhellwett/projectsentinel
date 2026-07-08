@@ -58,7 +58,7 @@ export function PostTable({ posts }: PostTableProps) {
                 <td className="py-3 px-4">
                   <span className={`text-sm font-semibold ${
                     post.status === 'published' ? 'text-cred-high' :
-                    post.status === 'corrected' ? 'text-amber-600 dark:text-amber-400' :
+                    post.status === 'corrected' ? 'text-amber-600' :
                     'text-cred-low'
                   }`}>
                     {post.status}
@@ -74,7 +74,7 @@ export function PostTable({ posts }: PostTableProps) {
                         setSelectedPost(post);
                         setCorrectionType('corrected');
                       }}
-                      className="tap-target min-h-[36px] text-xs px-3 py-1 bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-semibold rounded hover:bg-amber-200 dark:hover:bg-amber-900 transition-colors hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="tap-target min-h-[36px] text-xs px-3 py-1 bg-amber-100 text-amber-800 font-semibold rounded hover:bg-amber-200 transition-colors hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       Correct
                     </button>
@@ -83,7 +83,7 @@ export function PostTable({ posts }: PostTableProps) {
                         setSelectedPost(post);
                         setCorrectionType('retracted');
                       }}
-                      className="tap-target min-h-[36px] text-xs px-3 py-1 bg-red-100 dark:bg-red-950/80 text-red-800 dark:text-red-300 font-semibold rounded hover:bg-red-200 dark:hover:bg-red-900 transition-colors hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="tap-target min-h-[36px] text-xs px-3 py-1 bg-red-100 text-red-800 font-semibold rounded hover:bg-red-200 transition-colors hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       Retract
                     </button>

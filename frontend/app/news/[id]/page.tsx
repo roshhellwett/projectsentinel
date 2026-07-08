@@ -183,7 +183,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <aside className="md:col-span-2 relative premium-card p-5 sm:p-8 glass-hover-trigger">
+          <aside className="md:col-span-2 np-card p-5 sm:p-8">
             <span aria-hidden="true" className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full" />
             <h2 className="font-display flex items-center gap-2 text-xl font-bold text-ink mb-4">
               <ShieldCheck className="w-5 h-5 text-accent" strokeWidth={2.2} />
@@ -194,7 +194,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </p>
           </aside>
 
-          <aside className="premium-card p-5 sm:p-8">
+          <aside className="np-card p-5 sm:p-8">
             <h2 className="font-display text-base font-bold text-ink mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources
@@ -203,7 +203,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
         </div>
 
-        <div className="premium-card glass-sm p-7 mb-12 shadow-sm border-rule/50">
+        <div className="np-card p-7 mb-12">
           <h3 className="text-[11px] font-bold text-accent mb-5 uppercase tracking-[0.18em] text-center">
             How this story was built
           </h3>
@@ -215,7 +215,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               { label: 'Auto-Published', icon: <span className="text-base">&#9889;</span> },
             ].map((item) => (
               <div key={item.label} className="flex flex-col items-center text-center p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step">
-                <div className="w-10 h-10 rounded-xl border border-rule/60 bg-paper text-accent flex items-center justify-center mb-3 shadow-sm group-hover/step:border-accent/30 group-hover/step:shadow-card transition-all duration-300">
+                <div className="w-10 h-10 border border-rule bg-paper text-accent flex items-center justify-center mb-3 group-hover/step:border-accent/30 transition-all duration-300">
                   {item.icon}
                 </div>
                 <span className="text-[11px] font-semibold text-ink">{item.label}</span>

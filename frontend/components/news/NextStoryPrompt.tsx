@@ -3,11 +3,8 @@
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, X } from 'lucide-react';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
-import { IOS_SPRING } from '@/lib/theme/animations';
 
 interface NextStoryPromptProps {
   posts: Post[];
@@ -82,16 +79,11 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
   if (!next || dismissed) return null;
 
   return (
-    <AnimatePresence>
+    <>
       {visible && (
-        <motion.div
-          key="next-story"
-          initial={{ opacity: 0, y: 28, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.97 }}
-          transition={IOS_SPRING.sheet}
-          className={`fixed left-1/2 -translate-x-1/2 ${Z_INDEX.cookieConsent} w-[min(94vw,32rem)] will-change-transform transform-gpu`}
-          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}
+        <div
+          className={`animate-slide-up-fade fixed left-1/2 -translate-x-1/2 will-change-transform transform-gpu ${Z_INDEX.cookieConsent}`}
+          style={{ width: 'min(94vw,32rem)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}
         >
           <div className="relative">
             <Link
@@ -109,7 +101,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
                 </p>
               </div>
               <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-accent/12 border border-accent/30 text-accent flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:bg-accent group-hover:text-white">
-                <ArrowRight className="w-4 h-4" />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 6l7 7-7 7" /></svg>
               </span>
             </Link>
             <button
@@ -118,11 +110,11 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
               aria-label="Dismiss up next"
               className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-paper border border-rule-strong text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              <X className="w-3.5 h-3.5" />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>
             </button>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

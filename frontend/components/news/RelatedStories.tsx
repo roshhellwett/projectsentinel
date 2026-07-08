@@ -25,7 +25,7 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
           <Link
             key={post.id}
             href={`/news/${post.id}/`}
-            className="editorial-card group flex flex-col h-full rounded-md p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+            className="np-card group flex flex-col h-full p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
             <div className="relative z-10 flex items-center gap-2 mb-3">
               <CategoryTag category={post.category} />

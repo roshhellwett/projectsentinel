@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useCallback, useMemo, memo } from 'react';
-import { motion } from 'framer-motion';
 import { Post } from '@/types';
+import { cn } from '@/lib/utils/cn';
 import { dedupe } from '@/lib/utils/dedupe';
 import { NewsCard } from './NewsCard';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -12,29 +12,12 @@ import { useIntersectionObserver } from '@/lib/hooks/useIntersectionObserver';
 import { useReadPosts } from '@/lib/utils/readPosts';
 import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 import { useI18n } from '@/lib/i18n/i18n-shared';
-import { EngagementCounter } from '@/components/ui/EngagementCounter';
 import dynamic from 'next/dynamic';
 
 const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), {
   ssr: false,
-  loading: () => <div className="fixed inset-0 bg-paper md:bg-paper/80 md:backdrop-blur-sm z-50 animate-fade-in" aria-hidden="true" />,
+  loading: () => <div className="fixed inset-0 bg-paper z-50 animate-fade-in" aria-hidden="true" />,
 });
-const MilestoneCelebration = dynamic(() => import('@/components/ui/MilestoneCelebration').then(m => m.MilestoneCelebration), {
-  ssr: false,
-  loading: () => null,
-});
-
-
-const MILESTONE_LABELS: Record<number, string> = {
-  5: 'First 5 stories!',
-  10: 'Double digits!',
-  15: 'Half a dozen more!',
-  25: 'A quarter century!',
-  50: '50 stories deep!',
-  100: 'Century club!',
-};
-
-const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
 interface InfiniteFeedProps {
   initialPosts: Post[];
@@ -46,27 +29,22 @@ interface InfiniteFeedProps {
 
 export function FeedSkeleton() {
   return (
-    <div className="premium-card animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3 rounded-[24px] overflow-hidden" aria-hidden="true">
+    <div className="animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3 overflow-hidden border border-rule bg-paper-2 rounded-[6px]" aria-hidden="true">
       <div className="flex items-center gap-3">
-        <div className="h-3 w-16 rounded-full bg-rule/60" />
-        <div className="h-3 w-12 rounded-full bg-rule/40" />
+        <div className="h-3 w-16 bg-rule/60 border border-rule" />
+        <div className="h-3 w-12 bg-rule/40 border border-rule" />
       </div>
       <div className="space-y-2 mt-2">
-        <div className="h-5 w-full rounded bg-rule/50" />
-        <div className="h-5 w-3/4 rounded bg-rule/40" />
+        <div className="h-5 w-full bg-rule/50 border border-rule" />
+        <div className="h-5 w-3/4 bg-rule/40 border border-rule" />
       </div>
       <div className="space-y-1.5 mt-1">
-        <div className="h-3 w-full rounded bg-rule/30" />
-        <div className="h-3 w-5/6 rounded bg-rule/30" />
+        <div className="h-3 w-full bg-rule/30 border border-rule" />
+        <div className="h-3 w-5/6 bg-rule/30 border border-rule" />
       </div>
       <div className="mt-auto pt-4 border-t border-rule/50">
         <div className="flex items-center gap-2">
-          <div className="h-2 w-full rounded-full bg-rule/30" />
-          <div className="h-3 w-16 rounded bg-rule/30" />
-        </div>
-        <div className="flex gap-1.5 mt-3">
-          <div className="h-6 w-20 rounded bg-rule/30" />
-          <div className="h-6 w-16 rounded bg-rule/20" />
+          <div className="h-2 w-full bg-rule/30 border border-rule" />
         </div>
       </div>
     </div>
@@ -102,27 +80,16 @@ const FeedItem = memo(function FeedItem({
     />
   );
 
-  if (index >= 6) {
-    return (
-      <div className="feed-card-shell h-full rounded-xl transition-opacity duration-200 transform-gpu select-none touch-action-manipulation">
-        {content}
-      </div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.2,
-        ease: 'easeOut',
-        delay: Math.min(index, 4) * 0.03,
-      }}
-      className="feed-card-shell h-full rounded-xl transition-opacity duration-200 transform-gpu select-none touch-action-manipulation"
+    <div
+      className={cn(
+        'h-full transition-opacity duration-200 select-none touch-manipulation',
+        index < 6 && 'animate-slide-up'
+      )}
+      style={index < 6 ? { animationDelay: `${Math.min(index, 4) * 0.03}s` } : undefined}
     >
       {content}
-    </motion.div>
+    </div>
   );
 });
 
@@ -199,26 +166,15 @@ export function InfiniteFeed({
 
   const readMap = readIds;
   const readCount = useMemo(() => posts.filter((p) => readMap.has(p.id)).length, [posts, readMap]);
-  const nextMilestone = useMemo(() => [5, 10, 15, 25, 50, 100].find((m) => m > dailyCount) ?? 100, [dailyCount]);
-  const progressPct = useMemo(() => Math.min(100, (dailyCount / nextMilestone) * 100), [dailyCount, nextMilestone]);
-  const streakLabel = useMemo(() => STREAK_MILESTONES.slice().reverse().find((s) => streak >= s), [streak]);
 
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5 shadow-sm">
-          <svg
-            className="w-7 h-7 text-muted"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
-        </div>
-        <h3 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">{t('feed.no_news_title')}</h3>
-        <p className="text-sm text-muted max-w-sm">
+        <svg className="w-12 h-12 text-muted mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+        </svg>
+        <h3 className="font-body font-bold text-lg text-ink mb-1">{t('feed.no_news_title')}</h3>
+        <p className="font-body text-sm text-ink-soft max-w-sm">
           {t('feed.no_news_desc')}
         </p>
       </div>
@@ -228,68 +184,53 @@ export function InfiniteFeed({
   return (
     <>
       <ErrorBoundary>
-
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-        <EngagementCounter
-          dailyCount={dailyCount}
-          streak={streak}
-          nextMilestone={nextMilestone}
-        />
-
-        {readCount > 0 && (
-          <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto bg-paper-2 px-3 py-1 rounded-full border border-rule/60">
-            <span className="text-[11px] font-semibold text-muted tabular-nums whitespace-nowrap">
-              <span className="text-ink font-bold">{readCount}</span> / {posts.length} {t('feed.stories_read')}
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            {dailyCount} read today
+          </span>
+          {readCount > 0 && (
+            <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+              {readCount} / {posts.length} read
             </span>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="mb-6 relative z-20">
-        <MilestoneCelebration milestone={milestone} />
-      </div>
-
-      <motion.div
-        ref={gridRef}
-        className="feed-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch transform-gpu touch-action-pan-y"
-      >
-        {posts.map((post, index) => (
-          <FeedItem
-            key={post.id}
-            post={post}
-            index={index}
-            isNew={freshIds.has(post.id)}
-            isRead={readMap.has(post.id)}
-            wasRecentlyOpened={lastOpenedId === post.id}
-            onCardClick={stableOnCardClick}
-          />
-        ))}
-      </motion.div>
-
-      {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <motion.div
-              key={`skeleton-${i}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.06 }}
-            >
-              <FeedSkeleton />
-            </motion.div>
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch touch-pan-y"
+        >
+          {posts.map((post, index) => (
+            <FeedItem
+              key={post.id}
+              post={post}
+              index={index}
+              isNew={freshIds.has(post.id)}
+              isRead={readMap.has(post.id)}
+              wasRecentlyOpened={lastOpenedId === post.id}
+              onCardClick={stableOnCardClick}
+            />
           ))}
         </div>
-      )}
 
-      {!exhausted && (
-        <div ref={sentinelRef} className="h-12 w-full mt-8" aria-hidden="true" />
-      )}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={`skeleton-${i}`} className="animate-slide-up" style={{ animationDelay: `${i * 0.06}s` }}>
+                <FeedSkeleton />
+              </div>
+            ))}
+          </div>
+        )}
 
-      {exhausted && posts.length > pageSize && (
-        <p className="text-center text-xs text-muted mt-12">
-          {readCount}/{posts.length} {t('feed.stories_read')} &middot; {t('feed.reached_end')}
-        </p>
-      )}
+        {!exhausted && (
+          <div ref={sentinelRef} className="h-12 w-full mt-8" aria-hidden="true" />
+        )}
+
+        {exhausted && posts.length > pageSize && (
+          <p className="text-center font-body text-xs text-ink-soft mt-12">
+            {readCount}/{posts.length} {t('feed.stories_read')} · {t('feed.reached_end')}
+          </p>
+        )}
       </ErrorBoundary>
 
       <NewsDrawer
@@ -325,7 +266,6 @@ export function InfiniteFeed({
           }
         }}
       />
-
     </>
   );
 }

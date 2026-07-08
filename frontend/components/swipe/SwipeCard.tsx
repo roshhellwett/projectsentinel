@@ -259,7 +259,7 @@ export function SwipeCard({
       data-swipe-depth={depth}
     >
       <article
-        className="relative w-full premium-card overflow-hidden"
+        className="relative w-full np-card overflow-hidden"
         role="article"
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
@@ -316,7 +316,7 @@ export function SwipeCard({
                 exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.2 } }}
                 className={`absolute inset-0 ${Z_INDEX.cardOverlay} flex items-center justify-center pointer-events-none`}
               >
-                <div className="bg-ink/90 md:bg-ink/80 md:backdrop-blur-sm p-6 rounded-full shadow-2xl text-paper">
+                <div className="bg-ink/90 p-6 rounded-full shadow-2xl text-paper">
                   <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                   </svg>

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useId } from 'react';
-import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils/cn';
 
 interface ScoreRingProps {
@@ -17,12 +16,6 @@ function clampScore(score: number) {
   return Math.min(100, Math.max(0, Number.isFinite(score) ? Math.round(score) : 0));
 }
 
-function getGradientColors(score: number): [string, string] {
-  if (score >= 85) return ['#10b981', '#06b6d4'];
-  if (score >= 60) return ['#f59e0b', '#f97316'];
-  return ['#ef4444', '#f97316'];
-}
-
 export function ScoreRing({ 
   score, 
   size = 44, 
@@ -32,10 +25,6 @@ export function ScoreRing({
   compact = false,
 }: ScoreRingProps) {
   const clamped = clampScore(score);
-  const label = getScoreLabel(clamped);
-  const rawId = useId();
-  const gradientId = `grad-${rawId.replace(/:/g, '')}`;
-  const [gradFrom, gradTo] = getGradientColors(clamped);
   
   const [animated, setAnimated] = useState(false);
   const ref = useRef<SVGCircleElement>(null);
@@ -57,11 +46,13 @@ export function ScoreRing({
   const ringCircumference = 2 * Math.PI * ringRadius;
   const ringOffset = animated ? ringCircumference * (1 - clamped / 100) : ringCircumference;
 
+  const strokeThickness = Math.max(1.5, ringStroke * (clamped / 100));
+
   return (
     <div
       className={cn('inline-flex items-center gap-2 flex-shrink-0', className)}
       role="img"
-      aria-label={`Credibility score: ${clamped} out of 100, ${label}`}
+      aria-label={`Credibility score: ${clamped} out of 100`}
     >
       <div className="relative flex-shrink-0" style={{ width: ringSize, height: ringSize }}>
         <svg
@@ -71,13 +62,6 @@ export function ScoreRing({
           className="-rotate-90 overflow-visible"
           aria-hidden="true"
         >
-          <defs>
-            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={gradFrom} />
-              <stop offset="100%" stopColor={gradTo} />
-            </linearGradient>
-          </defs>
-
           <circle
             cx={ringSize / 2}
             cy={ringSize / 2}
@@ -85,7 +69,6 @@ export function ScoreRing({
             fill="none"
             stroke="rgb(var(--c-rule))"
             strokeWidth={ringStroke}
-            strokeOpacity={0.35}
           />
 
           <circle
@@ -94,18 +77,17 @@ export function ScoreRing({
             cy={ringSize / 2}
             r={ringRadius}
             fill="none"
-            stroke={`url(#${gradientId})`}
-            strokeWidth={ringStroke}
+            stroke="rgb(var(--c-ink))"
+            strokeWidth={strokeThickness}
             strokeLinecap="round"
             strokeDasharray={ringCircumference}
             strokeDashoffset={ringOffset}
-            className="score-circle"
           />
         </svg>
 
         <span 
           className={cn(
-            'absolute inset-0 flex items-center justify-center font-bold tabular-nums text-ink leading-none pointer-events-none',
+            'absolute inset-0 flex items-center justify-center font-mono text-ink leading-none pointer-events-none',
             compact ? 'text-[10px]' : 'text-[13px]'
           )}
           aria-hidden="true"
@@ -114,8 +96,8 @@ export function ScoreRing({
         </span>
       </div>
       {showLabel && (
-        <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">
-          {label}
+        <span className="font-body text-[10px] font-bold tracking-wider uppercase text-muted">
+          verified
         </span>
       )}
     </div>

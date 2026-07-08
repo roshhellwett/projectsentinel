@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { useLastFresh } from '@/lib/utils/freshSignal';
 
 const STALE_AFTER_MS = 5 * 60 * 60 * 1000;
@@ -50,17 +49,9 @@ export function LastRefreshed() {
       <div
         role="status"
         aria-live="polite"
-        aria-label={`Feed appears stale — last refreshed ${label}`}
-        title={`Feed appears stale — last refreshed ${label}`}
-        className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-soft border border-accent/30 text-[10px] font-semibold tracking-normal text-cred-low"
+        className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper text-xs text-ink-soft"
       >
-        <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-cred-low flex-shrink-0" aria-hidden="true">
-          <span className="absolute inset-0 rounded-full bg-cred-low/55 animate-ping" />
-        </span>
-        <AlertTriangle className="w-2.5 h-2.5 text-cred-low" aria-hidden="true" />
-        <span className="uppercase tracking-[0.16em] text-[9px] text-cred-low">Stale</span>
-        <span className="w-px h-3 bg-rule" aria-hidden="true" />
-        <span className="tabular-nums text-cred-low" suppressHydrationWarning>{label}</span>
+        <span className="font-body text-[10px] font-bold tracking-wider uppercase">Stale — {label}</span>
       </div>
     );
   }
@@ -69,15 +60,9 @@ export function LastRefreshed() {
     <div
       role="status"
       aria-live="off"
-      aria-label={`Feed last refreshed ${label}`}
-      className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-paper border border-rule text-[10px] font-semibold tracking-normal text-muted"
+      className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper text-xs text-ink-soft"
     >
-      <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-cred-high flex-shrink-0" aria-hidden="true">
-        <span className="absolute inset-0 rounded-full bg-cred-high/55 animate-ping" />
-      </span>
-      <span className="uppercase tracking-[0.16em] text-[9px] text-muted">Live</span>
-      <span className="w-px h-3 bg-rule" aria-hidden="true" />
-      <span className="tabular-nums text-ink" suppressHydrationWarning>{label}</span>
+      <span className="font-body text-[10px] font-bold tracking-wider uppercase">Live · {label}</span>
     </div>
   );
 }

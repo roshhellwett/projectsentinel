@@ -1,8 +1,4 @@
-
-
 import Link from 'next/link';
-import { Github, Rss, ExternalLink } from 'lucide-react';
-import { InstallAppButton } from './InstallAppButton';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 
 const NEWS_LINKS = [
@@ -17,6 +13,7 @@ const NEWS_LINKS = [
 const ABOUT_LINKS = [
   { href: '/how-it-works/', key: 'nav.how_it_works' },
   { href: '/saved/',        key: 'nav.saved' },
+  { href: '/swipe/',        key: 'nav.swipe' },
 ];
 
 const LEGAL_LINKS = [
@@ -26,94 +23,94 @@ const LEGAL_LINKS = [
   { href: '/contact/',     key: 'footer.contact' },
 ];
 
-const TRANSPARENCY = [
-  'No advertising or sponsored content',
-  'Every claim links back to its sources',
-  'Open-source under the MIT licence',
-  'AI cross-verifies before publishing',
-];
+function RssIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 11a9 9 0 019 9" />
+      <path d="M4 4a16 16 0 0116 16" />
+      <circle cx="5" cy="19" r="1" />
+    </svg>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
+}
 
 const REPO_URL = 'https://github.com/roshhellwett/projectsentinel';
 const RSS_URL = '/rss.xml';
 
-function ColumnHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="editorial-kicker mb-5 text-[11px]">
-      <span>{children}</span>
-    </h3>
-  );
-}
-
 export function Footer() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
+
   return (
-    <footer className="relative mt-auto bg-paper-2 border-t border-rule/40 overflow-x-hidden w-full max-w-full">
-
-      {/* Premium gradient divider with enhanced blur */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
-      <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-transparent via-accent/20 to-transparent blur-md" aria-hidden="true" />
-      <div className="absolute -top-4 inset-x-[20%] h-8 bg-gradient-to-r from-transparent via-accent/3 to-transparent blur-2xl" aria-hidden="true" />
-
-      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-12 pb-10">
-
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-10 mb-10 border-b border-rule">
+    <footer className="relative mt-auto border-t border-rule overflow-x-hidden w-full max-w-full">
+      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-10 pb-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-8 mb-8 border-b border-rule">
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2.5 group rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all hover-lift"
+              className="inline-flex items-center gap-2.5 group rounded"
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-10 h-10 bg-ink text-paper font-display font-bold text-base tracking-[0.06em] rounded-lg"
+                className="flex items-center justify-center w-10 h-10 border border-ink text-ink font-display font-bold text-base"
               >
                 IV
               </span>
               <span className="flex flex-col leading-tight">
-                <span className="font-display text-2xl font-bold text-ink tracking-[-0.025em]">
+                <span className="font-display text-xl text-ink">
                   India Verified
                 </span>
-                <span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-accent">
-                  AI-verified Indian news
+                <span className="text-xs text-ink-soft font-body">
+                  AI-cross-referenced Indian news
                 </span>
               </span>
             </Link>
-            <p className="mt-4 text-sm text-muted leading-relaxed max-w-md">
+            <p className="mt-3 text-sm text-ink-soft leading-relaxed max-w-md">
               {t('footer.description')}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <InstallAppButton />
             <a
               href={RSS_URL}
-              className="tap-target min-h-[44px] inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm"
             >
-              <Rss className="w-3.5 h-3.5" />
+              <RssIcon />
               {t('footer.rss_feed')}
             </a>
             <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="tap-target min-h-[44px] inline-flex items-center gap-1.5 px-3 pt-[7px] pb-[9px] border border-rule-strong text-[13px] font-medium text-ink hover:bg-paper transition-all hover-lift rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm"
             >
-              <Github className="w-3.5 h-3.5" />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
+              </svg>
               {t('footer.github')}
-              <ExternalLink className="w-3 h-3 opacity-60" />
+              <ExternalLinkIcon />
             </a>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-10 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-10 mb-8">
           <div>
-            <ColumnHeading>{t('footer.news')}</ColumnHeading>
-            <ul className="space-y-3 sm:space-y-2.5 text-sm">
+            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.news')}</h3>
+            <ul className="space-y-2.5 text-sm">
               {NEWS_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent footer-link"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all"
                   >
                     {t(link.key)}
                   </Link>
@@ -123,13 +120,13 @@ export function Footer() {
           </div>
 
           <div>
-            <ColumnHeading>{t('footer.about')}</ColumnHeading>
-            <ul className="space-y-3 sm:space-y-2.5 text-sm">
+            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.about')}</h3>
+            <ul className="space-y-2.5 text-sm">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all"
                   >
                     {t(link.key)}
                   </Link>
@@ -139,13 +136,13 @@ export function Footer() {
           </div>
 
           <div>
-            <ColumnHeading>{t('footer.legal')}</ColumnHeading>
-            <ul className="space-y-3 sm:space-y-2.5 text-sm">
+            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.legal')}</h3>
+            <ul className="space-y-2.5 text-sm">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted hover:text-accent transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all"
                   >
                     {t(link.key)}
                   </Link>
@@ -155,48 +152,46 @@ export function Footer() {
           </div>
 
           <div>
-            <ColumnHeading>{t('footer.transparency')}</ColumnHeading>
-            <ul className="space-y-3 sm:space-y-2.5 text-sm">
-              {TRANSPARENCY.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-muted">
-                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" aria-hidden="true" />
-                  <span className="leading-relaxed">{item}</span>
-                </li>
-              ))}
+            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.transparency')}</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li className="flex items-start gap-2 text-ink-soft">
+                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+                <span>No advertising or sponsored content</span>
+              </li>
+              <li className="flex items-start gap-2 text-ink-soft">
+                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+                <span>Every claim links back to its sources</span>
+              </li>
+              <li className="flex items-start gap-2 text-ink-soft">
+                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+                <span>Open-source under the MIT licence</span>
+              </li>
+              <li className="flex items-start gap-2 text-ink-soft">
+                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+                <span>AI cross-verifies before publishing</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-6 sm:gap-3 pt-8 md:pt-6 border-t border-rule">
-          <p className="text-xs text-subtle leading-relaxed">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-paper-tint border border-rule">
-              <span aria-hidden="true" className="inline-block w-4 h-3 rounded-[2px] overflow-hidden flex-shrink-0" style={{ background: 'linear-gradient(180deg, #ff9933 33%, #fff 33% 66%, #138808 66%)' }} />
-              <span className="font-semibold text-muted">{t('footer.built_in_india')}</span>
+        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-4 pt-6 border-t border-rule">
+          <p className="text-xs text-muted leading-relaxed">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-xs">
+              <span className="font-semibold text-ink-soft">{t('footer.built_in_india')}</span>
             </span>
-            <span aria-hidden="true" className="mx-2 text-rule-strong">·</span>
+            <span aria-hidden="true" className="mx-1.5 text-rule">·</span>
             Designed &amp; engineered by{' '}
             <a
               href="https://github.com/roshhellwett"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-ink underline decoration-rule-strong underline-offset-2 hover:decoration-accent transition-colors"
+              className="font-semibold text-ink underline decoration-rule underline-offset-2"
             >
               Roshhellwett
             </a>
-            , with the help of{' '}
-            <a
-              href="https://www.anthropic.com/claude"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted underline decoration-rule-strong underline-offset-2 hover:text-ink hover:decoration-accent transition-colors"
-            >
-              Claude
-            </a>{' '}
-            &amp; other tools.
           </p>
-          <p className="text-xs text-subtle leading-relaxed" suppressHydrationWarning>
-            &copy; {year} Zenith Open Source Projects. Reporting cross-verified by AI;
-            stories may be republished under the MIT licence with attribution.
+          <p className="text-xs text-muted leading-relaxed" suppressHydrationWarning>
+            &copy; {year} India Verified. MIT licence.
           </p>
         </div>
       </div>
