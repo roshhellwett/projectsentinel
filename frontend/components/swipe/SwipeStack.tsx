@@ -19,7 +19,6 @@ import { snoozeBreakToday } from '@/lib/utils/swipeStats';
 import { useSwipeTracking } from '@/lib/hooks/useSwipeTracking';
 
 const BREAK_PROMPT_AT = 25;
-const UNDO_TOAST_MS = 3500;
 
 interface SwipeStackProps {
   initialPosts: Post[];

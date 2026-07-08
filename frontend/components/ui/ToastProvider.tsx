@@ -1,6 +1,6 @@
 'use client';
 
-import { BookmarkCheck, BookmarkMinus, Share2, CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { BookmarkCheck, BookmarkMinus, Share2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useToasts } from '@/lib/utils/toast';
 

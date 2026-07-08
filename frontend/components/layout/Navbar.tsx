@@ -79,7 +79,7 @@ function ArrowRight() {
 export function Navbar() {
   const pathname = usePathname();
   const { t } = useI18n();
-  const { streak } = useDailyReadCount();
+  useDailyReadCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 

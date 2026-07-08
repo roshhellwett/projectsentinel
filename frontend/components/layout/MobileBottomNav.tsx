@@ -74,7 +74,7 @@ const TABS = [
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useI18n();
-  const { streak } = useDailyReadCount();
+  useDailyReadCount();
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
 

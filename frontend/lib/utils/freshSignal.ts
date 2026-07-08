@@ -3,11 +3,6 @@ import { useEffect, useState } from 'react';
 let lastFreshAt = 0;
 const subscribers = new Set<(ts: number) => void>();
 
-export function markFresh(): void {
-  lastFreshAt = Date.now();
-  subscribers.forEach((fn) => fn(lastFreshAt));
-}
-
 export function useLastFresh(): number {
   const [value, setValue] = useState<number>(0);
   useEffect(() => {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Z_INDEX } from '@/lib/theme/zIndex';
+
 import { Post } from '@/types';
 import { NewsCard } from '@/components/news/NewsCard';
 import { Skeleton } from '@/components/ui/Skeleton';

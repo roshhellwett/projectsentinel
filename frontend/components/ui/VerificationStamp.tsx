@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils/cn';
 
 interface VerificationStampProps {
   score: number;
-  date?: string;
   compact?: boolean;
   xsmall?: boolean;
   className?: string;
@@ -18,7 +17,7 @@ function CheckIcon() {
   );
 }
 
-export function VerificationStamp({ score, date, compact, xsmall, className }: VerificationStampProps) {
+export function VerificationStamp({ score, compact, xsmall, className }: VerificationStampProps) {
   if (xsmall) {
     return (
       <div

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { Post } from '@/types';
 import { useReadPosts } from '@/lib/utils/readPosts';
-import { Z_INDEX } from '@/lib/theme/zIndex';
+
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { VerificationStamp } from '@/components/ui/VerificationStamp';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';

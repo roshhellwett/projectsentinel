@@ -1,7 +1,6 @@
-export interface RateLimitConfig {
+interface RateLimitConfig {
   windowMs: number;
   maxRequests: number;
-  /** Optional prefix for the IP-based cache key */
   prefix?: string;
 }
 

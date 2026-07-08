@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertCircle, FileText, Send, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 import { Post } from '@/types';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
