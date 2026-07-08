@@ -17,7 +17,7 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
   return (
     <div
       className={cn(
-        'relative group inline-flex max-w-full items-center rounded border border-rule bg-paper',
+        'relative group inline-flex max-w-full items-center rounded border border-rule/50 bg-paper/70 backdrop-blur-sm',
         compact ? 'gap-2 px-2.5 py-1.5' : 'gap-3 px-3 py-2',
       )}
       aria-label={`Credibility score: ${clamped}/100, ${label}`}

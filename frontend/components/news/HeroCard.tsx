@@ -47,7 +47,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
   const otherSourceCount = Math.max(0, (post.source_count ?? (post.sources?.length ?? 0)) - 1);
 
   return (
-    <div className="w-full max-w-full border border-rule bg-paper-2 rounded-[8px] p-3 sm:p-6 md:p-8 relative overflow-hidden" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 300px' }}>
+    <div className="w-full max-w-full border border-rule/50 bg-paper-2/65 backdrop-blur-md rounded-[8px] p-3 sm:p-6 md:p-8 relative overflow-hidden" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 300px' }}>
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}

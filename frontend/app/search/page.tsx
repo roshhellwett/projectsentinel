@@ -27,7 +27,7 @@ async function SearchResults({ query }: { query: string }) {
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mb-5">
+        <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mb-5">
             <SearchX className="w-7 h-7 text-muted" />
         </div>
         <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-2">No results found</h2>

@@ -21,7 +21,7 @@ export default function OfflinePage() {
         </button>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-paper border border-rule text-ink rounded-xl font-medium hover:bg-paper-2 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-paper/70 backdrop-blur-sm border border-rule/50 text-ink rounded-xl font-medium hover:bg-paper-2/70 transition-colors"
         >
           Home
         </Link>

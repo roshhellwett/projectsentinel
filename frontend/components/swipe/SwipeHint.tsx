@@ -39,7 +39,7 @@ export function SwipeHint() {
             aria-label="Dismiss tutorial"
           />
 
-          <div className="animate-slide-up-in relative w-full max-w-sm bg-paper border border-rule-strong rounded-md shadow-paper-lift overflow-hidden">
+          <div className="animate-slide-up-in relative w-full max-w-sm bg-paper/80 backdrop-blur-xl border border-rule/50 rounded-md overflow-hidden">
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
             <div className="p-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-2">

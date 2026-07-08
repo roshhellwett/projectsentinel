@@ -51,7 +51,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto border-t border-rule overflow-x-hidden w-full max-w-full">
+    <footer className="relative mt-auto border-t border-rule/50 overflow-x-hidden w-full max-w-full bg-paper/70 backdrop-blur-md">
         <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-8 sm:pt-10 pb-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 sm:gap-6 pb-6 sm:pb-8 mb-6 sm:mb-8 border-b border-rule">
             <div>

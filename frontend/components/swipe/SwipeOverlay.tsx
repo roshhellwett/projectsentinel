@@ -60,7 +60,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
         dragVal={dragX}
         range={[0, -TRIGGER]}
         position="left"
-        accent="border-rule-strong text-ink bg-paper"
+        accent="border-rule-strong text-ink bg-paper/70 backdrop-blur-sm"
         disabled={!canRewind}
       />
       <Badge
@@ -69,7 +69,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
         dragVal={dragY}
         range={[0, -TRIGGER]}
         position="top"
-        accent="border-accent text-accent bg-paper"
+        accent="border-accent text-accent bg-paper/70 backdrop-blur-sm"
       />
       <Badge
         label="Previous"
@@ -77,7 +77,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
         dragVal={dragY}
         range={[0, TRIGGER]}
         position="bottom"
-        accent="border-rule-strong text-ink bg-paper"
+        accent="border-rule-strong text-ink bg-paper/70 backdrop-blur-sm"
         disabled={!canRewind}
       />
     </motion.div>

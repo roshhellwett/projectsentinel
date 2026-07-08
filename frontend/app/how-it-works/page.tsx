@@ -147,7 +147,7 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-12 sm:mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="np-card group flex gap-4 sm:gap-5 p-4 sm:p-6 transition-all duration-300">
+            <div className="np-card glass-card group flex gap-4 sm:gap-5 p-4 sm:p-6 transition-all duration-300">
               <div className="relative z-10 flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
                 <step.icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
               </div>
@@ -171,7 +171,7 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="np-card p-4 sm:p-8 md:p-10 mb-8 sm:mb-12">
+      <div className="np-card glass-card p-4 sm:p-8 md:p-10 mb-8 sm:mb-12">
         <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">Trusted sources</h2>
         <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6">
           We only pull from established Indian news organizations with editorial standards.
@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
           {TRUSTED_SOURCES.map(source => (
             <span
               key={source}
-              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-paper border border-rule rounded text-[11px] sm:text-sm font-medium text-ink hover:border-ink transition-colors"
+              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-paper/70 backdrop-blur-sm border border-rule/50 rounded text-[11px] sm:text-sm font-medium text-ink hover:border-ink transition-colors"
             >
               {source}
             </span>
@@ -215,7 +215,7 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="np-card text-center p-5 sm:p-10">
+      <div className="np-card glass-card text-center p-5 sm:p-10">
         <div className="w-10 h-10 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-3 sm:mb-5">
           <Github className="w-5 h-5 sm:w-8 sm:h-8 text-ink" />
         </div>
@@ -251,7 +251,7 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`np-card p-5 sm:p-6 ${borderColor}`}>
+    <div className={`np-card glass-card p-5 sm:p-6 ${borderColor}`}>
       <div className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-[11px] sm:text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}>
         {range}
       </div>

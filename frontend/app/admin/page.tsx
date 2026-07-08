@@ -32,7 +32,7 @@ export default async function AdminPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-ink mb-8 tracking-normal">Admin Dashboard</h1>
 
-      <div className="np-card p-6">
+      <div className="np-card glass-card p-6">
         <h2 className="text-xl font-semibold text-ink mb-4">All Posts</h2>
         <PostTable posts={posts} />
       </div>

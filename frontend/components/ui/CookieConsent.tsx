@@ -58,7 +58,7 @@ export function CookieConsent() {
           className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <div className="card border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">
+          <div className="glass border border-rule/50 rounded-lg px-5 py-4 md:px-6 md:py-5">
             <button
               type="button"
               onClick={reject}

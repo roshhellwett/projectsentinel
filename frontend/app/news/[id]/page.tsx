@@ -110,7 +110,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             href="/"
             className="inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group min-h-[44px]"
           >
-            <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-rule/60 bg-paper-2/80 group-hover:border-accent/40 group-hover:bg-paper transition-all shadow-sm">
+            <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-rule/50 bg-paper-2/70 backdrop-blur-sm group-hover:border-accent/40 group-hover:bg-paper/70 transition-all">
               <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </span>
             <span className="hidden sm:inline">Back to all news</span>
@@ -156,7 +156,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             {post.headline}
           </h1>
 
-          <div className="mb-6 sm:mb-10 rounded-2xl border border-rule/50 glass-sm p-3 sm:p-6 shadow-sm">
+          <div className="mb-6 sm:mb-10 rounded-2xl border border-rule/50 glass-sm p-3 sm:p-6">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-3 sm:mt-5 flex flex-col gap-2 sm:gap-4 border-t border-rule pt-3 sm:pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
@@ -183,7 +183,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </article>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 mb-10 sm:mb-16">
-          <aside className="md:col-span-2 np-card p-3 sm:p-5 md:p-8">
+          <aside className="md:col-span-2 np-card glass-card p-3 sm:p-5 md:p-8">
             <span aria-hidden="true" className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full" />
             <h2 className="font-display flex items-center gap-2 text-base sm:text-xl font-bold text-ink mb-2 sm:mb-4">
               <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-accent" strokeWidth={2.2} />
@@ -194,7 +194,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </p>
           </aside>
 
-          <aside className="np-card p-3 sm:p-5 md:p-8">
+          <aside className="np-card glass-card p-3 sm:p-5 md:p-8">
             <h2 className="font-display text-sm sm:text-base font-bold text-ink mb-3 sm:mb-5 flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources
@@ -203,7 +203,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
         </div>
 
-        <div className="np-card p-4 sm:p-7 mb-8 sm:mb-12">
+        <div className="np-card glass-card p-4 sm:p-7 mb-8 sm:mb-12">
           <h3 className="text-[10px] sm:text-[11px] font-bold text-accent mb-3 sm:mb-5 uppercase tracking-[0.18em] text-center">
             How this story was built
           </h3>
@@ -215,7 +215,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               { label: 'Auto-Published', icon: <span className="text-base">&#9889;</span> },
             ].map((item) => (
               <div key={item.label} className="flex flex-col items-center text-center p-2 sm:p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 border border-rule bg-paper text-accent flex items-center justify-center mb-2 sm:mb-3 group-hover/step:border-accent/30 transition-all duration-300">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 border border-rule/50 bg-paper/70 backdrop-blur-sm text-accent flex items-center justify-center mb-2 sm:mb-3 group-hover/step:border-accent/30 transition-all duration-300">
                   {item.icon}
                 </div>
                 <span className="text-[10px] sm:text-[11px] font-semibold text-ink">{item.label}</span>

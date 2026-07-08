@@ -17,7 +17,7 @@ export function PageShell({ children, className = '', narrow = false, pageNumber
       )}
       {narrow ? (
         <div className="max-w-3xl mx-auto">
-          <div className="ink-card p-6 md:p-8 lg:p-10">
+          <div className="glass-card p-6 md:p-8 lg:p-10 border border-rule/50 rounded-[6px]">
             {children}
           </div>
         </div>

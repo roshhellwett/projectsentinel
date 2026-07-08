@@ -54,7 +54,7 @@ export function ConnectionStatus() {
         <div
           role="status"
           aria-live="polite"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule/50 bg-paper/70 backdrop-blur-sm"
           title="You are currently offline. Showing cached content."
         >
           <WifiOffIcon />
@@ -68,7 +68,7 @@ export function ConnectionStatus() {
         <div
           role="status"
           aria-live="polite"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule/50 bg-paper/70 backdrop-blur-sm"
         >
           <WifiIcon />
           <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">

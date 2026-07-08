@@ -120,7 +120,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper border-b border-rule transform-gpu select-none`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/70 backdrop-blur-md border-b border-rule/50 transform-gpu select-none`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 lg:px-10">
@@ -226,7 +226,7 @@ export function Navbar() {
 
       <aside
         id="mobile-nav-drawer"
-        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper border-l border-rule flex flex-col overflow-x-hidden transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/80 backdrop-blur-xl border-l border-rule/50 flex flex-col overflow-x-hidden transition-transform duration-300 ${
           isMobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{

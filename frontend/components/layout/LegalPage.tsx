@@ -19,7 +19,7 @@ export function LegalPage({ kicker, title, lastUpdated, intro, children }: Legal
           href="/"
           className="tap-target min-h-[44px] inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group mb-6 sm:mb-8"
         >
-          <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-rule bg-paper group-hover:border-ink transition-colors">
+            <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-rule/50 bg-paper/70 backdrop-blur-sm group-hover:border-ink transition-colors">
             <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </span>
           Back to all news

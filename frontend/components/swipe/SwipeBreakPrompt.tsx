@@ -58,7 +58,7 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
         className="absolute inset-0 bg-ink/75 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-label="Dismiss break prompt"
       />
-      <div className="relative w-full max-w-sm np-card overflow-hidden">
+      <div className="relative w-full max-w-sm np-card glass-card overflow-hidden">
         <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
         <div className="p-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-2">

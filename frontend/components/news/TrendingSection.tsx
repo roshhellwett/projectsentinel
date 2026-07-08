@@ -160,7 +160,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                 >
                   <div
                     data-read={read ? 'true' : 'false'}
-                    className={`ink-card flex flex-col justify-between h-full p-4 sm:p-5 overflow-hidden w-full max-w-full ${read ? 'opacity-60' : ''}`}
+                    className={`ink-card glass-card flex flex-col justify-between h-full p-4 sm:p-5 overflow-hidden w-full max-w-full ${read ? 'opacity-60' : ''}`}
                   >
                     <div className="relative z-10">
                       <div className="flex items-center justify-between gap-2 mb-3">

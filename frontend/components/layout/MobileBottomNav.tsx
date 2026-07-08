@@ -112,7 +112,7 @@ export function MobileBottomNav() {
         >
           <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
           <div
-            className={`absolute left-3 right-3 bg-paper border border-rule transition-transform duration-300 ${
+            className={`absolute left-3 right-3 bg-paper/80 backdrop-blur-xl border border-rule/50 transition-transform duration-300 ${
               topicsOpen ? 'translate-y-0' : 'translate-y-full'
             }`}
             style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
@@ -153,7 +153,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? 'none' : 'auto' }}
       >
         <div
-          className="relative border-t border-rule bg-paper select-none touch-manipulation"
+          className="relative border-t border-rule/50 bg-paper/70 backdrop-blur-md select-none touch-manipulation"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">

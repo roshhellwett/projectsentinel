@@ -94,7 +94,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
               <button
                 type="button"
                 onClick={() => onSelect(post)}
-                className="group flex w-full items-start gap-3 rounded border border-rule bg-paper px-3.5 py-3.5 sm:py-3 text-left transition-all hover-lift hover:border-rule-strong hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent min-h-[52px]"
+                className="group flex w-full items-start gap-3 rounded border border-rule/50 bg-paper/70 backdrop-blur-sm px-3.5 py-3.5 sm:py-3 text-left transition-all hover-lift hover:border-rule hover:bg-paper-2/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent min-h-[52px]"
               >
                 <div className="flex-1 min-w-0">
                   <div className="mb-1.5 flex flex-wrap items-center gap-2">

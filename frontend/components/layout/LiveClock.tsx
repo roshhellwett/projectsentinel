@@ -58,7 +58,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
 
   if (variant === 'menu') {
     return (
-      <div className={`flex items-center gap-2 px-4 py-3 border border-rule bg-paper ${className}`} role="status">
+      <div className={`flex items-center gap-2 px-4 py-3 border border-rule/50 bg-paper/70 backdrop-blur-sm ${className}`} role="status">
         <div className="flex flex-col leading-tight min-w-0">
           <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">{date}</span>
           <time dateTime={isoLabel} className="font-mono text-xs text-ink tabular-nums">{time} IST</time>
@@ -69,7 +69,7 @@ export function LiveClock({ variant = 'navbar', className = '' }: LiveClockProps
 
   if (variant === 'hero') {
     return (
-      <div className={cn('inline-flex items-center gap-2 px-3 py-2 border border-rule bg-paper', className)} role="status">
+      <div className={cn('inline-flex items-center gap-2 px-3 py-2 border border-rule/50 bg-paper/70 backdrop-blur-sm', className)} role="status">
         <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">{date}</span>
         <span className="w-px h-3 bg-rule" aria-hidden="true" />
         <time dateTime={isoLabel} className="font-mono text-sm text-ink tabular-nums">{time} IST</time>

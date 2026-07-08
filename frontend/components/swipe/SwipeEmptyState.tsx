@@ -35,7 +35,7 @@ export function SwipeEmptyState({
 
   return (
     <div className="w-full max-w-md mx-auto px-4 py-10 text-center">
-      <div className="w-16 h-16 rounded-full bg-paper border border-rule flex items-center justify-center mx-auto mb-5 shadow-sm">
+      <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mx-auto mb-5">
         <CheckCircle2 className="w-7 h-7 text-accent" />
       </div>
       <h2 className="font-display text-2xl font-bold text-ink tracking-[-0.015em] mb-2">You&apos;re caught up.</h2>
@@ -73,7 +73,7 @@ export function SwipeEmptyState({
 
 function Stat({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) {
   return (
-    <div className="flex flex-col items-start gap-1 px-3 py-2.5 bg-paper-2 border border-rule rounded">
+    <div className="flex flex-col items-start gap-1 px-3 py-2.5 bg-paper-2/65 backdrop-blur-sm border border-rule/50 rounded">
       <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
         {icon}
         <span>{label}</span>

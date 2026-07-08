@@ -4,6 +4,7 @@ import { dedupe } from '@/lib/utils/dedupe';
 import { subscribeToPosts } from '@/lib/supabase/client';
 import { DEFAULT_PAGE_SIZE } from '@/lib/config/constants';
 import { cachedFetch, invalidatePostsCache } from '@/lib/utils/fetchCache';
+import { markFresh } from '@/lib/utils/freshSignal';
 
 interface UseInfiniteFeedProps {
   initialPosts: Post[];
@@ -123,6 +124,7 @@ export function useInfiniteFeed({
         if (!payload.hasMore) {
           setExhausted(true);
         }
+        markFresh();
       }
     } catch (err) {
       if ((err as { name?: string })?.name !== 'AbortError') {
@@ -250,6 +252,7 @@ export function useInfiniteFeed({
         if (incoming.length > 0) {
           processIncomingPosts(incoming);
         }
+        markFresh();
       } catch {
         // Silently retry on next interval
       }

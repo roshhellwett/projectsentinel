@@ -49,7 +49,7 @@ export function LastRefreshed() {
       <div
         role="status"
         aria-live="polite"
-        className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper text-xs text-ink-soft"
+        className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule/50 bg-paper/70 backdrop-blur-sm text-xs text-ink-soft"
       >
         <span className="font-body text-[10px] font-bold tracking-wider uppercase">Stale — {label}</span>
       </div>
@@ -60,7 +60,7 @@ export function LastRefreshed() {
     <div
       role="status"
       aria-live="off"
-      className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule bg-paper text-xs text-ink-soft"
+      className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule/50 bg-paper/70 backdrop-blur-sm text-xs text-ink-soft"
     >
       <span className="font-body text-[10px] font-bold tracking-wider uppercase">Live · {label}</span>
     </div>

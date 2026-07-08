@@ -80,7 +80,7 @@ export default function SavedPage() {
           href="/"
           className="tap-target min-h-[44px] inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink mb-6 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent group"
         >
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded border border-rule bg-paper group-hover:border-ink transition-all hover-lift">
+          <span className="inline-flex items-center justify-center w-8 h-8 rounded border border-rule/50 bg-paper/70 backdrop-blur-sm group-hover:border-ink transition-all hover-lift">
             <ArrowLeft className="w-4 h-4" />
           </span>
           {t('saved.back')}

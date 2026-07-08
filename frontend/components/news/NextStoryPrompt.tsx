@@ -88,7 +88,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
           <div className="relative">
             <Link
               href={`/news/${next.id}/`}
-              className="group relative flex items-center gap-3 rounded border border-rule-strong bg-paper pl-4 pr-12 py-3 shadow-paper-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="group relative flex items-center gap-3 rounded border border-rule/50 bg-paper/70 backdrop-blur-md pl-4 pr-12 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span aria-hidden="true" className="absolute inset-x-3 top-[1px] h-px rounded-full bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
               <div className="flex-1 min-w-0">
@@ -108,7 +108,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
               type="button"
               onClick={onDismiss}
               aria-label="Dismiss up next"
-              className="absolute -top-2.5 -right-2.5 inline-flex items-center justify-center w-8 h-8 rounded-full bg-paper border border-rule-strong text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="absolute -top-2.5 -right-2.5 inline-flex items-center justify-center w-8 h-8 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>
             </button>
