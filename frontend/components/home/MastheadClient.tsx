@@ -13,30 +13,32 @@ export function MastheadClient({ avgScore, verifiedToday }: MastheadClientProps)
   const { t } = useI18n();
 
   return (
-    <section aria-label="Today's edition" className="my-6 w-full max-w-full">
-      <div className="flex items-start justify-between gap-6 pb-6 border-b border-rule">
-        <div className="min-w-0">
-          <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-ink-soft mb-2">
-            AI-Cross-Referenced · Open Source
-          </p>
+    <section aria-label="Today's edition" className="my-5 sm:my-6 w-full max-w-full">
+      <div className="pb-5 sm:pb-6 border-b border-rule">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-6">
+          <div className="min-w-0">
+            <h1 className="font-display font-[900] text-ink text-[clamp(1.5rem,5vw,2.6rem)] leading-[1.05] tracking-[-0.02em] mb-1.5 sm:mb-2">
+              Satyamev Jayate
+            </h1>
 
-          <h1 className="font-body font-[900] text-ink text-[clamp(1.6rem,3.5vw,2.8rem)] leading-[1.05] tracking-[-0.03em] mb-3">
-            India Verified
-          </h1>
+            <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-ink-soft mb-3 sm:mb-4">
+              AI-Cross-Referenced · Open Source
+            </p>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="font-body text-[11px] tracking-wider text-ink-soft uppercase">
-              {t('feed.avg_credibility')}: <span className="text-ink font-bold">{avgScore}%</span>
-            </span>
-            <span className="w-px h-3 bg-rule" aria-hidden="true" />
-            <span className="font-body text-[11px] tracking-wider text-ink-soft uppercase">
-              <AnimatedCounter value={verifiedToday} /> {t('feed.stories')}
-            </span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="font-body text-[11px] tracking-wider text-ink-soft uppercase">
+                {t('feed.avg_credibility')}: <span className="text-ink font-bold">{avgScore}%</span>
+              </span>
+              <span className="w-px h-3 bg-rule" aria-hidden="true" />
+              <span className="font-body text-[11px] tracking-wider text-ink-soft uppercase">
+                <AnimatedCounter value={verifiedToday} /> {t('feed.stories')}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div className="flex-shrink-0">
-          <LiveClock variant="hero" />
+          <div className="flex-shrink-0">
+            <LiveClock variant="hero" className="rounded-lg" />
+          </div>
         </div>
       </div>
     </section>

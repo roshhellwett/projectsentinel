@@ -1,16 +1,14 @@
 'use client';
 
+import { X } from 'lucide-react';
 import { CategoryTag } from './CategoryTag';
 import { formatDate } from '@/lib/utils/formatDate';
-import { getCategoryTheme } from '@/lib/theme/categoryTheme';
-import { ScoreRing } from './ScoreRing';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 interface DrawerHeaderProps {
   category: string;
   publishedAt: string;
   onClose: () => void;
-  score?: number;
   onNext?: () => void;
   onPrev?: () => void;
 }
@@ -18,28 +16,23 @@ interface DrawerHeaderProps {
 export function DrawerHeader({
   category,
   publishedAt,
-  score = 92,
+  onClose,
   onNext,
   onPrev,
 }: DrawerHeaderProps) {
-  const theme = getCategoryTheme(category);
   const haptic = useHapticFeedback();
 
   return (
     <header className="pointer-events-none relative flex flex-col flex-shrink-0 border-b border-rule">
-      <div className="pointer-events-none flex items-center justify-between gap-2 px-5 py-3 pr-20 sm:px-6 sm:pr-20">
+      <div className="pointer-events-none flex items-center justify-between gap-2 px-5 py-3 sm:px-6">
         <div className="pointer-events-auto flex flex-1 items-center gap-2.5 min-w-0">
           <CategoryTag category={category} />
           <span className="np-dateline hidden sm:inline">{formatDate(publishedAt)}</span>
-          <div className="hidden min-[380px]:flex items-center gap-1.5 pl-2.5 border-l border-rule">
-            <ScoreRing score={score} size={26} strokeWidth={2.5} compact />
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted">{score}%</span>
-          </div>
         </div>
 
         <div className="pointer-events-auto relative z-20 flex flex-shrink-0 items-center gap-1.5">
           {(onPrev || onNext) && (
-            <div className="flex items-center gap-1 border border-rule">
+            <div className="hidden sm:flex items-center gap-1 border border-rule">
               <button
                 type="button"
                 onClick={() => { haptic.light(); onPrev?.(); }}
@@ -60,6 +53,14 @@ export function DrawerHeader({
               </button>
             </div>
           )}
+          <button
+            type="button"
+            onClick={() => { haptic.light(); onClose(); }}
+            className="tap-target min-w-[44px] min-h-[44px] flex items-center justify-center p-1.5 text-muted hover:text-ink hover:bg-paper-2 active:scale-90 transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label="Close article"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </header>

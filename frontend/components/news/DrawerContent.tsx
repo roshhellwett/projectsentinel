@@ -1,8 +1,7 @@
 'use client';
 
-import { Post, Source } from '@/types';
-import { memo, useState } from 'react';
-import { ExternalLink, Globe, ShieldCheck, Info } from 'lucide-react';
+import { Post } from '@/types';
+import { ExternalLink, ShieldCheck, Info } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 import { CorrectionsNotice } from './CorrectionsNotice';
 import { CredibilityBar } from './CredibilityBar';
@@ -11,28 +10,6 @@ import { DrawerRelated } from './DrawerRelated';
 import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { typographyStyles } from '@/lib/theme/typography';
 import { cn } from '@/lib/utils/cn';
-import { getHostname } from '@/lib/utils/getHostname';
-
-const SourceFaviconChip = memo(function SourceFaviconChip({ source }: { source: Source }) {
-  const [errored, setErrored] = useState(false);
-  const host = getHostname(source.url);
-  if (!host || errored) {
-    return (
-      <span className="inline-flex items-center justify-center w-4 h-4 border border-rule text-subtle flex-shrink-0">
-        <Globe className="w-2.5 h-2.5" />
-      </span>
-    );
-  }
-  return (
-    <img
-      src={`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`}
-      alt="" width={16} height={16}
-      loading="lazy" decoding="async"
-      onError={() => setErrored(true)}
-      className="w-4 h-4 flex-shrink-0 bg-paper-2 border border-rule"
-    />
-  );
-});
 
 interface DrawerContentProps {
   post: Post;
@@ -68,24 +45,6 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
             </span>
           </div>
           <CredibilityBar score={post.credibility_score} />
-          {post.sources && post.sources.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-rule">
-              {post.sources.slice(0, 5).map((src, i) => (
-                <a
-                  key={src.url || i}
-                  href={src.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 hover:bg-paper-tint border border-rule text-[11px] text-ink-soft hover:text-ink transition-colors"
-                  aria-label={`Open source: ${src.title || src.name || getHostname(src.url)} (opens in new tab)`}
-                >
-                  <SourceFaviconChip source={src} />
-                  <span className="truncate max-w-[100px]">{src.title || src.name || getHostname(src.url) || 'Source'}</span>
-                </a>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="mb-6">
