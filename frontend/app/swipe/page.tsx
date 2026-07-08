@@ -22,13 +22,13 @@ export default async function SwipePage() {
   return (
     <>
       <DesktopRedirect />
-      <main className="md:hidden flex flex-col items-center pt-4 pb-24 min-h-[calc(100dvh-3.5rem)]">
-        <header className="w-full max-w-md px-4 mb-3">
+      <main className="md:hidden flex flex-col items-center pt-3 pb-28 min-h-[calc(100dvh-3.5rem)]">
+        <header className="w-full max-w-md px-4 mb-2 sm:mb-3">
           <span className="block w-8 h-[2px] bg-accent rounded-full mb-2" aria-hidden="true" />
-          <h1 className="font-display text-lg font-bold text-ink leading-tight">
+          <h1 className="font-display text-base sm:text-lg font-bold text-ink leading-tight">
             Swipe
           </h1>
-          <p className="text-[11px] text-muted mt-0.5">One story at a time. Tap to read full.</p>
+          <p className="text-[10px] sm:text-[11px] text-muted mt-0.5">One story at a time. Tap to read full.</p>
         </header>
         <ErrorBoundary>
           <SwipeStack initialPosts={deduped} />

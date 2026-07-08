@@ -95,10 +95,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-          <header className="mb-10 pb-8 border-b border-rule">
-            <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
-            <p className="editorial-kicker mb-3">Category</p>
-            <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4">
+          <header className="mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-rule">
+            <span aria-hidden="true" className="block w-10 h-[2px] bg-accent rounded-full mb-4 sm:mb-5" />
+            <p className="editorial-kicker mb-2 sm:mb-3">Category</p>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-ink mb-3 sm:mb-4">
               {categoryName}
             </h1>
             <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
@@ -107,7 +107,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </header>
 
         <Suspense fallback={
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i}>
                 <FeedSkeleton />

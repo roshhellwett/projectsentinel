@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <p className="editorial-kicker mb-3">
             {query ? 'Search Results' : 'Search'}
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-3 leading-[1.05]">
+          <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-3 leading-[1.05]">
             {query ? query : 'Find verified news'}
           </h1>
           <p className="text-sm text-muted">
@@ -74,7 +74,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {query ? (
           <Suspense
             fallback={
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <Skeleton key={i} className="h-[218px] rounded-md" />
                 ))}

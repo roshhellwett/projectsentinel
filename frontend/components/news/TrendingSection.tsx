@@ -112,35 +112,35 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   if (trending.length === 0) return null;
 
   return (
-    <section aria-label="Trending stories" className="mb-10">
-      <div className="flex items-center justify-between gap-3 mb-5">
-        <h2 className="font-body font-bold text-xl text-ink">
-          Trending stories
-        </h2>
-        <div className="flex items-center gap-3">
-          <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
-            Top {trending.length} verified
-          </span>
-          <div className="hidden sm:flex items-center gap-1">
-            <button
-              onClick={() => scrollBy('left')}
-              disabled={!canScrollLeft}
-              className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px]"
-              aria-label="Scroll left"
-            >
-              <ArrowLeft />
-            </button>
-            <button
-              onClick={() => scrollBy('right')}
-              disabled={!canScrollRight}
-              className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px]"
-              aria-label="Scroll right"
-            >
-              <ArrowRight />
-            </button>
+      <section aria-label="Trending stories" className="mb-8 sm:mb-10">
+        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
+          <h2 className="font-body font-bold text-lg sm:text-xl text-ink">
+            Trending stories
+          </h2>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+              Top {trending.length} verified
+            </span>
+            <div className="hidden sm:flex items-center gap-1">
+              <button
+                onClick={() => scrollBy('left')}
+                disabled={!canScrollLeft}
+                className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px] min-touch"
+                aria-label="Scroll left"
+              >
+                <ArrowLeft />
+              </button>
+              <button
+                onClick={() => scrollBy('right')}
+                disabled={!canScrollRight}
+                className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px] min-touch"
+                aria-label="Scroll right"
+              >
+                <ArrowRight />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
       <ErrorBoundary>
         <div
@@ -153,14 +153,14 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             const rank = index + 1;
 
             return (
-              <div
-                key={post.id}
-                className="flex-shrink-0 w-[275px] sm:w-[315px] snap-start animate-slide-up"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
+                <div
+                  key={post.id}
+                  className="flex-shrink-0 w-[260px] sm:w-[300px] md:w-[315px] snap-start animate-slide-up"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
                   <div
                     data-read={read ? 'true' : 'false'}
-                    className={`ink-card flex flex-col justify-between h-full p-5 overflow-hidden w-full max-w-full ${read ? 'opacity-60' : ''}`}
+                    className={`ink-card flex flex-col justify-between h-full p-4 sm:p-5 overflow-hidden w-full max-w-full ${read ? 'opacity-60' : ''}`}
                   >
                     <div className="relative z-10">
                       <div className="flex items-center justify-between gap-2 mb-3">
@@ -193,7 +193,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                         onClick={() => haptic.light()}
                         aria-label={`${post.headline} (Rank ${rank})`}
                       >
-                        <p className="font-body font-bold text-[15px] leading-[1.25] text-ink line-clamp-3 mb-4">
+                        <p className="font-body font-bold text-[13px] sm:text-[15px] leading-[1.25] text-ink line-clamp-3 mb-3 sm:mb-4">
                           {post.headline}
                         </p>
                       </Link>

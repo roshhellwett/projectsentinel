@@ -83,7 +83,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
       {visible && (
         <div
           className={`animate-slide-up-fade fixed left-1/2 -translate-x-1/2 will-change-transform transform-gpu ${Z_INDEX.cookieConsent}`}
-          style={{ width: 'min(94vw,32rem)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}
+          style={{ width: 'min(94vw,32rem)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 6rem)' }}
         >
           <div className="relative">
             <Link
@@ -108,9 +108,9 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
               type="button"
               onClick={onDismiss}
               aria-label="Dismiss up next"
-              className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-paper border border-rule-strong text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="absolute -top-2.5 -right-2.5 inline-flex items-center justify-center w-8 h-8 rounded-full bg-paper border border-rule-strong text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>
             </button>
           </div>
         </div>

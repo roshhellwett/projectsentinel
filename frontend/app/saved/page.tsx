@@ -86,11 +86,11 @@ export default function SavedPage() {
           {t('saved.back')}
         </Link>
 
-        <div className="animate-slide-up mb-10 pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
+        <div className="animate-slide-up mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span aria-hidden="true" className="block w-12 h-[2px] bg-accent rounded-full mb-5" />
-            <p className="editorial-kicker mb-3">{t('saved.your_list')}</p>
-            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink mb-3 leading-[1.05]">
+            <span aria-hidden="true" className="block w-10 h-[2px] bg-accent rounded-full mb-4 sm:mb-5" />
+            <p className="editorial-kicker mb-2 sm:mb-3">{t('saved.your_list')}</p>
+            <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink mb-2 sm:mb-3 leading-[1.05]">
               {t('saved.page_title')}
             </h1>
             <p className="text-sm md:text-base text-muted max-w-xl leading-relaxed">
@@ -110,7 +110,7 @@ export default function SavedPage() {
         </div>
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i}>
                 <FeedSkeleton />
@@ -145,7 +145,7 @@ export default function SavedPage() {
 
         {!loading && !error && posts.length > 0 && (
           <ErrorBoundary>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
               {posts.map((post) => (
                 <NewsCard
                   key={post.id}

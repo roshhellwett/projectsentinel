@@ -167,7 +167,7 @@ export function ShareButtons({
             'animate-scale-in will-change-transform transform-gpu',
             placement === 'popover' && 'absolute right-0 top-full mt-2',
             placement === 'inline' && 'relative mt-3 w-full max-w-none shadow-paper-lift',
-            placement === 'sheet' && 'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_16px_40px_-12px_rgba(0,0,0,0.24)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
+            placement === 'sheet' && 'fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px))] left-3 right-3 w-auto max-w-none shadow-[0_16px_40px_-12px_rgba(0,0,0,0.24)] sm:absolute sm:bottom-full sm:left-auto sm:right-0 sm:mb-3 sm:w-[min(21rem,calc(100vw-2rem))]',
           )}
           style={{ width: placement === 'popover' ? 'min(21rem,calc(100vw-2rem))' : undefined }}
           onClick={(event) => event.stopPropagation()}

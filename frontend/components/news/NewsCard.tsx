@@ -74,18 +74,18 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       aria-label={`Read article: ${post.headline}`}
       data-read={isRead ? 'true' : 'false'}
       className={cn(
-        'cursor-pointer select-none touch-manipulation border border-rule bg-paper-2 rounded-[6px] p-4 flex flex-col h-full transition-shadow hover:shadow-[0_2px_6px_rgb(var(--c-ink)/0.1)]',
+        'cursor-pointer select-none touch-manipulation border border-rule bg-paper-2 rounded-[6px] p-3 sm:p-4 flex flex-col h-full transition-shadow hover:shadow-[0_2px_6px_rgb(var(--c-ink)/0.1)]',
         isNew && 'border-l-2 border-ink'
       )}
     >
-      <div className="flex items-start justify-between gap-3 mb-2 min-h-[20px]">
-        <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+      <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 min-h-[20px]">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+          <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
             {post.category}
           </span>
-          <span className="font-mono text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+          <span className="font-mono text-[9px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
           {smartLabel && (
-            <span className="font-body text-[11px] font-bold tracking-wider uppercase text-ink">{smartLabel}</span>
+            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink">{smartLabel}</span>
           )}
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -93,22 +93,22 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         </div>
       </div>
 
-      <h3 className="font-body font-bold text-[17px] leading-[1.25] tracking-[-0.01em] text-ink line-clamp-3 mb-1.5 flex-shrink-0">
+      <h3 className="font-body font-bold text-[15px] sm:text-[17px] leading-[1.25] tracking-[-0.01em] text-ink line-clamp-3 mb-1.5 flex-shrink-0">
         {post.headline}
       </h3>
 
-      <p className="font-body text-[13px] leading-[1.55] text-ink-soft line-clamp-2 mb-[14px] flex-shrink-0">
+      <p className="font-body text-[12px] sm:text-[13px] leading-[1.5] sm:leading-[1.55] text-ink-soft line-clamp-2 mb-3 sm:mb-[14px] flex-shrink-0">
         {truncateWords(post.summary, 22)}
       </p>
 
-      <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-rule/60">
-        <div className="flex items-center gap-2.5">
-          <span className="inline-flex items-center gap-1 font-body text-[11px] text-ink-soft">
+      <div className="flex items-center justify-between gap-2 mt-auto pt-2.5 sm:pt-3 border-t border-rule/60">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <span className="inline-flex items-center gap-1 font-body text-[10px] sm:text-[11px] text-ink-soft">
             <ShieldIcon />
             {sourcesCount} {sourcesCount === 1 ? 'source' : 'sources'}
           </span>
           {isVideo && (
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/15 text-ink-soft font-body text-[10px] font-bold tracking-wider uppercase">
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/15 text-ink-soft font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase">
               <YoutubeIcon />
               Video
             </span>
@@ -118,7 +118,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       </div>
 
       {isRead && (
-        <div className="font-body text-[11px] text-ink-soft mt-1">Read</div>
+        <div className="font-body text-[10px] sm:text-[11px] text-ink-soft mt-1">Read</div>
       )}
     </div>
   );

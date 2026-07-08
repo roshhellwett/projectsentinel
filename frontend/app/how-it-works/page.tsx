@@ -93,7 +93,7 @@ const PIPELINE_STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl">
+    <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -136,7 +136,7 @@ export default function HowItWorksPage() {
           <Zap className="w-4 h-4" />
           Fully Automated
         </div>
-        <h1 className="font-display text-4xl md:text-6xl font-bold mb-5 text-ink leading-[1.05] tracking-tight">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-5 text-ink leading-[1.05] tracking-tight">
           How India <span className="text-accent">Verified</span> works
         </h1>
         <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
@@ -147,18 +147,18 @@ export default function HowItWorksPage() {
       <div className="space-y-3 mb-20">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="np-card group flex gap-5 p-6 transition-all duration-300">
-              <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
-                <step.icon className="w-6 h-6 text-accent" />
+            <div className="np-card group flex gap-4 sm:gap-5 p-4 sm:p-6 transition-all duration-300">
+              <div className="relative z-10 flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
+                <step.icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
               </div>
               <div className="relative z-10 flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1.5">
                   <span className="text-[10px] font-bold text-accent uppercase tracking-[0.18em]">
                     Step {step.number}
                   </span>
                   <span className="text-[11px] text-muted font-medium">{step.subtitle}</span>
                 </div>
-                <h2 className="font-display text-lg font-bold text-ink mb-1">{step.title}</h2>
+                <h2 className="font-display text-base sm:text-lg font-bold text-ink mb-1">{step.title}</h2>
                 <p className="text-sm text-ink-soft leading-relaxed">{step.description}</p>
               </div>
             </div>
@@ -171,16 +171,16 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="np-card p-8 md:p-10 mb-12">
-        <h2 className="font-display text-2xl font-bold mb-3 text-ink tracking-tight">Trusted sources</h2>
-        <p className="text-muted mb-6">
+      <div className="np-card p-5 sm:p-8 md:p-10 mb-10 sm:mb-12">
+        <h2 className="font-display text-xl sm:text-2xl font-bold mb-3 text-ink tracking-tight">Trusted sources</h2>
+        <p className="text-muted mb-5 sm:mb-6">
           We only pull from established Indian news organizations with editorial standards.
         </p>
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-wrap gap-2">
           {TRUSTED_SOURCES.map(source => (
             <span
               key={source}
-              className="px-3.5 py-1.5 bg-paper border border-rule rounded text-sm font-medium text-ink hover:border-ink transition-colors"
+              className="px-3 py-1.5 bg-paper border border-rule rounded text-xs sm:text-sm font-medium text-ink hover:border-ink transition-colors"
             >
               {source}
             </span>
@@ -188,9 +188,9 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="mb-12">
-        <h2 className="font-display text-2xl font-bold mb-6 text-ink tracking-tight">Credibility scoring</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="mb-10 sm:mb-12">
+        <h2 className="font-display text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-ink tracking-tight">Credibility scoring</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
           <ScoreCard
             range="90-100"
             label="High Credibility"
@@ -215,19 +215,19 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="np-card text-center p-10">
-        <div className="w-16 h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-5">
-          <Github className="w-8 h-8 text-ink" />
+      <div className="np-card text-center p-6 sm:p-10">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-4 sm:mb-5">
+          <Github className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
         </div>
-        <h2 className="font-display text-2xl font-bold mb-3 text-ink tracking-tight">Open source</h2>
-        <p className="text-muted mb-6 max-w-md mx-auto leading-relaxed">
+        <h2 className="font-display text-xl sm:text-2xl font-bold mb-3 text-ink tracking-tight">Open source</h2>
+        <p className="text-muted mb-5 sm:mb-6 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
           The entire codebase is public. Anyone can audit how we work, suggest improvements, or run their own instance.
         </p>
         <a
           href="https://github.com/roshhellwett/projectsentinel"
           target="_blank"
           rel="noopener noreferrer"
-          className="tap-target min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 bg-ink hover:bg-ink/90 text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
+          className="tap-target min-h-[44px] inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-ink hover:bg-ink/90 text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
         >
           <Github className="w-5 h-5" />
           View on GitHub
@@ -251,11 +251,11 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`np-card p-6 ${borderColor}`}>
-      <div className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}>
+    <div className={`np-card p-5 sm:p-6 ${borderColor}`}>
+      <div className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-[11px] sm:text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}>
         {range}
       </div>
-      <h3 className="font-display relative z-10 font-bold text-ink mb-2">{label}</h3>
+      <h3 className="font-display relative z-10 font-bold text-ink mb-2 text-base sm:text-lg">{label}</h3>
       <p className="relative z-10 text-sm text-muted leading-relaxed">{description}</p>
     </div>
   );

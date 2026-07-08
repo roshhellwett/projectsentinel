@@ -52,65 +52,65 @@ export function Footer() {
 
   return (
     <footer className="relative mt-auto border-t border-rule overflow-x-hidden w-full max-w-full">
-      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-10 pb-8">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-8 mb-8 border-b border-rule">
-          <div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2.5 group rounded"
-            >
-              <span
-                aria-hidden="true"
-                className="flex items-center justify-center w-10 h-10 border border-ink text-ink font-display font-bold text-base"
+        <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-8 sm:pt-10 pb-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 sm:gap-6 pb-6 sm:pb-8 mb-6 sm:mb-8 border-b border-rule">
+            <div>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2.5 group rounded"
               >
-                IV
-              </span>
-              <span className="flex flex-col leading-tight">
-                <span className="font-display text-xl text-ink">
-                  India Verified
+                <span
+                  aria-hidden="true"
+                  className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 border border-ink text-ink font-display font-bold text-sm sm:text-base"
+                >
+                  IV
                 </span>
-                <span className="text-xs text-ink-soft font-body">
-                  AI-cross-referenced Indian news
+                <span className="flex flex-col leading-tight">
+                  <span className="font-display text-lg sm:text-xl text-ink">
+                    India Verified
+                  </span>
+                  <span className="text-[11px] sm:text-xs text-ink-soft font-body">
+                    AI-cross-referenced Indian news
+                  </span>
                 </span>
-              </span>
-            </Link>
-            <p className="mt-3 text-sm text-ink-soft leading-relaxed max-w-md">
-              {t('footer.description')}
-            </p>
+              </Link>
+              <p className="mt-2 sm:mt-3 text-sm text-ink-soft leading-relaxed max-w-md">
+                {t('footer.description')}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href={RSS_URL}
+                className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm min-h-[44px]"
+              >
+                <RssIcon />
+                {t('footer.rss_feed')}
+              </a>
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm min-h-[44px]"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
+                </svg>
+                {t('footer.github')}
+                <ExternalLinkIcon />
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              href={RSS_URL}
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm"
-            >
-              <RssIcon />
-              {t('footer.rss_feed')}
-            </a>
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
-              </svg>
-              {t('footer.github')}
-              <ExternalLinkIcon />
-            </a>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-10 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-y-6 sm:gap-y-8 gap-x-6 sm:gap-x-10 mb-6 sm:mb-8">
           <div>
-            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.news')}</h3>
-            <ul className="space-y-2.5 text-sm">
+            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.news')}</h3>
+            <ul className="space-y-3 sm:space-y-2.5">
               {NEWS_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-1 inline-block min-h-[36px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -120,13 +120,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.about')}</h3>
-            <ul className="space-y-2.5 text-sm">
+            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.about')}</h3>
+            <ul className="space-y-3 sm:space-y-2.5">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-1 inline-block min-h-[36px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -136,13 +136,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.legal')}</h3>
-            <ul className="space-y-2.5 text-sm">
+            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.legal')}</h3>
+            <ul className="space-y-3 sm:space-y-2.5">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-1 inline-block min-h-[36px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -152,34 +152,34 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-xs font-bold tracking-wider uppercase text-ink-soft mb-4">{t('footer.transparency')}</h3>
-            <ul className="space-y-2.5 text-sm">
-              <li className="flex items-start gap-2 text-ink-soft">
-                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+            <h3 className="font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-3 sm:mb-4">{t('footer.transparency')}</h3>
+            <ul className="space-y-3 sm:space-y-2.5">
+              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+                <span className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
                 <span>No advertising or sponsored content</span>
               </li>
-              <li className="flex items-start gap-2 text-ink-soft">
-                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+                <span className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
                 <span>Every claim links back to its sources</span>
               </li>
-              <li className="flex items-start gap-2 text-ink-soft">
-                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+                <span className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
                 <span>Open-source under the MIT licence</span>
               </li>
-              <li className="flex items-start gap-2 text-ink-soft">
-                <span className="mt-1.5 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
+              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+                <span className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0" aria-hidden="true" />
                 <span>AI cross-verifies before publishing</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-4 pt-6 border-t border-rule">
-          <p className="text-xs text-muted leading-relaxed">
-            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-xs">
+        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-rule">
+          <p className="text-[11px] sm:text-xs text-muted leading-relaxed">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-[11px] sm:text-xs">
               <span className="font-semibold text-ink-soft">{t('footer.built_in_india')}</span>
             </span>
-            <span aria-hidden="true" className="mx-1.5 text-rule">·</span>
+            <span aria-hidden="true" className="mx-1 text-rule">·</span>
             Designed &amp; engineered by{' '}
             <a
               href="https://github.com/roshhellwett"
@@ -190,7 +190,7 @@ export function Footer() {
               Roshhellwett
             </a>
           </p>
-          <p className="text-xs text-muted leading-relaxed" suppressHydrationWarning>
+          <p className="text-[11px] sm:text-xs text-muted leading-relaxed" suppressHydrationWarning>
             &copy; {year} India Verified. MIT licence.
           </p>
         </div>

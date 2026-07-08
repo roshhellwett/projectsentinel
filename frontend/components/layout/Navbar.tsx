@@ -123,22 +123,22 @@ export function Navbar() {
         className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper border-b border-rule transform-gpu select-none`}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
-        <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10">
-          <div className="flex items-center justify-between gap-4 h-14 lg:h-16">
+        <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 lg:px-10">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 h-12 sm:h-14 lg:h-16">
             <Link
               href="/"
               prefetch={true}
               aria-label="India Verified — home"
-              className="flex items-center gap-2.5 group rounded"
+              className="flex items-center gap-1.5 sm:gap-2.5 group rounded shrink min-w-0"
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-9 h-9 border border-ink text-ink font-display font-bold text-[15px]"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border border-ink text-ink font-display font-bold text-[13px] sm:text-[15px]"
               >
                 IV
               </span>
               <span className="flex flex-col leading-none whitespace-nowrap">
-                <span className="font-display text-xl text-ink">
+                <span className="font-display text-base sm:text-xl text-ink truncate max-w-[110px] sm:max-w-none">
                   India Verified
                 </span>
                 <span className="hidden md:inline text-[11px] text-ink-soft font-body mt-0.5">
@@ -172,8 +172,10 @@ export function Navbar() {
               })}
             </nav>
 
-            <div className="flex items-center gap-1 sm:gap-2">
-              <LastRefreshed />
+            <div className="flex items-center gap-0.5 sm:gap-1 lg:gap-2">
+              <div className="hidden xs:inline sm:inline md:inline">
+                <LastRefreshed />
+              </div>
               <ConnectionStatus />
               <LanguageFilter />
 
@@ -182,7 +184,7 @@ export function Navbar() {
                 onClick={openSearch}
                 aria-label="Search articles (press /)"
                 title="Search"
-                className="text-muted hover:text-ink transition-colors p-1.5"
+                className="text-muted hover:text-ink transition-colors p-2 sm:p-1.5 min-touch"
               >
                 <SearchIcon />
               </button>
@@ -206,7 +208,7 @@ export function Navbar() {
                 aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={isMobileOpen}
                 aria-controls="mobile-nav-drawer"
-                className="lg:hidden text-muted hover:text-ink p-1.5 rounded-sm"
+                className="lg:hidden text-muted hover:text-ink p-2 sm:p-1.5 rounded-sm min-touch"
               >
                 {isMobileOpen ? <CloseIcon /> : <MenuIcon />}
               </button>
@@ -251,7 +253,7 @@ export function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileOpen(false)}
                 aria-current={active ? 'page' : undefined}
-                className={`flex items-center justify-between px-3 py-3.5 border-b border-rule font-display text-lg transition-colors ${
+                className={`flex items-center justify-between px-3 min-h-[48px] border-b border-rule font-display text-base sm:text-lg transition-colors ${
                   active ? 'text-ink' : 'text-ink-soft hover:text-ink'
                 }`}
               >

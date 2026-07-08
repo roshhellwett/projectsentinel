@@ -55,7 +55,7 @@ export function CookieConsent() {
           role="dialog"
           aria-label="Cookie preferences"
           aria-modal="false"
-          className={`animate-slide-up-fade fixed left-3 right-3 bottom-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
+          className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="card border border-rule-strong rounded-lg shadow-paper-lift px-5 py-4 md:px-6 md:py-5">
@@ -63,7 +63,7 @@ export function CookieConsent() {
               type="button"
               onClick={reject}
               aria-label="Dismiss without accepting"
-              className="tap-target absolute top-2 right-2 text-subtle hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent p-1"
+              className="tap-target absolute top-1 right-1 text-subtle hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               <X className="w-5 h-5" />
             </button>
@@ -86,14 +86,14 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={reject}
-                className="tap-target px-4 pt-[7px] pb-[9px] text-sm font-medium text-ink border border-rule-strong rounded hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-medium text-ink border border-rule-strong rounded hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 Dismiss
               </button>
               <button
                 type="button"
                 onClick={accept}
-                className="tap-target px-4 pt-[7px] pb-[9px] text-sm font-semibold text-paper bg-ink rounded hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-semibold text-paper bg-ink rounded hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 Accept &amp; continue
               </button>

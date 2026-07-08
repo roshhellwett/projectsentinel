@@ -57,7 +57,7 @@ export function CategoryBar() {
                 ref={isActive ? activeRef : undefined}
                 role="tab"
                 aria-selected={isActive}
-                className={`relative flex items-center px-4 py-3 text-xs font-body whitespace-nowrap transition-colors snap-center ${
+                className={`relative flex items-center px-4 py-3 text-xs font-body whitespace-nowrap transition-colors snap-center min-h-[44px] ${
                   isActive ? 'text-ink border-b-2 border-ink' : 'text-muted hover:text-ink'
                 }`}
               >

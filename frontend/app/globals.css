@@ -47,6 +47,10 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
+@media (max-width: 380px) {
+  html { font-size: 15px; }
 }
 
 body::before {
@@ -79,6 +83,11 @@ body::before {
     position: relative;
     margin: 0;
     padding: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 767px) {
+    body { font-size: 15px; line-height: 1.6; }
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -322,6 +331,12 @@ body::before {
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .h-dynamic { height: 100vh; height: 100dvh; }
   .touch-manipulation { touch-action: manipulation; }
+  .min-touch { min-height: 44px; min-width: 44px; }
+  .min-touch-48 { min-height: 48px; min-width: 48px; }
+
+  .content-padding { padding-left: max(1rem, env(safe-area-inset-left, 0px)); padding-right: max(1rem, env(safe-area-inset-right, 0px)); }
+  @media (min-width: 640px) { .content-padding { padding-left: max(1.5rem, env(safe-area-inset-left, 0px)); padding-right: max(1.5rem, env(safe-area-inset-right, 0px)); } }
+  @media (min-width: 1024px) { .content-padding { padding-left: max(2.5rem, env(safe-area-inset-left, 0px)); padding-right: max(2.5rem, env(safe-area-inset-right, 0px)); } }
 }
 
 *:focus-visible {
@@ -374,6 +389,11 @@ html { scrollbar-color: rgb(var(--c-rule-strong) / 0.5) transparent; scrollbar-w
 }
 
 @media (max-width: 767px) {
+  body { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
+  html { scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
   body { padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
   html { scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
 }

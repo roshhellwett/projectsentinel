@@ -156,7 +156,7 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
           aria-label={`Article: ${displayPost.headline}`}
           tabIndex={-1}
           onKeyDown={handleTabKey}
-          className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper border-l border-rule lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(520px,40vw)] 2xl:w-[min(540px,32vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-all duration-300 ease-out ${show ? 'opacity-100 translate-y-0 lg:translate-x-0' : 'opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full'}`}
+          className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper border-l border-rule lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(500px,42vw)] 2xl:w-[min(540px,32vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-all duration-300 ease-out ${show ? 'opacity-100 translate-y-0 lg:translate-x-0' : 'opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full'}`}
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div
@@ -191,10 +191,10 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
         type="button"
         onClick={onClose}
         style={{ zIndex: 9999 }}
-        className={`fixed right-4 top-4 tap-target min-w-[44px] min-h-[44px] p-2 bg-paper/90 border border-rule hover:bg-paper-2 transition-colors duration-150 touch-manipulation select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex items-center justify-center ${show ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed right-3 sm:right-4 top-3 sm:top-4 tap-target min-w-[44px] min-h-[44px] p-2.5 sm:p-2 bg-paper/90 border border-rule hover:bg-paper-2 transition-colors duration-150 touch-manipulation select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent flex items-center justify-center ${show ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         aria-label="Close article"
       >
-        <svg className="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>
+        <svg className="w-5 h-5 sm:w-4 sm:h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>
       </button>
     </>,
     document.body

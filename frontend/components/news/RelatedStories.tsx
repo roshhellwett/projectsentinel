@@ -20,23 +20,23 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
 
   return (
     <section>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {related.map((post) => (
           <Link
             key={post.id}
             href={`/news/${post.id}/`}
-            className="np-card group flex flex-col h-full p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+            className="np-card group flex flex-col h-full p-4 sm:p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
-            <div className="relative z-10 flex items-center gap-2 mb-3">
+            <div className="relative z-10 flex items-center gap-2 mb-2 sm:mb-3">
               <CategoryTag category={post.category} />
             </div>
-            <h3 className="font-display relative z-10 text-[15px] font-bold text-ink tracking-[-0.01em] line-clamp-2 group-hover:text-accent transition-colors mb-3 leading-snug">
+            <h3 className="font-display relative z-10 text-[14px] sm:text-[15px] font-bold text-ink tracking-[-0.01em] line-clamp-2 group-hover:text-accent transition-colors mb-2 sm:mb-3 leading-snug">
               {post.headline}
             </h3>
-            <p className="relative z-10 text-xs text-muted line-clamp-2 mb-4 mt-auto leading-relaxed">
+            <p className="relative z-10 text-[12px] sm:text-xs text-muted line-clamp-2 mb-3 sm:mb-4 mt-auto leading-relaxed">
               {post.summary}
             </p>
-            <div className="relative z-10 flex items-center justify-between pt-3 border-t border-rule">
+            <div className="relative z-10 flex items-center justify-between pt-2.5 sm:pt-3 border-t border-rule">
               <CredibilityBadge score={post.credibility_score} compact />
               <span className="text-[10px] text-muted">{post.source_count} sources</span>
             </div>

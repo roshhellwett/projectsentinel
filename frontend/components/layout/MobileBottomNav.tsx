@@ -119,7 +119,7 @@ export function MobileBottomNav() {
           >
             <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
               <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-3 px-1">Browse Topics</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CATEGORIES.map((cat) => {
                   const active = pathname === `/category/${cat.slug}/`;
                   return (
@@ -128,7 +128,7 @@ export function MobileBottomNav() {
                       href={`/category/${cat.slug}/`}
                       prefetch={true}
                       onClick={closeTopics}
-                      className={`flex items-center justify-center px-3 py-3 text-center text-xs transition-colors ${
+                      className={`flex items-center justify-center px-3 py-3 sm:py-3 text-center text-xs sm:text-sm transition-colors min-h-[44px] ${
                         active
                           ? 'bg-ink text-paper border border-ink'
                           : 'text-ink border border-rule hover:bg-paper-2'
@@ -156,20 +156,20 @@ export function MobileBottomNav() {
           className="relative border-t border-rule bg-paper select-none touch-manipulation"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <div className="flex items-center justify-around px-2 pt-1.5 pb-2">
+          <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">
             {TABS.map((tab) => {
               const active = isActive(tab.id, tab.href);
               const Icon = tab.icon;
               const isTopics = tab.id === 'topics';
 
               const inner = (
-                <div className="relative flex flex-col items-center gap-1 px-3 py-2 min-w-[52px] active:scale-95 transition-transform duration-100">
+                <div className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[56px] active:scale-95 transition-transform duration-100 min-touch">
                   <Icon />
-                  <span className={`text-xs leading-none ${active ? 'text-ink font-semibold' : 'text-muted'}`}>
+                  <span className={`text-[10px] sm:text-xs leading-none ${active ? 'text-ink font-semibold' : 'text-muted'}`}>
                     {t(tab.key)}
                   </span>
                   {active && (
-                    <span className="absolute -top-1.5 inset-x-4 h-px bg-ink" />
+                    <span className="absolute -top-1 inset-x-3 sm:inset-x-4 h-px bg-ink" />
                   )}
                 </div>
               );
