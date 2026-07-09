@@ -5,12 +5,12 @@ test.describe('navigation', () => {
   test('homepage has hero section and feed', async ({ page }) => {
     await navigateTo(page, '/');
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('[aria-label="Today\'s stats masthead"]')).toBeVisible();
+    await expect(page.locator('[aria-label="Today\'s edition"]')).toBeVisible();
     await expect(page.locator('text=Your Verified Feed')).toBeVisible();
   });
 
   test('category page shows correct heading', async ({ page }) => {
-    await navigateTo(page, '/category/technology/');
+    await navigateTo(page, '/category/tech/');
     await expect(page.locator('h1')).toContainText('Tech');
   });
 

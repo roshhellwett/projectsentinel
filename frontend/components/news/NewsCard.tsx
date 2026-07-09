@@ -45,7 +45,6 @@ interface NewsCardProps {
   onClick?: () => void;
   isNew?: boolean;
   isRead?: boolean;
-  wasRecentlyOpened?: boolean;
 }
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {

@@ -56,14 +56,12 @@ const FeedItem = memo(function FeedItem({
   index,
   isNew,
   isRead,
-  wasRecentlyOpened,
   onCardClick,
 }: {
   post: Post;
   index: number;
   isNew: boolean;
   isRead: boolean;
-  wasRecentlyOpened: boolean;
   onCardClick: (post: Post) => void;
 }) {
   const handleClick = useCallback(() => {
@@ -76,7 +74,6 @@ const FeedItem = memo(function FeedItem({
       onClick={handleClick}
       isNew={isNew}
       isRead={isRead}
-      wasRecentlyOpened={wasRecentlyOpened}
     />
   );
 
@@ -111,8 +108,6 @@ export function InfiniteFeed({
 
   const { t } = useI18n();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
-  const openedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { readIds, markRead } = useReadPosts();
   const { dailyCount, streak, milestone, recordRead } = useDailyReadCount();
@@ -135,12 +130,6 @@ export function InfiniteFeed({
   }, [markRead, recordRead]);
 
   const handleCardClick = useCallback((post: Post) => {
-    setLastOpenedId(post.id);
-    if (openedTimerRef.current) clearTimeout(openedTimerRef.current);
-    openedTimerRef.current = setTimeout(() => {
-      openedTimerRef.current = null;
-      setLastOpenedId(null);
-    }, 1100);
     handleOpen(post);
   }, [handleOpen]);
 
@@ -154,12 +143,6 @@ export function InfiniteFeed({
   const handleCardKeyDown = useCallback((e: React.KeyboardEvent, post: Post) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      setLastOpenedId(post.id);
-      if (openedTimerRef.current) clearTimeout(openedTimerRef.current);
-      openedTimerRef.current = setTimeout(() => {
-        openedTimerRef.current = null;
-        setLastOpenedId(null);
-      }, 1100);
       handleOpen(post);
     }
   }, [handleOpen]);
@@ -206,7 +189,6 @@ export function InfiniteFeed({
               index={index}
               isNew={freshIds.has(post.id)}
               isRead={readMap.has(post.id)}
-              wasRecentlyOpened={lastOpenedId === post.id}
               onCardClick={stableOnCardClick}
             />
           ))}
@@ -236,7 +218,6 @@ export function InfiniteFeed({
       <NewsDrawer
         post={selectedPost}
         onClose={() => {
-          if (selectedPost) setLastOpenedId(selectedPost.id);
           setSelectedPost(null);
         }}
         onSelectRelated={(next) => {

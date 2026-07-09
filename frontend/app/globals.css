@@ -406,6 +406,7 @@ body::before {
   100% { stroke-dashoffset: 0; }
 }
 
+@keyframes particleBurst { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); } }
 @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .animate-fade-in { animation: fadeIn 0.3s ease-out both; }
 
