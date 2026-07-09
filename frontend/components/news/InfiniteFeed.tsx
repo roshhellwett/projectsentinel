@@ -140,13 +140,6 @@ export function InfiniteFeed({
     handleCardClickRef.current(post);
   }, []);
 
-  const handleCardKeyDown = useCallback((e: React.KeyboardEvent, post: Post) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleOpen(post);
-    }
-  }, [handleOpen]);
-
   const readMap = readIds;
   const readCount = useMemo(() => posts.filter((p) => readMap.has(p.id)).length, [posts, readMap]);
 
