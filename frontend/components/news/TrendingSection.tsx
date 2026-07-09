@@ -44,7 +44,7 @@ function ArrowRight() {
 
 function RankBadge({ rank }: { rank: number }) {
   return (
-    <span className="flex items-center justify-center w-7 h-7 border border-ink text-ink font-mono text-xs">
+    <span className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 border border-ink text-ink font-mono text-[10px] sm:text-xs">
       #{rank}
     </span>
   );
@@ -145,7 +145,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       <ErrorBoundary>
         <div
           ref={carouselRef}
-          className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
+          className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {trending.map((post, index) => {
@@ -155,7 +155,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
                 <div
                   key={post.id}
-                  className="flex-shrink-0 w-[75vw] sm:w-[300px] md:w-[315px] snap-start animate-slide-up"
+                  className="flex-shrink-0 w-[80vw] sm:w-[300px] md:w-[315px] snap-start animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div

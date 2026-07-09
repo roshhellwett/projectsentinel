@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/i18n-shared';
 
@@ -110,7 +111,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-1 inline-block min-h-[36px] flex items-center"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-2 inline-block min-h-[44px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -126,7 +127,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-1 inline-block min-h-[36px] flex items-center"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-2 inline-block min-h-[44px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -142,7 +143,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-1 inline-block min-h-[36px] flex items-center"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-2 inline-block min-h-[44px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>

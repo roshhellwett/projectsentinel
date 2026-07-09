@@ -27,6 +27,10 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
   const yOffsetRef = useRef(0);
   const draggingRef = useRef(false);
   const startYRef = useRef(0);
+  const startTimeRef = useRef(0);
+  const lastMoveTimeRef = useRef(0);
+  const lastMoveYRef = useRef(0);
+  const velocityRef = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const [canDrag, setCanDrag] = useState(false);
@@ -115,12 +119,22 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
     draggingRef.current = true;
     startYRef.current = e.clientY;
     yOffsetRef.current = 0;
+    startTimeRef.current = Date.now();
+    lastMoveTimeRef.current = Date.now();
+    lastMoveYRef.current = e.clientY;
+    velocityRef.current = 0;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     if (panelRef.current) panelRef.current.style.transition = 'none';
   }, [canDrag]);
 
   const handleDragMove = useCallback((e: React.PointerEvent) => {
     if (!draggingRef.current || !panelRef.current) return;
+    const now = Date.now();
+    const dt = now - lastMoveTimeRef.current;
+    const dy = e.clientY - lastMoveYRef.current;
+    if (dt > 0) velocityRef.current = dy / (dt / 1000);
+    lastMoveTimeRef.current = now;
+    lastMoveYRef.current = e.clientY;
     yOffsetRef.current = Math.max(0, e.clientY - startYRef.current);
     panelRef.current.style.transform = `translateY(${yOffsetRef.current}px)`;
   }, []);
@@ -129,13 +143,14 @@ export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: N
     if (!draggingRef.current || !panelRef.current) return;
     draggingRef.current = false;
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    if (yOffsetRef.current > 100 || (e as any).velocityY > 600) {
+    if (yOffsetRef.current > 100 || velocityRef.current > 600) {
       onCloseRef.current();
     } else {
       panelRef.current.style.transition = 'transform 0.3s var(--ease-apple)';
       panelRef.current.style.transform = 'translateY(0)';
     }
     yOffsetRef.current = 0;
+    velocityRef.current = 0;
   }, []);
 
   if (!mounted || !render) return null;

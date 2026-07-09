@@ -285,7 +285,6 @@ export function SwipeCard({
               toggleSaved(post.id);
               if (wasNotSaved) {
                 showToast('Saved to reading list', 'bookmark');
-                onSwipe?.('right', post);
               } else {
                 showToast('Removed from reading list', 'bookmark');
               }

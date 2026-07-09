@@ -8,7 +8,6 @@ import { CATEGORIES } from '@/lib/constants/categories';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { lockBodyScroll, unlockBodyScroll, subscribeBodyScrollLock, isBodyScrollLocked } from '@/lib/utils/bodyScrollLock';
 import { Z_INDEX } from '@/lib/theme/zIndex';
-import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 
 function HomeIcon() {
   return (
@@ -74,7 +73,6 @@ const TABS = [
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useI18n();
-  useDailyReadCount();
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
 
@@ -112,7 +110,7 @@ export function MobileBottomNav() {
         >
           <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
           <div
-            className={`absolute left-3 right-3 bg-paper/80 backdrop-blur-xl border border-rule/50 transition-transform duration-300 ${
+            className={`absolute left-3 right-3 max-[380px]:left-2 max-[380px]:right-2 bg-paper/80 backdrop-blur-xl border border-rule/50 transition-transform duration-300 ${
               topicsOpen ? 'translate-y-0' : 'translate-y-full'
             }`}
             style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
@@ -163,9 +161,9 @@ export function MobileBottomNav() {
               const isTopics = tab.id === 'topics';
 
               const inner = (
-                <div className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-1.5 sm:px-3 py-1.5 sm:py-2 min-w-[48px] sm:min-w-[56px] active:scale-95 transition-transform duration-100 min-touch">
+                <div className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[48px] sm:min-w-[56px] active:scale-95 transition-transform duration-100 min-touch">
                   <Icon />
-                  <span className={`text-[10px] sm:text-xs leading-none ${active ? 'text-ink font-semibold' : 'text-muted'}`}>
+                  <span className={`text-[11px] sm:text-xs leading-none ${active ? 'text-ink font-semibold' : 'text-muted'}`}>
                     {t(tab.key)}
                   </span>
                   {active && (

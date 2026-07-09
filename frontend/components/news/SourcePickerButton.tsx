@@ -165,7 +165,7 @@ export function SourcePickerButton({
   } : {
     position: 'fixed' as const,
     bottom: coords.bottom + 12,
-    right: (typeof window !== 'undefined' ? window.innerWidth : 0) - (coords.left + coords.width),
+    right: (coords.width > 0 ? document.documentElement.clientWidth - (coords.left + coords.width) : 0),
     width: 'min(22rem, calc(100vw - 2rem))',
   };
 

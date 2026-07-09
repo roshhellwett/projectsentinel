@@ -9,7 +9,7 @@ interface PageShellProps {
 
 export function PageShell({ children, className = '', narrow = false, pageNumber }: PageShellProps) {
   return (
-    <div className={`relative px-4 sm:px-6 lg:px-10 pb-24 md:pb-20 ${className}`}>
+    <div className={`relative px-4 max-[360px]:px-3 sm:px-6 lg:px-10 pb-24 md:pb-20 ${className}`}>
       {pageNumber && (
         <div className="absolute top-0 right-4 sm:right-6 lg:right-10 page-number">
           {pageNumber}

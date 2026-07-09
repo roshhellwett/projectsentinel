@@ -8,7 +8,6 @@ import dynamic from 'next/dynamic';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { OPEN_SEARCH_EVENT } from '@/components/ui/KeyboardShortcuts';
 import { useI18n } from '@/lib/i18n/i18n-shared';
-import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
 
 const SearchBar = dynamic(() => import('@/components/ui/SearchBar').then(m => m.SearchBar), { ssr: false });
 import { ConnectionStatus } from '@/components/layout/ConnectionStatus';
@@ -79,7 +78,6 @@ function ArrowRight() {
 export function Navbar() {
   const pathname = usePathname();
   const { t } = useI18n();
-  useDailyReadCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -138,7 +136,7 @@ export function Navbar() {
                 IV
               </span>
               <span className="flex flex-col leading-none whitespace-nowrap">
-                <span className="font-display text-base sm:text-xl text-ink truncate max-w-[110px] sm:max-w-none">
+                <span className="font-display text-base sm:text-xl text-ink truncate max-w-[130px] sm:max-w-none">
                   India Verified
                 </span>
                 <span className="hidden md:inline text-[11px] text-ink-soft font-body mt-0.5">
@@ -226,7 +224,7 @@ export function Navbar() {
 
       <aside
         id="mobile-nav-drawer"
-        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-[82%] max-w-sm bg-paper/80 backdrop-blur-xl border-l border-rule/50 flex flex-col overflow-x-hidden transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-full max-w-sm bg-paper/80 backdrop-blur-xl border-l border-rule/50 flex flex-col overflow-x-hidden transition-transform duration-300 ${
           isMobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{

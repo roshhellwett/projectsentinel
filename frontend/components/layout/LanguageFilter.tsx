@@ -30,7 +30,7 @@ export function LanguageFilter() {
         value={locale}
         onChange={(e) => setLocale(e.target.value as Locale)}
         aria-label={t('lang.switch_to', { language: t(`lang.${locale}`) })}
-        className="appearance-none bg-paper/70 backdrop-blur-sm border border-rule/60 rounded-sm px-2 py-1 pr-5 font-body text-xs text-muted hover:text-ink cursor-pointer transition-colors"
+        className="appearance-none bg-paper/70 backdrop-blur-sm border border-rule/60 rounded-sm px-2.5 py-1.5 sm:px-2 sm:py-1 pr-5 font-body text-xs text-muted hover:text-ink cursor-pointer transition-colors"
       >
         {LOCALES.map((l) => (
           <option key={l.code} value={l.code}>

@@ -53,7 +53,7 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
         type="button"
         onClick={() => {
           if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
-          onContinue();
+          onContinueRef.current();
         }}
         className="absolute inset-0 bg-ink/75 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-label="Dismiss break prompt"

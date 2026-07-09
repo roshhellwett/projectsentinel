@@ -38,6 +38,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const [resultCount, setResultCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -77,7 +78,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [query, isOpen]);
+  }, [query, isOpen, retryKey]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -112,6 +113,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       setResultCount(0);
       setError(null);
       setIsLoading(false);
+      setRetryKey(0);
     }
   }, [isOpen]);
 
@@ -248,7 +250,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               <p className="font-body text-sm text-ink mb-2">{error}</p>
               <button
                 type="button"
-                onClick={() => setQuery((q) => q + ' ')}
+                onClick={() => setRetryKey((k) => k + 1)}
                 className="ink-btn text-sm"
               >
                 Retry

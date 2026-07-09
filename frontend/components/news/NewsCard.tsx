@@ -107,15 +107,15 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
 
       <div className="flex items-start justify-between gap-1.5 sm:gap-3 mb-1.5 sm:mb-2 min-h-[18px] sm:min-h-[20px]">
         <div className="flex flex-wrap items-center gap-1 sm:gap-2 min-w-0">
-          <span className="font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+          <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
             {post.category}
           </span>
           <span className="text-ink-soft/40" aria-hidden="true">·</span>
-          <span className="font-mono text-[8px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+          <span className="font-mono text-[9px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
           {smartLabel && (
             <span
               className={cn(
-                'font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase',
+                'font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase',
                 smartLabel.priority >= 3 ? 'text-red-600' : 'text-ink'
               )}
             >
@@ -132,20 +132,20 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         {post.headline}
       </h3>
 
-      <p className="font-body text-[11px] sm:text-[13px] leading-[1.4] sm:leading-[1.55] text-ink-soft line-clamp-2 mb-2 sm:mb-[14px] flex-shrink-0">
+      <p className="font-body text-[12px] sm:text-[13px] leading-[1.4] sm:leading-[1.55] text-ink-soft line-clamp-2 mb-2 sm:mb-[14px] flex-shrink-0">
         {truncateWords(post.summary, 20)}
       </p>
 
       <div className="flex items-center justify-between gap-1.5 sm:gap-2 mt-auto pt-2 sm:pt-3 border-t border-rule/60">
         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
-          <span className="inline-flex items-center gap-1 font-body text-[9px] sm:text-[11px] text-ink-soft shrink-0">
+          <span className="inline-flex items-center gap-1 font-body text-[10px] sm:text-[11px] text-ink-soft shrink-0">
             <ShieldIcon />
             {sourcesCount} {sourcesCount === 1 ? 'source' : 'sources'}
           </span>
           <button
             type="button"
             onClick={handleYoutubeClick}
-            className="inline-flex items-center gap-1 px-1 sm:px-1.5 py-0.5 border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-colors"
+            className="inline-flex items-center gap-1 px-1.5 sm:px-1.5 py-1 sm:py-0.5 min-h-[28px] border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-colors"
             aria-label={`Search YouTube: ${post.headline}`}
           >
             <YoutubeIcon className="text-ink" />
@@ -156,7 +156,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       </div>
 
       {isRead && (
-        <span className="font-body text-[9px] sm:text-[11px] text-ink-soft/60 mt-1 sm:mt-1.5">Read</span>
+        <span className="font-body text-[10px] sm:text-[11px] text-ink-soft/60 mt-1 sm:mt-1.5">Read</span>
       )}
     </div>
   );

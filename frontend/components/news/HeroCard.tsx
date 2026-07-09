@@ -55,13 +55,13 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
       >
         <div className="flex items-start justify-between gap-2 sm:gap-4 mb-2 sm:mb-4">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 min-w-0">
-            <span className="font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
               {post.category}
             </span>
             <span className="w-px h-2.5 sm:h-3 bg-rule flex-shrink-0" />
-            <span className="font-mono text-[9px] sm:text-[11px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+            <span className="font-mono text-[10px] sm:text-[11px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
             {isVideo && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/15 text-ink-soft font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase">
+              <span className="inline-flex items-center gap-1 px-1.5 py-1 sm:py-0.5 border border-ink/15 text-ink-soft font-body text-[10px] sm:text-[10px] font-bold tracking-wider uppercase">
                 <YoutubeIcon />
                 Video
               </span>
@@ -71,7 +71,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
         </div>
 
         {badge && (
-          <span className="inline-block font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink mb-2 sm:mb-4">
+          <span className="inline-block font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink mb-2 sm:mb-4">
             {badge === 'breaking' ? 'Breaking Story' : 'Top Story'}
           </span>
         )}
@@ -80,23 +80,23 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
           {post.headline}
         </h2>
 
-        <p className="font-body text-[12px] sm:text-[14px] text-ink-soft leading-[1.5] sm:leading-[1.6] line-clamp-3 max-w-3xl mb-2 sm:mb-4">
+        <p className="font-body text-[13px] sm:text-[14px] text-ink-soft leading-[1.5] sm:leading-[1.6] line-clamp-3 max-w-3xl mb-2 sm:mb-4">
           {post.summary}
         </p>
 
         {firstHost && (
-          <p className="font-body text-[10px] sm:text-[12px] text-ink-soft mb-2 sm:mb-4">
+          <p className="font-body text-[11px] sm:text-[12px] text-ink-soft mb-2 sm:mb-4">
             First reported by <span className="font-semibold text-ink">{firstHost}</span>
             {otherSourceCount > 0 && <> · verified by {otherSourceCount} other sources</>}
           </p>
         )}
 
         <div className="flex items-center justify-between pt-2 sm:pt-4 border-t border-rule">
-          <span className="font-body text-[9px] sm:text-[11px] text-ink-soft flex items-center gap-1 sm:gap-1.5">
+          <span className="font-body text-[10px] sm:text-[11px] text-ink-soft flex items-center gap-1 sm:gap-1.5">
             <ShieldIcon />
             {post.source_count || 1} sources
           </span>
-          <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-ink-soft group-hover:text-ink transition-colors font-body font-semibold">
+          <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-ink-soft group-hover:text-ink transition-colors font-body font-semibold">
             Read article <ArrowRight />
           </span>
         </div>

@@ -10,8 +10,8 @@ interface DrawerFooterProps {
 
 export function DrawerFooter({ post, siteUrl }: DrawerFooterProps) {
   return (
-    <footer className="flex-shrink-0 border-t border-rule bg-paper-2 px-2 sm:px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] pt-2 sm:pt-3">
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+    <footer className="flex-shrink-0 border-t border-rule bg-paper-2 px-2 sm:px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] pt-2 sm:pt-3 overflow-hidden">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 min-w-0">
         <BookmarkButton
           postId={post.id}
           variant="pill"

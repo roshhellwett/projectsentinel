@@ -113,7 +113,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-rule/50 bg-paper-2/70 backdrop-blur-sm group-hover:border-accent/40 group-hover:bg-paper/70 transition-all">
               <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </span>
-            <span className="hidden sm:inline">Back to all news</span>
+            <span className="sm:inline">Back</span>
           </Link>
           <div className="hidden lg:block">
             <Breadcrumb
@@ -214,7 +214,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               { label: 'Unbiased AI', icon: <span className="font-bold text-[11px] leading-none">AI</span> },
               { label: 'Auto-Published', icon: <span className="text-base">&#9889;</span> },
             ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center text-center p-2 sm:p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step">
+              <div key={item.label} className="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 border border-rule/50 bg-paper/70 backdrop-blur-sm text-accent flex items-center justify-center mb-2 sm:mb-3 group-hover/step:border-accent/30 transition-all duration-300">
                   {item.icon}
                 </div>

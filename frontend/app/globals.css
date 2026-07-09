@@ -52,6 +52,9 @@ html {
 @media (max-width: 380px) {
   html { font-size: 15px; }
 }
+@media (max-width: 360px) {
+  html { font-size: 14px; }
+}
 
 body::before {
   content: '';
@@ -438,8 +441,8 @@ html { scrollbar-color: rgb(var(--c-rule-strong) / 0.5) transparent; scrollbar-w
 }
 
 @media (max-width: 767px) {
-  body { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
-  html { scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+  body { padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+  html { scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
