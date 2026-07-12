@@ -7,6 +7,10 @@ import { DesktopRedirect } from '@/components/swipe/DesktopRedirect';
 import { PageShell } from '@/components/layout/PageShell';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { getServerLocale } from '@/lib/i18n/server';
+import en from '@/messages/en.json';
+import hi from '@/messages/hi.json';
+
+const messagesMap = { en, hi } as const;
 
 export const metadata: Metadata = {
   title: 'Swipe — India Verified',
@@ -18,7 +22,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function SwipePage() {
   const locale = await getServerLocale();
-  const messages = (await import(`@/messages/${locale}.json`)).default;
+  const messages = messagesMap[locale];
 
   const { posts } = await fetchPosts(1, 20);
   const deduped = dedupe(posts ?? []);

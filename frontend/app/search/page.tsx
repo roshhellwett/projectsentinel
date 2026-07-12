@@ -7,6 +7,10 @@ import { SearchX } from 'lucide-react';
 import type { Metadata } from 'next';
 import { PageShell } from '@/components/layout/PageShell';
 import { getServerLocale } from '@/lib/i18n/server';
+import en from '@/messages/en.json';
+import hi from '@/messages/hi.json';
+
+const messagesMap = { en, hi } as const;
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
@@ -21,8 +25,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   };
 }
 
-async function SearchResults({ query, locale }: { query: string; locale: string }) {
-  const messages = (await import(`@/messages/${locale}.json`)).default;
+async function SearchResults({ query, locale: localeVal }: { query: string; locale: string }) {
+  const messages = messagesMap[localeVal as keyof typeof messagesMap];
 
   const { posts: raw, count } = await searchPosts(query, 30);
   const posts = dedupe(raw);
@@ -56,7 +60,7 @@ async function SearchResults({ query, locale }: { query: string; locale: string 
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const locale = await getServerLocale();
-  const messages = (await import(`@/messages/${locale}.json`)).default;
+  const messages = messagesMap[locale];
   const { q } = await searchParams;
   const query = (q || '').trim();
 
