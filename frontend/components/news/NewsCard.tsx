@@ -1,18 +1,28 @@
-'use client';
+"use client";
 
-import { memo, useCallback } from 'react';
-import type { Post } from '@/types';
-import { useTimeAgo } from '@/lib/hooks/useTimeAgo';
-import { truncateWords } from '@/lib/utils/truncate';
-import { cn } from '@/lib/utils/cn';
-import { BookmarkButton } from './BookmarkButton';
-import { VerificationStamp } from '@/components/ui/VerificationStamp';
-import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
-import { useI18n } from '@/lib/i18n/context';
+import { memo, useCallback } from "react";
+import type { Post } from "@/types";
+import { useTimeAgo } from "@/lib/hooks/useTimeAgo";
+import { truncateWords } from "@/lib/utils/truncate";
+import { cn } from "@/lib/utils/cn";
+import { BookmarkButton } from "./BookmarkButton";
+import { VerificationStamp } from "@/components/ui/VerificationStamp";
+import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
+import { useI18n } from "@/lib/i18n/context";
 
 function ShieldIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   );
@@ -20,7 +30,17 @@ function ShieldIcon() {
 
 function EyeIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
@@ -29,7 +49,14 @@ function EyeIcon() {
 
 function YoutubeIcon({ className }: { className?: string }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
     </svg>
   );
@@ -42,11 +69,15 @@ interface SmartLabel {
 
 function getSmartLabel(post: Post): SmartLabel | null {
   const ageMs = Date.now() - new Date(post.published_at).getTime();
-  const headline = (post.headline || '').toLowerCase();
-  if (headline.includes('live:') || headline.includes('live update')) return { text: 'LIVE', priority: 4 };
-  if (headline.includes('breaking') || headline.includes('alert:')) return { text: 'BREAKING', priority: 3 };
-  if (ageMs < 45 * 60 * 1000 && post.credibility_score >= 80) return { text: 'JUST IN', priority: 2 };
-  if (ageMs < 120 * 60 * 1000 && post.credibility_score >= 85) return { text: 'DEVELOPING', priority: 1 };
+  const headline = (post.headline || "").toLowerCase();
+  if (headline.includes("live:") || headline.includes("live update"))
+    return { text: "LIVE", priority: 4 };
+  if (headline.includes("breaking") || headline.includes("alert:"))
+    return { text: "BREAKING", priority: 3 };
+  if (ageMs < 45 * 60 * 1000 && post.credibility_score >= 80)
+    return { text: "JUST IN", priority: 2 };
+  if (ageMs < 120 * 60 * 1000 && post.credibility_score >= 85)
+    return { text: "DEVELOPING", priority: 1 };
   return null;
 }
 
@@ -57,33 +88,48 @@ interface NewsCardProps {
   isRead?: boolean;
 }
 
-const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
+const NewsCardComponent = ({
+  post,
+  onClick,
+  isNew = false,
+  isRead = false,
+}: NewsCardProps) => {
   const { t } = useI18n();
   const haptic = useHapticFeedback();
   const smartLabel = getSmartLabel(post);
-  const sourcesCount = post.source_count ?? (post.sources?.length ?? 0);
-  const isVideo = post.content_type === 'video';
+  const sourcesCount = post.source_count ?? post.sources?.length ?? 0;
+  const isVideo = post.content_type === "video";
 
   const handleClick = useCallback(() => {
     haptic.light();
     onClick?.();
   }, [haptic, onClick]);
 
-  const handleYoutubeClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    haptic.light();
-    const query = encodeURIComponent(`${post.headline} latest news`);
-    window.open(`https://www.youtube.com/results?search_query=${query}&sp=CAI%3D`, '_blank', 'noopener,noreferrer');
-  }, [haptic, post.headline]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      if ((e.target as HTMLElement).closest('a, button')) return;
+  const handleYoutubeClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
       e.preventDefault();
-      handleClick();
-    }
-  }, [handleClick]);
+      haptic.light();
+      const query = encodeURIComponent(`${post.headline} latest news`);
+      window.open(
+        `https://www.youtube.com/results?search_query=${query}&sp=CAI%3D`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+    },
+    [haptic, post.headline],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        if ((e.target as HTMLElement).closest("a, button")) return;
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [handleClick],
+  );
 
   return (
     <div
@@ -91,24 +137,24 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      aria-label={`${isVideo ? 'Video: ' : 'Read article: '}${post.headline}`}
-      data-read={isRead ? 'true' : 'false'}
+      aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}`}
+      data-read={isRead ? "true" : "false"}
       className={cn(
-        'group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-3 sm:p-4 flex flex-col h-full transition-all duration-200',
-        'hover:shadow-[0_2px_8px_rgb(var(--c-ink)/0.08)] hover:border-ink/20',
-        'focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:outline-none',
-        isNew && 'border-l-[3px] border-ink',
-        isVideo && 'border-amber-500/10'
+        "group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-3 sm:p-4 flex flex-col h-full transition-all duration-200",
+        "hover:shadow-[0_2px_8px_rgb(var(--c-ink)/0.08)] hover:border-ink/20",
+        "focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:outline-none",
+        isNew && "border-l-[3px] border-ink",
+        isVideo && "border-amber-500/10",
       )}
     >
       {isVideo && (
         <span className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
-          <span 
-            className="absolute top-[-2px] right-[-12px] h-5 w-12 bg-amber-500/10 rotate-45" 
-            style={{ 
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              backgroundColor: 'rgba(217, 119, 6, 0.15)'
+          <span
+            className="absolute top-[-2px] right-[-12px] h-5 w-12 bg-amber-500/10 rotate-45"
+            style={{
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              backgroundColor: "rgba(217, 119, 6, 0.15)",
             }}
           />
         </span>
@@ -119,13 +165,20 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
           <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
             {post.category}
           </span>
-          <span className="text-ink-soft/40" aria-hidden="true">·</span>
-          <span className="font-mono text-[9px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{useTimeAgo(post.published_at)}</span>
+          <span className="text-ink-soft/40" aria-hidden="true">
+            ·
+          </span>
+          <span
+            className="font-mono text-[9px] sm:text-[10px] text-ink-soft"
+            suppressHydrationWarning
+          >
+            {useTimeAgo(post.published_at)}
+          </span>
           {smartLabel && (
             <span
               className={cn(
-                'font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase',
-                smartLabel.priority >= 3 ? 'text-red-600' : 'text-ink'
+                "font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase",
+                smartLabel.priority >= 3 ? "text-red-600" : "text-ink",
               )}
             >
               {smartLabel.text}
@@ -149,16 +202,17 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
           <span className="inline-flex items-center gap-1 font-body text-[10px] sm:text-[11px] text-ink-soft shrink-0">
             <ShieldIcon />
-            {sourcesCount} {t(sourcesCount === 1 ? 'card.source' : 'card.sources')}
+            {sourcesCount}{" "}
+            {t(sourcesCount === 1 ? "card.source" : "card.sources")}
           </span>
           <button
             type="button"
             onClick={handleYoutubeClick}
             className="inline-flex items-center gap-1 px-1.5 sm:px-1.5 py-1 sm:py-0.5 min-h-[28px] border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-colors"
-            aria-label={t('news.aria_youtube', { headline: post.headline })}
+            aria-label={t("news.aria_youtube", { headline: post.headline })}
           >
             <YoutubeIcon className="text-ink" />
-            {t('card.youtube')}
+            {t("card.youtube")}
           </button>
         </div>
         <BookmarkButton postId={post.id} variant="icon" />
@@ -167,7 +221,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       {isRead && (
         <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 mt-1.5 border border-rule/80 rounded-full text-[9px] sm:text-[10px] font-medium text-ink-soft/80 bg-paper-2/40">
           <EyeIcon />
-          {t('card.viewed')}
+          {t("card.viewed")}
         </span>
       )}
     </div>

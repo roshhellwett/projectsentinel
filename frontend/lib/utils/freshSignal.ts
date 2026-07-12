@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 let lastFreshAt = 0;
 const subscribers = new Set<(ts: number) => void>();
@@ -6,7 +6,11 @@ const subscribers = new Set<(ts: number) => void>();
 export function markFresh(): void {
   lastFreshAt = Date.now();
   for (const cb of subscribers) {
-    try { cb(lastFreshAt); } catch { /* ignore subscriber error */ }
+    try {
+      cb(lastFreshAt);
+    } catch {
+      /* ignore subscriber error */
+    }
   }
 }
 

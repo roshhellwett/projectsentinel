@@ -1,23 +1,30 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion, type PanInfo } from 'framer-motion';
-import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
-import type { Post, Source } from '@/types';
-import { useTimeAgo } from '@/lib/hooks/useTimeAgo';
-import { summaryToBullets } from '@/lib/utils/summaryToBullets';
-import { getCategoryTheme } from '@/lib/theme/categoryTheme';
-import { Z_INDEX } from '@/lib/theme/zIndex';
-import { IOS_SPRING } from '@/lib/theme/animations';
-import { getHostname } from '@/lib/utils/getHostname';
-import { CredibilityBar } from '@/components/news/CredibilityBar';
-import { SourcePickerButton } from '@/components/news/SourcePickerButton';
-import { BookmarkButton } from '@/components/news/BookmarkButton';
-import { useSavedPosts } from '@/lib/utils/readPosts';
-import { showToast } from '@/lib/utils/toast';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  useReducedMotion,
+  type PanInfo,
+} from "framer-motion";
+import { ShieldCheck, BookOpen, Globe, AlertTriangle } from "lucide-react";
+import type { Post, Source } from "@/types";
+import { useTimeAgo } from "@/lib/hooks/useTimeAgo";
+import { summaryToBullets } from "@/lib/utils/summaryToBullets";
+import { getCategoryTheme } from "@/lib/theme/categoryTheme";
+import { Z_INDEX } from "@/lib/theme/zIndex";
+import { IOS_SPRING } from "@/lib/theme/animations";
+import { getHostname } from "@/lib/utils/getHostname";
+import { CredibilityBar } from "@/components/news/CredibilityBar";
+import { SourcePickerButton } from "@/components/news/SourcePickerButton";
+import { BookmarkButton } from "@/components/news/BookmarkButton";
+import { useSavedPosts } from "@/lib/utils/readPosts";
+import { showToast } from "@/lib/utils/toast";
 
-export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
+export type SwipeDirection = "up" | "down" | "left" | "right";
 
 const SWIPE_DIST = 100;
 const SWIPE_VEL = 600;
@@ -28,29 +35,31 @@ function decideDirection(info: PanInfo): SwipeDirection | null {
   const ay = Math.abs(offset.y);
   const avx = Math.abs(velocity.x);
   const avy = Math.abs(velocity.y);
-  
+
   if (ax < 20 && ay < 20 && avx < 200 && avy < 200) return null;
 
   const horizontalDominant = Math.max(ax, avx * 0.3) > Math.max(ay, avy * 0.3);
   if (horizontalDominant) {
-    if (offset.x >  SWIPE_DIST || velocity.x >  SWIPE_VEL) return 'right';
-    if (offset.x < -SWIPE_DIST || velocity.x < -SWIPE_VEL) return 'left';
+    if (offset.x > SWIPE_DIST || velocity.x > SWIPE_VEL) return "right";
+    if (offset.x < -SWIPE_DIST || velocity.x < -SWIPE_VEL) return "left";
     return null;
   }
-  if (offset.y < -SWIPE_DIST || velocity.y < -SWIPE_VEL) return 'up';
-  if (offset.y >  SWIPE_DIST || velocity.y >  SWIPE_VEL) return 'down';
+  if (offset.y < -SWIPE_DIST || velocity.y < -SWIPE_VEL) return "up";
+  if (offset.y > SWIPE_DIST || velocity.y > SWIPE_VEL) return "down";
   return null;
 }
 
 function haptic(pattern: number | number[] = 12) {
   try {
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(pattern);
     }
-  } catch {  }
+  } catch {}
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://zenithopensourceprojects.vercel.app";
 
 function estimateReadMinutes(text: string | null | undefined): number {
   if (!text) return 1;
@@ -59,16 +68,16 @@ function estimateReadMinutes(text: string | null | undefined): number {
 }
 
 function ageDotClass(ageMs: number): string {
-  if (ageMs < 60 * 60 * 1000) return 'bg-accent';
-  if (ageMs < 6 * 60 * 60 * 1000) return 'bg-ink';
-  return 'bg-rule-strong';
+  if (ageMs < 60 * 60 * 1000) return "bg-accent";
+  if (ageMs < 6 * 60 * 60 * 1000) return "bg-ink";
+  return "bg-rule-strong";
 }
 
 function getSourceLabel(source: Source): string {
   if (source.title?.trim()) return source.title.trim();
-  if (source.name?.trim())  return source.name.trim();
+  if (source.name?.trim()) return source.name.trim();
   const host = getHostname(source.url);
-  return host || 'Source';
+  return host || "Source";
 }
 
 function SourceChip({ source }: { source: Source }) {
@@ -101,12 +110,15 @@ function SourceChip({ source }: { source: Source }) {
             onLoad={() => setIsLoaded(true)}
             onError={() => setFaviconErrored(true)}
             className={`w-3 h-3 object-contain transition-opacity duration-300 ${
-              isLoaded ? 'opacity-100' : 'opacity-0'
+              isLoaded ? "opacity-100" : "opacity-0"
             }`}
           />
         </div>
       ) : host ? (
-        <Globe className="w-3 h-3 text-subtle flex-shrink-0" aria-hidden="true" />
+        <Globe
+          className="w-3 h-3 text-subtle flex-shrink-0"
+          aria-hidden="true"
+        />
       ) : null}
       <span className="truncate">{label}</span>
     </a>
@@ -128,10 +140,13 @@ interface SwipeCardProps {
   onDragProgress?: (progress: { x: number; y: number }) => void;
 }
 
-const DEPTH_STYLES: Record<0 | 1 | 2, { scale: number; translateY: number; opacity: number; z: number }> = {
-  0: { scale: 1,    translateY: 0,  opacity: 1,    z: 30 },
-  1: { scale: 0.96, translateY: 10, opacity: 0.7,  z: 20 },
-  2: { scale: 0.92, translateY: 20, opacity: 0.4,  z: 10 },
+const DEPTH_STYLES: Record<
+  0 | 1 | 2,
+  { scale: number; translateY: number; opacity: number; z: number }
+> = {
+  0: { scale: 1, translateY: 0, opacity: 1, z: 30 },
+  1: { scale: 0.96, translateY: 10, opacity: 0.7, z: 20 },
+  2: { scale: 0.92, translateY: 20, opacity: 0.4, z: 10 },
 };
 
 export function SwipeCard({
@@ -147,18 +162,43 @@ export function SwipeCard({
   const theme = getCategoryTheme(post.category);
   const timeAgo = useTimeAgo(post.published_at);
 
-  const bullets = useMemo(() => summaryToBullets(post.summary, 2), [post.summary]);
-  const { topSources, sourcesTotal, extraSources, uniqueHostCount, sourcesNoun } = useMemo(() => {
+  const bullets = useMemo(
+    () => summaryToBullets(post.summary, 2),
+    [post.summary],
+  );
+  const {
+    topSources,
+    sourcesTotal,
+    extraSources,
+    uniqueHostCount,
+    sourcesNoun,
+  } = useMemo(() => {
     const ts = (post.sources ?? []).slice(0, 3);
     const st = post.source_count ?? ts.length;
     const es = Math.max(0, st - ts.length);
-    const uhc = new Set((post.sources ?? []).map((s) => getHostname(s.url)).filter(Boolean)).size;
-    const sn = uhc > 1 && uhc === st
-      ? (st === 1 ? 'publication' : 'publications')
-      : (st === 1 ? 'source' : 'sources');
-    return { topSources: ts, sourcesTotal: st, extraSources: es, uniqueHostCount: uhc, sourcesNoun: sn };
+    const uhc = new Set(
+      (post.sources ?? []).map((s) => getHostname(s.url)).filter(Boolean),
+    ).size;
+    const sn =
+      uhc > 1 && uhc === st
+        ? st === 1
+          ? "publication"
+          : "publications"
+        : st === 1
+          ? "source"
+          : "sources";
+    return {
+      topSources: ts,
+      sourcesTotal: st,
+      extraSources: es,
+      uniqueHostCount: uhc,
+      sourcesNoun: sn,
+    };
   }, [post.sources, post.source_count]);
-  const ageMs = useMemo(() => Date.now() - new Date(post.published_at).getTime(), [post.published_at]);
+  const ageMs = useMemo(
+    () => Date.now() - new Date(post.published_at).getTime(),
+    [post.published_at],
+  );
   const ageDot = ageDotClass(ageMs);
   const readMinutes = estimateReadMinutes(post.summary);
   const breaking = isBreaking(post);
@@ -200,8 +240,8 @@ export function SwipeCard({
         onDragProgress({ x: dragX.get(), y: dragY.get() });
       });
     };
-    const unsubX = dragX.on('change', notify);
-    const unsubY = dragY.on('change', notify);
+    const unsubX = dragX.on("change", notify);
+    const unsubY = dragY.on("change", notify);
     return () => {
       unsubX();
       unsubY();
@@ -209,19 +249,22 @@ export function SwipeCard({
     };
   }, [interactive, onDragProgress, dragX, dragY]);
 
-  const handleDragEnd = useCallback((_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
-    let dir = decideDirection(info);
-    if ((dir === 'down' || dir === 'left') && !canRewind) dir = null;
-    if (!dir || !interactive) {
-      onDragProgress?.({ x: 0, y: 0 });
-      return;
-    }
+  const handleDragEnd = useCallback(
+    (_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+      let dir = decideDirection(info);
+      if ((dir === "down" || dir === "left") && !canRewind) dir = null;
+      if (!dir || !interactive) {
+        onDragProgress?.({ x: 0, y: 0 });
+        return;
+      }
 
-    haptic(dir === 'right' ? [8, 40, 8] : 10);
-    setExiting(true);
-    setExitDir(dir);
-    onSwipe?.(dir, post);
-  }, [interactive, canRewind, onDragProgress, onSwipe, post]);
+      haptic(dir === "right" ? [8, 40, 8] : 10);
+      setExiting(true);
+      setExitDir(dir);
+      onSwipe?.(dir, post);
+    },
+    [interactive, canRewind, onDragProgress, onSwipe, post],
+  );
 
   return (
     <motion.div
@@ -230,22 +273,27 @@ export function SwipeCard({
         initial: { opacity: 0, y: -40, scale: 0.95 },
         animate: ({ depth }) => ({
           x: 0,
-          y: depth === 0 ? 0 : (depth === 1 ? 14 : 28),
-          scale: depth === 0 ? 1 : (depth === 1 ? 0.95 : 0.90),
-          opacity: depth === 0 ? 1 : (depth === 1 ? 0.8 : 0.5),
-          zIndex: depth === 0 ? 30 : (depth === 1 ? 20 : 10),
-          transition: IOS_SPRING.snappy
+          y: depth === 0 ? 0 : depth === 1 ? 14 : 28,
+          scale: depth === 0 ? 1 : depth === 1 ? 0.95 : 0.9,
+          opacity: depth === 0 ? 1 : depth === 1 ? 0.8 : 0.5,
+          zIndex: depth === 0 ? 30 : depth === 1 ? 20 : 10,
+          transition: IOS_SPRING.snappy,
         }),
         exit: ({ exitDir }) => {
-          const transition = { duration: reducedMotion ? 0 : 0.22, ease: [0.32, 0.72, 0, 1] as const };
-          const w = typeof window !== 'undefined' ? window.innerWidth : 500;
-          const h = typeof window !== 'undefined' ? window.innerHeight : 800;
-          if (exitDir === 'up') return { y: -h, opacity: 0, transition };
-          if (exitDir === 'down') return { y: h, opacity: 0, transition };
-          if (exitDir === 'left') return { x: -w, rotate: -15, opacity: 0, transition };
-          if (exitDir === 'right') return { x: w, rotate: 15, opacity: 0, transition };
+          const transition = {
+            duration: reducedMotion ? 0 : 0.22,
+            ease: [0.32, 0.72, 0, 1] as const,
+          };
+          const w = typeof window !== "undefined" ? window.innerWidth : 500;
+          const h = typeof window !== "undefined" ? window.innerHeight : 800;
+          if (exitDir === "up") return { y: -h, opacity: 0, transition };
+          if (exitDir === "down") return { y: h, opacity: 0, transition };
+          if (exitDir === "left")
+            return { x: -w, rotate: -15, opacity: 0, transition };
+          if (exitDir === "right")
+            return { x: w, rotate: 15, opacity: 0, transition };
           return { opacity: 0, scale: 0.8, transition: { duration: 0.2 } };
-        }
+        },
       }}
       initial="initial"
       animate="animate"
@@ -265,34 +313,39 @@ export function SwipeCard({
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
         <div
-          className={`p-5 ${interactive ? 'cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset' : ''}`}
-          role={interactive ? 'button' : undefined}
+          className={`p-5 ${interactive ? "cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset" : ""}`}
+          role={interactive ? "button" : undefined}
           tabIndex={interactive ? 0 : undefined}
-          aria-label={interactive ? `Read article: ${post.headline}` : undefined}
-          data-swipe-card={interactive ? 'true' : undefined}
+          aria-label={
+            interactive ? `Read article: ${post.headline}` : undefined
+          }
+          data-swipe-card={interactive ? "true" : undefined}
           onClick={(e) => {
             if (!interactive) return;
-            if ((e.target as HTMLElement).closest('[data-swipe-actions]')) return;
+            if ((e.target as HTMLElement).closest("[data-swipe-actions]"))
+              return;
             if (Math.abs(dragX.get()) > 6 || Math.abs(dragY.get()) > 6) return;
-            
+
             const now = Date.now();
             const timeSinceLastTap = now - lastTapRef.current;
-            
+
             if (timeSinceLastTap < 250) {
-              
-              if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+              if (singleTapTimerRef.current)
+                clearTimeout(singleTapTimerRef.current);
               haptic([10, 40, 10]);
               const wasNotSaved = !isSaved(post.id);
               toggleSaved(post.id);
               if (wasNotSaved) {
-                showToast('Saved to reading list', 'bookmark');
+                showToast("Saved to reading list", "bookmark");
               } else {
-                showToast('Removed from reading list', 'bookmark');
+                showToast("Removed from reading list", "bookmark");
               }
               setShowDoubleTap(true);
-              doubleTapTimerRef.current = setTimeout(() => setShowDoubleTap(false), 900);
+              doubleTapTimerRef.current = setTimeout(
+                () => setShowDoubleTap(false),
+                900,
+              );
             } else {
-              
               haptic(6);
               singleTapTimerRef.current = setTimeout(() => {
                 onTap?.(post);
@@ -302,7 +355,7 @@ export function SwipeCard({
           }}
           onKeyDown={(e) => {
             if (!interactive) return;
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               onTap?.(post);
             }
@@ -317,7 +370,11 @@ export function SwipeCard({
                 className={`absolute inset-0 ${Z_INDEX.cardOverlay} flex items-center justify-center pointer-events-none`}
               >
                 <div className="bg-ink/90 p-6 rounded-full shadow-2xl text-paper">
-                  <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-16 h-16"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                   </svg>
                 </div>
@@ -356,7 +413,6 @@ export function SwipeCard({
             </span>
           </div>
 
-
           <h2
             id={`swipe-card-headline-${post.id}`}
             className="font-display text-[21px] sm:text-[23px] font-extrabold leading-[1.22] tracking-[-0.02em] text-ink mb-4"
@@ -364,11 +420,13 @@ export function SwipeCard({
             {post.headline}
           </h2>
 
-
           {bullets.length > 0 && (
             <ul className="space-y-2 mb-4">
               {bullets.map((b, i) => (
-                <li key={i} className="flex gap-2.5 text-[13.5px] leading-[1.5] text-ink/90">
+                <li
+                  key={i}
+                  className="flex gap-2.5 text-[13.5px] leading-[1.5] text-ink/90"
+                >
                   <span
                     aria-hidden="true"
                     className="mt-[7px] inline-block w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0"
@@ -379,17 +437,18 @@ export function SwipeCard({
             </ul>
           )}
 
-
           {flagsCount > 0 && (
             <div className="mb-3 inline-flex items-start gap-2 px-2.5 py-1.5 bg-paper-2 border border-rule rounded text-[11px] text-muted">
-              <AlertTriangle className="w-3 h-3 text-accent mt-[1px] flex-shrink-0" aria-hidden="true" />
+              <AlertTriangle
+                className="w-3 h-3 text-accent mt-[1px] flex-shrink-0"
+                aria-hidden="true"
+              />
               <span>
-                <span className="font-semibold text-ink">{flagsCount}</span>{' '}
-                fact-check {flagsCount === 1 ? 'flag' : 'flags'}
+                <span className="font-semibold text-ink">{flagsCount}</span>{" "}
+                fact-check {flagsCount === 1 ? "flag" : "flags"}
               </span>
             </div>
           )}
-
 
           {topSources.length > 0 && (
             <div className="flex flex-wrap items-center gap-1 mb-4">
@@ -404,7 +463,6 @@ export function SwipeCard({
             </div>
           )}
 
-
           <div className="pt-3 border-t border-rule">
             <div className="flex items-center gap-2.5 mb-2.5">
               <div className="flex-1 min-w-0">
@@ -416,7 +474,10 @@ export function SwipeCard({
                   aria-label={`Verified by ${sourcesTotal} ${sourcesNoun}`}
                   title={`Verified by ${sourcesTotal} ${sourcesNoun}`}
                 >
-                  <ShieldCheck className="w-3 h-3 text-cred-high" aria-hidden="true" />
+                  <ShieldCheck
+                    className="w-3 h-3 text-cred-high"
+                    aria-hidden="true"
+                  />
                   <span className="tabular-nums text-ink">{sourcesTotal}</span>
                   <span>{sourcesNoun}</span>
                 </span>
@@ -444,8 +505,17 @@ export function SwipeCard({
                   className="tap-target min-w-[44px] min-h-[44px] flex items-center justify-center group relative p-1.5 -m-1 rounded text-subtle hover:text-ink hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   aria-label="Share on WhatsApp"
                 >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  <span className={`pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max rounded bg-ink px-2 py-1 text-[10px] font-semibold text-paper opacity-0 transition-all group-hover:opacity-100 group-focus-visible:opacity-100 scale-95 group-hover:scale-100 ${Z_INDEX.tooltip} shadow-paper-lift`}>
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                  <span
+                    className={`pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max rounded bg-ink px-2 py-1 text-[10px] font-semibold text-paper opacity-0 transition-all group-hover:opacity-100 group-focus-visible:opacity-100 scale-95 group-hover:scale-100 ${Z_INDEX.tooltip} shadow-paper-lift`}
+                  >
                     Share WhatsApp
                     <span className="absolute left-1/2 top-full -translate-x-1/2 border-[4px] border-transparent border-t-ink" />
                   </span>

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface AnimatedCounterProps {
   value: number;
@@ -8,7 +8,11 @@ interface AnimatedCounterProps {
   className?: string;
 }
 
-export function AnimatedCounter({ value, duration = 1100, className }: AnimatedCounterProps) {
+export function AnimatedCounter({
+  value,
+  duration = 1100,
+  className,
+}: AnimatedCounterProps) {
   const [hydrated, setHydrated] = useState(false);
   const [display, setDisplay] = useState(value);
   const displayRef = useRef(value);
@@ -16,13 +20,15 @@ export function AnimatedCounter({ value, duration = 1100, className }: AnimatedC
   const startRef = useRef<number | null>(null);
   const fromRef = useRef(0);
 
-  useEffect(() => { setHydrated(true); }, []);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
     const target = Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0;
     if (target === displayRef.current) return;
-    
+
     fromRef.current = displayRef.current;
     startRef.current = null;
 
@@ -30,8 +36,10 @@ export function AnimatedCounter({ value, duration = 1100, className }: AnimatedC
       if (startRef.current === null) startRef.current = now;
       const t = Math.min(1, (now - startRef.current) / duration);
       const eased = 1 - Math.pow(1 - t, 3);
-      const next = Math.round(fromRef.current + (target - fromRef.current) * eased);
-      
+      const next = Math.round(
+        fromRef.current + (target - fromRef.current) * eased,
+      );
+
       setDisplay(next);
       displayRef.current = next;
 

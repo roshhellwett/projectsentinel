@@ -1,12 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
-import { useI18n } from '@/lib/i18n/context';
+import { useState, useEffect, useRef } from "react";
+import { useNetworkStatus } from "@/lib/hooks/useNetworkStatus";
+import { useI18n } from "@/lib/i18n/context";
 
 function WifiOffIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <line x1="1" y1="1" x2="23" y2="23" />
       <path d="M16.72 11.06A10.94 10.94 0 0119 12.55" />
       <path d="M5 12.55a10.94 10.94 0 015.17-2.39" />
@@ -20,7 +30,17 @@ function WifiOffIcon() {
 
 function WifiIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M5 12.55a11 11 0 0114.08 0" />
       <path d="M1.42 9a16 16 0 0121.16 0" />
       <path d="M8.53 16.11a6 6 0 016.95 0" />
@@ -60,7 +80,7 @@ export function ConnectionStatus() {
         >
           <WifiOffIcon />
           <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft whitespace-nowrap">
-            {t('status.offline')}
+            {t("status.offline")}
           </span>
         </div>
       )}
@@ -73,7 +93,7 @@ export function ConnectionStatus() {
         >
           <WifiIcon />
           <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">
-            {t('status.back_online')}
+            {t("status.back_online")}
           </span>
         </div>
       )}

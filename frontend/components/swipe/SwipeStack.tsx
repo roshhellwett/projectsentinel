@@ -1,22 +1,28 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, useMotionValue } from 'framer-motion';
-import type { Post } from '@/types';
-import { SwipeCard, type SwipeDirection } from './SwipeCard';
-import { SwipeOverlay } from './SwipeOverlay';
-import { SwipeProgress } from './SwipeProgress';
-import dynamic from 'next/dynamic';
-import { SwipeHint } from './SwipeHint';
-import { SwipeEmptyState } from './SwipeEmptyState';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, useMotionValue } from "framer-motion";
+import type { Post } from "@/types";
+import { SwipeCard, type SwipeDirection } from "./SwipeCard";
+import { SwipeOverlay } from "./SwipeOverlay";
+import { SwipeProgress } from "./SwipeProgress";
+import dynamic from "next/dynamic";
+import { SwipeHint } from "./SwipeHint";
+import { SwipeEmptyState } from "./SwipeEmptyState";
 
-const NewsDrawer = dynamic(() => import('@/components/news/NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
-const SwipeBreakPrompt = dynamic(() => import('./SwipeBreakPrompt').then(m => m.SwipeBreakPrompt), { ssr: false });
-import { useSwipeQueue } from '@/lib/hooks/useSwipeQueue';
-import { useReadPosts, useSavedPosts } from '@/lib/utils/readPosts';
-import { markSeen } from '@/lib/utils/seenSet';
-import { snoozeBreakToday } from '@/lib/utils/swipeStats';
-import { useSwipeTracking } from '@/lib/hooks/useSwipeTracking';
+const NewsDrawer = dynamic(
+  () => import("@/components/news/NewsDrawer").then((m) => m.NewsDrawer),
+  { ssr: false },
+);
+const SwipeBreakPrompt = dynamic(
+  () => import("./SwipeBreakPrompt").then((m) => m.SwipeBreakPrompt),
+  { ssr: false },
+);
+import { useSwipeQueue } from "@/lib/hooks/useSwipeQueue";
+import { useReadPosts, useSavedPosts } from "@/lib/utils/readPosts";
+import { markSeen } from "@/lib/utils/seenSet";
+import { snoozeBreakToday } from "@/lib/utils/swipeStats";
+import { useSwipeTracking } from "@/lib/hooks/useSwipeTracking";
 
 const BREAK_PROMPT_AT = 25;
 
@@ -38,23 +44,27 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   const dragY = useMotionValue(0);
   const lastDragRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
-  const { stats, showBreak, setShowBreak, trackSwipe, sessionCards } = useSwipeTracking();
+  const { stats, showBreak, setShowBreak, trackSwipe, sessionCards } =
+    useSwipeTracking();
 
-  const handleDragProgress = useCallback((newDrag: { x: number; y: number }) => {
-    if (newDrag.x === 0 && newDrag.y === 0) {
-      lastDragRef.current = { x: 0, y: 0 };
-      dragX.set(0);
-      dragY.set(0);
-      return;
-    }
-    const dx = Math.abs(newDrag.x - lastDragRef.current.x);
-    const dy = Math.abs(newDrag.y - lastDragRef.current.y);
-    if (dx > 6 || dy > 6) {
-      lastDragRef.current = newDrag;
-      dragX.set(newDrag.x);
-      dragY.set(newDrag.y);
-    }
-  }, [dragX, dragY]);
+  const handleDragProgress = useCallback(
+    (newDrag: { x: number; y: number }) => {
+      if (newDrag.x === 0 && newDrag.y === 0) {
+        lastDragRef.current = { x: 0, y: 0 };
+        dragX.set(0);
+        dragY.set(0);
+        return;
+      }
+      const dx = Math.abs(newDrag.x - lastDragRef.current.x);
+      const dy = Math.abs(newDrag.y - lastDragRef.current.y);
+      if (dx > 6 || dy > 6) {
+        lastDragRef.current = newDrag;
+        dragX.set(newDrag.x);
+        dragY.set(newDrag.y);
+      }
+    },
+    [dragX, dragY],
+  );
 
   const queueRef = useRef(queue);
   queueRef.current = queue;
@@ -62,7 +72,7 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   const handleSwipe = useCallback(
     (direction: SwipeDirection, post: Post) => {
       const q = queueRef.current;
-      if (direction === 'down' || direction === 'left') {
+      if (direction === "down" || direction === "left") {
         q.rewind();
         lastDragRef.current = { x: 0, y: 0 };
         dragX.set(0);
@@ -114,20 +124,27 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
       const cur = queueRef.current.current;
       if (!cur || drawerPostRef.current || showBreakRef.current) return;
       const target = e.target as HTMLElement;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable || target.closest('a, button, [role="button"]:not([data-swipe-card])'))) return;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable ||
+          target.closest('a, button, [role="button"]:not([data-swipe-card])'))
+      )
+        return;
 
-      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") {
         e.preventDefault();
-        handleSwipeRef.current(e.key === 'ArrowRight' ? 'right' : 'up', cur);
-      } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+        handleSwipeRef.current(e.key === "ArrowRight" ? "right" : "up", cur);
+      } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
         if (queueRef.current.canRewind) {
           e.preventDefault();
-          handleSwipeRef.current('left', cur);
+          handleSwipeRef.current("left", cur);
         }
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   if (queue.isExhausted) {
@@ -145,10 +162,16 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
   if (visible.length === 0 && queue.hasError) {
     return (
       <div className="w-full max-w-md mx-auto px-4 py-10 text-center">
-        <span className="block w-12 h-[2px] bg-accent mx-auto mb-5" aria-hidden="true" />
-        <h2 className="font-display text-2xl font-bold text-ink mb-2">Couldn&apos;t load stories</h2>
+        <span
+          className="block w-12 h-[2px] bg-accent mx-auto mb-5"
+          aria-hidden="true"
+        />
+        <h2 className="font-display text-2xl font-bold text-ink mb-2">
+          Couldn&apos;t load stories
+        </h2>
         <p className="text-[13px] text-muted mb-6">
-          We&apos;re having trouble reaching the server. Check your connection and try again.
+          We&apos;re having trouble reaching the server. Check your connection
+          and try again.
         </p>
         <button
           type="button"
@@ -156,14 +179,13 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
           disabled={queue.isFetching}
           className="tap-target min-h-[44px] px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-all hover-lift disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          {queue.isFetching ? 'Retrying…' : 'Try again'}
+          {queue.isFetching ? "Retrying…" : "Try again"}
         </button>
       </div>
     );
   }
 
   if (visible.length === 0) {
-
     return (
       <div className="w-full max-w-md mx-auto px-4 py-10">
         <div className="h-72 rounded-md border border-rule bg-paper-2 animate-pulse" />
@@ -204,12 +226,16 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
                 );
               })}
           </AnimatePresence>
-          <SwipeOverlay dragX={dragX} dragY={dragY} canRewind={queue.canRewind} />
+          <SwipeOverlay
+            dragX={dragX}
+            dragY={dragY}
+            canRewind={queue.canRewind}
+          />
         </div>
       </div>
 
       <p className="mt-3 px-4 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-subtle">
-        {queue.canRewind ? '↑ → next • ↓ ← previous' : '↑ → next'}
+        {queue.canRewind ? "↑ → next • ↓ ← previous" : "↑ → next"}
       </p>
 
       <SwipeHint />

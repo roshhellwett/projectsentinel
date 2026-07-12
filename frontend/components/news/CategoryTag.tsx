@@ -1,12 +1,12 @@
-import { Category } from '@/types';
-import { getCategoryTheme } from '@/lib/theme/categoryTheme';
+import { Category } from "@/types";
+import { getCategoryTheme } from "@/lib/theme/categoryTheme";
 
 interface CategoryTagProps {
   category: Category | string;
   className?: string;
 }
 
-export function CategoryTag({ category, className = '' }: CategoryTagProps) {
+export function CategoryTag({ category, className = "" }: CategoryTagProps) {
   const theme = getCategoryTheme(category);
 
   return (

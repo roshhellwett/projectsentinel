@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { Post } from '@/types';
-import { NewsCard } from './NewsCard';
-import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { useReadPosts } from '@/lib/utils/readPosts';
-import { useDailyReadCount } from '@/lib/hooks/useDailyReadCount';
-import dynamic from 'next/dynamic';
+import { useState, useCallback } from "react";
+import { Post } from "@/types";
+import { NewsCard } from "./NewsCard";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { useReadPosts } from "@/lib/utils/readPosts";
+import { useDailyReadCount } from "@/lib/hooks/useDailyReadCount";
+import dynamic from "next/dynamic";
 
-const NewsDrawer = dynamic(() => import('./NewsDrawer').then(m => m.NewsDrawer), { ssr: false });
+const NewsDrawer = dynamic(
+  () => import("./NewsDrawer").then((m) => m.NewsDrawer),
+  { ssr: false },
+);
 
 interface SearchResultsGridProps {
   posts: Post[];
@@ -19,11 +22,14 @@ export function SearchResultsGrid({ posts }: SearchResultsGridProps) {
   const { readIds, markRead } = useReadPosts();
   const { recordRead } = useDailyReadCount();
 
-  const handleOpen = useCallback((post: Post) => {
-    markRead(post.id);
-    recordRead();
-    setSelected(post);
-  }, [markRead, recordRead]);
+  const handleOpen = useCallback(
+    (post: Post) => {
+      markRead(post.id);
+      recordRead();
+      setSelected(post);
+    },
+    [markRead, recordRead],
+  );
 
   const close = useCallback(() => setSelected(null), []);
 

@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import { Metadata } from "next";
 import {
   Newspaper,
   Search,
@@ -9,85 +9,101 @@ import {
   Clock,
   Github,
   Zap,
-  ArrowDown
-} from 'lucide-react';
+  ArrowDown,
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: 'How It Works - India Verified',
-  description: 'Learn how our AI cross-references and scores news from multiple trusted sources to fight misinformation.',
+  title: "How It Works - India Verified",
+  description:
+    "Learn how our AI cross-references and scores news from multiple trusted sources to fight misinformation.",
   openGraph: {
-    title: 'How It Works - India Verified',
-    description: 'Learn how our AI verifies Indian news.',
+    title: "How It Works - India Verified",
+    description: "Learn how our AI verifies Indian news.",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'How It Works - India Verified',
-    description: 'Learn how our AI verifies Indian news.',
+    card: "summary_large_image",
+    title: "How It Works - India Verified",
+    description: "Learn how our AI verifies Indian news.",
   },
 };
 
 const TRUSTED_SOURCES = [
-  'NDTV', 'The Hindu', 'Times of India', 'Indian Express',
-  'Hindustan Times', 'Mint', 'The Wire', 'Scroll.in',
-  'Deccan Herald', 'ANI News', 'AltNews (fact-check)'
+  "NDTV",
+  "The Hindu",
+  "Times of India",
+  "Indian Express",
+  "Hindustan Times",
+  "Mint",
+  "The Wire",
+  "Scroll.in",
+  "Deccan Herald",
+  "ANI News",
+  "AltNews (fact-check)",
 ];
 
 const PIPELINE_STEPS = [
   {
-    number: '01',
-    title: 'Fetch News',
-    subtitle: 'Every 10 Minutes',
-    description: 'Our system continuously monitors RSS feeds from 20+ trusted Indian news sources. We fetch headlines and the first 150 words of each article for efficiency.',
+    number: "01",
+    title: "Fetch News",
+    subtitle: "Every 10 Minutes",
+    description:
+      "Our system continuously monitors RSS feeds from 20+ trusted Indian news sources. We fetch headlines and the first 150 words of each article for efficiency.",
     icon: Clock,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
   {
-    number: '02',
-    title: 'Deduplicate',
-    subtitle: 'SHA256 Hashing',
-    description: 'Each article URL is hashed using SHA256. If we have seen this story before, we skip it. No duplicates, ever.',
+    number: "02",
+    title: "Deduplicate",
+    subtitle: "SHA256 Hashing",
+    description:
+      "Each article URL is hashed using SHA256. If we have seen this story before, we skip it. No duplicates, ever.",
     icon: Database,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
   {
-    number: '03',
-    title: 'Filter',
-    subtitle: 'Block Unreliable Sources',
-    description: 'We automatically block known satire sites, spam domains, and sources that have published false claims verified by AltNews or AFP.',
+    number: "03",
+    title: "Filter",
+    subtitle: "Block Unreliable Sources",
+    description:
+      "We automatically block known satire sites, spam domains, and sources that have published false claims verified by AltNews or AFP.",
     icon: Shield,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
   {
-    number: '04',
-    title: 'Cross-Source Check',
-    subtitle: '2+ Sources Required',
-    description: 'Stories must be confirmed by 2 or more different trusted sources. Single-source stories are discarded—they never reach you.',
+    number: "04",
+    title: "Cross-Source Check",
+    subtitle: "2+ Sources Required",
+    description:
+      "Stories must be confirmed by 2 or more different trusted sources. Single-source stories are discarded—they never reach you.",
     icon: Search,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
   {
-    number: '05',
-    title: 'AI Verification',
-    subtitle: 'AI Cross-Referencing',
-    description: 'AI analyzes headlines and excerpts from confirming sources. It returns a credibility score (0-100), key facts, category, headline, and summary.',
+    number: "05",
+    title: "AI Verification",
+    subtitle: "AI Cross-Referencing",
+    description:
+      "AI analyzes headlines and excerpts from confirming sources. It returns a credibility score (0-100), key facts, category, headline, and summary.",
     icon: CheckCircle,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
   {
-    number: '06',
-    title: 'AI Writing',
-    subtitle: 'Neutral, Factual',
-    description: 'Verified facts are written into a neutral headline and 3-sentence summary. No opinion, no bias, no sensationalism.',
+    number: "06",
+    title: "AI Writing",
+    subtitle: "Neutral, Factual",
+    description:
+      "Verified facts are written into a neutral headline and 3-sentence summary. No opinion, no bias, no sensationalism.",
     icon: PenTool,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
   {
-    number: '07',
-    title: 'Publish',
-    subtitle: 'Instant Delivery',
-    description: 'The final story appears on the site instantly. You will see the AI-written headline, summary, credibility score, and all original source links.',
+    number: "07",
+    title: "Publish",
+    subtitle: "Instant Delivery",
+    description:
+      "The final story appears on the site instantly. You will see the AI-written headline, summary, credibility score, and all original source links.",
     icon: Newspaper,
-    gradient: 'from-accent/40 via-accent/20 to-accent/5',
+    gradient: "from-accent/40 via-accent/20 to-accent/5",
   },
 ];
 
@@ -98,31 +114,31 @@ export default function HowItWorksPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
             mainEntity: [
               {
-                '@type': 'Question',
-                name: 'How does India Verified fetch news?',
+                "@type": "Question",
+                name: "How does India Verified fetch news?",
                 acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Our system continuously monitors RSS feeds from 20+ trusted Indian news sources every 10 minutes.',
+                  "@type": "Answer",
+                  text: "Our system continuously monitors RSS feeds from 20+ trusted Indian news sources every 10 minutes.",
                 },
               },
               {
-                '@type': 'Question',
-                name: 'How does India Verified verify news?',
+                "@type": "Question",
+                name: "How does India Verified verify news?",
                 acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Stories must be confirmed by 2+ different trusted sources. Cross-referencing AI then analyzes headlines and excerpts, returning a credibility score.',
+                  "@type": "Answer",
+                  text: "Stories must be confirmed by 2+ different trusted sources. Cross-referencing AI then analyzes headlines and excerpts, returning a credibility score.",
                 },
               },
               {
-                '@type': 'Question',
-                name: 'Is India Verified open source?',
+                "@type": "Question",
+                name: "Is India Verified open source?",
                 acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Yes, the entire codebase is open source under MIT license.',
+                  "@type": "Answer",
+                  text: "Yes, the entire codebase is open source under MIT license.",
                 },
               },
             ],
@@ -131,7 +147,10 @@ export default function HowItWorksPage() {
       />
 
       <div className="text-center mb-10 sm:mb-16 pb-8 sm:pb-10 border-b border-rule">
-        <span aria-hidden="true" className="block w-10 sm:w-12 h-[2px] bg-accent mb-4 sm:mb-5 mx-auto" />
+        <span
+          aria-hidden="true"
+          className="block w-10 sm:w-12 h-[2px] bg-accent mb-4 sm:mb-5 mx-auto"
+        />
         <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-accent/10 text-accent text-xs sm:text-sm font-semibold rounded-full mb-4 sm:mb-6 border border-accent/20">
           <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           Fully Automated
@@ -140,7 +159,8 @@ export default function HowItWorksPage() {
           How India <span className="text-accent">Verified</span> works
         </h1>
         <p className="text-sm sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
-          Every story goes through a rigorous 7-step AI verification pipeline before reaching you.
+          Every story goes through a rigorous 7-step AI verification pipeline
+          before reaching you.
         </p>
       </div>
 
@@ -156,10 +176,16 @@ export default function HowItWorksPage() {
                   <span className="text-[10px] font-bold text-accent uppercase tracking-[0.18em]">
                     Step {step.number}
                   </span>
-                  <span className="text-[11px] text-muted font-medium">{step.subtitle}</span>
+                  <span className="text-[11px] text-muted font-medium">
+                    {step.subtitle}
+                  </span>
                 </div>
-                <h2 className="font-display text-base sm:text-lg font-bold text-ink mb-1">{step.title}</h2>
-                <p className="text-sm text-ink-soft leading-relaxed">{step.description}</p>
+                <h2 className="font-display text-base sm:text-lg font-bold text-ink mb-1">
+                  {step.title}
+                </h2>
+                <p className="text-sm text-ink-soft leading-relaxed">
+                  {step.description}
+                </p>
               </div>
             </div>
             {i < PIPELINE_STEPS.length - 1 && (
@@ -172,12 +198,15 @@ export default function HowItWorksPage() {
       </div>
 
       <div className="np-card glass-card p-4 sm:p-8 md:p-10 mb-8 sm:mb-12">
-        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">Trusted sources</h2>
+        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">
+          Trusted sources
+        </h2>
         <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6">
-          We only pull from established Indian news organizations with editorial standards.
+          We only pull from established Indian news organizations with editorial
+          standards.
         </p>
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {TRUSTED_SOURCES.map(source => (
+          {TRUSTED_SOURCES.map((source) => (
             <span
               key={source}
               className="px-2 sm:px-3 py-1 sm:py-1.5 bg-paper/70 backdrop-blur-sm border border-rule/50 rounded text-[11px] sm:text-sm font-medium text-ink hover:border-ink transition-colors"
@@ -189,7 +218,9 @@ export default function HowItWorksPage() {
       </div>
 
       <div className="mb-8 sm:mb-12">
-        <h2 className="font-display text-lg sm:text-2xl font-bold mb-3 sm:mb-6 text-ink tracking-tight">Credibility scoring</h2>
+        <h2 className="font-display text-lg sm:text-2xl font-bold mb-3 sm:mb-6 text-ink tracking-tight">
+          Credibility scoring
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
           <ScoreCard
             range="90-100"
@@ -219,9 +250,12 @@ export default function HowItWorksPage() {
         <div className="w-10 h-10 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-3 sm:mb-5">
           <Github className="w-5 h-5 sm:w-8 sm:h-8 text-ink" />
         </div>
-        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">Open source</h2>
+        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">
+          Open source
+        </h2>
         <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6 max-w-md mx-auto leading-relaxed">
-          The entire codebase is public. Anyone can audit how we work, suggest improvements, or run their own instance.
+          The entire codebase is public. Anyone can audit how we work, suggest
+          improvements, or run their own instance.
         </p>
         <a
           href="https://github.com/roshhellwett/projectsentinel"
@@ -252,11 +286,17 @@ function ScoreCard({
 }) {
   return (
     <div className={`np-card glass-card p-5 sm:p-6 ${borderColor}`}>
-      <div className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-[11px] sm:text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}>
+      <div
+        className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-[11px] sm:text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}
+      >
         {range}
       </div>
-      <h3 className="font-display relative z-10 font-bold text-ink mb-2 text-base sm:text-lg">{label}</h3>
-      <p className="relative z-10 text-sm text-muted leading-relaxed">{description}</p>
+      <h3 className="font-display relative z-10 font-bold text-ink mb-2 text-base sm:text-lg">
+        {label}
+      </h3>
+      <p className="relative z-10 text-sm text-muted leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }

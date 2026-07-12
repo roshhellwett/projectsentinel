@@ -38,8 +38,8 @@ export function checkRateLimit(
   config: RateLimitConfig,
 ): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
-  const store = getStore(config.prefix || 'default');
-  const key = `${config.prefix || 'default'}:${ip}`;
+  const store = getStore(config.prefix || "default");
+  const key = `${config.prefix || "default"}:${ip}`;
 
   if (now - lastPrune > PRUNE_INTERVAL) {
     pruneStore(store);
@@ -49,16 +49,26 @@ export function checkRateLimit(
   const entry = store.get(key);
   if (!entry || now > entry.resetAt) {
     store.set(key, { count: 1, resetAt: now + config.windowMs });
-    return { allowed: true, remaining: config.maxRequests - 1, resetAt: now + config.windowMs };
+    return {
+      allowed: true,
+      remaining: config.maxRequests - 1,
+      resetAt: now + config.windowMs,
+    };
   }
 
   entry.count++;
   const allowed = entry.count <= config.maxRequests;
-  return { allowed, remaining: Math.max(0, config.maxRequests - entry.count), resetAt: entry.resetAt };
+  return {
+    allowed,
+    remaining: Math.max(0, config.maxRequests - entry.count),
+    resetAt: entry.resetAt,
+  };
 }
 
 export function getClientIp(request: Request): string {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || request.headers.get('x-real-ip')?.trim()
-    || '127.0.0.1';
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    "127.0.0.1"
+  );
 }

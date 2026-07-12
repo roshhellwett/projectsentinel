@@ -1,9 +1,9 @@
-import { cookies } from 'next/headers';
-import type { Locale } from './i18n-shared';
+import { cookies } from "next/headers";
+import type { Locale } from "./i18n-shared";
 
-const COOKIE_KEY = 'iv-locale';
-const SUPPORTED: Locale[] = ['en', 'hi'];
-const FALLBACK: Locale = 'en';
+const COOKIE_KEY = "iv-locale";
+const SUPPORTED: Locale[] = ["en", "hi"];
+const FALLBACK: Locale = "en";
 
 export async function getServerLocale(): Promise<Locale> {
   try {

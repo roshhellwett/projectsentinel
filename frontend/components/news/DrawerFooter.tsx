@@ -1,7 +1,7 @@
-import { Post } from '@/types';
-import { BookmarkButton } from './BookmarkButton';
-import { ShareButtons } from './ShareButtons';
-import { SourcePickerButton } from './SourcePickerButton';
+import { Post } from "@/types";
+import { BookmarkButton } from "./BookmarkButton";
+import { ShareButtons } from "./ShareButtons";
+import { SourcePickerButton } from "./SourcePickerButton";
 
 interface DrawerFooterProps {
   post: Post;

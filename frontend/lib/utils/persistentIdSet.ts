@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Options {
   key: string;
@@ -11,7 +11,11 @@ const subscribers = new Map<string, Set<() => void>>();
 
 function notify(key: string) {
   subscribers.get(key)?.forEach((fn) => {
-    try { fn(); } catch { /* ignore */ }
+    try {
+      fn();
+    } catch {
+      /* ignore */
+    }
   });
 }
 
@@ -28,24 +32,29 @@ function subscribe(key: string, fn: () => void): () => void {
   };
 }
 
-import { safeRead, safeWrite as persistToStorage } from './safeStorage';
+import { safeRead, safeWrite as persistToStorage } from "./safeStorage";
 
 function loadFromStorage(key: string): string[] {
   try {
     const raw = safeRead(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((x) => typeof x === "string")
+      : [];
   } catch {
     return [];
   }
 }
 
 // BroadcastChannel for instant cross-tab sync
-const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('iv-sync') : null;
+const channel =
+  typeof BroadcastChannel !== "undefined"
+    ? new BroadcastChannel("iv-sync")
+    : null;
 
 function broadcastChange(key: string) {
-  channel?.postMessage({ type: 'id-set-change', key, timestamp: Date.now() });
+  channel?.postMessage({ type: "id-set-change", key, timestamp: Date.now() });
 }
 
 export function usePersistentIdSet({ key, max = 500 }: Options) {
@@ -64,54 +73,66 @@ export function usePersistentIdSet({ key, max = 500 }: Options) {
     };
 
     const onBroadcast = (e: MessageEvent) => {
-      if (e.data?.type === 'id-set-change' && e.data?.key === key) {
+      if (e.data?.type === "id-set-change" && e.data?.key === key) {
         refresh();
       }
     };
 
-    window.addEventListener('storage', onStorage);
-    channel?.addEventListener('message', onBroadcast);
+    window.addEventListener("storage", onStorage);
+    channel?.addEventListener("message", onBroadcast);
     const unsub = subscribe(key, refresh);
 
     return () => {
-      window.removeEventListener('storage', onStorage);
-      channel?.removeEventListener('message', onBroadcast);
+      window.removeEventListener("storage", onStorage);
+      channel?.removeEventListener("message", onBroadcast);
       unsub();
     };
   }, [key]);
 
-  const add = useCallback((id: string) => {
-    if (!id) return;
-    const arr = loadFromStorage(key);
-    if (arr.includes(id)) return;
-    arr.push(id);
-    const trimmed = arr.length > max ? arr.slice(arr.length - max) : arr;
-    persistToStorage(key, trimmed);
-    notify(key);
-    broadcastChange(key);
-  }, [key, max]);
-
-  const remove = useCallback((id: string) => {
-    if (!id) return;
-    const arr = loadFromStorage(key).filter((x) => x !== id);
-    persistToStorage(key, arr);
-    notify(key);
-    broadcastChange(key);
-  }, [key]);
-
-  const toggle = useCallback((id: string) => {
-    if (!id) return;
-    const arr = loadFromStorage(key);
-    if (arr.includes(id)) {
-      persistToStorage(key, arr.filter((x) => x !== id));
-    } else {
+  const add = useCallback(
+    (id: string) => {
+      if (!id) return;
+      const arr = loadFromStorage(key);
+      if (arr.includes(id)) return;
       arr.push(id);
       const trimmed = arr.length > max ? arr.slice(arr.length - max) : arr;
       persistToStorage(key, trimmed);
-    }
-    notify(key);
-    broadcastChange(key);
-  }, [key, max]);
+      notify(key);
+      broadcastChange(key);
+    },
+    [key, max],
+  );
+
+  const remove = useCallback(
+    (id: string) => {
+      if (!id) return;
+      const arr = loadFromStorage(key).filter((x) => x !== id);
+      persistToStorage(key, arr);
+      notify(key);
+      broadcastChange(key);
+    },
+    [key],
+  );
+
+  const toggle = useCallback(
+    (id: string) => {
+      if (!id) return;
+      const arr = loadFromStorage(key);
+      if (arr.includes(id)) {
+        persistToStorage(
+          key,
+          arr.filter((x) => x !== id),
+        );
+      } else {
+        arr.push(id);
+        const trimmed = arr.length > max ? arr.slice(arr.length - max) : arr;
+        persistToStorage(key, trimmed);
+      }
+      notify(key);
+      broadcastChange(key);
+    },
+    [key, max],
+  );
 
   const clear = useCallback(() => {
     persistToStorage(key, []);

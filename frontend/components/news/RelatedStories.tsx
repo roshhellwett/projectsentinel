@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { Post } from '@/types';
-import { CategoryTag } from './CategoryTag';
-import { CredibilityBadge } from './CredibilityBadge';
+import Link from "next/link";
+import { Post } from "@/types";
+import { CategoryTag } from "./CategoryTag";
+import { CredibilityBadge } from "./CredibilityBadge";
 
 interface RelatedStoriesProps {
   posts: Post[];
@@ -13,7 +13,10 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
 
   const related = posts
     .filter((p) => p.id !== currentPostId)
-    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+    )
     .slice(0, 3);
 
   if (related.length === 0) return null;
@@ -38,7 +41,9 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
             </p>
             <div className="relative z-10 flex items-center justify-between pt-2.5 sm:pt-3 border-t border-rule">
               <CredibilityBadge score={post.credibility_score} compact />
-              <span className="text-[10px] text-muted">{post.source_count} sources</span>
+              <span className="text-[10px] text-muted">
+                {post.source_count} sources
+              </span>
             </div>
           </Link>
         ))}
@@ -46,4 +51,3 @@ export function RelatedStories({ posts, currentPostId }: RelatedStoriesProps) {
     </section>
   );
 }
-

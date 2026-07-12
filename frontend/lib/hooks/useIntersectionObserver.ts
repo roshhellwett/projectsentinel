@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface UseIntersectionObserverProps {
   onIntersect: () => void;
@@ -8,7 +8,7 @@ interface UseIntersectionObserverProps {
 
 export function useIntersectionObserver({
   onIntersect,
-  rootMargin = '0px',
+  rootMargin = "0px",
   enabled = true,
 }: UseIntersectionObserverProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -31,7 +31,7 @@ export function useIntersectionObserver({
           }
         }
       },
-      { rootMargin }
+      { rootMargin },
     );
 
     observer.observe(el);

@@ -1,13 +1,17 @@
-import { Suspense } from 'react';
-import { fetchLatestPost, fetchPostsCursor } from '@/lib/supabase/server';
-import { HeroCard } from '@/components/news/HeroCard';
-import { TrendingSection } from '@/components/news/TrendingSection';
-import { InfiniteFeed } from '@/components/news/InfiniteFeed';
-import { MastheadClient } from '@/components/home/MastheadClient';
-import { FeedSectionHeader } from '@/components/home/FeedSectionHeader';
-import { FeedSkeleton } from '@/components/news/InfiniteFeed';
-import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
-import { dedupe } from '@/lib/utils/dedupe';
+import { Suspense } from "react";
+import { fetchLatestPost, fetchPostsCursor } from "@/lib/supabase/server";
+import { HeroCard } from "@/components/news/HeroCard";
+import { TrendingSection } from "@/components/news/TrendingSection";
+import { InfiniteFeed } from "@/components/news/InfiniteFeed";
+import { MastheadClient } from "@/components/home/MastheadClient";
+import { FeedSectionHeader } from "@/components/home/FeedSectionHeader";
+import { FeedSkeleton } from "@/components/news/InfiniteFeed";
+import {
+  websiteJsonLd,
+  organizationJsonLd,
+  jsonLdToString,
+} from "@/lib/utils/structuredData";
+import { dedupe } from "@/lib/utils/dedupe";
 
 export const revalidate = 60;
 
@@ -25,13 +29,18 @@ async function MastheadSection() {
 
   const NOW = Date.now();
   const DAY_AGO = NOW - 24 * 3_600_000;
-  const verifiedToday = allPosts.filter(
-    (p) => new Date(p.published_at).getTime() >= DAY_AGO,
-  ).length + (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
+  const verifiedToday =
+    allPosts.filter((p) => new Date(p.published_at).getTime() >= DAY_AGO)
+      .length +
+    (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
 
-  const avgScore = allPosts.length > 0 
-    ? Math.round(allPosts.reduce((acc, p) => acc + p.credibility_score, 0) / allPosts.length)
-    : 92;
+  const avgScore =
+    allPosts.length > 0
+      ? Math.round(
+          allPosts.reduce((acc, p) => acc + p.credibility_score, 0) /
+            allPosts.length,
+        )
+      : 92;
 
   return <MastheadClient avgScore={avgScore} verifiedToday={verifiedToday} />;
 }
@@ -58,7 +67,8 @@ async function TrendingAndFeedSection() {
 
   const trendingPosts = [...allPosts]
     .map((post) => {
-      const ageHours = (NOW - new Date(post.published_at).getTime()) / 3_600_000;
+      const ageHours =
+        (NOW - new Date(post.published_at).getTime()) / 3_600_000;
       const freshness = Math.max(0, 1 - ageHours / 12);
       return { post, score: post.credibility_score * 0.6 + freshness * 40 };
     })
@@ -125,7 +135,11 @@ export default function HomePage() {
       />
 
       <div className="relative z-10 px-3 sm:px-6 lg:px-10 pb-24 max-w-[1600px] mx-auto">
-        <Suspense fallback={<div className="h-24 animate-pulse border border-rule bg-paper-2 rounded-[8px] mb-10" />}>
+        <Suspense
+          fallback={
+            <div className="h-24 animate-pulse border border-rule bg-paper-2 rounded-[8px] mb-10" />
+          }
+        >
           <MastheadSection />
         </Suspense>
 

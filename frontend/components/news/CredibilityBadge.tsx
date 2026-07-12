@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/cn';
-import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
-import { useI18n } from '@/lib/i18n/context';
+import { cn } from "@/lib/utils/cn";
+import { getScoreHex, getScoreLabel } from "@/lib/utils/scoreColor";
+import { useI18n } from "@/lib/i18n/context";
 
 interface CredibilityBadgeProps {
   score: number;
@@ -10,35 +10,50 @@ interface CredibilityBadgeProps {
   compact?: boolean;
 }
 
-export function CredibilityBadge({ score, showTooltip = false, compact = false }: CredibilityBadgeProps) {
+export function CredibilityBadge({
+  score,
+  showTooltip = false,
+  compact = false,
+}: CredibilityBadgeProps) {
   const { t } = useI18n();
-  const clamped = Math.min(100, Math.max(0, Number.isFinite(score) ? Math.round(score) : 0));
+  const clamped = Math.min(
+    100,
+    Math.max(0, Number.isFinite(score) ? Math.round(score) : 0),
+  );
   const label = getScoreLabel(clamped);
   const scoreColor = getScoreHex(clamped);
 
   return (
     <div
       className={cn(
-        'relative group inline-flex max-w-full items-center rounded border border-rule/50 bg-paper/70 backdrop-blur-sm',
-        compact ? 'gap-2 px-2.5 py-1.5' : 'gap-3 px-3 py-2',
+        "relative group inline-flex max-w-full items-center rounded border border-rule/50 bg-paper/70 backdrop-blur-sm",
+        compact ? "gap-2 px-2.5 py-1.5" : "gap-3 px-3 py-2",
       )}
-      aria-label={`${t('credibility.label')}: ${clamped}/100, ${label}`}
+      aria-label={`${t("credibility.label")}: ${clamped}/100, ${label}`}
       role="img"
     >
-      <div className={cn('flex min-w-0 flex-col', compact ? 'w-16' : 'w-24')}>
+      <div className={cn("flex min-w-0 flex-col", compact ? "w-16" : "w-24")}>
         <div className="mb-1 flex items-center justify-between gap-2">
           {!compact && (
             <span className="truncate text-[9px] font-bold uppercase tracking-wider text-muted">
               {label}
             </span>
           )}
-          <span className={cn('font-bold tabular-nums text-ink', compact ? 'text-[11px]' : 'text-xs')}>
+          <span
+            className={cn(
+              "font-bold tabular-nums text-ink",
+              compact ? "text-[11px]" : "text-xs",
+            )}
+          >
             {clamped}
           </span>
         </div>
         <div
           className="relative h-1.5 rounded-full bg-paper-2"
-          style={{ background: 'linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)' }}
+          style={{
+            background:
+              "linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)",
+          }}
         >
           <div
             className="absolute inset-0 rounded-full bg-paper/85"
@@ -48,11 +63,16 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
         </div>
       </div>
 
-      {!compact && <div className="h-5 w-px flex-shrink-0 bg-rule" aria-hidden="true" />}
+      {!compact && (
+        <div className="h-5 w-px flex-shrink-0 bg-rule" aria-hidden="true" />
+      )}
 
       {!compact && (
-        <span className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-wider text-muted" aria-hidden="true">
-          {t('credibility.label')}
+        <span
+          className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-wider text-muted"
+          aria-hidden="true"
+        >
+          {t("credibility.label")}
         </span>
       )}
 
@@ -61,7 +81,7 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
           className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-ink text-paper text-xs font-medium rounded shadow-paper-lift opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
           role="tooltip"
         >
-          {label} · {t('credibility.label')} {clamped}/100
+          {label} · {t("credibility.label")} {clamped}/100
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-ink" />
         </div>
       )}

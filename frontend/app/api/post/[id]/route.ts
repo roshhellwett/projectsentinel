@@ -1,15 +1,19 @@
-import { NextResponse } from 'next/server';
-import { fetchPostById, updatePostStatus } from '@/lib/supabase/server';
-import { verifyAdminAuth } from '@/lib/api/auth';
-import { getServerCache, setServerCache, invalidateServerCache } from '@/lib/api/serverCache';
+import { NextResponse } from "next/server";
+import { fetchPostById, updatePostStatus } from "@/lib/supabase/server";
+import { verifyAdminAuth } from "@/lib/api/auth";
+import {
+  getServerCache,
+  setServerCache,
+  invalidateServerCache,
+} from "@/lib/api/serverCache";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-const VALID_STATUSES = ['published', 'corrected', 'retracted'] as const;
+const VALID_STATUSES = ["published", "corrected", "retracted"] as const;
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -17,15 +21,20 @@ export async function GET(
     const cached = getServerCache<{ post: unknown }>(cacheKey);
     if (cached) {
       return NextResponse.json(cached, {
-        headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' }
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
       });
     }
 
     const post = await fetchPostById(id);
     if (!post) {
       return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+        { error: "Post not found" },
+        {
+          status: 404,
+          headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
+        },
       );
     }
     const payload = { post };
@@ -33,27 +42,35 @@ export async function GET(
 
     return NextResponse.json(payload, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
-      }
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
     });
   } catch {
     return NextResponse.json(
-      { error: 'Failed to fetch post' },
-      { status: 500, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+      { error: "Failed to fetch post" },
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
+      },
     );
   }
 }
 
 function isJsonContentType(request: Request): boolean {
-  return request.headers.get('content-type')?.startsWith('application/json') === true;
+  return (
+    request.headers.get("content-type")?.startsWith("application/json") === true
+  );
 }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   if (!isJsonContentType(request)) {
-    return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 415 });
+    return NextResponse.json(
+      { error: "Content-Type must be application/json" },
+      { status: 415 },
+    );
   }
 
   const authError = await verifyAdminAuth(request);
@@ -65,22 +82,22 @@ export async function PATCH(
     const { status, correction_note } = body;
 
     if (!status || !VALID_STATUSES.includes(status)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const normalizedNote = correction_note === '' ? null : correction_note;
+    const normalizedNote = correction_note === "" ? null : correction_note;
     await updatePostStatus(id, status, normalizedNote);
-    
+
     // Invalidate server caches when post is updated
     invalidateServerCache(`post:${id}`);
-    invalidateServerCache('posts:');
-    invalidateServerCache('batch:');
+    invalidateServerCache("posts:");
+    invalidateServerCache("batch:");
 
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
-      { error: 'Failed to update post' },
-      { status: 500 }
+      { error: "Failed to update post" },
+      { status: 500 },
     );
   }
 }

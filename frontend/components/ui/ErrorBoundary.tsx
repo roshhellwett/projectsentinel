@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { AlertOctagon, RefreshCw, Trash2, WifiOff } from 'lucide-react';
+import { Component, type ReactNode, type ErrorInfo } from "react";
+import { AlertOctagon, RefreshCw, Trash2, WifiOff } from "lucide-react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -18,29 +18,50 @@ interface ErrorBoundaryState {
   isOffline: boolean;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   static defaultProps = {
     maxRetries: 3,
   };
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null, retryCount: 0, isOffline: false };
+    this.state = {
+      hasError: false,
+      error: null,
+      retryCount: 0,
+      isOffline: false,
+    };
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { hasError: true, error, isOffline: typeof navigator !== 'undefined' && !navigator.onLine };
+    return {
+      hasError: true,
+      error,
+      isOffline: typeof navigator !== "undefined" && !navigator.onLine,
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.props.onError?.(error, errorInfo);
     // Auto-retry with backoff if online
-    if (this.props.maxRetries! > 0 && typeof navigator !== 'undefined' && navigator.onLine) {
+    if (
+      this.props.maxRetries! > 0 &&
+      typeof navigator !== "undefined" &&
+      navigator.onLine
+    ) {
       const delay = Math.min(1000 * Math.pow(2, this.state.retryCount), 8000);
       setTimeout(() => {
         this.setState((prev) => {
           if (prev.retryCount >= this.props.maxRetries!) return prev;
-          return { hasError: false, error: null, retryCount: prev.retryCount + 1, isOffline: false };
+          return {
+            hasError: false,
+            error: null,
+            retryCount: prev.retryCount + 1,
+            isOffline: false,
+          };
         });
       }, delay);
     }
@@ -52,11 +73,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   handleClearCacheAndReload = () => {
     try {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const keysToRemove: string[] = [];
         for (let i = 0; i < window.localStorage.length; i++) {
           const k = window.localStorage.key(i);
-          if (k && (k.startsWith('zenith_cache_') || k.startsWith('iv:'))) {
+          if (k && (k.startsWith("zenith_cache_") || k.startsWith("iv:"))) {
             keysToRemove.push(k);
           }
         }
@@ -76,10 +97,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         return this.props.fallback;
       }
 
-      const isOffline = this.state.isOffline || (typeof navigator !== 'undefined' && !navigator.onLine);
+      const isOffline =
+        this.state.isOffline ||
+        (typeof navigator !== "undefined" && !navigator.onLine);
 
       return (
-        <div className="flex flex-col items-center justify-center py-12 px-4 text-center" role="alert" aria-live="assertive">
+        <div
+          className="flex flex-col items-center justify-center py-12 px-4 text-center"
+          role="alert"
+          aria-live="assertive"
+        >
           <div className="w-12 h-12 rounded-full bg-accent-soft/50 border border-accent/20 flex items-center justify-center mb-4 shadow-sm">
             {isOffline ? (
               <WifiOff className="w-6 h-6 text-cred-mid" strokeWidth={1.5} />
@@ -88,12 +115,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             )}
           </div>
           <h3 className="text-base font-bold text-ink mb-1">
-            {isOffline ? 'You are offline' : 'Section Unavailable'}
+            {isOffline ? "You are offline" : "Section Unavailable"}
           </h3>
           <p className="text-sm text-muted max-w-sm mb-5">
             {isOffline
-              ? 'Connect to the internet to refresh this content. Cached stories are still available.'
-              : 'Something went wrong loading this content. This may be due to a temporary network issue or stale browser cache.'}
+              ? "Connect to the internet to refresh this content. Cached stories are still available."
+              : "Something went wrong loading this content. This may be due to a temporary network issue or stale browser cache."}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             <button

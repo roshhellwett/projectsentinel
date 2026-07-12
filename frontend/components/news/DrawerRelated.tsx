@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Post } from '@/types';
-import { CategoryTag } from './CategoryTag';
-import { CredibilityBadge } from './CredibilityBadge';
-import { ArrowUpRight } from 'lucide-react';
-import { useI18n } from '@/lib/i18n/context';
+import { useEffect, useState } from "react";
+import { Post } from "@/types";
+import { CategoryTag } from "./CategoryTag";
+import { CredibilityBadge } from "./CredibilityBadge";
+import { ArrowUpRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n/context";
 
 interface DrawerRelatedProps {
   currentPost: Post;
@@ -24,36 +24,46 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     setError(false);
     const ctrl = new AbortController();
     const params = new URLSearchParams({
-      page: '1',
-      limit: '8',
-      category: currentPost.category || '',
+      page: "1",
+      limit: "8",
+      category: currentPost.category || "",
     });
-    fetch(`/api/posts/?${params.toString()}`, { signal: ctrl.signal, cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to fetch related'))))
+    fetch(`/api/posts/?${params.toString()}`, {
+      signal: ctrl.signal,
+      cache: "no-store",
+    })
+      .then((r) =>
+        r.ok ? r.json() : Promise.reject(new Error("Failed to fetch related")),
+      )
       .then(async (payload: { posts: Post[] }) => {
         if (cancelled) return;
-        let filtered = (payload.posts ?? [])
-          .filter((p) => p.id !== currentPost.id);
+        let filtered = (payload.posts ?? []).filter(
+          (p) => p.id !== currentPost.id,
+        );
 
         if (filtered.length < 3 && !cancelled) {
           try {
-            const fallbackRes = await fetch('/api/posts/?limit=10', { signal: ctrl.signal, cache: 'no-store' });
+            const fallbackRes = await fetch("/api/posts/?limit=10", {
+              signal: ctrl.signal,
+              cache: "no-store",
+            });
             if (fallbackRes.ok) {
               const fallbackPayload = await fallbackRes.json();
               const more = (fallbackPayload.posts ?? []).filter(
-                (p: Post) => p.id !== currentPost.id && !filtered.some((f) => f.id === p.id)
+                (p: Post) =>
+                  p.id !== currentPost.id &&
+                  !filtered.some((f) => f.id === p.id),
               );
               filtered = [...filtered, ...more];
             }
-          } catch {
-          }
+          } catch {}
         }
 
         if (cancelled) return;
         setRelated(filtered.slice(0, 3));
       })
       .catch((err) => {
-        if (cancelled || err?.name === 'AbortError') return;
+        if (cancelled || err?.name === "AbortError") return;
         setError(true);
       })
       .finally(() => {
@@ -71,7 +81,9 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     <section className="mt-8 border-t border-rule pt-6">
       <div className="flex items-center gap-2 mb-4">
         <span aria-hidden="true" className="w-1 h-4 bg-accent" />
-        <h3 className="font-display text-sm font-bold text-ink tracking-[-0.01em]">{t('drawer.keep_reading')}</h3>
+        <h3 className="font-display text-sm font-bold text-ink tracking-[-0.01em]">
+          {t("drawer.keep_reading")}
+        </h3>
       </div>
 
       {loading ? (
@@ -84,14 +96,19 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
           ))}
         </div>
       ) : error ? (
-        <p className="text-[13px] text-muted py-4 text-center">{t('drawer.related_error')}</p>
+        <p className="text-[13px] text-muted py-4 text-center">
+          {t("drawer.related_error")}
+        </p>
       ) : (
         <ul className="space-y-2.5">
           {related.map((post, i) => (
             <li
               key={post.id}
               className="animate-slide-up"
-              style={{ animationDelay: `${i * 40}ms`, animationFillMode: 'both' }}
+              style={{
+                animationDelay: `${i * 40}ms`,
+                animationFillMode: "both",
+              }}
             >
               <button
                 type="button"

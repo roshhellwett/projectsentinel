@@ -1,15 +1,15 @@
-function getScoreTier(score: number): 'high' | 'mid' | 'low' {
+function getScoreTier(score: number): "high" | "mid" | "low" {
   const c = Math.max(0, Math.min(100, score));
-  if (c >= 90) return 'high';
-  if (c >= 70) return 'mid';
-  return 'low';
+  if (c >= 90) return "high";
+  if (c >= 70) return "mid";
+  return "low";
 }
 
 export function getScoreLabel(score: number): string {
   const tier = getScoreTier(score);
-  if (tier === 'high') return 'High credibility';
-  if (tier === 'mid') return 'Moderate';
-  return 'Low';
+  if (tier === "high") return "High credibility";
+  if (tier === "mid") return "Moderate";
+  return "Low";
 }
 
 export function getScoreHex(score: number): string {

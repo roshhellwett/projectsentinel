@@ -1,10 +1,10 @@
-import type { Metadata } from 'next';
-import { LegalPage } from '@/components/layout/LegalPage';
+import type { Metadata } from "next";
+import { LegalPage } from "@/components/layout/LegalPage";
 
 export const metadata: Metadata = {
-  title: 'Corrections Policy — India Verified',
+  title: "Corrections Policy — India Verified",
   description:
-    'How India Verified handles errors, retractions, and updates. Every change is logged on the affected story.',
+    "How India Verified handles errors, retractions, and updates. Every change is logged on the affected story.",
 };
 
 export default function CorrectionsPolicy() {
@@ -28,50 +28,52 @@ export default function CorrectionsPolicy() {
           attribution that do not match the underlying sources.
         </li>
         <li>
-          Misrepresentation of context — when our summary shifts the meaning
-          of what the source publication actually reported.
+          Misrepresentation of context — when our summary shifts the meaning of
+          what the source publication actually reported.
         </li>
         <li>
-          Significant changes in a still-developing story that materially
-          alter our earlier conclusions.
+          Significant changes in a still-developing story that materially alter
+          our earlier conclusions.
         </li>
       </ul>
 
       <h2>What happens after a correction is filed</h2>
       <ol>
-        <li>An editor reviews the report against the original sources within 24 hours.</li>
         <li>
-          If the report stands, the story is amended and a <strong>Correction</strong> notice
-          is appended above the body, summarising what changed and when.
+          An editor reviews the report against the original sources within 24
+          hours.
         </li>
         <li>
-          The credibility score is recalculated to reflect the corrected
-          state.
+          If the report stands, the story is amended and a{" "}
+          <strong>Correction</strong> notice is appended above the body,
+          summarising what changed and when.
         </li>
         <li>
-          A line is added to the public correction log for the affected
-          story.
+          The credibility score is recalculated to reflect the corrected state.
+        </li>
+        <li>
+          A line is added to the public correction log for the affected story.
         </li>
       </ol>
 
       <h2>Retractions</h2>
       <p>
-        In rare cases where a story turns out to be unsupportable — a
-        fabricated source, a hoax that fooled multiple wires, or a defamation
-        risk — we retract it. Retracted stories remain online with a clear{' '}
-        <strong>Retracted</strong> banner so the historical record stays
-        intact, but the headline is struck through and the original summary
-        is replaced with an explanation.
+        In rare cases where a story turns out to be unsupportable — a fabricated
+        source, a hoax that fooled multiple wires, or a defamation risk — we
+        retract it. Retracted stories remain online with a clear{" "}
+        <strong>Retracted</strong> banner so the historical record stays intact,
+        but the headline is struck through and the original summary is replaced
+        with an explanation.
       </p>
 
       <h2>How to report an error</h2>
       <p>Choose whichever channel is easiest:</p>
       <ul>
         <li>
-          Email{' '}
+          Email{" "}
           <a href="mailto:zenithprojects@icloud.com">
             zenithprojects@icloud.com
-          </a>{' '}
+          </a>{" "}
           with the article URL and the specific claim that is wrong.
         </li>
         <li>
@@ -79,16 +81,16 @@ export default function CorrectionsPolicy() {
           story (where available).
         </li>
         <li>
-          For urgent items (defamation, safety, ongoing harm), include the
-          word <strong>URGENT</strong> in the subject line.
+          For urgent items (defamation, safety, ongoing harm), include the word{" "}
+          <strong>URGENT</strong> in the subject line.
         </li>
       </ul>
 
       <h2>What we will not change</h2>
       <p>
         A complaint that a story is unflattering is not, by itself, a
-        correction. We do not edit accurate reporting because a subject finds
-        it inconvenient. We will, however, always engage with substantiated
+        correction. We do not edit accurate reporting because a subject finds it
+        inconvenient. We will, however, always engage with substantiated
         objections about facts or framing.
       </p>
     </LegalPage>

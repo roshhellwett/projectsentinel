@@ -1,5 +1,5 @@
-import { PageShell } from '@/components/layout/PageShell';
-import { FeedSkeleton } from '@/components/news/InfiniteFeed';
+import { PageShell } from "@/components/layout/PageShell";
+import { FeedSkeleton } from "@/components/news/InfiniteFeed";
 
 export default function SavedLoading() {
   return (

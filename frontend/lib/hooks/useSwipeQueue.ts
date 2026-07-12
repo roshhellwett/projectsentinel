@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Post } from '@/types';
-import { dedupe } from '@/lib/utils/dedupe';
-import { loadSeenWithinDays, unmarkSeen } from '@/lib/utils/seenSet';
-import { cachedFetch } from '@/lib/utils/fetchCache';
-import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Post } from "@/types";
+import { dedupe } from "@/lib/utils/dedupe";
+import { loadSeenWithinDays, unmarkSeen } from "@/lib/utils/seenSet";
+import { cachedFetch } from "@/lib/utils/fetchCache";
+import { safeRead, safeWrite } from "@/lib/utils/safeStorage";
 
-const READ_KEY = 'iv:readPosts:v1';
+const READ_KEY = "iv:readPosts:v1";
 const SWIPE_PAGE_SIZE = 25;
 const PREFETCH_THRESHOLD = 10;
 const HISTORY_MAX = 25;
-const SEEN_PREFIX = 'iv:swipe:seen:';
+const SEEN_PREFIX = "iv:swipe:seen:";
 const MAX_REFILL_FAILURES = 3;
 const REFILL_BACKOFF_MS = [1500, 4000, 10000] as const;
 
@@ -21,11 +21,13 @@ function loadReadIdsSync(): Set<string> {
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
-    const ids = parsed.filter((x) => typeof x === 'string');
+    const ids = parsed.filter((x) => typeof x === "string");
     // If over 500 read items, trim oldest half to prevent quota inflation
     if (ids.length > 500) {
       const trimmed = ids.slice(ids.length - 250);
-      try { safeWrite(READ_KEY, JSON.stringify(trimmed)); } catch {}
+      try {
+        safeWrite(READ_KEY, JSON.stringify(trimmed));
+      } catch {}
       return new Set(trimmed);
     }
     return new Set(ids);
@@ -36,7 +38,7 @@ function loadReadIdsSync(): Set<string> {
 
 export interface HistoryEntry {
   post: Post;
-  direction: 'up' | 'left' | 'right';
+  direction: "up" | "left" | "right";
   wasSaved: boolean;
 }
 
@@ -55,7 +57,11 @@ interface SwipeQueueApi {
   isFetching: boolean;
   isExhausted: boolean;
   hasError: boolean;
-  advance: (post: Post, direction: 'up' | 'left' | 'right', wasSaved: boolean) => void;
+  advance: (
+    post: Post,
+    direction: "up" | "left" | "right",
+    wasSaved: boolean,
+  ) => void;
   rewind: () => HistoryEntry | null;
   refill: () => Promise<void>;
   retry: () => Promise<void>;
@@ -131,18 +137,21 @@ export function useSwipeQueue({
     const seen = seenRef.current;
     const readNow = hideRead ? loadReadIdsSync() : new Set<string>();
     const cleaned = dedupe(
-      initialPosts.filter((p) => p?.id && !seen.has(p.id) && !readNow.has(p.id)),
+      initialPosts.filter(
+        (p) => p?.id && !seen.has(p.id) && !readNow.has(p.id),
+      ),
     );
 
     cleaned.sort(
-      (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+      (a, b) =>
+        new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
     );
     setQueue(cleaned);
     setHydrated(true);
   }, [hideRead, initialPosts]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     const onStorage = (e: StorageEvent) => {
       if (!e.key) return;
       if (e.key.startsWith(SEEN_PREFIX)) {
@@ -154,26 +163,27 @@ export function useSwipeQueue({
         setQueue((prev) => prev.filter((p) => !fresh.has(p.id)));
       }
     };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, [refreshSeenFromDisk, hideRead]);
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return;
     const onVisible = () => {
-      if (document.visibilityState !== 'visible') return;
+      if (document.visibilityState !== "visible") return;
       refreshSeenFromDisk();
       if (hideRead) {
         const fresh = loadReadIdsSync();
         setQueue((prev) => prev.filter((p) => !fresh.has(p.id)));
       }
     };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [refreshSeenFromDisk, hideRead]);
 
   const refill = useCallback(async () => {
-    if (fetchingRef.current || exhaustedRef.current || !mountedRef.current) return;
+    if (fetchingRef.current || exhaustedRef.current || !mountedRef.current)
+      return;
     fetchingRef.current = true;
     setIsFetching(true);
 
@@ -189,7 +199,7 @@ export function useSwipeQueue({
         page: String(nextPage),
         limit: String(SWIPE_PAGE_SIZE),
       });
-      
+
       const timeoutId = setTimeout(() => controller.abort(), 12_000);
       let payload: { posts: Post[]; count?: number };
       try {
@@ -214,12 +224,15 @@ export function useSwipeQueue({
         setHasError(false);
       }
     } catch (err) {
-      if ((err as { name?: string })?.name === 'AbortError') return;
+      if ((err as { name?: string })?.name === "AbortError") return;
       failureCountRef.current += 1;
       if (failureCountRef.current >= MAX_REFILL_FAILURES) {
         if (mountedRef.current) setHasError(true);
       } else {
-        const delay = REFILL_BACKOFF_MS[Math.min(failureCountRef.current - 1, REFILL_BACKOFF_MS.length - 1)];
+        const delay =
+          REFILL_BACKOFF_MS[
+            Math.min(failureCountRef.current - 1, REFILL_BACKOFF_MS.length - 1)
+          ];
 
         retryTimerRef.current = setTimeout(() => {
           retryTimerRef.current = null;
@@ -232,7 +245,11 @@ export function useSwipeQueue({
         return;
       }
     } finally {
-      if (!retryTimerRef.current && mountedRef.current && abortControllerRef.current === controller) {
+      if (
+        !retryTimerRef.current &&
+        mountedRef.current &&
+        abortControllerRef.current === controller
+      ) {
         setIsFetching(false);
         fetchingRef.current = false;
         abortControllerRef.current = null;
@@ -266,19 +283,22 @@ export function useSwipeQueue({
     }
   }, [hydrated, queue.length, refill]);
 
-  const advance = useCallback((post: Post, direction: 'up' | 'left' | 'right', wasSaved: boolean) => {
-    setQueue((prev) => {
-      if (prev.length === 0) return prev;
-      const front = prev[0];
-      if (front.id !== post.id) return prev;
-      return prev.slice(1);
-    });
-    setHistory((prev) => {
-      const entry: HistoryEntry = { post, direction, wasSaved };
-      const next = [entry, ...prev];
-      return next.length > HISTORY_MAX ? next.slice(0, HISTORY_MAX) : next;
-    });
-  }, []);
+  const advance = useCallback(
+    (post: Post, direction: "up" | "left" | "right", wasSaved: boolean) => {
+      setQueue((prev) => {
+        if (prev.length === 0) return prev;
+        const front = prev[0];
+        if (front.id !== post.id) return prev;
+        return prev.slice(1);
+      });
+      setHistory((prev) => {
+        const entry: HistoryEntry = { post, direction, wasSaved };
+        const next = [entry, ...prev];
+        return next.length > HISTORY_MAX ? next.slice(0, HISTORY_MAX) : next;
+      });
+    },
+    [],
+  );
 
   const rewind = useCallback((): HistoryEntry | null => {
     const hist = historyRef.current;

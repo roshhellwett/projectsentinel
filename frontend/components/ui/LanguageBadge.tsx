@@ -1,22 +1,26 @@
-'use client';
+"use client";
 
-import type { ContentLanguage } from '@/types';
+import type { ContentLanguage } from "@/types";
 
 const LANGUAGE_LABELS: Record<string, string> = {
-  en: 'EN',
-  hi: 'HI',
-  ta: 'TA',
-  te: 'TE',
-  bn: 'BN',
-  mr: 'MR',
-  ml: 'ML',
-  kn: 'KN',
-  gu: 'GU',
-  ur: 'UR',
+  en: "EN",
+  hi: "HI",
+  ta: "TA",
+  te: "TE",
+  bn: "BN",
+  mr: "MR",
+  ml: "ML",
+  kn: "KN",
+  gu: "GU",
+  ur: "UR",
 };
 
-export function LanguageBadge({ language }: { language?: ContentLanguage | string | null }) {
-  if (!language || language === 'en') return null;
+export function LanguageBadge({
+  language,
+}: {
+  language?: ContentLanguage | string | null;
+}) {
+  if (!language || language === "en") return null;
   const label = LANGUAGE_LABELS[language] || language.toUpperCase();
 
   return (

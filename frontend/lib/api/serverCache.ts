@@ -16,11 +16,15 @@ export function getServerCache<T>(key: string): T | null {
   return entry.data as T;
 }
 
-export function setServerCache(key: string, data: unknown, ttlMs = 60_000): void {
+export function setServerCache(
+  key: string,
+  data: unknown,
+  ttlMs = 60_000,
+): void {
   if (serverCache.size >= MAX_SERVER_CACHE_KEYS) {
     // Batch evict oldest 20% to avoid repeated single evictions
-    const entries = [...serverCache.entries()].sort((a, b) =>
-      (a[1]?.expiresAt ?? 0) - (b[1]?.expiresAt ?? 0)
+    const entries = [...serverCache.entries()].sort(
+      (a, b) => (a[1]?.expiresAt ?? 0) - (b[1]?.expiresAt ?? 0),
     );
     const toEvict = Math.max(1, Math.floor(entries.length * 0.2));
     for (let i = 0; i < toEvict; i++) {

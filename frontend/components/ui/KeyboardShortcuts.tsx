@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Z_INDEX } from '@/lib/theme/zIndex';
-import { X, Keyboard } from 'lucide-react';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Z_INDEX } from "@/lib/theme/zIndex";
+import { X, Keyboard } from "lucide-react";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/utils/bodyScrollLock";
 
 const SHORTCUTS: Array<{ keys: string[]; description: string }> = [
-  { keys: ['/'], description: 'Focus search' },
-  { keys: ['?'], description: 'Show keyboard shortcuts' },
-  { keys: ['g', 'h'], description: 'Go to home' },
-  { keys: ['g', 's'], description: 'Go to saved stories' },
-  { keys: ['Esc'], description: 'Close any open dialog' },
+  { keys: ["/"], description: "Focus search" },
+  { keys: ["?"], description: "Show keyboard shortcuts" },
+  { keys: ["g", "h"], description: "Go to home" },
+  { keys: ["g", "s"], description: "Go to saved stories" },
+  { keys: ["Esc"], description: "Close any open dialog" },
 ];
 
-export const OPEN_SEARCH_EVENT = 'iv:open-search';
+export const OPEN_SEARCH_EVENT = "iv:open-search";
 
 export function KeyboardShortcuts() {
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  const bufferRef = useRef<string>('');
+  const bufferRef = useRef<string>("");
   const bufferTimerRef = useRef<number | null>(null);
 
   const closeHelp = useCallback(() => setHelpOpen(false), []);
@@ -46,7 +46,7 @@ export function KeyboardShortcuts() {
 
   useEffect(() => {
     const resetBuffer = () => {
-      bufferRef.current = '';
+      bufferRef.current = "";
       if (bufferTimerRef.current !== null) {
         window.clearTimeout(bufferTimerRef.current);
         bufferTimerRef.current = null;
@@ -56,18 +56,18 @@ export function KeyboardShortcuts() {
     const isEditableTarget = (target: EventTarget | null): boolean => {
       if (!(target instanceof HTMLElement)) return false;
       const tag = target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT")
+        return true;
       if (target.isContentEditable) return true;
       return false;
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
-
       if (isEditableTarget(e.target)) return;
 
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         if (helpOpen) {
           e.preventDefault();
           setHelpOpen(false);
@@ -75,38 +75,38 @@ export function KeyboardShortcuts() {
         return;
       }
 
-      if (e.key === '/') {
+      if (e.key === "/") {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
         resetBuffer();
         return;
       }
 
-      if (e.key === '?') {
+      if (e.key === "?") {
         e.preventDefault();
         setHelpOpen((v) => !v);
         resetBuffer();
         return;
       }
 
-      if (bufferRef.current === 'g') {
-        if (e.key === 'h') {
+      if (bufferRef.current === "g") {
+        if (e.key === "h") {
           e.preventDefault();
-          router.push('/');
+          router.push("/");
           resetBuffer();
           return;
         }
-        if (e.key === 's') {
+        if (e.key === "s") {
           e.preventDefault();
-          router.push('/saved/');
+          router.push("/saved/");
           resetBuffer();
           return;
         }
         resetBuffer();
       }
 
-      if (e.key === 'g') {
-        bufferRef.current = 'g';
+      if (e.key === "g") {
+        bufferRef.current = "g";
         if (bufferTimerRef.current !== null) {
           window.clearTimeout(bufferTimerRef.current);
         }
@@ -114,9 +114,9 @@ export function KeyboardShortcuts() {
       }
     };
 
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("keydown", onKeyDown);
       resetBuffer();
     };
   }, [helpOpen, router]);
@@ -135,7 +135,7 @@ export function KeyboardShortcuts() {
             aria-modal="true"
             aria-label="Keyboard shortcuts"
             className={`animate-scale-in fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] right-4 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:right-6 ${Z_INDEX.shortcutWidget}`}
-            style={{ width: 'min(calc(100vw-2rem),22rem)' }}
+            style={{ width: "min(calc(100vw-2rem),22rem)" }}
           >
             <div className="card rounded-2xl p-6 shadow-paper-lift">
               <div className="flex items-center justify-between mb-5">
@@ -178,8 +178,8 @@ export function KeyboardShortcuts() {
                 ))}
               </ul>
               <p className="mt-5 text-[11px] text-subtle leading-relaxed">
-                Shortcuts are disabled while you&apos;re typing in a search or text
-                field.
+                Shortcuts are disabled while you&apos;re typing in a search or
+                text field.
               </p>
             </div>
           </div>

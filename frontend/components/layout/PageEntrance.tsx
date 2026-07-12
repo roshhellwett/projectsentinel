@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from "react";
 
 export function PageEntrance({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -10,7 +10,7 @@ export function PageEntrance({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className={mounted ? 'animate-entrance' : ''} style={{ opacity: 0 }}>
+    <div className={mounted ? "animate-entrance" : ""} style={{ opacity: 0 }}>
       {children}
     </div>
   );

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { formatTimeAgo } from '@/lib/utils/formatDate';
+import { useState, useEffect } from "react";
+import { formatTimeAgo } from "@/lib/utils/formatDate";
 
 export function useTimeAgo(dateString: string): string {
   const [text, setText] = useState(() => formatTimeAgo(dateString));

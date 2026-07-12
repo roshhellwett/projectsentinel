@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from "react";
 
 interface DailyData {
   date: string;
@@ -9,11 +9,11 @@ interface DailyData {
   days: Record<string, number>;
 }
 
-const STORAGE_KEY = 'iv:daily:v4';
+const STORAGE_KEY = "iv:daily:v4";
 const MILESTONES = [5, 10, 15, 25, 50, 100];
 
 function pad(n: number): string {
-  return String(n).padStart(2, '0');
+  return String(n).padStart(2, "0");
 }
 
 function getLocalYmd(d: Date = new Date()): string {
@@ -29,14 +29,25 @@ function load(): DailyData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object' && typeof parsed.count === 'number') return parsed;
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        typeof parsed.count === "number"
+      )
+        return parsed;
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return { date: todayKey(), count: 0, lastMilestone: 0, days: {} };
 }
 
 function save(data: DailyData): void {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    /* ignore */
+  }
 }
 
 function calcStreak(days: Record<string, number>): number {
@@ -78,8 +89,13 @@ export function useDailyReadCount() {
     const baseCount = isNewDay ? 0 : existing.count;
     const incremented = baseCount + 1;
 
-    const newDays = { ...existing.days, [today]: (existing.days[today] ?? 0) + 1 };
-    const nextMilestone = MILESTONES.find((m) => incremented >= m && m > existing.lastMilestone) ?? null;
+    const newDays = {
+      ...existing.days,
+      [today]: (existing.days[today] ?? 0) + 1,
+    };
+    const nextMilestone =
+      MILESTONES.find((m) => incremented >= m && m > existing.lastMilestone) ??
+      null;
 
     save({
       date: today,
@@ -100,7 +116,12 @@ export function useDailyReadCount() {
     }
   }, []);
 
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    [],
+  );
 
   return { dailyCount: count, streak, milestone, recordRead };
 }

@@ -1,36 +1,43 @@
-const IST: Intl.DateTimeFormatOptions = { timeZone: 'Asia/Kolkata' };
+const IST: Intl.DateTimeFormatOptions = { timeZone: "Asia/Kolkata" };
 
 function parseSafeDate(dateString: string): Date {
   if (!dateString) return new Date(NaN);
-  let safeString = dateString.trim().replace(' ', 'T');
-  if (!safeString.endsWith('Z') && !safeString.includes('+') && !safeString.match(/-\d{2}:\d{2}$/)) {
-    safeString += 'Z';
+  let safeString = dateString.trim().replace(" ", "T");
+  if (
+    !safeString.endsWith("Z") &&
+    !safeString.includes("+") &&
+    !safeString.match(/-\d{2}:\d{2}$/)
+  ) {
+    safeString += "Z";
   }
   return new Date(safeString);
 }
 
 export function formatDate(dateString: string): string {
   const date = parseSafeDate(dateString);
-  if (isNaN(date.getTime())) return 'Unknown date';
-  return date.toLocaleDateString('en-IN', {
+  if (isNaN(date.getTime())) return "Unknown date";
+  return date.toLocaleDateString("en-IN", {
     ...IST,
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: true,
   });
 }
 
 export function formatTimeAgo(dateString: string): string {
   const date = parseSafeDate(dateString);
-  if (isNaN(date.getTime())) return '';
+  if (isNaN(date.getTime())) return "";
   const now = new Date();
-  const diffInSeconds = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000));
+  const diffInSeconds = Math.max(
+    0,
+    Math.floor((now.getTime() - date.getTime()) / 1000),
+  );
 
   if (diffInSeconds < 60) {
-    return 'just now';
+    return "just now";
   }
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
@@ -48,9 +55,9 @@ export function formatTimeAgo(dateString: string): string {
     return `${diffInDays}d ago`;
   }
 
-  return date.toLocaleDateString('en-IN', {
+  return date.toLocaleDateString("en-IN", {
     ...IST,
-    month: 'short',
-    day: 'numeric',
+    month: "short",
+    day: "numeric",
   });
 }

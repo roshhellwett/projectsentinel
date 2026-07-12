@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Z_INDEX } from '@/lib/theme/zIndex';
-import { useEffect, useRef } from 'react';
+import { Z_INDEX } from "@/lib/theme/zIndex";
+import { useEffect, useRef } from "react";
 
 interface ReadingProgressProps {
   targetSelector?: string;
@@ -14,7 +14,7 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
   useEffect(() => {
     const compute = () => {
       const target = targetSelector
-        ? document.querySelector(targetSelector) as HTMLElement | null
+        ? (document.querySelector(targetSelector) as HTMLElement | null)
         : null;
 
       const scrolled = window.scrollY;
@@ -38,8 +38,10 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
 
       if (barRef.current) {
         barRef.current.style.transform = `scaleX(${ratio})`;
-        barRef.current.style.opacity = visible ? '1' : '0';
-        barRef.current.style.willChange = visible ? 'transform, opacity' : 'auto';
+        barRef.current.style.opacity = visible ? "1" : "0";
+        barRef.current.style.willChange = visible
+          ? "transform, opacity"
+          : "auto";
       }
     };
 
@@ -53,11 +55,11 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
     };
 
     compute();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, [targetSelector]);
 
@@ -65,16 +67,17 @@ export function ReadingProgress({ targetSelector }: ReadingProgressProps = {}) {
     <div
       aria-hidden="true"
       className={`fixed inset-x-0 ${Z_INDEX.readingProgress} h-[2px] pointer-events-none`}
-      style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
+      style={{ top: "calc(env(safe-area-inset-top, 0px) + 3.5rem)" }}
     >
       <div
         ref={barRef}
         className="h-full origin-left transition-opacity duration-300 transform-gpu"
         style={{
-          transform: 'scaleX(0)',
+          transform: "scaleX(0)",
           opacity: 0,
-          background: 'linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))',
-          boxShadow: '0 0 12px rgb(var(--c-accent) / 0.55)',
+          background:
+            "linear-gradient(to right, rgb(var(--c-accent-hover)), rgb(var(--c-accent)), rgb(var(--c-accent-hover)))",
+          boxShadow: "0 0 12px rgb(var(--c-accent) / 0.55)",
         }}
       />
     </div>

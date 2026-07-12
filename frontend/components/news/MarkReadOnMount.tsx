@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useReadPosts } from '@/lib/utils/readPosts';
+import { useEffect } from "react";
+import { useReadPosts } from "@/lib/utils/readPosts";
 
 interface MarkReadOnMountProps {
   postId: string;

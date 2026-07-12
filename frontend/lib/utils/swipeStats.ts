@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-const COUNT_PREFIX  = 'iv:swipe:count:';
-const HOSTS_PREFIX  = 'iv:swipe:hosts:';
-const STREAK_KEY    = 'iv:swipe:streak:v1';
-const HINT_KEY      = 'iv:swipe:hint:dismissed:v1';
-const BREAK_PREFIX  = 'iv:swipe:break:snoozed:';
+const COUNT_PREFIX = "iv:swipe:count:";
+const HOSTS_PREFIX = "iv:swipe:hosts:";
+const STREAK_KEY = "iv:swipe:streak:v1";
+const HINT_KEY = "iv:swipe:hint:dismissed:v1";
+const BREAK_PREFIX = "iv:swipe:break:snoozed:";
 
 const KEEP_DAYS = 14;
 const MS_PER_DAY = 86_400_000;
 
-function pad(n: number): string { return String(n).padStart(2, '0'); }
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
 
 function ymd(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function todayYmd(): string { return ymd(new Date()); }
+function todayYmd(): string {
+  return ymd(new Date());
+}
 
 function dayDiff(aYmd: string, bYmd: string): number {
   const a = new Date(`${aYmd}T00:00:00Z`);
@@ -23,7 +27,7 @@ function dayDiff(aYmd: string, bYmd: string): number {
   return Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
 }
 
-import { safeRead as baseSafeRead, safeWrite, safeRemove } from './safeStorage';
+import { safeRead as baseSafeRead, safeWrite, safeRemove } from "./safeStorage";
 
 function safeRead<T>(key: string, fallback: T): T {
   try {
@@ -36,7 +40,7 @@ function safeRead<T>(key: string, fallback: T): T {
 }
 
 export function pruneStaleStatsKeys(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - KEEP_DAYS);
   try {
@@ -44,12 +48,12 @@ export function pruneStaleStatsKeys(): void {
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
       if (!k) continue;
-      const isSwipeKey = k.startsWith('iv:swipe:');
+      const isSwipeKey = k.startsWith("iv:swipe:");
       if (!isSwipeKey) continue;
-      
+
       const dateMatch = k.match(/(\d{4}-\d{2}-\d{2})$/);
       if (!dateMatch) continue;
-      
+
       const datePart = dateMatch[1];
       const parsed = new Date(`${datePart}T00:00:00`);
       if (Number.isFinite(parsed.getTime()) && parsed < cutoff) {
@@ -57,8 +61,7 @@ export function pruneStaleStatsKeys(): void {
       }
     }
     toDelete.forEach((k) => safeRemove(k));
-  } catch {
-      }
+  } catch {}
 }
 
 export function getCardsToday(): number {

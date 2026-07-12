@@ -1,19 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect, type ReactNode } from 'react';
-import { I18nContext, type Locale } from './i18n-shared';
-import en from '../../messages/en.json';
-import hi from '../../messages/hi.json';
+import { useState, useCallback, useEffect, type ReactNode } from "react";
+import { I18nContext, type Locale } from "./i18n-shared";
+import en from "../../messages/en.json";
+import hi from "../../messages/hi.json";
 
 type Messages = Record<string, string>;
 
-const SUPPORTED_LOCALES: Locale[] = ['en', 'hi'];
-const FALLBACK_LOCALE: Locale = 'en';
-const STORAGE_KEY = 'iv-locale';
+const SUPPORTED_LOCALES: Locale[] = ["en", "hi"];
+const FALLBACK_LOCALE: Locale = "en";
+const STORAGE_KEY = "iv-locale";
 
 const LANG_MAP: Record<Locale, Messages> = { en, hi };
 
-function interpolate(template: string, params?: Record<string, string | number>): string {
+function interpolate(
+  template: string,
+  params?: Record<string, string | number>,
+): string {
   if (!params) return template;
   return template.replace(/\{(\w+)\}/g, (_, key) => {
     const val = params[key];
@@ -21,7 +24,11 @@ function interpolate(template: string, params?: Record<string, string | number>)
   });
 }
 
-function getMessage(key: string, locale: Locale, params?: Record<string, string | number>): string {
+function getMessage(
+  key: string,
+  locale: Locale,
+  params?: Record<string, string | number>,
+): string {
   const msgs = LANG_MAP[locale];
   const template = msgs?.[key];
   if (template) return interpolate(template, params);
@@ -70,4 +77,4 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export { useI18n } from './i18n-shared';
+export { useI18n } from "./i18n-shared";

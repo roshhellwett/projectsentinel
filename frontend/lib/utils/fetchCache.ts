@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface CacheEntry {
   data: unknown;
@@ -10,7 +10,7 @@ const cache = new Map<string, CacheEntry>();
 const DEFAULT_TTL = 60_000;
 const FALLBACK_TTL = 24 * 60 * 60 * 1000; // 24 hours fallback window
 const MAX_MEMORY_ITEMS = 100;
-const STORAGE_PREFIX = 'zenith_cache_';
+const STORAGE_PREFIX = "zenith_cache_";
 
 function getCacheKey(url: string, method: string, body?: unknown): string {
   if (body) return `${method}:${url}:${JSON.stringify(body)}`;
@@ -18,7 +18,7 @@ function getCacheKey(url: string, method: string, body?: unknown): string {
 }
 
 function pruneLocalStorage(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   try {
     const keys: { key: string; timestamp: number }[] = [];
     const now = Date.now();
@@ -56,12 +56,12 @@ function pruneLocalStorage(): void {
 }
 
 // Run initial cleanup once in browser environment
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   setTimeout(pruneLocalStorage, 2000);
 }
 
 function getFromLocalStorage<T>(key: string): CacheEntry | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   try {
     const item = window.localStorage.getItem(`${STORAGE_PREFIX}${key}`);
     if (!item) return null;
@@ -72,15 +72,26 @@ function getFromLocalStorage<T>(key: string): CacheEntry | null {
 }
 
 function saveToLocalStorage(key: string, entry: CacheEntry): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(entry));
+    window.localStorage.setItem(
+      `${STORAGE_PREFIX}${key}`,
+      JSON.stringify(entry),
+    );
   } catch (err) {
     // Check if storage quota exceeded
-    if (err instanceof DOMException && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+    if (
+      err instanceof DOMException &&
+      (err.name === "QuotaExceededError" ||
+        err.code === 22 ||
+        err.code === 1014)
+    ) {
       pruneLocalStorage();
       try {
-        window.localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(entry));
+        window.localStorage.setItem(
+          `${STORAGE_PREFIX}${key}`,
+          JSON.stringify(entry),
+        );
       } catch {
         // If still failing after prune, ignore
       }
@@ -104,8 +115,10 @@ function getCached<T>(key: string, allowStale = false): T | null {
   }
   if (allowStale && age > FALLBACK_TTL) {
     cache.delete(key);
-    if (typeof window !== 'undefined') {
-      try { window.localStorage.removeItem(`${STORAGE_PREFIX}${key}`); } catch {}
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(`${STORAGE_PREFIX}${key}`);
+      } catch {}
     }
     return null;
   }
@@ -125,7 +138,7 @@ function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
   }
   const entry = { data, timestamp: Date.now(), ttl };
   cache.set(key, entry);
-  if (key.startsWith('GET:')) {
+  if (key.startsWith("GET:")) {
     saveToLocalStorage(key, entry);
   }
 }
@@ -133,7 +146,7 @@ function setCache(key: string, data: unknown, ttl = DEFAULT_TTL): void {
 function clearCache(pattern?: string): void {
   if (!pattern) {
     cache.clear();
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       try {
         for (let i = window.localStorage.length - 1; i >= 0; i--) {
           const k = window.localStorage.key(i);
@@ -146,8 +159,10 @@ function clearCache(pattern?: string): void {
   for (const key of cache.keys()) {
     if (key.includes(pattern)) {
       cache.delete(key);
-      if (typeof window !== 'undefined') {
-        try { window.localStorage.removeItem(`${STORAGE_PREFIX}${key}`); } catch {}
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem(`${STORAGE_PREFIX}${key}`);
+        } catch {}
       }
     }
   }
@@ -155,45 +170,60 @@ function clearCache(pattern?: string): void {
 
 const inflight = new Map<string, Promise<unknown>>();
 
-async function fetchWithRetry<T>(url: string, options?: RequestInit, retries = 2, delayMs = 600): Promise<T> {
+async function fetchWithRetry<T>(
+  url: string,
+  options?: RequestInit,
+  retries = 2,
+  delayMs = 600,
+): Promise<T> {
   // If offline immediately fail to trigger fallback without waiting
-  if (typeof window !== 'undefined' && !navigator.onLine) {
-    throw new Error('Device is offline');
+  if (typeof window !== "undefined" && !navigator.onLine) {
+    throw new Error("Device is offline");
   }
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(url, { ...options, cache: options?.cache || 'no-store' });
+      const res = await fetch(url, {
+        ...options,
+        cache: options?.cache || "no-store",
+      });
       if (!res.ok) {
         if ((res.status >= 500 || res.status === 429) && attempt < retries) {
-          await new Promise((r) => setTimeout(r, delayMs * Math.pow(2, attempt)));
+          await new Promise((r) =>
+            setTimeout(r, delayMs * Math.pow(2, attempt)),
+          );
           continue;
         }
         throw new Error(`fetch failed: ${res.status}`);
       }
       return await res.json();
     } catch (err) {
-      if (attempt < retries && (typeof window === 'undefined' || navigator.onLine)) {
+      if (
+        attempt < retries &&
+        (typeof window === "undefined" || navigator.onLine)
+      ) {
         await new Promise((r) => setTimeout(r, delayMs * Math.pow(2, attempt)));
         continue;
       }
       throw err;
     }
   }
-  throw new Error('Fetch exhausted retries');
+  throw new Error("Fetch exhausted retries");
 }
 
 export async function cachedFetch<T>(
   url: string,
   options?: RequestInit & { cacheTtl?: number },
 ): Promise<T> {
-  const method = options?.method || 'GET';
-  const shouldCache = method === 'GET' || (options?.cacheTtl !== undefined && options.cacheTtl > 0);
+  const method = options?.method || "GET";
+  const shouldCache =
+    method === "GET" ||
+    (options?.cacheTtl !== undefined && options.cacheTtl > 0);
   const cacheKey = getCacheKey(url, method, options?.body);
 
   if (shouldCache) {
     // When offline, immediately allow stale data even if TTL expired (up to FALLBACK_TTL)
-    const isOffline = typeof window !== 'undefined' && !navigator.onLine;
+    const isOffline = typeof window !== "undefined" && !navigator.onLine;
     const cached = getCached<T>(cacheKey, isOffline);
     if (cached !== null) return cached;
 
@@ -212,7 +242,10 @@ export async function cachedFetch<T>(
       if (shouldCache) {
         const staleFallback = getCached<T>(cacheKey, true);
         if (staleFallback !== null) {
-          console.warn(`[Fetch Fallback] Serving stale data for ${url} due to network error/offline:`, err);
+          console.warn(
+            `[Fetch Fallback] Serving stale data for ${url} due to network error/offline:`,
+            err,
+          );
           return staleFallback;
         }
       }
@@ -232,6 +265,6 @@ export async function cachedFetch<T>(
 }
 
 export function invalidatePostsCache(): void {
-  clearCache('/api/posts/');
-  clearCache('/api/post/');
+  clearCache("/api/posts/");
+  clearCache("/api/post/");
 }

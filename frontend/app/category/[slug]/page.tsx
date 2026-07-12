@@ -1,23 +1,25 @@
-import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
-import { fetchPostsCursor } from '@/lib/supabase/server';
-import { InfiniteFeed, FeedSkeleton } from '@/components/news/InfiniteFeed';
-import { CATEGORY_SLUGS } from '@/lib/constants/categories';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { PageShell } from '@/components/layout/PageShell';
+import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import { fetchPostsCursor } from "@/lib/supabase/server";
+import { InfiniteFeed, FeedSkeleton } from "@/components/news/InfiniteFeed";
+import { CATEGORY_SLUGS } from "@/lib/constants/categories";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PageShell } from "@/components/layout/PageShell";
 
 export const revalidate = 60;
 export const dynamicParams = false;
 
 const VALID_CATEGORIES = CATEGORY_SLUGS;
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://zenithopensourceprojects.vercel.app";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  return VALID_CATEGORIES.map(slug => ({ slug }));
+  return VALID_CATEGORIES.map((slug) => ({ slug }));
 }
 
 function titleCase(str: string): string {
@@ -28,7 +30,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
   const { slug } = await params;
   if (!(VALID_CATEGORIES as readonly string[]).includes(slug)) {
     return {
-      title: 'Category Not Found - India Verified',
+      title: "Category Not Found - India Verified",
     };
   }
 
@@ -50,7 +52,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: `${category} News - India Verified`,
       description: `Latest verified ${category} news from India. Every story verified across multiple sources.`,
       images: [`${siteUrl}/opengraph-image.png`],
@@ -64,12 +66,20 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 async function CategoryGrid({ slug }: { slug: string }) {
   const { posts, hasMore } = await fetchPostsCursor(undefined, 20, slug);
 
-  return <InfiniteFeed initialPosts={posts} hasInitialMore={hasMore} category={slug} />;
+  return (
+    <InfiniteFeed
+      initialPosts={posts}
+      hasInitialMore={hasMore}
+      category={slug}
+    />
+  );
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const isValidCategory = (VALID_CATEGORIES as readonly string[]).includes(slug);
+  const isValidCategory = (VALID_CATEGORIES as readonly string[]).includes(
+    slug,
+  );
   if (!isValidCategory) {
     notFound();
   }
@@ -82,12 +92,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'CollectionPage',
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
             name: `${categoryName} News`,
             description: `AI-verified ${slug} news from multiple trusted Indian sources.`,
             url: `${siteUrl}/category/${slug}/`,
-            publisher: { '@type': 'Organization', name: 'India Verified' },
+            publisher: { "@type": "Organization", name: "India Verified" },
           }),
         }}
       />
@@ -95,26 +105,32 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-          <header className="mb-6 sm:mb-10 pb-5 sm:pb-8 border-b border-rule">
-            <span aria-hidden="true" className="block w-8 sm:w-10 h-[2px] bg-accent rounded-full mb-3 sm:mb-5" />
-            <p className="editorial-kicker mb-1.5 sm:mb-3">Category</p>
-            <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-bold tracking-tight text-ink mb-2 sm:mb-4">
-              {categoryName}
-            </h1>
-            <p className="text-xs sm:text-sm md:text-base text-muted max-w-xl leading-relaxed">
-              AI-verified {slug} stories cross-referenced across multiple trusted sources.
-            </p>
-          </header>
+        <header className="mb-6 sm:mb-10 pb-5 sm:pb-8 border-b border-rule">
+          <span
+            aria-hidden="true"
+            className="block w-8 sm:w-10 h-[2px] bg-accent rounded-full mb-3 sm:mb-5"
+          />
+          <p className="editorial-kicker mb-1.5 sm:mb-3">Category</p>
+          <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-bold tracking-tight text-ink mb-2 sm:mb-4">
+            {categoryName}
+          </h1>
+          <p className="text-xs sm:text-sm md:text-base text-muted max-w-xl leading-relaxed">
+            AI-verified {slug} stories cross-referenced across multiple trusted
+            sources.
+          </p>
+        </header>
 
-        <Suspense fallback={
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i}>
-                <FeedSkeleton />
-              </div>
-            ))}
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i}>
+                  <FeedSkeleton />
+                </div>
+              ))}
+            </div>
+          }
+        >
           <CategoryGrid slug={slug} />
         </Suspense>
       </PageShell>

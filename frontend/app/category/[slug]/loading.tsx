@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Zenith Open Source Projects
 // SPDX-License-Identifier: MIT
 
-import { PageShell } from '@/components/layout/PageShell';
-import { FeedSkeleton } from '@/components/news/InfiniteFeed';
+import { PageShell } from "@/components/layout/PageShell";
+import { FeedSkeleton } from "@/components/news/InfiniteFeed";
 
 export default function CategoryLoadingSkeleton() {
   return (

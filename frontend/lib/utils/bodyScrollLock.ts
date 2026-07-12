@@ -10,20 +10,20 @@ function emit(): void {
   for (const fn of listeners) {
     try {
       fn(locked);
-    } catch {
-    }
+    } catch {}
   }
 }
 
 export function lockBodyScroll(): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
   const wasLocked = lockCount > 0;
   if (lockCount === 0) {
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
     previousOverflow = document.body.style.overflow;
     previousPaddingRight = document.body.style.paddingRight;
 
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     if (scrollbarWidth > 0) {
       document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
@@ -33,12 +33,12 @@ export function lockBodyScroll(): void {
 }
 
 export function unlockBodyScroll(): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
   if (lockCount === 0) return;
   lockCount -= 1;
   if (lockCount === 0) {
-    document.body.style.overflow = previousOverflow ?? '';
-    document.body.style.paddingRight = previousPaddingRight ?? '';
+    document.body.style.overflow = previousOverflow ?? "";
+    document.body.style.paddingRight = previousPaddingRight ?? "";
     previousOverflow = null;
     previousPaddingRight = null;
     emit();
@@ -46,11 +46,11 @@ export function unlockBodyScroll(): void {
 }
 
 export function forceUnlockBodyScroll(): void {
-  if (typeof document === 'undefined') return;
-  if (lockCount > 0 || document.body.style.overflow === 'hidden') {
+  if (typeof document === "undefined") return;
+  if (lockCount > 0 || document.body.style.overflow === "hidden") {
     lockCount = 0;
-    document.body.style.overflow = previousOverflow ?? '';
-    document.body.style.paddingRight = previousPaddingRight ?? '';
+    document.body.style.overflow = previousOverflow ?? "";
+    document.body.style.paddingRight = previousPaddingRight ?? "";
     previousOverflow = null;
     previousPaddingRight = null;
     emit();

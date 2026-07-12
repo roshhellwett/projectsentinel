@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 const MOBILE_BREAKPOINT_PX = 768;
 
@@ -10,22 +10,22 @@ export function DesktopRedirect() {
   const redirectedRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     const mq = window.matchMedia(`(min-width: ${MOBILE_BREAKPOINT_PX}px)`);
     if (mq.matches && !redirectedRef.current) {
       redirectedRef.current = true;
-      router.replace('/');
+      router.replace("/");
       return;
     }
     const handler = (e: MediaQueryListEvent) => {
       if (e.matches && !redirectedRef.current) {
         redirectedRef.current = true;
-        router.replace('/');
+        router.replace("/");
       }
     };
     if (mq.addEventListener) {
-      mq.addEventListener('change', handler);
-      return () => mq.removeEventListener('change', handler);
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
     } else if (mq.addListener) {
       mq.addListener(handler);
       return () => mq.removeListener(handler);

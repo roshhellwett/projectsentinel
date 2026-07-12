@@ -1,23 +1,25 @@
-import { fetchPosts } from '@/lib/supabase/server';
-import type { Post } from '@/types';
-import { getServerCache, setServerCache } from '@/lib/api/serverCache';
+import { fetchPosts } from "@/lib/supabase/server";
+import type { Post } from "@/types";
+import { getServerCache, setServerCache } from "@/lib/api/serverCache";
 
-export const revalidate = 900; 
+export const revalidate = 900;
 
 export async function GET() {
-  const cacheKey = 'rss_feed_xml';
+  const cacheKey = "rss_feed_xml";
   const cachedRss = getServerCache<string>(cacheKey);
   if (cachedRss) {
     return new Response(cachedRss, {
       headers: {
-        'Content-Type': 'application/rss+xml; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
-        'X-Cache': 'HIT',
+        "Content-Type": "application/rss+xml; charset=utf-8",
+        "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+        "X-Cache": "HIT",
       },
     });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://zenithopensourceprojects.vercel.app";
   let posts: Post[] = [];
   try {
     const result = await fetchPosts(1, 50);
@@ -27,10 +29,12 @@ export async function GET() {
   }
 
   function escapeCdata(value: string): string {
-    return (value || '').replace(/]]>/g, ']]]]><![CDATA[>');
+    return (value || "").replace(/]]>/g, "]]]]><![CDATA[>");
   }
 
-  const items = (posts || []).map((post) => `
+  const items = (posts || [])
+    .map(
+      (post) => `
     <item>
       <title><![CDATA[${escapeCdata(post.headline)}]]></title>
       <description><![CDATA[${escapeCdata(post.summary)}]]></description>
@@ -39,7 +43,9 @@ export async function GET() {
       <category>${post.category}</category>
       <pubDate>${new Date(post.published_at).toUTCString()}</pubDate>
     </item>
-  `).join('\n');
+  `,
+    )
+    .join("\n");
 
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
@@ -68,9 +74,9 @@ ${items}
 
   return new Response(rss, {
     headers: {
-      'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
-      'X-Cache': 'MISS',
+      "Content-Type": "application/rss+xml; charset=utf-8",
+      "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+      "X-Cache": "MISS",
     },
   });
 }

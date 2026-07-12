@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback, useRef } from 'react';
-import Link from 'next/link';
-import { Info, X } from 'lucide-react';
-import { Z_INDEX } from '@/lib/theme/zIndex';
+import { useEffect, useState, useCallback, useRef } from "react";
+import Link from "next/link";
+import { Info, X } from "lucide-react";
+import { Z_INDEX } from "@/lib/theme/zIndex";
 
-import { useI18n } from '@/lib/i18n/context';
-import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
+import { useI18n } from "@/lib/i18n/context";
+import { safeRead, safeWrite } from "@/lib/utils/safeStorage";
 
-const STORAGE_KEY = 'iv-cookie-consent';
+const STORAGE_KEY = "iv-cookie-consent";
 
-type Decision = 'accepted' | 'rejected';
+type Decision = "accepted" | "rejected";
 
 function readDecision(): Decision | null {
   const v = safeRead(STORAGE_KEY);
-  return v === 'accepted' || v === 'rejected' ? v : null;
+  return v === "accepted" || v === "rejected" ? v : null;
 }
 
 function writeDecision(d: Decision) {
@@ -35,17 +35,19 @@ export function CookieConsent() {
 
   useEffect(() => {
     if (!open || !consentRef.current) return;
-    const firstFocusable = consentRef.current.querySelector<HTMLElement>('button, a, input, [tabindex]:not([tabindex="-1"])');
+    const firstFocusable = consentRef.current.querySelector<HTMLElement>(
+      'button, a, input, [tabindex]:not([tabindex="-1"])',
+    );
     firstFocusable?.focus();
   }, [open]);
 
   const accept = useCallback(() => {
-    writeDecision('accepted');
+    writeDecision("accepted");
     setOpen(false);
   }, []);
 
   const reject = useCallback(() => {
-    writeDecision('rejected');
+    writeDecision("rejected");
     setOpen(false);
   }, []);
 
@@ -55,31 +57,35 @@ export function CookieConsent() {
         <div
           ref={consentRef}
           role="dialog"
-          aria-label={t('cookie.aria_preferences')}
+          aria-label={t("cookie.aria_preferences")}
           aria-modal="false"
           className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="glass border border-rule/50 rounded-lg px-5 py-4 md:px-6 md:py-5">
             <button
               type="button"
               onClick={reject}
-              aria-label={t('cookie.aria_dismiss')}
+              aria-label={t("cookie.aria_dismiss")}
               className="tap-target absolute top-1 right-1 text-subtle hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               <X className="w-5 h-5" />
             </button>
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-accent mb-2">
-              {t('cookie.title')}
+              {t("cookie.title")}
             </p>
             <h2 className="font-display text-lg font-bold text-ink mb-2 leading-snug">
-              {t('cookie.desc')}
+              {t("cookie.desc")}
             </h2>
             <p className="text-sm text-muted leading-relaxed mb-4">
-              {t('cookie.body')}{' '}
-              <Link href="/privacy/" className="text-ink underline decoration-rule-strong hover:decoration-accent underline-offset-2">
+              {t("cookie.body")}{" "}
+              <Link
+                href="/privacy/"
+                className="text-ink underline decoration-rule-strong hover:decoration-accent underline-offset-2"
+              >
                 Privacy Policy
-              </Link>.
+              </Link>
+              .
             </p>
             <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 sm:items-center">
               <button
@@ -87,14 +93,14 @@ export function CookieConsent() {
                 onClick={reject}
                 className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-medium text-ink border border-rule-strong rounded hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                {t('cookie.dismiss')}
+                {t("cookie.dismiss")}
               </button>
               <button
                 type="button"
                 onClick={accept}
                 className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-semibold text-paper bg-ink rounded hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                {t('cookie.accept')}
+                {t("cookie.accept")}
               </button>
             </div>
           </div>

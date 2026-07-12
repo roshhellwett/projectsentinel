@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import type { Post } from '@/types';
-import { getHostname } from '@/lib/utils/getHostname';
-import { pruneStaleSeenKeys } from '@/lib/utils/seenSet';
+import { useState, useRef, useEffect, useCallback } from "react";
+import type { Post } from "@/types";
+import { getHostname } from "@/lib/utils/getHostname";
+import { pruneStaleSeenKeys } from "@/lib/utils/seenSet";
 import {
   bumpStreak,
   getCardsToday,
@@ -11,7 +11,7 @@ import {
   isBreakSnoozedToday,
   pruneStaleStatsKeys,
   recordHostsToday,
-} from '@/lib/utils/swipeStats';
+} from "@/lib/utils/swipeStats";
 
 const BREAK_PROMPT_AT = 25;
 
@@ -41,20 +41,20 @@ export function useSwipeTracking() {
     refreshStats();
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key && e.key.startsWith('iv:swipe:')) {
+      if (e.key && e.key.startsWith("iv:swipe:")) {
         refreshStats();
       }
     };
     const onVisible = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         refreshStats();
       }
     };
-    window.addEventListener('storage', onStorage);
-    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener("storage", onStorage);
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
-      window.removeEventListener('storage', onStorage);
-      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener("storage", onStorage);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [refreshStats]);
 
@@ -67,22 +67,25 @@ export function useSwipeTracking() {
 
   const [sessionCards, setSessionCards] = useState(0);
 
-  const trackSwipe = useCallback((post: Post) => {
-    incrementCardsToday();
-    recordSourceHosts(post);
-    sessionCardsRef.current += 1;
-    setSessionCards(sessionCardsRef.current);
-    refreshStats();
+  const trackSwipe = useCallback(
+    (post: Post) => {
+      incrementCardsToday();
+      recordSourceHosts(post);
+      sessionCardsRef.current += 1;
+      setSessionCards(sessionCardsRef.current);
+      refreshStats();
 
-    if (
-      !breakShownRef.current &&
-      !isBreakSnoozedToday() &&
-      sessionCardsRef.current >= BREAK_PROMPT_AT
-    ) {
-      breakShownRef.current = true;
-      setShowBreak(true);
-    }
-  }, [recordSourceHosts, refreshStats]);
+      if (
+        !breakShownRef.current &&
+        !isBreakSnoozedToday() &&
+        sessionCardsRef.current >= BREAK_PROMPT_AT
+      ) {
+        breakShownRef.current = true;
+        setShowBreak(true);
+      }
+    },
+    [recordSourceHosts, refreshStats],
+  );
 
   return {
     stats,

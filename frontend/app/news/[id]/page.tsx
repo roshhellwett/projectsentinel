@@ -1,39 +1,53 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { fetchPostById, fetchPosts } from '@/lib/supabase/server';
-import { CategoryTag } from '@/components/news/CategoryTag';
-import { CredibilityBar } from '@/components/news/CredibilityBar';
-import { SourceLinks } from '@/components/news/SourceLinks';
-import { CorrectionsNotice } from '@/components/news/CorrectionsNotice';
-import { ShareButtons } from '@/components/news/ShareButtons';
-import { BookmarkButton } from '@/components/news/BookmarkButton';
-import { RelatedStories } from '@/components/news/RelatedStories';
-import { ReadingTime } from '@/components/news/ReadingTime';
-import { ReadingProgress } from '@/components/ui/ReadingProgress';
-import { MarkReadOnMount } from '@/components/news/MarkReadOnMount';
-import { formatDate } from '@/lib/utils/formatDate';
-import { newsArticleJsonLd, breadcrumbJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
-import { ArrowLeft, Clock, ShieldCheck, Database, Calendar } from 'lucide-react';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { NextStoryPrompt } from '@/components/news/NextStoryPrompt';
-import { PageShell } from '@/components/layout/PageShell';
+import { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { fetchPostById, fetchPosts } from "@/lib/supabase/server";
+import { CategoryTag } from "@/components/news/CategoryTag";
+import { CredibilityBar } from "@/components/news/CredibilityBar";
+import { SourceLinks } from "@/components/news/SourceLinks";
+import { CorrectionsNotice } from "@/components/news/CorrectionsNotice";
+import { ShareButtons } from "@/components/news/ShareButtons";
+import { BookmarkButton } from "@/components/news/BookmarkButton";
+import { RelatedStories } from "@/components/news/RelatedStories";
+import { ReadingTime } from "@/components/news/ReadingTime";
+import { ReadingProgress } from "@/components/ui/ReadingProgress";
+import { MarkReadOnMount } from "@/components/news/MarkReadOnMount";
+import { formatDate } from "@/lib/utils/formatDate";
+import {
+  newsArticleJsonLd,
+  breadcrumbJsonLd,
+  jsonLdToString,
+} from "@/lib/utils/structuredData";
+import {
+  ArrowLeft,
+  Clock,
+  ShieldCheck,
+  Database,
+  Calendar,
+} from "lucide-react";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { NextStoryPrompt } from "@/components/news/NextStoryPrompt";
+import { PageShell } from "@/components/layout/PageShell";
 
 export const revalidate = 300;
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://zenithopensourceprojects.vercel.app";
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({ params }: NewsPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: NewsPageProps): Promise<Metadata> {
   const { id } = await params;
   const post = await fetchPostById(id);
 
   if (!post) {
     return {
-      title: 'Not Found - Zenith Open Source Projects'
+      title: "Not Found - Zenith Open Source Projects",
     };
   }
 
@@ -45,7 +59,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
     openGraph: {
       title: post.headline,
       description: post.summary,
-      type: 'article',
+      type: "article",
       publishedTime: post.published_at,
       url: `${siteUrl}/news/${post.id}/`,
       images: [
@@ -58,7 +72,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: post.headline,
       description: post.summary,
       images: [ogImage],
@@ -77,18 +91,19 @@ export default async function NewsPage({ params }: NewsPageProps) {
     notFound();
   }
 
-  const [relatedPosts] = await Promise.all([
-    fetchPosts(1, 4, post.category),
-  ]);
+  const [relatedPosts] = await Promise.all([fetchPosts(1, 4, post.category)]);
 
-  const isCorrected = post.status === 'corrected';
-  const isRetracted = post.status === 'retracted';
+  const isCorrected = post.status === "corrected";
+  const isRetracted = post.status === "retracted";
 
   const jsonLd = [
     newsArticleJsonLd(post),
     breadcrumbJsonLd([
-      { name: 'Home', url: siteUrl },
-      { name: post.category.charAt(0).toUpperCase() + post.category.slice(1), url: `${siteUrl}/category/${post.category}/` },
+      { name: "Home", url: siteUrl },
+      {
+        name: post.category.charAt(0).toUpperCase() + post.category.slice(1),
+        url: `${siteUrl}/category/${post.category}/`,
+      },
       { name: post.headline, url: `${siteUrl}/news/${post.id}/` },
     ]),
   ];
@@ -118,7 +133,12 @@ export default async function NewsPage({ params }: NewsPageProps) {
           <div className="hidden lg:block">
             <Breadcrumb
               items={[
-                { label: post.category.charAt(0).toUpperCase() + post.category.slice(1), href: `/category/${post.category}/` },
+                {
+                  label:
+                    post.category.charAt(0).toUpperCase() +
+                    post.category.slice(1),
+                  href: `/category/${post.category}/`,
+                },
                 { label: post.headline },
               ]}
             />
@@ -136,9 +156,14 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         )}
 
-        <article id="article-body" className={`relative max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-14 ${isRetracted ? 'opacity-60' : ''}`}>
-
-          <span aria-hidden="true" className="block w-10 sm:w-12 h-[3px] bg-gradient-to-r from-accent via-accent/60 to-transparent rounded-full mb-4 sm:mb-7" />
+        <article
+          id="article-body"
+          className={`relative max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-14 ${isRetracted ? "opacity-60" : ""}`}
+        >
+          <span
+            aria-hidden="true"
+            className="block w-10 sm:w-12 h-[3px] bg-gradient-to-r from-accent via-accent/60 to-transparent rounded-full mb-4 sm:mb-7"
+          />
 
           <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-4 gap-y-1.5 mb-3 sm:mb-6">
             <CategoryTag category={post.category} />
@@ -152,7 +177,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </span>
           </div>
 
-          <h1 className={`font-display font-bold text-ink tracking-[-0.03em] leading-[1.04] mb-4 sm:mb-9 text-[clamp(1.4rem,5.5vw,4rem)] ${isRetracted ? 'line-through text-muted' : ''}`}>
+          <h1
+            className={`font-display font-bold text-ink tracking-[-0.03em] leading-[1.04] mb-4 sm:mb-9 text-[clamp(1.4rem,5.5vw,4rem)] ${isRetracted ? "line-through text-muted" : ""}`}
+          >
             {post.headline}
           </h1>
 
@@ -161,18 +188,27 @@ export default async function NewsPage({ params }: NewsPageProps) {
             <div className="mt-3 sm:mt-5 flex flex-col gap-2 sm:gap-4 border-t border-rule pt-3 sm:pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
                 <Database className="w-4 h-4 text-accent" />
-                {typeof post.source_count === 'number' && (
+                {typeof post.source_count === "number" && (
                   <>
                     <span className="tabular-nums">{post.source_count}</span>
                     <span className="text-muted uppercase tracking-[0.14em] text-[10px] font-bold">
-                      {post.source_count === 1 ? 'source verified' : 'sources verified'}
+                      {post.source_count === 1
+                        ? "source verified"
+                        : "sources verified"}
                     </span>
                   </>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <BookmarkButton postId={post.id} variant="pill" stopPropagation={false} />
-                <ShareButtons headline={post.headline} url={`${siteUrl}/news/${post.id}/`} />
+                <BookmarkButton
+                  postId={post.id}
+                  variant="pill"
+                  stopPropagation={false}
+                />
+                <ShareButtons
+                  headline={post.headline}
+                  url={`${siteUrl}/news/${post.id}/`}
+                />
               </div>
             </div>
           </div>
@@ -184,9 +220,15 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 mb-10 sm:mb-16">
           <aside className="md:col-span-2 np-card glass-card p-3 sm:p-5 md:p-8">
-            <span aria-hidden="true" className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full" />
+            <span
+              aria-hidden="true"
+              className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full"
+            />
             <h2 className="font-display flex items-center gap-2 text-base sm:text-xl font-bold text-ink mb-2 sm:mb-4">
-              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-accent" strokeWidth={2.2} />
+              <ShieldCheck
+                className="w-4 h-4 sm:w-5 sm:h-5 text-accent"
+                strokeWidth={2.2}
+              />
               AI Credibility Analysis
             </h2>
             <p className="text-ink-soft leading-[1.6] sm:leading-[1.7] text-sm sm:text-base">
@@ -209,16 +251,35 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
             {[
-              { label: 'Cross-Referenced', icon: <ShieldCheck className="w-4 h-4" /> },
-              { label: `${post.source_count} Sources`, icon: <Database className="w-4 h-4" /> },
-              { label: 'Unbiased AI', icon: <span className="font-bold text-[11px] leading-none">AI</span> },
-              { label: 'Auto-Published', icon: <span className="text-base">&#9889;</span> },
+              {
+                label: "Cross-Referenced",
+                icon: <ShieldCheck className="w-4 h-4" />,
+              },
+              {
+                label: `${post.source_count} Sources`,
+                icon: <Database className="w-4 h-4" />,
+              },
+              {
+                label: "Unbiased AI",
+                icon: (
+                  <span className="font-bold text-[11px] leading-none">AI</span>
+                ),
+              },
+              {
+                label: "Auto-Published",
+                icon: <span className="text-base">&#9889;</span>,
+              },
             ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step">
+              <div
+                key={item.label}
+                className="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-xl hover:bg-paper transition-all duration-300 group/step"
+              >
                 <div className="w-8 h-8 sm:w-10 sm:h-10 border border-rule/50 bg-paper/70 backdrop-blur-sm text-accent flex items-center justify-center mb-2 sm:mb-3 group-hover/step:border-accent/30 transition-all duration-300">
                   {item.icon}
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-semibold text-ink">{item.label}</span>
+                <span className="text-[10px] sm:text-[11px] font-semibold text-ink">
+                  {item.label}
+                </span>
               </div>
             ))}
           </div>
@@ -226,9 +287,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <div id="related-news" className="mt-8 sm:mt-14 pt-6 sm:pt-10 relative">
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rule to-transparent" />
-          <h2 className="section-heading mb-5 sm:mb-7">
-            Related stories
-          </h2>
+          <h2 className="section-heading mb-5 sm:mb-7">Related stories</h2>
           <RelatedStories posts={relatedPosts.posts} currentPostId={post.id} />
         </div>
       </PageShell>

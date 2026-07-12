@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { usePersistentIdSet } from './persistentIdSet';
+import { usePersistentIdSet } from "./persistentIdSet";
 
-const READ_KEY = 'iv:readPosts:v1';
-const SAVED_KEY = 'iv:savedPosts:v1';
+const READ_KEY = "iv:readPosts:v1";
+const SAVED_KEY = "iv:savedPosts:v1";
 
 export function useReadPosts() {
   const { ids, add, has } = usePersistentIdSet({ key: READ_KEY, max: 500 });

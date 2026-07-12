@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Post } from '@/types';
-import { dedupe } from '@/lib/utils/dedupe';
-import { subscribeToPosts } from '@/lib/supabase/client';
-import { DEFAULT_PAGE_SIZE } from '@/lib/config/constants';
-import { cachedFetch, invalidatePostsCache } from '@/lib/utils/fetchCache';
-import { markFresh } from '@/lib/utils/freshSignal';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Post } from "@/types";
+import { dedupe } from "@/lib/utils/dedupe";
+import { subscribeToPosts } from "@/lib/supabase/client";
+import { DEFAULT_PAGE_SIZE } from "@/lib/config/constants";
+import { cachedFetch, invalidatePostsCache } from "@/lib/utils/fetchCache";
+import { markFresh } from "@/lib/utils/freshSignal";
 
 interface UseInfiniteFeedProps {
   initialPosts: Post[];
@@ -52,7 +52,15 @@ export function useInfiniteFeed({
     return () => {
       mountedRef.current = false;
     };
-  }, [excludeIds, posts, cursor, exhausted, category, pageSize, initialPosts.length]);
+  }, [
+    excludeIds,
+    posts,
+    cursor,
+    exhausted,
+    category,
+    pageSize,
+    initialPosts.length,
+  ]);
 
   // When initialPosts change (e.g. category switch), reset feed state
   useEffect(() => {
@@ -97,29 +105,38 @@ export function useInfiniteFeed({
     abortControllerRef.current = controller;
 
     try {
-      const params = new URLSearchParams({ limit: String(pageSizeRef.current) });
-      if (cursorRef.current) params.set('cursor', cursorRef.current);
-      if (categoryRef.current) params.set('category', categoryRef.current);
+      const params = new URLSearchParams({
+        limit: String(pageSizeRef.current),
+      });
+      if (cursorRef.current) params.set("cursor", cursorRef.current);
+      if (categoryRef.current) params.set("category", categoryRef.current);
       // Add cache-bust param when no cursor (initial load after realtime update)
-      if (!cursorRef.current && postsRef.current.length > initialPostsLenRef.current) {
-        params.set('_cb', String(Date.now()));
+      if (
+        !cursorRef.current &&
+        postsRef.current.length > initialPostsLenRef.current
+      ) {
+        params.set("_cb", String(Date.now()));
       }
-      
-      const payload = await cachedFetch<{ posts: Post[]; nextCursor: string | null; hasMore: boolean }>(
-        `/api/posts/?${params.toString()}`,
-        { cacheTtl: 60_000, signal: controller.signal },
-      );
+
+      const payload = await cachedFetch<{
+        posts: Post[];
+        nextCursor: string | null;
+        hasMore: boolean;
+      }>(`/api/posts/?${params.toString()}`, {
+        cacheTtl: 60_000,
+        signal: controller.signal,
+      });
 
       if (mountedRef.current && !controller.signal.aborted) {
         setPosts((prev) => {
           const existing = new Set(prev.map((p) => p.id));
           const excluded = excludeIdsRef.current;
           const incoming = payload.posts.filter(
-            (p) => !existing.has(p.id) && !(excluded?.has(p.id)),
+            (p) => !existing.has(p.id) && !excluded?.has(p.id),
           );
           return dedupe([...prev, ...incoming]);
         });
-        
+
         setCursor(payload.nextCursor);
         if (!payload.hasMore) {
           setExhausted(true);
@@ -127,8 +144,8 @@ export function useInfiniteFeed({
         markFresh();
       }
     } catch (err) {
-      if ((err as { name?: string })?.name !== 'AbortError') {
-        console.error('Failed to load more posts', err);
+      if ((err as { name?: string })?.name !== "AbortError") {
+        console.error("Failed to load more posts", err);
       }
     } finally {
       if (mountedRef.current && abortControllerRef.current === controller) {
@@ -150,36 +167,41 @@ export function useInfiniteFeed({
 
     const existing = new Set(postsRef.current.map((p) => p.id));
     const excluded = excludeIdsRef.current;
-    
+
     const fresh = incoming.filter(
       (p) =>
         !existing.has(p.id) &&
-        !(excluded?.has(p.id)) &&
+        !excluded?.has(p.id) &&
         (!categoryRef.current || p.category === categoryRef.current),
     );
-    
+
     if (fresh.length === 0) return;
     flashFresh(fresh.map((p) => p.id));
     setPosts((prev) => dedupe([...fresh, ...prev]));
   }, [flashFresh]);
 
-  const processIncomingPosts = useCallback((incoming: Post[]) => {
-    if (incoming.length === 0) return;
+  const processIncomingPosts = useCallback(
+    (incoming: Post[]) => {
+      if (incoming.length === 0) return;
 
-    const bufIds = new Set(incomingBufferRef.current.map((p) => p.id));
-    for (const p of incoming) {
-      if (bufIds.has(p.id)) {
-        incomingBufferRef.current = incomingBufferRef.current.map((b) => (b.id === p.id ? p : b));
-      } else {
-        incomingBufferRef.current.push(p);
-        bufIds.add(p.id);
+      const bufIds = new Set(incomingBufferRef.current.map((p) => p.id));
+      for (const p of incoming) {
+        if (bufIds.has(p.id)) {
+          incomingBufferRef.current = incomingBufferRef.current.map((b) =>
+            b.id === p.id ? p : b,
+          );
+        } else {
+          incomingBufferRef.current.push(p);
+          bufIds.add(p.id);
+        }
       }
-    }
 
-    if (flushTimerRef.current === null) {
-      flushTimerRef.current = setTimeout(flushIncoming, 800);
-    }
-  }, [flushIncoming]);
+      if (flushTimerRef.current === null) {
+        flushTimerRef.current = setTimeout(flushIncoming, 800);
+      }
+    },
+    [flushIncoming],
+  );
 
   useEffect(() => {
     const flashTimers = flashTimersRef.current;
@@ -188,7 +210,11 @@ export function useInfiniteFeed({
     });
 
     return () => {
-      try { sub.unsubscribe(); } catch { /* ignore */ }
+      try {
+        sub.unsubscribe();
+      } catch {
+        /* ignore */
+      }
       if (flushTimerRef.current !== null) {
         clearTimeout(flushTimerRef.current);
         flushTimerRef.current = null;
@@ -213,7 +239,7 @@ export function useInfiniteFeed({
 
     async function pollLatest() {
       if (!mounted) return;
-      if (typeof document !== 'undefined' && document.hidden) {
+      if (typeof document !== "undefined" && document.hidden) {
         pollTimer = setTimeout(pollLatest, 60_000);
         return;
       }
@@ -227,17 +253,25 @@ export function useInfiniteFeed({
 
       try {
         // 1. Lightweight check — no post data, just a boolean
-        const checkRes = await fetch(`/api/posts/check?since=${since}&_cb=${Date.now()}`);
-        if (!checkRes.ok) { pollTimer = setTimeout(pollLatest, 60_000); return; }
+        const checkRes = await fetch(
+          `/api/posts/check?since=${since}&_cb=${Date.now()}`,
+        );
+        if (!checkRes.ok) {
+          pollTimer = setTimeout(pollLatest, 60_000);
+          return;
+        }
         const { hasNew } = await checkRes.json();
-        if (!hasNew) { pollTimer = setTimeout(pollLatest, 60_000); return; }
+        if (!hasNew) {
+          pollTimer = setTimeout(pollLatest, 60_000);
+          return;
+        }
 
         // 2. Only fetch full post data when new content exists
         invalidatePostsCache();
         const params = new URLSearchParams({
-          limit: '5',
+          limit: "5",
           _cb: String(Date.now()),
-          _poll: '1',
+          _poll: "1",
         });
 
         const payload = await cachedFetch<{ posts: Post[] }>(
@@ -265,19 +299,23 @@ export function useInfiniteFeed({
     pollTimer = setTimeout(pollLatest, 8_000);
 
     const onVisibility = () => {
-      if (typeof document !== 'undefined' && !document.hidden && pollTimer === null) {
+      if (
+        typeof document !== "undefined" &&
+        !document.hidden &&
+        pollTimer === null
+      ) {
         pollLatest();
       }
     };
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', onVisibility);
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", onVisibility);
     }
 
     return () => {
       mounted = false;
       if (pollTimer !== null) clearTimeout(pollTimer);
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', onVisibility);
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", onVisibility);
       }
     };
   }, [processIncomingPosts]);
@@ -288,6 +326,6 @@ export function useInfiniteFeed({
     loading,
     exhausted,
     freshIds,
-    loadMore
+    loadMore,
   };
 }

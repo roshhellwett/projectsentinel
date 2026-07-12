@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Z_INDEX } from '@/lib/theme/zIndex';
-import { useEffect, useRef } from 'react';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
-import { useI18n } from '@/lib/i18n/context';
+import { Z_INDEX } from "@/lib/theme/zIndex";
+import { useEffect, useRef } from "react";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/utils/bodyScrollLock";
+import { useI18n } from "@/lib/i18n/context";
 
 interface SwipeBreakPromptProps {
   cardsThisSession: number;
@@ -11,7 +11,11 @@ interface SwipeBreakPromptProps {
   onContinue: () => void;
 }
 
-export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: SwipeBreakPromptProps) {
+export function SwipeBreakPrompt({
+  cardsThisSession,
+  onSnooze,
+  onContinue,
+}: SwipeBreakPromptProps) {
   const { t } = useI18n();
   const autoTimerRef = useRef<number | null>(null);
   const onSnoozeRef = useRef(onSnooze);
@@ -22,24 +26,29 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
 
   useEffect(() => {
     lockBodyScroll();
-    const focusTimer = window.setTimeout(() => primaryBtnRef.current?.focus(), 50);
+    const focusTimer = window.setTimeout(
+      () => primaryBtnRef.current?.focus(),
+      50,
+    );
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+      if (e.key === "Escape") {
+        if (autoTimerRef.current !== null)
+          window.clearTimeout(autoTimerRef.current);
         onContinueRef.current();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     autoTimerRef.current = window.setTimeout(() => {
       onSnoozeRef.current();
     }, 60000);
 
     return () => {
-      if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+      if (autoTimerRef.current !== null)
+        window.clearTimeout(autoTimerRef.current);
       window.clearTimeout(focusTimer);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
       unlockBodyScroll();
     };
   }, []);
@@ -54,42 +63,45 @@ export function SwipeBreakPrompt({ cardsThisSession, onSnooze, onContinue }: Swi
       <button
         type="button"
         onClick={() => {
-          if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+          if (autoTimerRef.current !== null)
+            window.clearTimeout(autoTimerRef.current);
           onContinueRef.current();
         }}
         className="absolute inset-0 bg-ink/75 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        aria-label={t('swipe.aria_dismiss_break')}
+        aria-label={t("swipe.aria_dismiss_break")}
       />
       <div className="relative w-full max-w-sm np-card glass-card overflow-hidden">
         <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
         <div className="p-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-2">
-            {t('swipe.break_title')}
+            {t("swipe.break_title")}
           </p>
           <p className="text-[13.5px] text-muted leading-relaxed mb-6">
-            {t('swipe.break_desc', { count: cardsThisSession })}
+            {t("swipe.break_desc", { count: cardsThisSession })}
           </p>
           <div className="flex flex-col gap-2">
             <button
               ref={primaryBtnRef}
               type="button"
               onClick={() => {
-                if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+                if (autoTimerRef.current !== null)
+                  window.clearTimeout(autoTimerRef.current);
                 onSnooze();
               }}
               className="w-full px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              {t('swipe.take_break')}
+              {t("swipe.take_break")}
             </button>
             <button
               type="button"
               onClick={() => {
-                if (autoTimerRef.current !== null) window.clearTimeout(autoTimerRef.current);
+                if (autoTimerRef.current !== null)
+                  window.clearTimeout(autoTimerRef.current);
                 onContinue();
               }}
               className="w-full px-4 pt-[7px] pb-[9px] text-[12px] font-medium text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
             >
-              {t('swipe.keep_reading')}
+              {t("swipe.keep_reading")}
             </button>
           </div>
         </div>

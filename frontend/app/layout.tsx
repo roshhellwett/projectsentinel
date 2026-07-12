@@ -1,84 +1,95 @@
-import type { Metadata, Viewport } from 'next';
-import { Source_Serif_4, Caveat, JetBrains_Mono } from 'next/font/google';
-import Script from 'next/script';
+import type { Metadata, Viewport } from "next";
+import { Source_Serif_4, Caveat, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 
-import './globals.css';
-import dynamic from 'next/dynamic';
-import { Z_INDEX } from '@/lib/theme/zIndex';
-import { websiteJsonLd, organizationJsonLd, jsonLdToString } from '@/lib/utils/structuredData';
+import "./globals.css";
+import dynamic from "next/dynamic";
+import { Z_INDEX } from "@/lib/theme/zIndex";
+import {
+  websiteJsonLd,
+  organizationJsonLd,
+  jsonLdToString,
+} from "@/lib/utils/structuredData";
 
-const ClientShell = dynamic(() => import('@/components/layout/ClientShell'));
+const ClientShell = dynamic(() => import("@/components/layout/ClientShell"));
 
 const sourceSerif = Source_Serif_4({
-  variable: '--font-body',
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
+  variable: "--font-body",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
   adjustFontFallback: true,
   preload: true,
 });
 
 const caveat = Caveat({
-  variable: '--font-hand',
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['500', '600', '700'],
+  variable: "--font-hand",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "700"],
   adjustFontFallback: true,
   preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-mono',
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '500'],
+  variable: "--font-mono",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500"],
   adjustFontFallback: true,
   preload: true,
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://zenithopensourceprojects.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'India Verified — AI-Cross-Referenced Indian News',
-    template: '%s — India Verified',
+    default: "India Verified — AI-Cross-Referenced Indian News",
+    template: "%s — India Verified",
   },
   description:
-    'An open-source Indian news reader. Every story is cross-referenced across multiple sources. No ads. No bias. Made by Roshhellwett.',
+    "An open-source Indian news reader. Every story is cross-referenced across multiple sources. No ads. No bias. Made by Roshhellwett.",
   keywords: [
-    'Roshhellwett',
-    'India Verified',
-    'Indian news',
-    'AI verified news',
-    'fact-check',
-    'news aggregator',
-    'India news',
-    'trusted news',
+    "Roshhellwett",
+    "India Verified",
+    "Indian news",
+    "AI verified news",
+    "fact-check",
+    "news aggregator",
+    "India news",
+    "trusted news",
   ],
-  authors: [{ name: 'Roshhellwett', url: 'https://github.com/roshhellwett' }],
-  creator: 'Roshhellwett',
-  publisher: 'India Verified',
-  category: 'News & Media',
+  authors: [{ name: "Roshhellwett", url: "https://github.com/roshhellwett" }],
+  creator: "Roshhellwett",
+  publisher: "India Verified",
+  category: "News & Media",
   verification: {
-    google: 'google1bd198fa5b4dc9f1.html',
+    google: "google1bd198fa5b4dc9f1.html",
     other: {
-      'google-site-verification': ['google1bd198fa5b4dc9f1.html', '1bd198fa5b4dc9f1'],
+      "google-site-verification": [
+        "google1bd198fa5b4dc9f1.html",
+        "1bd198fa5b4dc9f1",
+      ],
     },
   },
   openGraph: {
-    title: 'India Verified — AI-Cross-Referenced Indian News',
-    description: 'An open-source Indian news reader. Every story cross-referenced across multiple sources. No ads. No bias.',
-    type: 'website',
-    locale: 'en_IN',
-    siteName: 'India Verified',
+    title: "India Verified — AI-Cross-Referenced Indian News",
+    description:
+      "An open-source Indian news reader. Every story cross-referenced across multiple sources. No ads. No bias.",
+    type: "website",
+    locale: "en_IN",
+    siteName: "India Verified",
     url: siteUrl,
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'India Verified — AI-Cross-Referenced Indian News',
-    description: 'An open-source Indian news reader. Every story cross-referenced across multiple sources.',
+    card: "summary_large_image",
+    title: "India Verified — AI-Cross-Referenced Indian News",
+    description:
+      "An open-source Indian news reader. Every story cross-referenced across multiple sources.",
   },
   robots: {
     index: true,
@@ -86,32 +97,36 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   alternates: {
     canonical: siteUrl,
-    types: { 'application/rss+xml': `${siteUrl}/rss.xml` },
+    types: { "application/rss+xml": `${siteUrl}/rss.xml` },
   },
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/apple-touch-icon.svg',
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.svg",
   },
-  manifest: '/manifest.webmanifest',
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
-  themeColor: '#f2efe9',
-  width: 'device-width',
+  themeColor: "#f2efe9",
+  width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  viewportFit: 'cover',
+  viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
   const supabaseOrigin = (() => {
@@ -119,8 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
         return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin;
       }
-    } catch {
-          }
+    } catch {}
     return null;
   })();
 
@@ -133,9 +147,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <link rel="dns-prefetch" href={supabaseOrigin} />
           </>
         )}
-        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="modulepreload" href="/manifest.webmanifest" as="fetch" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+          crossOrigin=""
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link
+          rel="modulepreload"
+          href="/manifest.webmanifest"
+          as="fetch"
+          crossOrigin=""
+        />
 
         <script
           type="application/ld+json"
@@ -143,7 +170,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdToString(organizationJsonLd()) }}
+          dangerouslySetInnerHTML={{
+            __html: jsonLdToString(organizationJsonLd()),
+          }}
         />
         {gtmId && (
           <Script id="gtm-script" strategy="afterInteractive">
@@ -169,7 +198,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
               height="0"
               width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
+              style={{ display: "none", visibility: "hidden" }}
             />
           </noscript>
         )}
@@ -180,9 +209,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <ClientShell>
-          {children}
-        </ClientShell>
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );

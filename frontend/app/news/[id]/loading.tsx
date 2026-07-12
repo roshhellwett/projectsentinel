@@ -28,7 +28,7 @@ export default function ArticleLoadingSkeleton() {
         <div className="h-4 w-full bg-rule rounded" />
         <div className="h-4 w-[85%] bg-rule rounded" />
       </div>
-      
+
       <div className="space-y-4 mt-8">
         <div className="h-4 w-[92%] bg-rule rounded" />
         <div className="h-4 w-full bg-rule rounded" />

@@ -6,4 +6,3 @@ export const IOS_SPRING = {
   pill: { type: "spring" as const, stiffness: 400, damping: 28, mass: 0.9 },
   sheet: { type: "spring" as const, stiffness: 380, damping: 32, mass: 1 },
 } as const;
-

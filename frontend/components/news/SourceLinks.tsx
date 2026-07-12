@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { memo, useState } from 'react';
-import { ExternalLink, Globe } from 'lucide-react';
-import { Source } from '@/types';
-import { getHostname } from '@/lib/utils/getHostname';
-import { useI18n } from '@/lib/i18n/i18n-shared';
+import { memo, useState } from "react";
+import { ExternalLink, Globe } from "lucide-react";
+import { Source } from "@/types";
+import { getHostname } from "@/lib/utils/getHostname";
+import { useI18n } from "@/lib/i18n/i18n-shared";
 
 interface SourceLinksProps {
   sources: Source[];
@@ -14,7 +14,7 @@ function getSourceLabel(source: Source): string {
   if (source.title && source.title.trim()) return source.title.trim();
   if (source.name && source.name.trim()) return source.name.trim();
   const host = getHostname(source.url);
-  return host || source.url || 'Source';
+  return host || source.url || "Source";
 }
 
 const SourceFavicon = memo(function SourceFavicon({ url }: { url: string }) {
@@ -33,7 +33,6 @@ const SourceFavicon = memo(function SourceFavicon({ url }: { url: string }) {
   }
 
   return (
-
     <img
       src={`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`}
       alt=""
@@ -48,10 +47,12 @@ const SourceFavicon = memo(function SourceFavicon({ url }: { url: string }) {
   );
 });
 
-export const SourceLinks = memo(function SourceLinks({ sources }: SourceLinksProps) {
+export const SourceLinks = memo(function SourceLinks({
+  sources,
+}: SourceLinksProps) {
   const { t } = useI18n();
   if (!sources || sources.length === 0) {
-    return <p className="text-sm text-muted">{t('drawer.no_sources')}</p>;
+    return <p className="text-sm text-muted">{t("drawer.no_sources")}</p>;
   }
 
   return (
@@ -59,7 +60,7 @@ export const SourceLinks = memo(function SourceLinks({ sources }: SourceLinksPro
       {sources.map((source, index) => {
         const label = getSourceLabel(source);
         return (
-          <li key={`${source.url || 'src'}-${index}`}>
+          <li key={`${source.url || "src"}-${index}`}>
             <a
               href={source.url}
               target="_blank"
@@ -68,7 +69,9 @@ export const SourceLinks = memo(function SourceLinks({ sources }: SourceLinksPro
               aria-label={`Read full article on ${label} (opens in new tab)`}
             >
               <SourceFavicon url={source.url} />
-              <span className="flex-1 min-w-0 truncate font-medium">{label}</span>
+              <span className="flex-1 min-w-0 truncate font-medium">
+                {label}
+              </span>
               <ExternalLink className="w-3.5 h-3.5 text-accent opacity-65 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
             </a>
           </li>
