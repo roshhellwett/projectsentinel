@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils/cn';
 import { BookmarkButton } from './BookmarkButton';
 import { VerificationStamp } from '@/components/ui/VerificationStamp';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useI18n } from '@/lib/i18n/context';
 
 function ShieldIcon() {
   return (
@@ -48,6 +49,7 @@ interface NewsCardProps {
 }
 
 const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: NewsCardProps) => {
+  const { t } = useI18n();
   const haptic = useHapticFeedback();
   const smartLabel = getSmartLabel(post);
   const sourcesCount = post.source_count ?? (post.sources?.length ?? 0);
@@ -138,23 +140,23 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
           <span className="inline-flex items-center gap-1 font-body text-[10px] sm:text-[11px] text-ink-soft shrink-0">
             <ShieldIcon />
-            {sourcesCount} {sourcesCount === 1 ? 'source' : 'sources'}
+            {sourcesCount} {t(sourcesCount === 1 ? 'card.source' : 'card.sources')}
           </span>
           <button
             type="button"
             onClick={handleYoutubeClick}
             className="inline-flex items-center gap-1 px-1.5 sm:px-1.5 py-1 sm:py-0.5 min-h-[28px] border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-colors"
-            aria-label={`Search YouTube: ${post.headline}`}
+            aria-label={t('news.aria_youtube', { headline: post.headline })}
           >
             <YoutubeIcon className="text-ink" />
-            YouTube
+            {t('card.youtube')}
           </button>
         </div>
         <BookmarkButton postId={post.id} variant="icon" />
       </div>
 
       {isRead && (
-        <span className="font-body text-[10px] sm:text-[11px] text-ink-soft/60 mt-1 sm:mt-1.5">Read</span>
+        <span className="font-body text-[10px] sm:text-[11px] text-ink-soft/60 mt-1 sm:mt-1.5">{t('card.read')}</span>
       )}
     </div>
   );

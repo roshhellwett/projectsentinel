@@ -4,18 +4,14 @@ import { useState, useCallback, useEffect, type ReactNode } from 'react';
 import { I18nContext, type Locale } from './i18n-shared';
 import en from '../../messages/en.json';
 import hi from '../../messages/hi.json';
-import ml from '../../messages/ml.json';
-import ta from '../../messages/ta.json';
-import mr from '../../messages/mr.json';
-import bn from '../../messages/bn.json';
 
 type Messages = Record<string, string>;
 
-const SUPPORTED_LOCALES: Locale[] = ['en', 'hi', 'ml', 'ta', 'mr', 'bn'];
+const SUPPORTED_LOCALES: Locale[] = ['en', 'hi'];
 const FALLBACK_LOCALE: Locale = 'en';
 const STORAGE_KEY = 'iv-locale';
 
-const LANG_MAP: Record<Locale, Messages> = { en, hi, ml, ta, mr, bn };
+const LANG_MAP: Record<Locale, Messages> = { en, hi };
 
 function interpolate(template: string, params?: Record<string, string | number>): string {
   if (!params) return template;
@@ -54,7 +50,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
-    localStorage.setItem(STORAGE_KEY, newLocale);
+    try {
+      localStorage.setItem(STORAGE_KEY, newLocale);
+      document.cookie = `${STORAGE_KEY}=${newLocale};path=/;max-age=31536000;SameSite=Lax`;
+    } catch {}
   }, []);
 
   const t = useCallback(
@@ -70,3 +69,5 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     </I18nContext.Provider>
   );
 }
+
+export { useI18n } from './i18n-shared';

@@ -5,10 +5,6 @@ import { useI18n, type Locale } from '@/lib/i18n/i18n-shared';
 const LOCALES: { code: Locale; labelKey: string }[] = [
   { code: 'en', labelKey: 'lang.en' },
   { code: 'hi', labelKey: 'lang.hi' },
-  { code: 'ml', labelKey: 'lang.ml' },
-  { code: 'ta', labelKey: 'lang.ta' },
-  { code: 'mr', labelKey: 'lang.mr' },
-  { code: 'bn', labelKey: 'lang.bn' },
 ];
 
 function LangIcon() {

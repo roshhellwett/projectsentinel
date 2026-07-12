@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
+import { useI18n } from '@/lib/i18n/context';
 
 function WifiOffIcon() {
   return (
@@ -29,6 +30,7 @@ function WifiIcon() {
 }
 
 export function ConnectionStatus() {
+  const { t } = useI18n();
   const { isOnline } = useNetworkStatus();
   const [showReconnected, setShowReconnected] = useState(false);
   const wasOfflineRef = useRef(false);
@@ -55,11 +57,10 @@ export function ConnectionStatus() {
           role="status"
           aria-live="polite"
           className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-rule/50 bg-paper/70 backdrop-blur-sm"
-          title="You are currently offline. Showing cached content."
         >
           <WifiOffIcon />
           <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft whitespace-nowrap">
-            Offline
+            {t('status.offline')}
           </span>
         </div>
       )}
@@ -72,7 +73,7 @@ export function ConnectionStatus() {
         >
           <WifiIcon />
           <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">
-            Back online
+            {t('status.back_online')}
           </span>
         </div>
       )}

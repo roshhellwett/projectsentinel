@@ -7,6 +7,7 @@ import { formatTimeAgo } from '@/lib/utils/formatDate';
 import { getHostname } from '@/lib/utils/getHostname';
 import { VerificationStamp } from '@/components/ui/VerificationStamp';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useI18n } from '@/lib/i18n/context';
 
 function ArrowRight() {
   return (
@@ -39,6 +40,7 @@ interface HeroCardProps {
 }
 
 export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: HeroCardProps) {
+  const { t } = useI18n();
   const haptic = useHapticFeedback();
   const isVideo = post.content_type === 'video';
 
@@ -63,7 +65,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
             {isVideo && (
               <span className="inline-flex items-center gap-1 px-1.5 py-1 sm:py-0.5 border border-ink/15 text-ink-soft font-body text-[10px] sm:text-[10px] font-bold tracking-wider uppercase">
                 <YoutubeIcon />
-                Video
+                {t('hero.video')}
               </span>
             )}
           </div>
@@ -72,7 +74,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
 
         {badge && (
           <span className="inline-block font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink mb-2 sm:mb-4">
-            {badge === 'breaking' ? 'Breaking Story' : 'Top Story'}
+            {badge === 'breaking' ? t('hero.breaking') : t('hero.top_story')}
           </span>
         )}
 
@@ -86,18 +88,18 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
 
         {firstHost && (
           <p className="font-body text-[11px] sm:text-[12px] text-ink-soft mb-2 sm:mb-4">
-            First reported by <span className="font-semibold text-ink">{firstHost}</span>
-            {otherSourceCount > 0 && <> · verified by {otherSourceCount} other sources</>}
+            {t('hero.first_reported')} <span className="font-semibold text-ink">{firstHost}</span>
+            {otherSourceCount > 0 && <> · {t('hero.verified_by', { count: otherSourceCount })}</>}
           </p>
         )}
 
         <div className="flex items-center justify-between pt-2 sm:pt-4 border-t border-rule">
           <span className="font-body text-[10px] sm:text-[11px] text-ink-soft flex items-center gap-1 sm:gap-1.5">
             <ShieldIcon />
-            {post.source_count || 1} sources
+            {t('hero.sources_count', { n: post.source_count || 1 })}
           </span>
           <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-ink-soft group-hover:text-ink transition-colors font-body font-semibold">
-            Read article <ArrowRight />
+            {t('hero.read_article')} <ArrowRight />
           </span>
         </div>
       </Link>

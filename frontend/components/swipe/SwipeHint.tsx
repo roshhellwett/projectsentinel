@@ -4,8 +4,10 @@ import { Z_INDEX } from '@/lib/theme/zIndex';
 import { useEffect, useState } from 'react';
 import { ArrowUp, Undo2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { isHintDismissed, dismissHint } from '@/lib/utils/swipeStats';
+import { useI18n } from '@/lib/i18n/context';
 
 export function SwipeHint() {
+  const { t } = useI18n();
   const [show, setShow] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -36,17 +38,17 @@ export function SwipeHint() {
             type="button"
             onClick={close}
             className="absolute inset-0 bg-ink/65 cursor-pointer"
-            aria-label="Dismiss tutorial"
+            aria-label={t('swipe.aria_dismiss_hint')}
           />
 
           <div className="animate-slide-up-in relative w-full max-w-sm bg-paper/80 backdrop-blur-xl border border-rule/50 rounded-md overflow-hidden">
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
             <div className="p-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-2">
-                How to swipe
+                {t('swipe.how_to')}
               </p>
               <h2 id="swipe-hint-title" className="font-display text-lg font-bold text-ink mb-4">
-                Two ways to move
+                {t('swipe.two_ways')}
               </h2>
 
               <ul className="space-y-4 mb-6">
@@ -60,8 +62,8 @@ export function SwipeHint() {
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
-                    <span className="text-[13px] font-bold text-ink tracking-[-0.01em]">Next story</span>
-                    <span className="text-[12px] text-muted">Swipe Up or Right</span>
+                    <span className="text-[13px] font-bold text-ink tracking-[-0.01em]">{t('swipe.next_story')}</span>
+                    <span className="text-[12px] text-muted">{t('swipe.swipe_up_right')}</span>
                   </span>
                 </li>
 
@@ -75,14 +77,14 @@ export function SwipeHint() {
                     </span>
                   </div>
                   <span className="flex flex-col mt-0.5 leading-tight">
-                    <span className="text-[13px] font-bold text-ink tracking-[-0.01em]">Previous story</span>
-                    <span className="text-[12px] text-muted">Swipe Down or Left</span>
+                    <span className="text-[13px] font-bold text-ink tracking-[-0.01em]">{t('swipe.previous_story')}</span>
+                    <span className="text-[12px] text-muted">{t('swipe.swipe_down_left')}</span>
                   </span>
                 </li>
               </ul>
 
               <p className="text-[12px] text-muted mb-5 leading-relaxed">
-                <span className="font-semibold text-ink">Made a mistake?</span> Tap the undo button that appears after each swipe, or swipe down to go back. Tap a card to read the full article.
+                <span className="font-semibold text-ink">{t('swipe.swipe_desc')}</span>
               </p>
 
               <button
@@ -90,7 +92,7 @@ export function SwipeHint() {
                 onClick={close}
                 className="w-full px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                Got it
+                {t('swipe.got_it')}
               </button>
             </div>
           </div>

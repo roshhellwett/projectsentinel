@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Info, X } from 'lucide-react';
 import { Z_INDEX } from '@/lib/theme/zIndex';
 
+import { useI18n } from '@/lib/i18n/context';
 import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 
 const STORAGE_KEY = 'iv-cookie-consent';
@@ -21,6 +22,7 @@ function writeDecision(d: Decision) {
 }
 
 export function CookieConsent() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const consentRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +55,7 @@ export function CookieConsent() {
         <div
           ref={consentRef}
           role="dialog"
-          aria-label="Cookie preferences"
+          aria-label={t('cookie.aria_preferences')}
           aria-modal="false"
           className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
@@ -62,25 +64,22 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={reject}
-              aria-label="Dismiss without accepting"
+              aria-label={t('cookie.aria_dismiss')}
               className="tap-target absolute top-1 right-1 text-subtle hover:text-ink rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               <X className="w-5 h-5" />
             </button>
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-accent mb-2">
-              Cookies &amp; privacy
+              {t('cookie.title')}
             </p>
             <h2 className="font-display text-lg font-bold text-ink mb-2 leading-snug">
-              We use minimal cookies to keep this site working.
+              {t('cookie.desc')}
             </h2>
             <p className="text-sm text-muted leading-relaxed mb-4">
-              No advertising or third-party tracking. We store your reading
-              preferences (theme, saved stories, search history) on this
-              device only. See our{' '}
+              {t('cookie.body')}{' '}
               <Link href="/privacy/" className="text-ink underline decoration-rule-strong hover:decoration-accent underline-offset-2">
                 Privacy Policy
-              </Link>
-              {' '}for full details.
+              </Link>.
             </p>
             <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 sm:items-center">
               <button
@@ -88,14 +87,14 @@ export function CookieConsent() {
                 onClick={reject}
                 className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-medium text-ink border border-rule-strong rounded hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                Dismiss
+                {t('cookie.dismiss')}
               </button>
               <button
                 type="button"
                 onClick={accept}
                 className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-semibold text-paper bg-ink rounded hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                Accept &amp; continue
+                {t('cookie.accept')}
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils/cn';
 import { getScoreHex, getScoreLabel } from '@/lib/utils/scoreColor';
+import { useI18n } from '@/lib/i18n/context';
 
 interface CredibilityBadgeProps {
   score: number;
@@ -10,6 +11,7 @@ interface CredibilityBadgeProps {
 }
 
 export function CredibilityBadge({ score, showTooltip = false, compact = false }: CredibilityBadgeProps) {
+  const { t } = useI18n();
   const clamped = Math.min(100, Math.max(0, Number.isFinite(score) ? Math.round(score) : 0));
   const label = getScoreLabel(clamped);
   const scoreColor = getScoreHex(clamped);
@@ -20,7 +22,7 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
         'relative group inline-flex max-w-full items-center rounded border border-rule/50 bg-paper/70 backdrop-blur-sm',
         compact ? 'gap-2 px-2.5 py-1.5' : 'gap-3 px-3 py-2',
       )}
-      aria-label={`Credibility score: ${clamped}/100, ${label}`}
+      aria-label={`${t('credibility.label')}: ${clamped}/100, ${label}`}
       role="img"
     >
       <div className={cn('flex min-w-0 flex-col', compact ? 'w-16' : 'w-24')}>
@@ -50,7 +52,7 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
 
       {!compact && (
         <span className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-wider text-muted" aria-hidden="true">
-          Credibility
+          {t('credibility.label')}
         </span>
       )}
 
@@ -59,7 +61,7 @@ export function CredibilityBadge({ score, showTooltip = false, compact = false }
           className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-ink text-paper text-xs font-medium rounded shadow-paper-lift opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
           role="tooltip"
         >
-          {label} · score {clamped}/100
+          {label} · {t('credibility.label')} {clamped}/100
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-ink" />
         </div>
       )}

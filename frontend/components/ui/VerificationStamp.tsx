@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils/cn';
+import { useI18n } from '@/lib/i18n/context';
 
 interface VerificationStampProps {
   score: number;
@@ -18,6 +19,7 @@ function CheckIcon() {
 }
 
 export function VerificationStamp({ score, compact, xsmall, className }: VerificationStampProps) {
+  const { t } = useI18n();
   if (xsmall) {
     return (
       <div
@@ -25,7 +27,7 @@ export function VerificationStamp({ score, compact, xsmall, className }: Verific
           'inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/25 text-ink font-mono text-[10px] leading-none',
           className,
         )}
-        aria-label={`Credibility ${score}%`}
+        aria-label={t('credibility.score') + ` ${score}%`}
       >
         <CheckIcon />
         <span>{score}%</span>
@@ -40,11 +42,11 @@ export function VerificationStamp({ score, compact, xsmall, className }: Verific
           'inline-flex items-center gap-1.5 px-2 py-1 border border-ink/25 text-ink',
           className,
         )}
-        aria-label={`Credibility ${score}%`}
+        aria-label={t('credibility.score') + ` ${score}%`}
       >
         <CheckIcon />
         <span className="font-mono text-xs leading-none">{score}%</span>
-        <span className="font-body text-[9px] font-bold tracking-wider uppercase text-ink-soft leading-none">ver.</span>
+        <span className="font-body text-[9px] font-bold tracking-wider uppercase text-ink-soft leading-none">{t('verification.short')}</span>
       </div>
     );
   }
@@ -55,11 +57,11 @@ export function VerificationStamp({ score, compact, xsmall, className }: Verific
         'inline-flex items-center gap-2 px-3 py-1.5 border border-ink/25 text-ink',
         className,
       )}
-      aria-label={`Credibility score ${score} percent`}
+      aria-label={t('credibility.score') + ` ${score} percent`}
     >
       <CheckIcon />
       <span className="font-mono text-sm leading-none font-medium">{score}%</span>
-      <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft leading-none">verified</span>
+      <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft leading-none">{t('verification.full')}</span>
     </div>
   );
 }

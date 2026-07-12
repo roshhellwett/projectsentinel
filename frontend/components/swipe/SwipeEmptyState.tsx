@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Flame, Layers, Newspaper, CheckCircle2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/context';
 
 interface SwipeEmptyStateProps {
   cardsToday: number;
@@ -19,6 +20,7 @@ export function SwipeEmptyState({
   onRefresh,
   isFetching = false,
 }: SwipeEmptyStateProps) {
+  const { t } = useI18n();
   const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
@@ -38,15 +40,13 @@ export function SwipeEmptyState({
       <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mx-auto mb-5">
         <CheckCircle2 className="w-7 h-7 text-accent" />
       </div>
-      <h2 className="font-display text-2xl font-bold text-ink tracking-[-0.015em] mb-2">You&apos;re caught up.</h2>
-      <p className="text-[13px] text-muted mb-8">
-        No more verified stories right now. Check back in a few minutes.
-      </p>
+      <h2 className="font-display text-2xl font-bold text-ink tracking-[-0.015em] mb-2">{t('swipe.caught_up')}</h2>
+      <p className="text-[13px] text-muted mb-8">{t('feed.no_news_desc')}</p>
 
       <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8 text-left">
-        <Stat icon={<Layers className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={cardsToday} label="read today" />
-        <Stat icon={<Newspaper className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={uniqueHostsToday} label="sources" />
-        <Stat icon={<Flame className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={streak} label={streak === 1 ? 'day' : 'days'} />
+        <Stat icon={<Layers className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={cardsToday} label={t('swipe.read_today')} />
+        <Stat icon={<Newspaper className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={uniqueHostsToday} label={t('swipe.sources')} />
+        <Stat icon={<Flame className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />} value={streak} label={streak === 1 ? t('swipe.day') : t('swipe.days')} />
       </dl>
 
       <div className="flex flex-col gap-2">
@@ -57,14 +57,14 @@ export function SwipeEmptyState({
             disabled={isFetching || cooldown > 0}
             className="w-full px-4 pt-[9px] pb-[11px] bg-ink text-paper text-[13px] font-semibold rounded hover:bg-ink/90 hover-lift transition-colors disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            {isFetching ? 'Checking…' : cooldown > 0 ? `Wait ${cooldown}s` : 'Check for new stories'}
+            {isFetching ? t('swipe.checking') : cooldown > 0 ? t('swipe.wait_s', { s: cooldown }) : t('swipe.check_for_new')}
           </button>
         )}
         <Link
           href="/"
           className="w-full tap-target min-h-[44px] inline-flex items-center justify-center px-4 pt-[7px] pb-[9px] border border-rule-strong text-[12px] font-semibold text-ink hover:bg-paper-2 hover-lift transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          Back to grid
+          {t('swipe.back_to_grid')}
         </Link>
       </div>
     </div>

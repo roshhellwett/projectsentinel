@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils/cn';
 import { getHostname } from '@/lib/utils/getHostname';
 import { buttonVariants } from '@/components/ui/Button';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { useI18n } from '@/lib/i18n/context';
 
 interface SourcePickerButtonProps {
   sources: Source[];
@@ -60,6 +61,7 @@ export function SourcePickerButton({
   buttonClassName,
   stopPropagation = true,
 }: SourcePickerButtonProps) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -183,7 +185,7 @@ export function SourcePickerButton({
           }}
         >
           <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
-            Choose source
+            {t('source_picker.choose_source')}
           </div>
           <div className="max-h-[45vh] overflow-y-auto pr-1">
             {validSources.map((source, index) => {
@@ -198,7 +200,7 @@ export function SourcePickerButton({
                   role="menuitem"
                   onClick={() => setOpen(false)}
                   className="flex min-w-0 items-center gap-3 rounded px-3 py-2.5 text-ink transition-colors hover:bg-paper-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                  aria-label={`Open ${sourceLabel} in a new tab`}
+                  aria-label={t('source_picker.aria_open', { name: sourceLabel })}
                 >
                   <SourceIcon url={source.url} />
                   <span className="min-w-0 flex-1">

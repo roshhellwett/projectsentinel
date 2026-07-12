@@ -110,13 +110,13 @@ export function MobileBottomNav() {
         >
           <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
           <div
-            className={`absolute left-3 right-3 max-[380px]:left-2 max-[380px]:right-2 bg-paper/80 backdrop-blur-xl border border-rule/50 transition-transform duration-300 ${
+            className={`absolute left-3 right-3 max-[380px]:left-2 max-[380px]:right-2 bg-paper/80 border border-rule/50 transition-transform duration-300 ${
               topicsOpen ? 'translate-y-0' : 'translate-y-full'
             }`}
             style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom, 0px))' }}
           >
             <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
-              <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-3 px-1">Browse Topics</p>
+              <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-3 px-1">{t('nav.browse_topics')}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CATEGORIES.map((cat) => {
                   const active = pathname === `/category/${cat.slug}/`;

@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { SearchX } from 'lucide-react';
 import type { Metadata } from 'next';
 import { PageShell } from '@/components/layout/PageShell';
+import { getServerLocale } from '@/lib/i18n/server';
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
@@ -20,7 +21,9 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   };
 }
 
-async function SearchResults({ query }: { query: string }) {
+async function SearchResults({ query, locale }: { query: string; locale: string }) {
+  const messages = (await import(`@/messages/${locale}.json`)).default;
+
   const { posts: raw, count } = await searchPosts(query, 30);
   const posts = dedupe(raw);
 
@@ -30,9 +33,9 @@ async function SearchResults({ query }: { query: string }) {
         <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mb-5">
             <SearchX className="w-7 h-7 text-muted" />
         </div>
-        <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-2">No results found</h2>
+        <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-2">{messages['search.no_results']?.replace('{query}', query)}</h2>
         <p className="text-sm text-muted max-w-sm">
-          No verified stories matched &ldquo;{query}&rdquo;. Try different keywords.
+          {messages['search.try_different']}
         </p>
       </div>
     );
@@ -52,6 +55,8 @@ async function SearchResults({ query }: { query: string }) {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const locale = await getServerLocale();
+  const messages = (await import(`@/messages/${locale}.json`)).default;
   const { q } = await searchParams;
   const query = (q || '').trim();
 
@@ -61,13 +66,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <header className="mb-6 sm:mb-10 pb-6 sm:pb-8 border-b border-rule">
           <span aria-hidden="true" className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-3 sm:mb-5" />
           <p className="editorial-kicker mb-2 sm:mb-3">
-            {query ? 'Search Results' : 'Search'}
+            {query ? messages['search.title'] : messages['search.page_title']}
           </p>
           <h1 className="font-display text-xl sm:text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-2 sm:mb-3 leading-[1.05]">
-            {query ? query : 'Find verified news'}
+            {query ? query : messages['search.page_subtitle']}
           </h1>
           <p className="text-xs sm:text-sm text-muted">
-            Browse calm, verified coverage from the India Verified archive.
+            {messages['search.page_desc']}
           </p>
         </header>
 
@@ -81,11 +86,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </div>
             }
           >
-            <SearchResults query={query} />
+            <SearchResults query={query} locale={locale} />
           </Suspense>
         ) : (
           <p className="text-muted">
-            Use the search button in the top navigation to find verified news.
+            {messages['search.use_search']}
           </p>
         )}
       </PageShell>

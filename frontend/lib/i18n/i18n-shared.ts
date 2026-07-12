@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-export type Locale = 'en' | 'hi' | 'ml' | 'ta' | 'mr' | 'bn';
+export type Locale = 'en' | 'hi';
 
 export interface I18nContextValue {
   locale: Locale;

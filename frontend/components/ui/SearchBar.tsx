@@ -8,6 +8,7 @@ import { NewsCard } from '@/components/news/NewsCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/utils/bodyScrollLock';
 import { cachedFetch } from '@/lib/utils/fetchCache';
+import { useI18n } from '@/lib/i18n/context';
 
 function SearchIcon() {
   return (
@@ -32,6 +33,7 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ isOpen, onClose }: SearchBarProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Post[]>([]);
@@ -69,7 +71,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
         })
         .catch((err) => {
           if (err?.name === 'AbortError' || controller.signal.aborted) return;
-          setError('Search failed. Check connection.');
+          setError(t('search.error'));
           setIsLoading(false);
         });
     }, 300);
@@ -78,7 +80,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [query, isOpen, retryKey]);
+  }, [query, isOpen, retryKey, t]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -180,17 +182,17 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      aria-label="Search articles"
-      className="fixed inset-0 overflow-y-auto bg-paper/80 backdrop-blur-xl select-none overflow-x-hidden w-full max-w-full touch-manipulation"
+      aria-label={t('search.aria_dialog')}
+      className="fixed inset-0 overflow-y-auto bg-paper/80 select-none overflow-x-hidden w-full max-w-full touch-manipulation"
       style={{ zIndex: 100 }}
     >
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8 md:py-10">
         <div className="flex items-center justify-between mb-4 sm:mb-8">
-          <h2 className="font-display text-xl sm:text-3xl md:text-4xl text-ink">Search</h2>
+          <h2 className="font-display text-xl sm:text-3xl md:text-4xl text-ink">{t('search.page_title')}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-paper-2 transition-colors tap-target"
-            aria-label="Close search"
+            aria-label={t('search.aria_close')}
           >
             <CloseIcon />
           </button>
@@ -212,9 +214,9 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search verified news, topics, keywords..."
+              placeholder={t('search.placeholder')}
               className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper-2 text-ink border border-rule focus:border-ink outline-none transition-all font-body placeholder:text-muted text-sm sm:text-base"
-              aria-label="Search query"
+              aria-label={t('search.aria_query')}
               aria-controls="search-results"
             />
             {query && (
@@ -225,7 +227,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                   inputRef.current?.focus();
                 }}
                 className="absolute right-2 sm:right-3 p-1.5 text-muted hover:text-ink transition-colors"
-                aria-label="Clear search query"
+                aria-label={t('search.aria_clear')}
               >
                 <CloseIcon />
               </button>
@@ -254,22 +256,22 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 onClick={() => setRetryKey((k) => k + 1)}
                 className="ink-btn text-sm"
               >
-                Retry
+                {t('search.retry')}
               </button>
             </div>
           )}
 
           {!isLoading && !error && query.trim().length >= 2 && results.length === 0 && (
             <div className="text-center py-16 px-4">
-              <p className="font-display text-lg text-ink mb-1">No verified stories found</p>
-              <p className="font-body text-sm text-ink-soft">Try searching for different keywords or broader topics.</p>
+              <p className="font-display text-lg text-ink mb-1">{t('search.no_stories')}</p>
+              <p className="font-body text-sm text-ink-soft">{t('search.no_stories_desc')}</p>
             </div>
           )}
 
           {!isLoading && !error && results.length > 0 && (
             <div>
               <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-4 px-1">
-                Found {resultCount} verified {resultCount === 1 ? 'story' : 'stories'}
+                {t('search.found_count', { count: resultCount })}
               </p>
               <div className="space-y-4">
                 {results.map((post) => (

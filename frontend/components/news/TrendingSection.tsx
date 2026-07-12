@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { Post } from '@/types';
 import { useReadPosts } from '@/lib/utils/readPosts';
+import { useI18n } from '@/lib/i18n/context';
 
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { VerificationStamp } from '@/components/ui/VerificationStamp';
@@ -55,6 +56,7 @@ interface TrendingSectionProps {
 }
 
 export function TrendingSection({ posts }: TrendingSectionProps) {
+  const { t } = useI18n();
   const haptic = useHapticFeedback();
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -112,21 +114,21 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   if (trending.length === 0) return null;
 
   return (
-      <section aria-label="Trending stories" className="mb-6 sm:mb-10">
+      <section aria-label={t('trending.title')} className="mb-6 sm:mb-10">
         <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5">
           <h2 className="font-body font-bold text-base sm:text-xl text-ink">
-            Trending stories
+            {t('trending.title')}
           </h2>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
-              Top {trending.length} verified
+              {t('trending.top_count', { n: trending.length })}
             </span>
             <div className="hidden sm:flex items-center gap-1">
               <button
                 onClick={() => scrollBy('left')}
                 disabled={!canScrollLeft}
                 className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px] min-touch"
-                aria-label="Scroll left"
+                aria-label={t('trending.aria_scroll_left')}
               >
                 <ArrowLeft />
               </button>
@@ -134,7 +136,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                 onClick={() => scrollBy('right')}
                 disabled={!canScrollRight}
                 className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px] min-touch"
-                aria-label="Scroll right"
+                aria-label={t('trending.aria_scroll_right')}
               >
                 <ArrowRight />
               </button>
@@ -175,7 +177,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                                 <rect x="2" y="5" width="20" height="14" rx="3" />
                                 <path d="M10 9l6 4-6 4z" />
                               </svg>
-                              Video
+                              {t('card.video')}
                             </span>
                           )}
                         </div>
@@ -183,7 +185,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                         {read && (
                           <span className="inline-flex items-center gap-1 text-xs text-ink-soft font-body">
                             <CheckIcon />
-                            Read
+                            {t('card.read')}
                           </span>
                         )}
                       </div>
@@ -206,7 +208,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                         onClick={() => haptic.light()}
                         className="inline-flex items-center gap-1 font-body text-[11px] text-ink-soft hover:text-ink transition-colors"
                       >
-                        Read <ArrowRight />
+                        {t('card.read')} <ArrowRight />
                       </Link>
                     </div>
                   </div>

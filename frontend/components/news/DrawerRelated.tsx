@@ -5,6 +5,7 @@ import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
 import { CredibilityBadge } from './CredibilityBadge';
 import { ArrowUpRight } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/context';
 
 interface DrawerRelatedProps {
   currentPost: Post;
@@ -12,6 +13,7 @@ interface DrawerRelatedProps {
 }
 
 export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
+  const { t } = useI18n();
   const [related, setRelated] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -69,7 +71,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
     <section className="mt-8 border-t border-rule pt-6">
       <div className="flex items-center gap-2 mb-4">
         <span aria-hidden="true" className="w-1 h-4 bg-accent" />
-        <h3 className="font-display text-sm font-bold text-ink tracking-[-0.01em]">Keep reading</h3>
+        <h3 className="font-display text-sm font-bold text-ink tracking-[-0.01em]">{t('drawer.keep_reading')}</h3>
       </div>
 
       {loading ? (
@@ -82,7 +84,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
           ))}
         </div>
       ) : error ? (
-        <p className="text-[13px] text-muted py-4 text-center">Could not load related stories.</p>
+        <p className="text-[13px] text-muted py-4 text-center">{t('drawer.related_error')}</p>
       ) : (
         <ul className="space-y-2.5">
           {related.map((post, i) => (

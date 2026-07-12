@@ -6,6 +6,7 @@ import { showToast } from '@/lib/utils/toast';
 import { buttonVariants } from '@/components/ui/Button';
 import { cn } from '@/lib/utils/cn';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useI18n } from '@/lib/i18n/context';
 
 interface BookmarkButtonProps {
   postId: string;
@@ -20,6 +21,7 @@ export function BookmarkButton({
   stopPropagation = true,
   className,
 }: BookmarkButtonProps) {
+  const { t } = useI18n();
   const haptic = useHapticFeedback();
   const { isSaved, toggleSaved } = useSavedPosts();
   const saved = isSaved(postId);
@@ -40,9 +42,9 @@ export function BookmarkButton({
         haptic.light();
       }
       toggleSaved(postId);
-      showToast(nextSaved ? 'Saved to reading list' : 'Removed from reading list', nextSaved ? 'bookmark' : 'bookmark-off');
+      showToast(nextSaved ? t('bookmark.toast_save') : t('bookmark.toast_unsave'), nextSaved ? 'bookmark' : 'bookmark-off');
     },
-    [postId, toggleSaved, stopPropagation, saved, haptic],
+    [postId, toggleSaved, stopPropagation, saved, haptic, t],
   );
 
   if (variant === 'pill') {
@@ -51,7 +53,7 @@ export function BookmarkButton({
         type="button"
         onClick={handleClick}
         aria-pressed={saved}
-        aria-label={saved ? 'Remove from saved' : 'Save for later'}
+        aria-label={saved ? t('bookmark.aria_unsave') : t('bookmark.aria_save')}
         className={cn(
           buttonVariants({ variant: saved ? 'secondary' : 'outline' }),
           'relative tap-target gap-2 px-4 py-2 rounded-xl font-bold shadow-sm transition-all duration-200 active:scale-95',
@@ -88,7 +90,7 @@ export function BookmarkButton({
           ) : (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 4v16l-6-5-6 5V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1z" /></svg>
           )}
-          <span>{saved ? 'Saved' : 'Save'}</span>
+          <span>{saved ? t('bookmark.saved_label') : t('common.save')}</span>
         </span>
       </button>
     );
@@ -99,7 +101,7 @@ export function BookmarkButton({
       type="button"
       onClick={handleClick}
       aria-pressed={saved}
-      aria-label={saved ? 'Remove from saved' : 'Save for later'}
+      aria-label={saved ? t('bookmark.aria_unsave') : t('bookmark.aria_save')}
       className={cn(
         'group relative tap-target min-w-[44px] min-h-[44px] flex items-center justify-center p-2 -m-2 rounded-full transition-all duration-200',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-90',
@@ -137,7 +139,7 @@ export function BookmarkButton({
       )}
 
       <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max bg-ink px-2.5 py-1 text-[10px] font-bold text-paper opacity-0 transition-all group-hover:opacity-100 group-focus-visible:opacity-100 scale-95 group-hover:scale-100">
-        {saved ? 'Remove saved' : 'Save story'}
+        {saved ? t('bookmark.tooltip_unsave') : t('bookmark.tooltip_save')}
         <span className="absolute left-1/2 top-full -translate-x-1/2 border-[4px] border-transparent border-t-ink" />
       </span>
     </button>

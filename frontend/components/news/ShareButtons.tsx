@@ -6,6 +6,7 @@ import { Z_INDEX } from '@/lib/theme/zIndex';
 import { cn } from '@/lib/utils/cn';
 import { showToast } from '@/lib/utils/toast';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useI18n } from '@/lib/i18n/context';
 
 interface ShareButtonsProps {
   headline: string;
@@ -47,6 +48,7 @@ export function ShareButtons({
   className,
   buttonClassName,
 }: ShareButtonsProps) {
+  const { t } = useI18n();
   const haptic = useHapticFeedback();
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -147,12 +149,12 @@ export function ShareButtons({
           (isInline || isSheet) && 'w-full justify-center',
           buttonClassName,
         )}
-        aria-label="Share this article"
+        aria-label={t('share.aria_button')}
         aria-expanded={showMenu}
         aria-controls="share-menu"
       >
         <Share2 className="w-4 h-4" />
-        Share
+        {t('share.button')}
       </button>
 
       {showMenu && (
@@ -161,7 +163,7 @@ export function ShareButtons({
           id="share-menu"
           role="dialog"
           aria-modal="true"
-          aria-label="Share article options"
+          aria-label={t('share.aria_menu')}
           className={cn(
             `${Z_INDEX.shareMenu} rounded border border-rule-strong bg-paper p-2 shadow-paper-lift`,
             'animate-scale-in will-change-transform transform-gpu',
@@ -208,7 +210,7 @@ export function ShareButtons({
             ) : (
               <LinkIcon className="w-4 h-4" />
             )}
-            {copied ? 'Copied!' : 'Copy link'}
+            {copied ? t('share.copied') : t('share.copy_link')}
           </button>
         </div>
       )}

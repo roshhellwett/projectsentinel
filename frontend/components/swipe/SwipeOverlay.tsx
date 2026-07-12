@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, useTransform, useMotionValue, useMotionValueEvent, type MotionValue } from 'framer-motion';
 import { safeRead, safeWrite } from '@/lib/utils/safeStorage';
 import { Z_INDEX } from '@/lib/theme/zIndex';
+import { useI18n } from '@/lib/i18n/context';
 
 interface SwipeOverlayProps {
   dragX: MotionValue<number>;
@@ -22,6 +23,7 @@ function clamp01(n: number): number {
 }
 
 export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayProps) {
+  const { t } = useI18n();
   const [hasSeen, setHasSeen] = useState(false);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
   return (
     <motion.div className={`pointer-events-none absolute inset-0 ${Z_INDEX.dropdown} touch-manipulation`}>
       <Badge
-        label="Next"
+        label={t('swipe.next')}
         icon={<ArrowRight className="w-4 h-4" />}
         dragVal={dragX}
         range={[0, TRIGGER]}
@@ -55,7 +57,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
         accent="border-accent text-accent bg-paper"
       />
       <Badge
-        label="Previous"
+        label={t('swipe.previous')}
         icon={<Undo2 className="w-4 h-4" />}
         dragVal={dragX}
         range={[0, -TRIGGER]}
@@ -64,7 +66,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
         disabled={!canRewind}
       />
       <Badge
-        label="Next"
+        label={t('swipe.next')}
         icon={<ArrowUp className="w-4 h-4" />}
         dragVal={dragY}
         range={[0, -TRIGGER]}
@@ -72,7 +74,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
         accent="border-accent text-accent bg-paper/70 backdrop-blur-sm"
       />
       <Badge
-        label="Previous"
+        label={t('swipe.previous')}
         icon={<ArrowDown className="w-4 h-4" />}
         dragVal={dragY}
         range={[0, TRIGGER]}

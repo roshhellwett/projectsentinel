@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { Post } from '@/types';
 import { CategoryTag } from './CategoryTag';
+import { useI18n } from '@/lib/i18n/context';
 
 interface NextStoryPromptProps {
   posts: Post[];
@@ -13,6 +14,7 @@ interface NextStoryPromptProps {
 }
 
 export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#related-news' }: NextStoryPromptProps) {
+  const { t } = useI18n();
   const next = posts.find((p) => p.id !== currentPostId);
   const [visible, setVisible] = useState(false);
   const visibleRef = useRef(false);
@@ -94,7 +96,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <CategoryTag category={next.category} />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">Up next</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">{t('drawer.up_next')}</span>
                 </div>
                 <p className="font-display text-[14.5px] font-semibold text-ink line-clamp-2 leading-snug group-hover:text-accent transition-colors">
                   {next.headline}
@@ -107,7 +109,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
             <button
               type="button"
               onClick={onDismiss}
-              aria-label="Dismiss up next"
+              aria-label={t('nextstory.aria_dismiss')}
               className="absolute -top-2.5 -right-2.5 inline-flex items-center justify-center w-8 h-8 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 text-muted hover:text-ink hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 6.5l-11 11M6.5 6.5l11 11" /></svg>

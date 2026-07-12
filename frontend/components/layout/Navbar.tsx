@@ -224,7 +224,7 @@ export function Navbar() {
 
       <aside
         id="mobile-nav-drawer"
-        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-full max-w-sm bg-paper/80 backdrop-blur-xl border-l border-rule/50 flex flex-col overflow-x-hidden transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-full max-w-sm bg-paper/80 border-l border-rule/50 flex flex-col overflow-x-hidden transition-transform duration-300 ${
           isMobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{

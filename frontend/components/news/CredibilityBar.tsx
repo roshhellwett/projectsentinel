@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { getScoreLabel } from '@/lib/utils/scoreColor';
+import { useI18n } from '@/lib/i18n/context';
 
 interface CredibilityBarProps {
   score: number;
@@ -15,6 +16,7 @@ function clampScore(score: number) {
 }
 
 export function CredibilityBar({ score, className, compact = false }: CredibilityBarProps) {
+  const { t } = useI18n();
   const clamped = clampScore(score);
   const label = getScoreLabel(clamped);
 
@@ -31,15 +33,15 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
     <div
       className={cn('w-full min-w-0 flex-shrink-0', className)}
       role="img"
-      aria-label={`Credibility score: ${clamped} out of 100, ${label}`}
+      aria-label={`${t('credibility.score')}: ${clamped}/100, ${label}`}
     >
       <div className={cn('flex items-center justify-between gap-3', compact ? 'mb-1' : 'mb-1.5')}>
         <span className={cn('truncate font-semibold text-muted', compact ? 'text-[9px]' : 'text-[10px]')}>
-          {compact ? label : 'Credibility score'}
+          {compact ? label : t('credibility.score')}
         </span>
         <span className={cn('flex-shrink-0 font-bold tabular-nums text-ink', compact ? 'text-[10px]' : 'text-[11px]')}>
           {clamped}
-          {!compact && <span className="font-semibold text-subtle"> / 100</span>}
+          {!compact && <span className="font-semibold text-subtle">/100</span>}
         </span>
       </div>
 
@@ -70,9 +72,9 @@ export function CredibilityBar({ score, className, compact = false }: Credibilit
 
       {!compact && (
         <div className="mt-1 flex items-center justify-between text-[9px] font-semibold text-muted">
-          <span>Low</span>
-          <span>Moderate</span>
-          <span>High</span>
+          <span>{t('credibility.low')}</span>
+          <span>{t('credibility.moderate')}</span>
+          <span>{t('credibility.high')}</span>
         </div>
       )}
     </div>
