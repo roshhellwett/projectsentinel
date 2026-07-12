@@ -17,7 +17,7 @@ interface NewsDrawerProps {
   onPrev?: () => void;
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
 
 export function NewsDrawer({ post, onClose, onSelectRelated, onNext, onPrev }: NewsDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);

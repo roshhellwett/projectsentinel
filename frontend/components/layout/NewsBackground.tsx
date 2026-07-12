@@ -6,11 +6,11 @@ export function NewsBackground() {
     >
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
-        style={{ backgroundImage: 'url("/webmob.webp")' }}
+        style={{ backgroundImage: 'url("/webmob.webp")', filter: 'blur(2px)' }}
       />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
-        style={{ backgroundImage: 'url("/webdesk.webp")' }}
+        style={{ backgroundImage: 'url("/webdesk.webp")', filter: 'blur(2px)' }}
       />
       <div
         className="absolute inset-0 opacity-[0.03]"

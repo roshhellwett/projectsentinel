@@ -87,14 +87,13 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
         'hover:shadow-[0_2px_8px_rgb(var(--c-ink)/0.08)] hover:border-ink/20',
         'focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:outline-none',
         isNew && 'border-l-[3px] border-ink',
-        isVideo && 'border-amber-500/10 backdrop-blur-sm'
+        isVideo && 'border-amber-500/10'
       )}
-      style={isVideo ? { backdropFilter: 'blur(12px)' } : undefined}
     >
       {isVideo && (
-        <span className="absolute top-0 right-0 w-16 h-16 overflow-hidden pointer-events-none">
+        <span className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
           <span 
-            className="absolute top-[-4px] right-[-16px] w-[50px] h-[22px] bg-amber-500/10 rotate-45" 
+            className="absolute top-[-2px] right-[-12px] h-5 w-12 bg-amber-500/10 rotate-45" 
             style={{ 
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',

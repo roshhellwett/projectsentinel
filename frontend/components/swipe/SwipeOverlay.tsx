@@ -45,7 +45,7 @@ export function SwipeOverlay({ dragX, dragY, canRewind = true }: SwipeOverlayPro
   if (hasSeen) return null;
 
   return (
-    <motion.div className={`pointer-events-none absolute inset-0 ${Z_INDEX.dropdown} touch-action-manipulation`}>
+    <motion.div className={`pointer-events-none absolute inset-0 ${Z_INDEX.dropdown} touch-manipulation`}>
       <Badge
         label="Next"
         icon={<ArrowRight className="w-4 h-4" />}

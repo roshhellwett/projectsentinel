@@ -82,7 +82,7 @@ export function NextStoryPrompt({ posts, currentPostId, hideNearSelector = '#rel
     <>
       {visible && (
         <div
-          className={`animate-slide-up-fade fixed left-1/2 -translate-x-1/2 will-change-transform transform-gpu ${Z_INDEX.cookieConsent}`}
+          className={`animate-slide-up-fade fixed left-1/2 -translate-x-1/2 will-change-transform transform-gpu ${Z_INDEX.prompts}`}
           style={{ width: 'min(94vw,32rem)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 6rem)' }}
         >
           <div className="relative">

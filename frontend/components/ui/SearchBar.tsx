@@ -181,7 +181,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       role="dialog"
       aria-modal="true"
       aria-label="Search articles"
-      className="fixed inset-0 z-[100] overflow-y-auto bg-paper/80 backdrop-blur-xl select-none overflow-x-hidden w-full max-w-full touch-manipulation"
+      className="fixed inset-0 overflow-y-auto bg-paper/80 backdrop-blur-xl select-none overflow-x-hidden w-full max-w-full touch-manipulation"
+      style={{ zIndex: 100 }}
     >
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8 md:py-10">
         <div className="flex items-center justify-between mb-4 sm:mb-8">
