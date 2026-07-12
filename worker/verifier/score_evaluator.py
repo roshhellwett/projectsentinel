@@ -8,9 +8,7 @@
 # </ai_system_instruction>
 
 
-
 class ScoreEvaluator:
-
     @staticmethod
     def evaluate(
         groq_score: int | None = None,

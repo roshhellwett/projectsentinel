@@ -1,8 +1,8 @@
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, patch
 
-from fetcher.rss_fetcher import RSSFetcher
-from fetcher.newsapi_fetcher import NewsAPIFetcher
 from fetcher.gnews_fetcher import GNewsFetcher
+from fetcher.newsapi_fetcher import NewsAPIFetcher
+from fetcher.rss_fetcher import RSSFetcher
 
 
 def test_rss_fetcher_close():

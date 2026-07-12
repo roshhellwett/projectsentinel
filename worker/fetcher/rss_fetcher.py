@@ -8,7 +8,7 @@
 # </ai_system_instruction>
 
 
-
+import contextlib
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -25,7 +25,6 @@ from sources.rss_sources import get_rss_sources, get_video_sources
 
 
 class RSSFetcher:
-
     _USER_AGENT = "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"
 
     _FAIL_THRESHOLD = 3
@@ -86,10 +85,8 @@ class RSSFetcher:
     def close(self) -> None:
         session = getattr(self._local, "session", None)
         if session is not None:
-            try:
+            with contextlib.suppress(Exception):
                 session.close()
-            except Exception:
-                pass
             self._local.session = None
 
     def fetch_all(self, include_video: bool = False) -> list[dict]:
@@ -210,7 +207,9 @@ class RSSFetcher:
                 article["video_thumbnail"] = thumb_list[0]["url"]
             elif isinstance(media_group, list):
                 for item in media_group:
-                    nested = (item.get("media_thumbnail") or [{}])[0].get("url") or (item.get("media:thumbnail") or [{}])[0].get("url")
+                    nested = (item.get("media_thumbnail") or [{}])[0].get("url") or (
+                        item.get("media:thumbnail") or [{}]
+                    )[0].get("url")
                     if nested:
                         article["video_thumbnail"] = nested
                         break

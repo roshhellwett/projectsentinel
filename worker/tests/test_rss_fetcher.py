@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -23,11 +22,13 @@ def _isolate_health_state():
     yield
     RSSFetcher._reset_health()
 
+
 def _make_failing_response():
 
     resp = MagicMock()
     resp.raise_for_status.side_effect = Exception("404 Client Error")
     return resp
+
 
 def _make_ok_response():
 
@@ -45,12 +46,14 @@ def _make_ok_response():
     )
     return resp
 
+
 def _make_empty_response():
 
     resp = MagicMock()
     resp.raise_for_status.return_value = None
     resp.content = b"<?xml version='1.0'?><rss><channel><title>t</title></channel></rss>"
     return resp
+
 
 def test_transient_failure_does_not_park_feed():
 
@@ -61,6 +64,7 @@ def test_transient_failure_does_not_park_feed():
         fetcher._fetch_feed(source)
 
     assert RSSFetcher._is_parked(source["url"]) is False
+
 
 def test_two_failures_still_not_parked():
 
@@ -73,6 +77,7 @@ def test_two_failures_still_not_parked():
 
     assert RSSFetcher._is_parked(source["url"]) is False
 
+
 def test_three_consecutive_failures_parks_feed():
 
     source = {"name": "Test", "url": "https://example.com/feed", "category_hint": "general"}
@@ -84,6 +89,7 @@ def test_three_consecutive_failures_parks_feed():
         fetcher._fetch_feed(source)
 
     assert RSSFetcher._is_parked(source["url"]) is True
+
 
 def test_success_resets_failure_streak():
 
@@ -103,6 +109,7 @@ def test_success_resets_failure_streak():
 
     assert RSSFetcher._is_parked(source["url"]) is False
 
+
 def test_parked_feed_is_skipped_in_fetch_all():
 
     source = {"name": "Test", "url": "https://example.com/feed", "category_hint": "general"}
@@ -113,13 +120,12 @@ def test_parked_feed_is_skipped_in_fetch_all():
     RSSFetcher._record_failure(source["url"])
     assert RSSFetcher._is_parked(source["url"]) is True
 
-    with patch(
-        "fetcher.rss_fetcher.get_rss_sources", return_value=[source]
-    ), patch("requests.Session.get") as mock_get:
+    with patch("fetcher.rss_fetcher.get_rss_sources", return_value=[source]), patch("requests.Session.get") as mock_get:
         result = fetcher.fetch_all()
 
     assert result == []
     assert mock_get.call_count == 0
+
 
 def test_park_lifts_after_duration_elapses():
 
@@ -134,6 +140,7 @@ def test_park_lifts_after_duration_elapses():
 
     assert RSSFetcher._is_parked(source["url"]) is False
 
+
 def test_three_consecutive_empty_fetches_parks_feed():
 
     source = {"name": "Test", "url": "https://example.com/feed", "category_hint": "general"}
@@ -146,6 +153,7 @@ def test_three_consecutive_empty_fetches_parks_feed():
         fetcher._fetch_feed(source)
 
     assert RSSFetcher._is_parked(source["url"]) is True
+
 
 def test_real_success_resets_empty_fetch_streak():
 

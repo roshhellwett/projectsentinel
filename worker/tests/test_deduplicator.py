@@ -13,8 +13,8 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
-from cache.shared_cache import cache
 from cache.keys import KNOWN_HASHES, KNOWN_HASHES_TTL, RECENT_HEADLINES, RECENT_HEADLINES_TTL
+from cache.shared_cache import cache
 from fetcher.deduplicator import Deduplicator
 
 
@@ -31,15 +31,18 @@ def _make_dedup_with_mock_supabase() -> tuple[Deduplicator, MagicMock]:
         dedup = Deduplicator()
     return dedup, mock_sb
 
+
 def test_sweep_with_zero_hours_is_noop():
     dedup, mock_sb = _make_dedup_with_mock_supabase()
     assert dedup.sweep_stale_unprocessed(hours=0) == 0
     mock_sb.table.assert_not_called()
 
+
 def test_sweep_without_supabase_is_noop():
     with patch("fetcher.deduplicator.get_supabase", return_value=None):
         dedup = Deduplicator()
     assert dedup.sweep_stale_unprocessed(hours=4) == 0
+
 
 def test_sweep_filters_on_processed_false_and_age_cutoff():
     dedup, mock_sb = _make_dedup_with_mock_supabase()
@@ -70,6 +73,7 @@ def test_sweep_filters_on_processed_false_and_age_cutoff():
         f"cutoff {cutoff} not in expected window [{expected_min}, {expected_max}]"
     )
 
+
 def test_sweep_returns_zero_on_supabase_exception():
     dedup, mock_sb = _make_dedup_with_mock_supabase()
     mock_sb.table.return_value.update.return_value.eq.return_value.lt.return_value.execute.side_effect = Exception(
@@ -78,6 +82,7 @@ def test_sweep_returns_zero_on_supabase_exception():
 
     swept = dedup.sweep_stale_unprocessed(hours=4)
     assert swept == 0
+
 
 def test_sweep_returns_zero_when_response_payload_is_empty():
     dedup, mock_sb = _make_dedup_with_mock_supabase()
@@ -118,7 +123,15 @@ def test_batch_insert_updates_shared_cache():
     )
     mock_sb.table.return_value.upsert.return_value.execute.return_value = MagicMock(data=[])
     articles = [
-        {"url_hash": "h1", "url": "https://example.com/1", "headline": "Headline 1", "source_name": "Src", "source_url": "https://src.com", "excerpt": "excerpt", "category_hint": "general"},
+        {
+            "url_hash": "h1",
+            "url": "https://example.com/1",
+            "headline": "Headline 1",
+            "source_name": "Src",
+            "source_url": "https://src.com",
+            "excerpt": "excerpt",
+            "category_hint": "general",
+        },
     ]
     dedup._load_known_hashes()
     dedup.batch_insert_new_articles(articles)
@@ -134,14 +147,18 @@ def test_batch_insert_empty_articles():
 def test_load_known_hashes_returns_stale_on_supabase_error():
     cache.set(KNOWN_HASHES, {"stale_hash"})
     dedup, mock_sb = _make_dedup_with_mock_supabase()
-    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("db timeout")
+    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception(
+        "db timeout"
+    )
     hashes = dedup._load_known_hashes()
     assert "stale_hash" in hashes
 
 
 def test_load_known_hashes_returns_empty_on_error_with_no_stale():
     dedup, mock_sb = _make_dedup_with_mock_supabase()
-    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("db timeout")
+    mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception(
+        "db timeout"
+    )
     hashes = dedup._load_known_hashes()
     assert hashes == set()
 

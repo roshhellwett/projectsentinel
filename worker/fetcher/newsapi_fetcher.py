@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import os
 import threading
 from datetime import UTC, datetime, timedelta
@@ -22,7 +21,6 @@ from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
 
 
 class NewsAPIFetcher:
-
     API_URL = "https://newsapi.org/v2/everything"
     PAGE_SIZE = 100
     MAX_429_ROTATIONS = 6
@@ -114,8 +112,7 @@ class NewsAPIFetcher:
                         rotations += 1
                         self.logger.log(
                             "NEWSAPI_ERROR",
-                            f"Key #{slot_idx + 1} permanently invalid ({code}), "
-                            f"disabling and rotating: {msg[:80]}",
+                            f"Key #{slot_idx + 1} permanently invalid ({code}), disabling and rotating: {msg[:80]}",
                         )
                         continue
                     if code in self._QUOTA_CODES:

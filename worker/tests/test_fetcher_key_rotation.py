@@ -26,6 +26,7 @@ def reset_pools():
     GNewsFetcher._reset_pool()
     NewsAPIFetcher._reset_pool()
 
+
 def _mock_gnews_ok(headline="Some Indian Headline"):
     r = MagicMock()
     r.status_code = 200
@@ -41,6 +42,7 @@ def _mock_gnews_ok(headline="Some Indian Headline"):
         ]
     }
     return r
+
 
 def _mock_newsapi_ok():
     r = MagicMock()
@@ -59,12 +61,14 @@ def _mock_newsapi_ok():
     }
     return r
 
+
 def _mock_429():
     r = MagicMock()
     r.status_code = 429
     r.headers = {}
     r.text = ""
     return r
+
 
 def _mock_newsapi_quota_error(code="rateLimited"):
     r = MagicMock()
@@ -73,11 +77,13 @@ def _mock_newsapi_quota_error(code="rateLimited"):
     r.json.return_value = {"status": "error", "code": code, "message": "You hit the rate limit"}
     return r
 
+
 def test_gnews_no_keys_returns_empty():
     with patch.dict(os.environ, {}, clear=True):
         GNewsFetcher._reset_pool()
         assert GNewsFetcher().fetch() == []
         assert GNewsFetcher.has_quota() is False
+
 
 def test_gnews_legacy_single_key():
     with patch.dict(os.environ, {"GNEWS_API_KEY": "legacy"}, clear=True):
@@ -87,6 +93,7 @@ def test_gnews_legacy_single_key():
         assert pool.size() == 1
         assert pool.get_stats()[0]["tier"] == 1
 
+
 def test_gnews_six_keys_loaded_with_tiers():
     env = {f"GNEWS_API_KEY_{i}": f"gn{i}" for i in range(1, 7)}
     with patch.dict(os.environ, env, clear=True):
@@ -94,6 +101,7 @@ def test_gnews_six_keys_loaded_with_tiers():
         pool = GNewsFetcher._ensure_pool()
         assert pool.size() == 6
         assert [s["tier"] for s in pool.get_stats()] == [1, 1, 1, 2, 2, 2]
+
 
 @patch("fetcher.gnews_fetcher.requests.Session.get")
 def test_gnews_rotates_tier_one_then_succeeds_on_tier_two(mock_get):
@@ -111,6 +119,7 @@ def test_gnews_rotates_tier_one_then_succeeds_on_tier_two(mock_get):
     for call in mock_get.call_args_list[:3]:
         assert call.kwargs["params"]["apikey"] in {"gn1", "gn2", "gn3"}
 
+
 @patch("fetcher.gnews_fetcher.requests.Session.get")
 def test_gnews_all_exhausted_returns_empty_not_raise(mock_get):
     mock_get.return_value = _mock_429()
@@ -124,6 +133,7 @@ def test_gnews_all_exhausted_returns_empty_not_raise(mock_get):
     assert mock_get.call_count == 2
     assert GNewsFetcher.has_quota() is False
 
+
 @patch("fetcher.gnews_fetcher.requests.Session.get")
 def test_gnews_uses_page_size_100(mock_get):
     mock_get.return_value = _mock_gnews_ok()
@@ -134,11 +144,13 @@ def test_gnews_uses_page_size_100(mock_get):
     params = mock_get.call_args.kwargs["params"]
     assert params["max"] == 100
 
+
 def test_newsapi_no_keys_returns_empty():
     with patch.dict(os.environ, {}, clear=True):
         NewsAPIFetcher._reset_pool()
         assert NewsAPIFetcher().fetch() == []
         assert NewsAPIFetcher.has_quota() is False
+
 
 def test_newsapi_legacy_single_key():
     with patch.dict(os.environ, {"NEWSAPI_KEY": "legacy"}, clear=True):
@@ -147,6 +159,7 @@ def test_newsapi_legacy_single_key():
         assert pool is not None
         assert pool.size() == 1
 
+
 def test_newsapi_six_keys_loaded_with_tiers():
     env = {f"NEWSAPI_KEY_{i}": f"na{i}" for i in range(1, 7)}
     with patch.dict(os.environ, env, clear=True):
@@ -154,6 +167,7 @@ def test_newsapi_six_keys_loaded_with_tiers():
         pool = NewsAPIFetcher._ensure_pool()
         assert pool.size() == 6
         assert [s["tier"] for s in pool.get_stats()] == [1, 1, 1, 2, 2, 2]
+
 
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
 def test_newsapi_rotates_on_http_429(mock_get):
@@ -168,6 +182,7 @@ def test_newsapi_rotates_on_http_429(mock_get):
     assert mock_get.call_count == 4
     last_params = mock_get.call_args_list[-1].kwargs["params"]
     assert last_params["apiKey"] in {"na4", "na5", "na6"}
+
 
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
 def test_newsapi_rotates_on_in_body_quota_error(mock_get):
@@ -184,6 +199,7 @@ def test_newsapi_rotates_on_in_body_quota_error(mock_get):
 
     assert len(result) == 1
     assert mock_get.call_count == 3
+
 
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
 def test_newsapi_unknown_error_code_does_not_penalize_key(mock_get):
@@ -205,6 +221,7 @@ def test_newsapi_unknown_error_code_does_not_penalize_key(mock_get):
     assert mock_get.call_count == 1
     assert NewsAPIFetcher.has_quota() is True
 
+
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
 def test_newsapi_api_key_invalid_permanently_disables_slot(mock_get):
     bad = MagicMock()
@@ -224,6 +241,7 @@ def test_newsapi_api_key_invalid_permanently_disables_slot(mock_get):
     assert mock_get.call_count == 2
     stats = NewsAPIFetcher._key_pool.get_stats()
     assert stats[0]["skip_this_run"] is True
+
 
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
 def test_newsapi_api_key_exhausted_rotates_and_recovers_next_day(mock_get):
@@ -246,6 +264,7 @@ def test_newsapi_api_key_exhausted_rotates_and_recovers_next_day(mock_get):
     assert len(result) == 1
     assert mock_get.call_count == 2
 
+
 @patch("fetcher.gnews_fetcher.requests.Session.get")
 def test_gnews_401_permanently_disables_slot(mock_get):
     revoked = MagicMock()
@@ -263,6 +282,7 @@ def test_gnews_401_permanently_disables_slot(mock_get):
     assert mock_get.call_count == 2
     stats = GNewsFetcher._key_pool.get_stats()
     assert stats[0]["skip_this_run"] is True
+
 
 @patch("fetcher.gnews_fetcher.requests.Session.get")
 def test_gnews_403_permanently_disables_slot(mock_get):
@@ -282,6 +302,7 @@ def test_gnews_403_permanently_disables_slot(mock_get):
     stats = GNewsFetcher._key_pool.get_stats()
     assert stats[0]["skip_this_run"] is True
 
+
 @patch("fetcher.newsapi_fetcher.requests.Session.get")
 def test_newsapi_uses_page_size_100(mock_get):
     mock_get.return_value = _mock_newsapi_ok()
@@ -290,6 +311,7 @@ def test_newsapi_uses_page_size_100(mock_get):
         NewsAPIFetcher().fetch()
     params = mock_get.call_args.kwargs["params"]
     assert params["pageSize"] == 100
+
 
 def test_keypool_has_available_reflects_exhaustion():
     pool = KeyPool([(1, "a"), (2, "b")])

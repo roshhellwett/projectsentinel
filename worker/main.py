@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -28,6 +27,7 @@ scheduler = BackgroundScheduler(
     job_defaults={"coalesce": True, "misfire_grace_time": 300},
     timezone="UTC",
 )
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -80,6 +80,7 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
+
 app = FastAPI(
     title="India Verified Worker",
     description="AI-powered news verification and publishing pipeline",
@@ -87,9 +88,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-allowed_origins = os.getenv("CORS_ORIGINS", "https://zenithopensourceprojects.vercel.app,https://verifiedindian.vercel.app,https://indiaverified.vercel.app").split(
-    ","
-)
+allowed_origins = os.getenv(
+    "CORS_ORIGINS",
+    "https://zenithopensourceprojects.vercel.app,https://verifiedindian.vercel.app,https://indiaverified.vercel.app",
+).split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in allowed_origins if o.strip()],

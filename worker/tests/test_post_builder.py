@@ -31,12 +31,14 @@ def test_build_valid_post():
     assert post["status"] == "published"
     assert "published_at" in post
 
+
 def test_build_empty_headline():
     pb = PostBuilder()
     import pytest
 
     with pytest.raises(ValueError, match="Headline cannot be empty"):
         pb.build("", "summary", "politics", 50, "reason", [])
+
 
 def test_build_empty_summary():
     pb = PostBuilder()
@@ -45,6 +47,7 @@ def test_build_empty_summary():
     with pytest.raises(ValueError, match="Summary cannot be empty"):
         pb.build("headline", "", "politics", 50, "reason", [])
 
+
 def test_build_score_clamping():
     pb = PostBuilder()
     post = pb.build("Headline", "Summary.", "tech", 150, "reason", [{"url": "https://x.com"}])
@@ -52,6 +55,7 @@ def test_build_score_clamping():
 
     post = pb.build("Headline", "Summary.", "tech", -10, "reason", [{"url": "https://x.com"}])
     assert post["credibility_score"] == 0
+
 
 def test_build_no_url_sources():
     pb = PostBuilder()

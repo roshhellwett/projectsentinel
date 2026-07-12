@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-from cache.shared_cache import cache
 from cache.keys import KNOWN_CLAIMS, KNOWN_CLAIMS_TTL
+from cache.shared_cache import cache
 from verifier.factcheck_matcher import FactCheckMatcher
 
 
@@ -26,7 +26,11 @@ def test_loads_claims_on_first_call():
     cache.reset_state()
     cache.register(KNOWN_CLAIMS, KNOWN_CLAIMS_TTL)
     fake_claims = [
-        {"claim_summary": "This is a known false claim about something important", "keywords": ["false", "claim"], "fact_check_url": "https://example.com/fact1"},
+        {
+            "claim_summary": "This is a known false claim about something important",
+            "keywords": ["false", "claim"],
+            "fact_check_url": "https://example.com/fact1",
+        },
     ]
     matcher, mock_sb = _make_matcher_with_mock(fake_claims)
     result = matcher.is_false_claim("This is a false claim")
@@ -60,7 +64,11 @@ def test_keyword_matching():
     cache.reset_state()
     cache.register(KNOWN_CLAIMS, KNOWN_CLAIMS_TTL)
     fake_claims = [
-        {"claim_summary": "Donald Trump wins election fraud", "keywords": ["election", "fraud", "trump"], "fact_check_url": "https://example.com/fact1"},
+        {
+            "claim_summary": "Donald Trump wins election fraud",
+            "keywords": ["election", "fraud", "trump"],
+            "fact_check_url": "https://example.com/fact1",
+        },
     ]
     matcher, _ = _make_matcher_with_mock(fake_claims)
     assert matcher.is_false_claim("TRUMP wins ELECTION with FRAUD") is True
@@ -71,7 +79,11 @@ def test_word_overlap_matching():
     cache.reset_state()
     cache.register(KNOWN_CLAIMS, KNOWN_CLAIMS_TTL)
     fake_claims = [
-        {"claim_summary": "Government conspiracy to hide alien contact from public for decades", "keywords": [], "fact_check_url": "https://example.com/fact2"},
+        {
+            "claim_summary": "Government conspiracy to hide alien contact from public for decades",
+            "keywords": [],
+            "fact_check_url": "https://example.com/fact2",
+        },
     ]
     matcher, _ = _make_matcher_with_mock(fake_claims)
     assert matcher.is_false_claim("How government hid alien contact from public") is True
@@ -84,7 +96,9 @@ def test_uses_stale_cache_on_supabase_error():
     with patch("verifier.factcheck_matcher.get_supabase") as mock_get:
         mock_sb = MagicMock()
         mock_get.return_value = mock_sb
-        mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.side_effect = Exception("db down")
+        mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.side_effect = (
+            Exception("db down")
+        )
         matcher = FactCheckMatcher()
         assert matcher.is_false_claim("test") is False
 

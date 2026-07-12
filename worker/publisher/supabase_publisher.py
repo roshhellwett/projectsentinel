@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import hashlib
 import re
 
@@ -20,16 +19,17 @@ from logger.pipeline_logger import PipelineLogger
 
 _NORMALIZE_RE = re.compile(r"[^\w\s]")
 
+
 def _normalize_headline(text: str) -> str:
 
     return _NORMALIZE_RE.sub("", text.lower()).strip()
+
 
 # Register cache key at module load time
 cache.register(PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL)
 
 
 class SupabasePublisher:
-
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
@@ -57,8 +57,7 @@ class SupabasePublisher:
                 recent = self._get_recent_headlines()
 
                 for existing in recent:
-                    if (_normalize_headline(existing) == norm_headline
-                            or title_similarity(headline, existing) >= 0.75):
+                    if _normalize_headline(existing) == norm_headline or title_similarity(headline, existing) >= 0.75:
                         self.logger.log("PUBLISH_SKIP", f"Skipped duplicate headline: {headline[:50]}")
                         return False
 
@@ -95,11 +94,7 @@ class SupabasePublisher:
 
         try:
             recent = (
-                self.supabase.table("posts")
-                .select("headline")
-                .order("published_at", desc=True)
-                .limit(200)
-                .execute()
+                self.supabase.table("posts").select("headline").order("published_at", desc=True).limit(200).execute()
             )
             headlines = [row.get("headline", "") for row in (recent.data or []) if row.get("headline")]
             cache.set(PUBLISH_HEADLINES, headlines)

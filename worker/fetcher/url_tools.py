@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import hashlib
 import re
 from difflib import SequenceMatcher
@@ -27,6 +26,7 @@ TRACKING_PARAMS = {
 }
 
 _AMP_PATH_SUFFIXES = re.compile(r"(/amp/?|/amp\.html?)$", re.IGNORECASE)
+
 
 def normalize_url(url: str) -> str:
 
@@ -50,15 +50,18 @@ def normalize_url(url: str) -> str:
     query = urlencode(sorted(filtered_query), doseq=True)
     return urlunparse((scheme, netloc, path, "", query, ""))
 
+
 def compute_url_hash(url: str) -> str:
 
     return hashlib.sha256(normalize_url(url).encode()).hexdigest()
+
 
 def title_similarity(a: str, b: str) -> float:
 
     if not a or not b:
         return 0.0
     return SequenceMatcher(None, a.lower().strip(), b.lower().strip()).ratio()
+
 
 def is_duplicate_title(headline: str, recent_headlines: list[str], threshold: float = 0.80) -> bool:
 

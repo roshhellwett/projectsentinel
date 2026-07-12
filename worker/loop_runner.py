@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import os
 import sys
 import time
@@ -26,6 +25,7 @@ MAX_RUNS = int(os.getenv("MAX_RUNS", "50"))
 BASE_WAIT = 60
 MAX_WAIT = 600
 
+
 def get_post_count() -> int:
 
     supabase = get_supabase()
@@ -36,6 +36,7 @@ def get_post_count() -> int:
         return result.count if result.count is not None else 0
     except Exception:
         return 0
+
 
 def main():
     print("=" * 60)
@@ -100,6 +101,7 @@ def main():
     print(f"\n{'=' * 60}")
     print("Pipeline completed.")
     print(f"{'=' * 60}")
+
 
 if __name__ == "__main__":
     main()

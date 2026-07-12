@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-from cache.shared_cache import cache
 from cache.keys import PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL
+from cache.shared_cache import cache
 from publisher.supabase_publisher import SupabasePublisher
 
 
@@ -97,8 +97,8 @@ def test_get_recent_headlines_loads_from_db():
     cache.reset_state()
     cache.register(PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL)
     pub, mock_sb = _make_publisher_with_mock()
-    mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.return_value = MagicMock(
-        data=[{"headline": "DB Headline 1"}, {"headline": "DB Headline 2"}]
+    mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.return_value = (
+        MagicMock(data=[{"headline": "DB Headline 1"}, {"headline": "DB Headline 2"}])
     )
     headlines = pub._get_recent_headlines()
     assert headlines == ["DB Headline 1", "DB Headline 2"]
@@ -109,6 +109,8 @@ def test_get_recent_headlines_returns_stale_on_db_error():
     cache.register(PUBLISH_HEADLINES, PUBLISH_HEADLINES_TTL)
     cache.set(PUBLISH_HEADLINES, ["Stale Headline"])
     pub, mock_sb = _make_publisher_with_mock()
-    mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.side_effect = Exception("timeout")
+    mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.side_effect = (
+        Exception("timeout")
+    )
     headlines = pub._get_recent_headlines()
     assert headlines == ["Stale Headline"]

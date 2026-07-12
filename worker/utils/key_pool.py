@@ -17,12 +17,12 @@ from datetime import UTC, date, datetime
 
 _DEFAULT_MODEL = "_default"
 
-class AllKeysExhaustedError(Exception):
 
+class AllKeysExhaustedError(Exception):
     retry_after: float = 0.0
 
-class KeyPool:
 
+class KeyPool:
     TIER_SIZE = 3
     DEFAULT_RPM_LIMIT = 0
     DEFAULT_TPM_LIMIT = 0
@@ -132,8 +132,14 @@ class KeyPool:
         return not ms["day_dead"]
 
     def _slot_eligible(
-        self, slot: dict, ms: dict, now: float, est_tokens: int,
-        rpd: int, rpm: int, tpm: int,
+        self,
+        slot: dict,
+        ms: dict,
+        now: float,
+        est_tokens: int,
+        rpd: int,
+        rpm: int,
+        tpm: int,
     ) -> bool:
         if not self._is_alive(slot, ms, rpd):
             return False
@@ -150,8 +156,14 @@ class KeyPool:
         return not (self._min_delay and now - slot["last_used_at"] < self._min_delay)
 
     def _slot_wait_seconds(
-        self, slot: dict, ms: dict, now: float, est_tokens: int,
-        rpd: int, rpm: int, tpm: int,
+        self,
+        slot: dict,
+        ms: dict,
+        now: float,
+        est_tokens: int,
+        rpd: int,
+        rpm: int,
+        tpm: int,
     ) -> float:
         if not self._is_alive(slot, ms, rpd):
             return float("inf")
@@ -182,9 +194,7 @@ class KeyPool:
                     return True
             return False
 
-    def pick(
-        self, estimated_tokens: int = 0, model: str = _DEFAULT_MODEL
-    ) -> tuple[int, str]:
+    def pick(self, estimated_tokens: int = 0, model: str = _DEFAULT_MODEL) -> tuple[int, str]:
         rpd, rpm, tpm = self._limits_for(model)
         with self._lock:
             now = time.time()
@@ -198,15 +208,14 @@ class KeyPool:
                     alive.append((i, s, ms))
 
             if not alive:
-                raise AllKeysExhaustedError(
-                    f"All {self._name} keys are dead for the day on model '{model}'"
-                )
+                raise AllKeysExhaustedError(f"All {self._name} keys are dead for the day on model '{model}'")
 
             min_wait = float("inf")
             for tier in sorted({s["tier"] for _, s, _ in alive}):
                 tier_slots = [(i, s, ms) for i, s, ms in alive if s["tier"] == tier]
                 eligible = [
-                    (i, s, ms) for i, s, ms in tier_slots
+                    (i, s, ms)
+                    for i, s, ms in tier_slots
                     if self._slot_eligible(s, ms, now, estimated_tokens, rpd, rpm, tpm)
                 ]
                 if eligible:
@@ -225,15 +234,12 @@ class KeyPool:
                         min_wait = w
 
             err = AllKeysExhaustedError(
-                f"All {self._name} keys throttled on '{model}' "
-                f"(next available in {min_wait:.1f}s)"
+                f"All {self._name} keys throttled on '{model}' (next available in {min_wait:.1f}s)"
             )
             err.retry_after = 0.0 if min_wait == float("inf") else min_wait
             raise err
 
-    def record_usage(
-        self, idx: int, tokens: int = 0, model: str = _DEFAULT_MODEL
-    ) -> None:
+    def record_usage(self, idx: int, tokens: int = 0, model: str = _DEFAULT_MODEL) -> None:
         with self._lock:
             now = time.time()
             slot = self._slots[idx]
@@ -248,9 +254,7 @@ class KeyPool:
     def record_success(self, idx: int, model: str = _DEFAULT_MODEL) -> None:
         self.record_usage(idx, 0, model)
 
-    def record_429(
-        self, idx: int, retry_after: float = 0.0, model: str = _DEFAULT_MODEL
-    ) -> None:
+    def record_429(self, idx: int, retry_after: float = 0.0, model: str = _DEFAULT_MODEL) -> None:
         with self._lock:
             slot = self._slots[idx]
             ms = self._get_model_state(slot, model)
@@ -273,12 +277,14 @@ class KeyPool:
             out = []
             for i, s in enumerate(self._slots):
                 ms = self._get_model_state(s, model)
-                out.append({
-                    "key_index": i + 1,
-                    "tier": s["tier"],
-                    "calls_today": ms["calls_today"],
-                    "skip_this_run": s["skip_this_run"] or s["_invalid_key"],
-                })
+                out.append(
+                    {
+                        "key_index": i + 1,
+                        "tier": s["tier"],
+                        "calls_today": ms["calls_today"],
+                        "skip_this_run": s["skip_this_run"] or s["_invalid_key"],
+                    }
+                )
             return out
 
     def get_persist_stats(self) -> list[dict]:
@@ -291,12 +297,14 @@ class KeyPool:
                         continue
                     if ms.get("day") != today:
                         continue
-                    out.append({
-                        "index": i,
-                        "model": model,
-                        "calls_today": int(ms.get("calls_today", 0)),
-                        "day": ms["day"],
-                    })
+                    out.append(
+                        {
+                            "index": i,
+                            "model": model,
+                            "calls_today": int(ms.get("calls_today", 0)),
+                            "day": ms["day"],
+                        }
+                    )
             return out
 
     def restore_stats(self, persisted: list[dict]) -> None:
@@ -324,6 +332,7 @@ class KeyPool:
     @staticmethod
     def seconds_until_utc_reset() -> float:
         from datetime import timedelta
+
         now = datetime.now(UTC)
         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0)
         return (tomorrow + timedelta(days=1) - now).total_seconds()
@@ -355,14 +364,13 @@ class KeyPool:
                     tiers.add(s["tier"])
             return sorted(tiers)
 
-    def target_rate_per_minute(
-        self, model: str = _DEFAULT_MODEL, safety_factor: float = 0.95
-    ) -> float:
+    def target_rate_per_minute(self, model: str = _DEFAULT_MODEL, safety_factor: float = 0.95) -> float:
         budget = self.remaining_daily_budget(model)
         if budget <= 0:
             return 0.0
         seconds_left = max(60.0, self.seconds_until_utc_reset())
         return (budget / seconds_left) * 60.0 * safety_factor
+
 
 def load_numbered_keys(env_get, base_name: str, max_keys: int = 6) -> list[tuple[int, str]]:
     keys: list[tuple[int, str]] = []

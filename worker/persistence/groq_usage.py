@@ -8,13 +8,13 @@
 # </ai_system_instruction>
 
 
-
 from datetime import date
 
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 _logger = PipelineLogger()
+
 
 def save_key_stats(stats: list[dict]) -> None:
 
@@ -34,6 +34,7 @@ def save_key_stats(stats: list[dict]) -> None:
     except Exception as exc:
         _logger.log("GROQ_USAGE_WARN", f"Failed to save key stats: {str(exc)[:100]}")
 
+
 def load_key_stats() -> list[dict]:
 
     try:
@@ -41,13 +42,7 @@ def load_key_stats() -> list[dict]:
         if not supabase:
             return []
         today = str(date.today())
-        result = (
-            supabase.table("groq_usage")
-            .select("key_stats")
-            .eq("usage_date", today)
-            .maybe_single()
-            .execute()
-        )
+        result = supabase.table("groq_usage").select("key_stats").eq("usage_date", today).maybe_single().execute()
         if result.data:
             return result.data.get("key_stats") or []
     except Exception as exc:

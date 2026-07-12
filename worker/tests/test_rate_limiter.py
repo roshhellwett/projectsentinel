@@ -14,6 +14,7 @@ def test_rate_limit_exceeded_error_can_be_raised():
 
 def test_rate_limiter_class_removed():
     import sys
+
     mod = sys.modules.get("rate_limiter.limiter")
     assert mod is not None
     assert not hasattr(mod, "RateLimiter")

@@ -1,6 +1,7 @@
-from datetime import UTC, datetime, timedelta
 from threading import Thread
-from cache.shared_cache import SharedCache, cache as global_cache
+
+from cache.shared_cache import SharedCache
+from cache.shared_cache import cache as global_cache
 
 
 def test_register_and_get():
@@ -16,6 +17,7 @@ def test_ttl_expiry():
     c.register("expires", 1)
     c.set("expires", "value")
     import time
+
     time.sleep(1.1)
     assert c.get("expires") is None
 
@@ -26,6 +28,7 @@ def test_stale_or_none_after_expiry():
     assert c.stale_or_none("stale_test") is None
     c.set("stale_test", "old_value")
     import time
+
     time.sleep(1.1)
     assert c.get("stale_test") is None
     assert c.stale_or_none("stale_test") == "old_value"
@@ -135,6 +138,7 @@ def test_concurrent_add_to_set():
 
 def test_global_cache_singleton():
     from cache.shared_cache import cache as c2
+
     assert global_cache is c2
 
 
@@ -187,7 +191,6 @@ def test_age_seconds_loaded():
 def test_lock_is_rlock():
     c = SharedCache()
     assert isinstance(c.lock, type(c.lock))
-    import threading
     assert type(c.lock).__name__ == "RLock"
 
 

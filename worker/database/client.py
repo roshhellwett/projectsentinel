@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import contextlib
 import os
 import threading
@@ -19,6 +18,7 @@ from logger.pipeline_logger import PipelineLogger
 
 _client_instance: Client | None = None
 _client_lock = threading.Lock()
+
 
 def get_supabase() -> Client | None:
 
@@ -44,6 +44,7 @@ def get_supabase() -> Client | None:
             PipelineLogger().log("SUPABASE_ERROR", "Credentials not configured")
 
         return None
+
 
 def reset_client() -> None:
 

@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import os
 import threading
 from datetime import UTC, datetime, timedelta
@@ -22,7 +21,6 @@ from utils.key_pool import AllKeysExhaustedError, KeyPool, load_numbered_keys
 
 
 class GNewsFetcher:
-
     API_URL = "https://gnews.io/api/v4/search"
     PAGE_SIZE = 100
     MAX_429_ROTATIONS = 6

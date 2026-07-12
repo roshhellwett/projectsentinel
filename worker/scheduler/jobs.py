@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import contextlib
 import os
 import threading
@@ -83,6 +82,7 @@ def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
         )
     return clamped
 
+
 def _record_run_start(logger: PipelineLogger, start_time: datetime, mode: str) -> str | None:
 
     try:
@@ -96,6 +96,7 @@ def _record_run_start(logger: PipelineLogger, start_time: datetime, mode: str) -
     except Exception as _e:
         logger.log("PIPELINE", f"Could not record pipeline run start: {_e}")
     return None
+
 
 def _record_run_end(logger: PipelineLogger, run_id: str | None, duration: float, stats: dict) -> None:
 
@@ -115,6 +116,7 @@ def _record_run_end(logger: PipelineLogger, run_id: str | None, duration: float,
             ).eq("id", run_id).execute()
     except Exception as _e:
         logger.log("PIPELINE", f"Could not record pipeline run completion: {_e}")
+
 
 def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -> None:
 
@@ -186,8 +188,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 rss_fetcher.close()
 
         should_supplement = supplementary_only or (
-            len(rss_articles) == 0
-            and (GNewsFetcher.has_quota() or NewsAPIFetcher.has_quota())
+            len(rss_articles) == 0 and (GNewsFetcher.has_quota() or NewsAPIFetcher.has_quota())
         )
 
         if not should_supplement and len(rss_articles) == 0 and not supplementary_only:
@@ -273,7 +274,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         logger.log(
             "PIPELINE",
             f"Processing {len(unique_combined)} articles ({len(new_articles)} new, "
-            f"{len(unique_combined) - len(new_articles)} old unprocessed)"
+            f"{len(unique_combined) - len(new_articles)} old unprocessed)",
         )
 
         title_deduped: list[dict] = []
@@ -339,16 +340,15 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
             if not _processed_hashes or not deduplicator.supabase:
                 return
             try:
-                deduplicator.supabase.table("raw_articles").update(
-                    {"processed": True}
-                ).in_("url_hash", list(_processed_hashes)).execute()
+                deduplicator.supabase.table("raw_articles").update({"processed": True}).in_(
+                    "url_hash", list(_processed_hashes)
+                ).execute()
             except Exception as e:
                 logger.log("DEDUP_ERROR", f"Batch mark processed failed: {str(e)}")
 
         for grp in verified_groups:
             rep = grp[0].get("headline", "") if grp else ""
             rep_lower = rep.lower().strip()
-
 
             is_dup = False
             for seen_lower in seen_rep_headlines_lower:

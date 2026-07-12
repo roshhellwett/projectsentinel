@@ -9,7 +9,6 @@ cache.register(KNOWN_CLAIMS, KNOWN_CLAIMS_TTL)
 
 
 class FactCheckMatcher:
-
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None

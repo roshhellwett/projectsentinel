@@ -1,4 +1,5 @@
 import { fetchPosts } from '@/lib/supabase/server';
+import type { Post } from '@/types';
 import { getServerCache, setServerCache } from '@/lib/api/serverCache';
 
 export const revalidate = 900; 
@@ -17,7 +18,13 @@ export async function GET() {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zenithopensourceprojects.vercel.app';
-  const { posts } = await fetchPosts(1, 50);
+  let posts: Post[] = [];
+  try {
+    const result = await fetchPosts(1, 50);
+    posts = result.posts ?? [];
+  } catch {
+    // Supabase unreachable during build — render empty feed
+  }
 
   function escapeCdata(value: string): string {
     return (value || '').replace(/]]>/g, ']]]]><![CDATA[>');

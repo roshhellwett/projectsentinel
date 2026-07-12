@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 from __future__ import annotations
 
 import os
@@ -26,15 +25,15 @@ TPM_SAFETY_FACTOR = 0.95
 RPM_HEADROOM = 2
 
 GROQ_MODEL_LIMITS: dict[str, tuple[int, int, int]] = {
-    "llama-3.3-70b-versatile":                       (1000,  30, 12000),
-    "meta-llama/llama-4-scout-17b-16e-instruct":     (1000,  30, 30000),
-    "qwen/qwen3-32b":                                (1000,  60,  6000),
-    "openai/gpt-oss-20b":                            (1000,  30,  8000),
-    "openai/gpt-oss-120b":                           (1000,  30,  8000),
-    "groq/compound":                                 ( 250,  30, 70000),
-    "groq/compound-mini":                            ( 250,  30, 70000),
-    "allam-2-7b":                                    (7000,  30,  6000),
-    "llama-3.1-8b-instant":                         (14400,  30,  6000),
+    "llama-3.3-70b-versatile": (1000, 30, 12000),
+    "meta-llama/llama-4-scout-17b-16e-instruct": (1000, 30, 30000),
+    "qwen/qwen3-32b": (1000, 60, 6000),
+    "openai/gpt-oss-20b": (1000, 30, 8000),
+    "openai/gpt-oss-120b": (1000, 30, 8000),
+    "groq/compound": (250, 30, 70000),
+    "groq/compound-mini": (250, 30, 70000),
+    "allam-2-7b": (7000, 30, 6000),
+    "llama-3.1-8b-instant": (14400, 30, 6000),
 }
 
 VERIFY_MODEL_CHAIN: list[str] = [
@@ -52,9 +51,11 @@ WRITE_MODEL_CHAIN: list[str] = [
     "llama-3.3-70b-versatile",
 ]
 
+
 def model_limits(model: str) -> tuple[int, int, int]:
 
     return GROQ_MODEL_LIMITS.get(model, (1000, 30, 6000))
+
 
 def safe_model_limits(model: str) -> tuple[int, int, int]:
 
@@ -64,10 +65,12 @@ def safe_model_limits(model: str) -> tuple[int, int, int]:
     tpm = max(1, int(tpm * TPM_SAFETY_FACTOR))
     return rpd, rpm, tpm
 
+
 def _build_model_limits_map() -> dict[str, tuple[int, int, int]]:
 
     used = set(VERIFY_MODEL_CHAIN) | set(WRITE_MODEL_CHAIN)
     return {m: safe_model_limits(m) for m in used}
+
 
 def _load_groq_keys() -> list[tuple[int, str]]:
 
@@ -76,19 +79,23 @@ def _load_groq_keys() -> list[tuple[int, str]]:
         keys = load_numbered_keys(os.getenv, "GROQ_API_KEY", max_keys=MAX_GROQ_KEYS)
     return keys
 
+
 def _env_float(name: str, default: float) -> float:
     try:
         return float(os.getenv(name, str(default)))
     except (ValueError, TypeError):
         return default
 
+
 def get_verify_model_chain() -> list[str]:
 
     return _env_chain("GROQ_VERIFY_MODEL_CHAIN", "GROQ_VERIFY_MODEL", VERIFY_MODEL_CHAIN)
 
+
 def get_write_model_chain() -> list[str]:
 
     return _env_chain("GROQ_WRITE_MODEL_CHAIN", "GROQ_WRITE_MODEL", WRITE_MODEL_CHAIN)
+
 
 def _env_chain(chain_var: str, head_var: str, default: list[str]) -> list[str]:
 
@@ -107,6 +114,7 @@ def _env_chain(chain_var: str, head_var: str, default: list[str]) -> list[str]:
             seen.add(m)
             out.append(m)
     return out
+
 
 def get_groq_pool() -> KeyPool | None:
 
@@ -128,20 +136,25 @@ def get_groq_pool() -> KeyPool | None:
             _restore_persisted(_pool)
         return _pool
 
+
 def reset_pool() -> None:
 
     global _pool
     with _lock:
         _pool = None
 
+
 def get_verify_pool() -> KeyPool | None:
-       return get_groq_pool()
+    return get_groq_pool()
+
 
 def get_write_pool() -> KeyPool | None:
-       return get_groq_pool()
+    return get_groq_pool()
+
 
 def reset_pools() -> None:
-       reset_pool()
+    reset_pool()
+
 
 def save_verify_pool_stats() -> None:
 
@@ -155,6 +168,7 @@ def save_verify_pool_stats() -> None:
         save_key_stats(pool.get_persist_stats())
     except Exception:
         pass
+
 
 def _restore_persisted(pool: KeyPool) -> None:
     try:

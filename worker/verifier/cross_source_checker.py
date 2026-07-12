@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import random
 import re
 from collections import defaultdict
@@ -17,7 +16,6 @@ from logger.pipeline_logger import PipelineLogger
 
 
 class UnionFind:
-
     def __init__(self, n: int):
         self.parent = list(range(n))
         self.rank = [0] * n
@@ -40,6 +38,7 @@ class UnionFind:
         if self.rank[px] == self.rank[py]:
             self.rank[px] += 1
         return True
+
 
 STOP_WORDS: frozenset[str] = frozenset(
     {
@@ -145,8 +144,8 @@ STOP_WORDS: frozenset[str] = frozenset(
     }
 )
 
-class CrossSourceChecker:
 
+class CrossSourceChecker:
     MIN_SHARED_KEYWORDS = 2
     MIN_SIMILARITY = 0.24
     MAX_ARTICLES_TO_COMPARE = 200

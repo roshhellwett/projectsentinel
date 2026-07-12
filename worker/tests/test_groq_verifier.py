@@ -13,8 +13,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
 from utils.key_pool import KeyPool
+from verifier.groq_verifier import AllKeysExhaustedError, GroqVerifier
 
 
 @pytest.fixture(autouse=True)
@@ -23,11 +23,13 @@ def reset_key_pool():
     yield
     GroqVerifier._reset_pool()
 
+
 def test_verifier_init_defaults():
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY_1": "test_key"}, clear=True):
         v = GroqVerifier()
         pool = v._ensure_pool()
         assert pool is not None
+
 
 def test_verifier_init_custom_model():
     with patch.dict(
@@ -37,11 +39,13 @@ def test_verifier_init_custom_model():
         pool = v._ensure_pool()
         assert pool is not None
 
+
 def test_verifier_no_api_key():
     with patch.dict(os.environ, {}, clear=True):
         v = GroqVerifier()
         with pytest.raises(Exception, match="Groq verification API key not configured"):
             v.verify([{"headline": "test", "source_name": "src", "excerpt": "test"}])
+
 
 def test_verifier_legacy_single_key_fallback():
     with patch.dict(os.environ, {"GROQ_API_KEY_VERIFY": "legacy_key"}, clear=True):
@@ -50,6 +54,7 @@ def test_verifier_legacy_single_key_fallback():
         assert pool is not None
         idx, key = pool.pick()
         assert key == "legacy_key"
+
 
 def test_verifier_three_keys_loaded():
     env = {
@@ -63,6 +68,7 @@ def test_verifier_three_keys_loaded():
         stats = pool.get_stats()
         assert len(stats) == 3
 
+
 def test_verifier_numbered_keys_take_priority_over_legacy():
     env = {
         "GROQ_API_KEY_VERIFY_1": "numbered_key",
@@ -75,6 +81,7 @@ def test_verifier_numbered_keys_take_priority_over_legacy():
         assert len(stats) == 1
         _, key = pool.pick()
         assert key == "numbered_key"
+
 
 def test_parse_response_valid():
     v = GroqVerifier()
@@ -94,15 +101,18 @@ def test_parse_response_valid():
     assert result["category"] == "politics"
     assert len(result["key_facts"]) == 2
 
+
 def test_parse_response_invalid_json():
     v = GroqVerifier()
     result = v._parse_response("not json")
     assert result is None
 
+
 def test_parse_response_missing_fields():
     v = GroqVerifier()
     result = v._parse_response(json.dumps({"score": 50}))
     assert result is None
+
 
 def test_parse_response_score_clamped():
     v = GroqVerifier()
@@ -111,12 +121,14 @@ def test_parse_response_score_clamped():
     )
     assert result["score"] == 100
 
+
 def test_parse_response_invalid_category_defaults():
     v = GroqVerifier()
     result = v._parse_response(
         json.dumps({"score": 50, "reason": "test", "key_facts": ["fact"], "category": "invalid_category"})
     )
     assert result["category"] == "world"
+
 
 def test_build_prompt_truncation():
     v = GroqVerifier()
@@ -126,16 +138,19 @@ def test_build_prompt_truncation():
     assert "Headline:" in prompt
     assert "Source1" in prompt
 
+
 def test_trim_words_short():
     v = GroqVerifier()
     result = v._trim_words("hello world", 10)
     assert result == "hello world"
+
 
 def test_trim_words_long():
     v = GroqVerifier()
     text = "one two three four five"
     result = v._trim_words(text, 3)
     assert result == "one two three"
+
 
 @patch("verifier.groq_verifier.requests.post")
 def test_verify_success(mock_post):
@@ -168,6 +183,7 @@ def test_verify_success(mock_post):
         assert result["score"] == 80
         assert result["category"] == "tech"
 
+
 @patch("verifier.groq_verifier.time.sleep", return_value=None)
 @patch("verifier.groq_verifier.requests.post")
 def test_verify_retry_on_failure(mock_post, mock_sleep):
@@ -181,6 +197,7 @@ def test_verify_retry_on_failure(mock_post, mock_sleep):
             v.verify([{"headline": "test", "source_name": "src", "excerpt": "text"}])
         assert mock_post.call_count >= 3
 
+
 def test_key_pool_lowest_usage_first():
     pool = KeyPool(["key_a", "key_b", "key_c"])
     pool.record_success(0)
@@ -189,6 +206,7 @@ def test_key_pool_lowest_usage_first():
     assert idx in (1, 2), "Should pick key_b or key_c (both at 0 calls)"
     assert key in ("key_b", "key_c")
 
+
 def test_key_pool_exhausted_key_skipped():
     pool = KeyPool(["key_a", "key_b"])
     pool.mark_exhausted(0)
@@ -196,12 +214,14 @@ def test_key_pool_exhausted_key_skipped():
     assert idx == 1
     assert key == "key_b"
 
+
 def test_key_pool_all_exhausted_raises():
     pool = KeyPool(["key_a", "key_b"])
     pool.mark_exhausted(0)
     pool.mark_exhausted(1)
     with pytest.raises(AllKeysExhaustedError):
         pool.pick()
+
 
 def test_key_pool_midnight_reset():
     from datetime import date, timedelta
@@ -220,11 +240,13 @@ def test_key_pool_midnight_reset():
     assert pool.get_stats()[0]["calls_today"] == 0
     assert pool.get_stats()[0]["skip_this_run"] is False
 
+
 def test_key_pool_record_success_increments():
     pool = KeyPool(["key_a"])
     pool.record_success(0)
     pool.record_success(0)
     assert pool.get_stats()[0]["calls_today"] == 2
+
 
 @patch("verifier.groq_verifier.time.sleep", return_value=None)
 @patch("verifier.groq_verifier.requests.post")
@@ -260,6 +282,7 @@ def test_verify_rotates_on_429(mock_post, mock_sleep):
     assert result["score"] == 72
     assert mock_post.call_count == 2
 
+
 @patch("verifier.groq_verifier.time.sleep", return_value=None)
 @patch("verifier.groq_verifier.requests.post")
 def test_verify_all_keys_429_raises(mock_post, mock_sleep):
@@ -276,6 +299,7 @@ def test_verify_all_keys_429_raises(mock_post, mock_sleep):
         with pytest.raises(AllKeysExhaustedError):
             v.verify([{"headline": "test", "source_name": "src", "excerpt": "text"}])
 
+
 def test_verifier_six_keys_loaded_with_correct_tiers():
     env = {f"GROQ_API_KEY_VERIFY_{i}": f"key{i}" for i in range(1, 7)}
     with patch.dict(os.environ, env, clear=True):
@@ -284,6 +308,7 @@ def test_verifier_six_keys_loaded_with_correct_tiers():
         stats = pool.get_stats()
         assert len(stats) == 6
         assert [s["tier"] for s in stats] == [1, 1, 1, 2, 2, 2]
+
 
 def test_key_pool_tier_two_dormant_until_tier_one_exhausted():
     pool = KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
@@ -296,6 +321,7 @@ def test_key_pool_tier_two_dormant_until_tier_one_exhausted():
     idx, key = pool.pick()
     assert idx in (0, 1, 2), "Tier-2 must stay dormant while tier-1 has any usable key"
     assert key in ("k1", "k2", "k3")
+
 
 def test_key_pool_tier_two_activates_after_tier_one_exhausted():
     pool = KeyPool([(1, "k1"), (2, "k2"), (3, "k3"), (4, "k4"), (5, "k5"), (6, "k6")])
@@ -314,6 +340,7 @@ def test_key_pool_tier_two_activates_after_tier_one_exhausted():
     with pytest.raises(AllKeysExhaustedError):
         pool.pick()
 
+
 def test_key_pool_sparse_numbering_preserves_tier():
     pool = KeyPool([(1, "k1"), (2, "k2"), (4, "k4")])
     stats = pool.get_stats()
@@ -328,6 +355,7 @@ def test_key_pool_sparse_numbering_preserves_tier():
     assert idx == 2
     assert key == "k4"
 
+
 def test_pool_per_model_state_is_independent():
     pool = KeyPool(["k1"], rpd_limit=2)
     pool.record_usage(0, tokens=100, model="model_a")
@@ -336,6 +364,7 @@ def test_pool_per_model_state_is_independent():
         pool.pick(model="model_a")
     idx, _ = pool.pick(model="model_b")
     assert idx == 0
+
 
 def test_pool_equal_pressure_distribution_across_models():
     pool = KeyPool(["k1", "k2", "k3"])
@@ -350,6 +379,7 @@ def test_pool_equal_pressure_distribution_across_models():
     counts = [used_indices.count(i) for i in range(3)]
     assert min(counts) >= 2, f"Uneven load distribution: {counts}"
 
+
 def test_pool_lru_picks_oldest_within_tier():
     import time as _time
 
@@ -363,6 +393,7 @@ def test_pool_lru_picks_oldest_within_tier():
     i3, _ = pool.pick(model="m")
     assert {i1, i2, i3} == {0, 1, 2}
 
+
 def test_pool_invalid_key_stays_dead_across_models():
     pool = KeyPool(["k1", "k2"])
     pool.mark_invalid(0)
@@ -370,6 +401,7 @@ def test_pool_invalid_key_stays_dead_across_models():
     assert idx == 1
     idx, _ = pool.pick(model="model_b")
     assert idx == 1
+
 
 @patch("verifier.groq_verifier.time.sleep", return_value=None)
 @patch("verifier.groq_verifier.requests.post")
@@ -407,12 +439,11 @@ def test_verify_cascades_to_next_model_when_keys_exhaust(mock_post, mock_sleep):
         assert result["score"] == 88
 
         sent_model = mock_post.call_args.kwargs["json"]["model"]
-        assert sent_model != primary, (
-            f"Expected cascade to fallback model, got {sent_model}"
-        )
+        assert sent_model != primary, f"Expected cascade to fallback model, got {sent_model}"
         assert sent_model == "meta-llama/llama-4-scout-17b-16e-instruct", (
             f"Expected first fallback to be llama-4-scout, got {sent_model}"
         )
+
 
 @patch("verifier.groq_verifier.time.sleep", return_value=None)
 @patch("verifier.groq_verifier.requests.post")
@@ -451,6 +482,7 @@ def test_verify_disables_revoked_key_on_401(mock_post, mock_sleep):
 
         pool = v._ensure_pool()
         assert pool.get_stats()[0]["skip_this_run"] is True
+
 
 @patch("verifier.groq_verifier.time.sleep", return_value=None)
 @patch("verifier.groq_verifier.requests.post")

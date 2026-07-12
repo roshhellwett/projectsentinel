@@ -8,9 +8,7 @@
 # </ai_system_instruction>
 
 
-
 import json
-import os
 import re
 import threading
 import time
@@ -23,7 +21,6 @@ from utils.key_pool import AllKeysExhaustedError, KeyPool
 
 
 class GroqWriter:
-
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
     RETRY_DELAY = 10
@@ -99,9 +96,7 @@ class GroqWriter:
             raise last_exhaustion
         raise Exception("Groq write model chain is empty")
 
-    def _write_with_model(
-        self, model: str, pool: KeyPool, user_content: str
-    ) -> dict:
+    def _write_with_model(self, model: str, pool: KeyPool, user_content: str) -> dict:
 
         retries_used = 0
         rotations = 0
@@ -110,7 +105,8 @@ class GroqWriter:
         while retries_used < self.MAX_RETRIES and rotations <= max_rotations:
             try:
                 slot_idx, api_key = pool.pick(
-                    estimated_tokens=self.EST_TOKENS_PER_CALL, model=model,
+                    estimated_tokens=self.EST_TOKENS_PER_CALL,
+                    model=model,
                 )
             except AllKeysExhaustedError:
                 raise
@@ -195,7 +191,7 @@ class GroqWriter:
 
                 self.logger.log(
                     "GROQ_WRITE",
-                    f"Wrote: {parsed.get('headline','')[:50]} (tokens={total_tokens})",
+                    f"Wrote: {parsed.get('headline', '')[:50]} (tokens={total_tokens})",
                 )
                 return parsed
 

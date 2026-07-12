@@ -1,7 +1,7 @@
-import os
-from unittest.mock import MagicMock, patch, ANY
+from unittest.mock import MagicMock, patch
 
 import pytest
+
 from cache.shared_cache import cache
 from scheduler.jobs import _pipeline_running
 
@@ -42,13 +42,37 @@ def test_dead_letter_on_budget_exhaust():
         mock_dedup_cls.return_value = mock_dedup
 
         mock_rss = MagicMock()
-        mock_rss.fetch_all.return_value = [{"url_hash": "a", "url": "https://a.com", "headline": "Headline A", "source_name": "SrcA", "source_url": "https://srca.com"}]
+        mock_rss.fetch_all.return_value = [
+            {
+                "url_hash": "a",
+                "url": "https://a.com",
+                "headline": "Headline A",
+                "source_name": "SrcA",
+                "source_url": "https://srca.com",
+            }
+        ]
         mock_rss_cls.return_value = mock_rss
 
         mock_csc = MagicMock()
         mock_csc.get_verified_groups.return_value = [
-            [{"url_hash": "g1a", "url": "https://g1a.com", "headline": "Group 1 Headline", "source_name": "Src1", "source_url": "https://src1.com"}],
-            [{"url_hash": "g2a", "url": "https://g2a.com", "headline": "Group 2 Headline", "source_name": "Src2", "source_url": "https://src2.com"}],
+            [
+                {
+                    "url_hash": "g1a",
+                    "url": "https://g1a.com",
+                    "headline": "Group 1 Headline",
+                    "source_name": "Src1",
+                    "source_url": "https://src1.com",
+                }
+            ],
+            [
+                {
+                    "url_hash": "g2a",
+                    "url": "https://g2a.com",
+                    "headline": "Group 2 Headline",
+                    "source_name": "Src2",
+                    "source_url": "https://src2.com",
+                }
+            ],
         ]
         mock_csc_cls.return_value = mock_csc
 
@@ -137,14 +161,28 @@ def test_pipeline_skips_groups_over_cap():
 
         mock_rss = MagicMock()
         mock_rss.fetch_all.return_value = [
-            {"url_hash": f"h{i}", "url": f"https://a.com/{i}", "headline": f"Headline {i}", "source_name": f"Src{i}", "source_url": f"https://src{i}.com"}
+            {
+                "url_hash": f"h{i}",
+                "url": f"https://a.com/{i}",
+                "headline": f"Headline {i}",
+                "source_name": f"Src{i}",
+                "source_url": f"https://src{i}.com",
+            }
             for i in range(5)
         ]
         mock_rss_cls.return_value = mock_rss
 
         mock_csc = MagicMock()
         mock_csc.get_verified_groups.return_value = [
-            [{"url_hash": f"g{i}a", "url": f"https://g{i}a.com", "headline": f"Group {i} Headline", "source_name": f"Src{i}", "source_url": f"https://src{i}.com"}]
+            [
+                {
+                    "url_hash": f"g{i}a",
+                    "url": f"https://g{i}a.com",
+                    "headline": f"Group {i} Headline",
+                    "source_name": f"Src{i}",
+                    "source_url": f"https://src{i}.com",
+                }
+            ]
             for i in range(3)
         ]
         mock_csc_cls.return_value = mock_csc
@@ -175,7 +213,15 @@ def test_pipeline_supplementary_mode():
         mock_dedup_cls.return_value = mock_dedup
 
         mock_gn = MagicMock()
-        mock_gn.fetch.return_value = [{"url_hash": "gn1", "url": "https://gn.com", "headline": "GNews Article", "source_name": "GNews", "source_url": "https://gn.com"}]
+        mock_gn.fetch.return_value = [
+            {
+                "url_hash": "gn1",
+                "url": "https://gn.com",
+                "headline": "GNews Article",
+                "source_name": "GNews",
+                "source_url": "https://gn.com",
+            }
+        ]
         mock_gn_cls.has_quota.return_value = True
         mock_gn_cls.return_value = mock_gn
 

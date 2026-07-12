@@ -1,15 +1,12 @@
-import sys
+import contextlib
 import time
 from threading import Barrier, BrokenBarrierError, Thread
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from cache.shared_cache import SharedCache
 
 
 class TestCacheConcurrency:
-
     def test_100_threads_contended_get_set(self):
         c = SharedCache()
         c.register("hot", 120)
@@ -18,10 +15,8 @@ class TestCacheConcurrency:
         errors = []
 
         def worker():
-            try:
+            with contextlib.suppress(BrokenBarrierError):
                 barrier.wait()
-            except BrokenBarrierError:
-                pass
             for _ in range(200):
                 c.set("hot", 1)
                 v = c.get("hot")
@@ -40,7 +35,6 @@ class TestCacheConcurrency:
         c = SharedCache()
         c.register("bigset", 120)
         c.set("bigset", set())
-        barrier = Barrier(50)
         threads = []
         for batch in range(10):
             start = batch * 100
@@ -55,13 +49,14 @@ class TestCacheConcurrency:
 
     def test_20_threads_register_and_set_different_keys(self):
         c = SharedCache()
-        barrier = Barrier(20)
         threads = []
         for i in range(20):
-            t = Thread(target=lambda i=i: (
-                c.register(f"key_{i}", 60),
-                c.set(f"key_{i}", i),
-            ))
+            t = Thread(
+                target=lambda i=i: (
+                    c.register(f"key_{i}", 60),
+                    c.set(f"key_{i}", i),
+                )
+            )
             threads.append(t)
         for t in threads:
             t.start()
@@ -125,7 +120,6 @@ class TestCacheConcurrency:
 
 
 class TestCacheStaleFallback:
-
     def test_stale_returned_on_db_failure(self):
         from cache.keys import KNOWN_HASHES, KNOWN_HASHES_TTL
         from cache.shared_cache import cache as global_cache
@@ -136,7 +130,9 @@ class TestCacheStaleFallback:
 
         with patch("fetcher.deduplicator.get_supabase") as mock_get:
             mock_sb_fail = MagicMock()
-            mock_sb_fail.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("db timeout")
+            mock_sb_fail.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception(
+                "db timeout"
+            )
             mock_get.return_value = mock_sb_fail
             dedup = Deduplicator()
             result = dedup._load_known_hashes()
@@ -144,7 +140,9 @@ class TestCacheStaleFallback:
 
         with patch("fetcher.deduplicator.get_supabase") as mock_get:
             mock_sb_ok = MagicMock()
-            mock_sb_ok.table.return_value.select.return_value.gte.return_value.order.return_value.range.return_value.execute.return_value = MagicMock(data=[{"url_hash": "h1"}])
+            mock_sb_ok.table.return_value.select.return_value.gte.return_value.order.return_value.range.return_value.execute.return_value = MagicMock(
+                data=[{"url_hash": "h1"}]
+            )
             mock_get.return_value = mock_sb_ok
             dedup2 = Deduplicator()
             global_cache.reset_state()
@@ -154,7 +152,9 @@ class TestCacheStaleFallback:
 
         with patch("fetcher.deduplicator.get_supabase") as mock_get:
             mock_sb_fail2 = MagicMock()
-            mock_sb_fail2.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("db timeout again")
+            mock_sb_fail2.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception(
+                "db timeout again"
+            )
             mock_get.return_value = mock_sb_fail2
             dedup3 = Deduplicator()
             result3 = dedup3._load_known_hashes()
@@ -170,7 +170,9 @@ class TestCacheStaleFallback:
 
         with patch("fetcher.deduplicator.get_supabase") as mock_get:
             mock_sb = MagicMock()
-            mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = Exception("initial failure")
+            mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.side_effect = (
+                Exception("initial failure")
+            )
             mock_get.return_value = mock_sb
             dedup = Deduplicator()
             result = dedup._load_known_hashes()
@@ -188,7 +190,9 @@ class TestCacheStaleFallback:
 
         with patch("publisher.supabase_publisher.get_supabase") as mock_get:
             mock_sb = MagicMock()
-            mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.side_effect = Exception("db error")
+            mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.side_effect = (
+                Exception("db error")
+            )
             mock_get.return_value = mock_sb
             pub = SupabasePublisher()
             headlines = pub._get_recent_headlines()
@@ -196,7 +200,6 @@ class TestCacheStaleFallback:
 
 
 class TestCacheIsolation:
-
     def test_different_keys_dont_interfere(self):
         c = SharedCache()
         c.register("a", 60)
@@ -229,7 +232,6 @@ class TestCacheIsolation:
 
 
 class TestCacheEdgeCases:
-
     def test_set_none_value(self):
         c = SharedCache()
         c.register("none_val", 60)
@@ -262,7 +264,6 @@ class TestCacheEdgeCases:
 
 
 class TestPipelinerapidCalls:
-
     def test_rapid_is_new_calls(self):
         from cache.keys import KNOWN_HASHES, KNOWN_HASHES_TTL
         from cache.shared_cache import cache as global_cache
@@ -273,13 +274,15 @@ class TestPipelinerapidCalls:
 
         with patch("fetcher.deduplicator.get_supabase") as mock_get:
             mock_sb = MagicMock()
-            mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.return_value.execute.return_value = MagicMock(data=[
-                {"url_hash": f"existing_{i}"} for i in range(100)
-            ])
+            mock_sb.table.return_value.select.return_value.gte.return_value.order.return_value.range.return_value.execute.return_value = MagicMock(
+                data=[{"url_hash": f"existing_{i}"} for i in range(100)]
+            )
             mock_get.return_value = mock_sb
             dedup = Deduplicator()
 
-            articles = [{"url_hash": f"existing_{i}", "url": f"https://a.com/{i}", "headline": "Test"} for i in range(100)]
+            articles = [
+                {"url_hash": f"existing_{i}", "url": f"https://a.com/{i}", "headline": "Test"} for i in range(100)
+            ]
             articles += [{"url_hash": f"new_{i}", "url": f"https://b.com/{i}", "headline": "Test"} for i in range(100)]
 
             start = time.time()
@@ -299,7 +302,9 @@ class TestPipelinerapidCalls:
 
         with patch("publisher.supabase_publisher.get_supabase") as mock_get:
             mock_sb = MagicMock()
-            mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.return_value = MagicMock(data=[])
+            mock_sb.table.return_value.select.return_value.order.return_value.limit.return_value.execute.return_value = MagicMock(
+                data=[]
+            )
             mock_sb.table.return_value.insert.return_value.execute.return_value = MagicMock(data=[{"id": 1}])
             mock_get.return_value = mock_sb
             pub = SupabasePublisher()
@@ -317,9 +322,14 @@ class TestPipelinerapidCalls:
                 "Major earthquake hits Pacific region",
             ]
             posts = [
-                {"headline": h, "summary": "Test", "category": "world",
-                 "credibility_score": 80, "credibility_reason": "good",
-                 "sources": [{"url": f"https://a.com/{i}"}]}
+                {
+                    "headline": h,
+                    "summary": "Test",
+                    "category": "world",
+                    "credibility_score": 80,
+                    "credibility_reason": "good",
+                    "sources": [{"url": f"https://a.com/{i}"}],
+                }
                 for i, h in enumerate(headlines)
             ]
 
@@ -332,7 +342,6 @@ class TestPipelinerapidCalls:
 
 
 class TestPipelineRapidRuns:
-
     def test_10_rapid_pipeline_runs(self):
         from cache.shared_cache import cache as global_cache
         from scheduler.jobs import _pipeline_running, run_pipeline
@@ -368,21 +377,41 @@ class TestPipelineRapidRuns:
 
                 mock_rss = MagicMock()
                 mock_rss.fetch_all.return_value = [
-                    {"url_hash": f"h{i}_{run_num}", "url": f"https://a.com/{i}", "headline": f"Headline {i} run {run_num}",
-                     "source_name": f"Src{i}", "source_url": f"https://src{i}.com"}
+                    {
+                        "url_hash": f"h{i}_{run_num}",
+                        "url": f"https://a.com/{i}",
+                        "headline": f"Headline {i} run {run_num}",
+                        "source_name": f"Src{i}",
+                        "source_url": f"https://src{i}.com",
+                    }
                     for i in range(5)
                 ]
                 mock_rss_cls.return_value = mock_rss
 
                 mock_csc = MagicMock()
-                mock_csc.get_verified_groups.return_value = [[
-                    {"url_hash": f"g{r}0", "url": f"https://g{r}0.com", "headline": f"Group {r} run {run_num}",
-                     "source_name": f"Src{r}", "source_url": f"https://src{r}.com"}
-                ] for r in range(2)]
+                mock_csc.get_verified_groups.return_value = [
+                    [
+                        {
+                            "url_hash": f"g{r}0",
+                            "url": f"https://g{r}0.com",
+                            "headline": f"Group {r} run {run_num}",
+                            "source_name": f"Src{r}",
+                            "source_url": f"https://src{r}.com",
+                        }
+                    ]
+                    for r in range(2)
+                ]
                 mock_csc_cls.return_value = mock_csc
 
                 mock_gv = MagicMock()
-                mock_gv.verify.return_value = {"score": 80, "headline": f"Generated Headline {run_num}", "summary": "A summary", "key_facts": [], "category": "world", "reason": "good score"}
+                mock_gv.verify.return_value = {
+                    "score": 80,
+                    "headline": f"Generated Headline {run_num}",
+                    "summary": "A summary",
+                    "key_facts": [],
+                    "category": "world",
+                    "reason": "good score",
+                }
                 mock_gv_cls.return_value = mock_gv
 
                 mock_sb = MagicMock()
@@ -396,8 +425,9 @@ class TestPipelineRapidRuns:
                 mock_rss.close.assert_called_once()
 
     def test_concurrent_main_and_supplementary(self):
-        from scheduler.jobs import _pipeline_running, run_pipeline
         from cache.shared_cache import cache as global_cache
+        from scheduler.jobs import _pipeline_running, run_pipeline
+
         _pipeline_running.clear()
 
         def run_main():

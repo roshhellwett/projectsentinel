@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import email.utils
 import json
 import re
@@ -27,8 +26,8 @@ from utils.groq_pool import (
 )
 from utils.key_pool import AllKeysExhaustedError, KeyPool
 
-class GroqVerifier:
 
+class GroqVerifier:
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
     RETRY_DELAY = 10
@@ -127,9 +126,7 @@ class GroqVerifier:
             raise last_error
         raise Exception("Groq verify model chain is empty")
 
-    def _verify_with_model(
-        self, model: str, pool: KeyPool, user_content: str
-    ) -> dict:
+    def _verify_with_model(self, model: str, pool: KeyPool, user_content: str) -> dict:
 
         retries_used = 0
         rotations = 0
@@ -216,8 +213,7 @@ class GroqVerifier:
                     retries_used += 1
                     self.logger.log(
                         "GROQ_VERIFY_ERROR",
-                        f"Malformed API response shape (retry {retries_used}/{self.MAX_RETRIES}): "
-                        f"{str(e)[:80]}",
+                        f"Malformed API response shape (retry {retries_used}/{self.MAX_RETRIES}): {str(e)[:80]}",
                     )
                     continue
 
@@ -226,8 +222,7 @@ class GroqVerifier:
                     retries_used += 1
                     self.logger.log(
                         "GROQ_VERIFY",
-                        f"Unparseable response (retry {retries_used}/{self.MAX_RETRIES}), "
-                        f"model={model} — retrying",
+                        f"Unparseable response (retry {retries_used}/{self.MAX_RETRIES}), model={model} — retrying",
                     )
                     continue
 

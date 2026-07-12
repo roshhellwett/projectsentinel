@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 from datetime import UTC, datetime
 from urllib.parse import urlparse
 
@@ -51,6 +50,7 @@ DOMAIN_TO_NAME: dict[str, str] = {
     "youtube.com": "YouTube",
 }
 
+
 def _derive_source_title(source_name: str, url: str) -> str:
 
     if url:
@@ -65,8 +65,8 @@ def _derive_source_title(source_name: str, url: str) -> str:
             pass
     return source_name or "Unknown"
 
-class PostBuilder:
 
+class PostBuilder:
     def build(
         self,
         headline: str,

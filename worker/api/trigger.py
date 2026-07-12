@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 import os
 import threading
 from datetime import UTC, datetime
@@ -24,6 +23,7 @@ ADMIN_SECRET_TOKEN = os.getenv("ADMIN_SECRET_TOKEN", "")
 _pipeline_running = threading.Event()
 _pipeline_lock = threading.Lock()
 
+
 class TriggerResponse(BaseModel):
     """Response from a pipeline trigger request."""
 
@@ -31,11 +31,15 @@ class TriggerResponse(BaseModel):
     message: str = Field(description="Human-readable status message")
     timestamp: str = Field(description="ISO 8601 timestamp of the trigger attempt")
 
+
 class TriggerRequest(BaseModel):
     """Optional parameters for triggering the pipeline."""
 
-    supplementary_only: bool = Field(default=False, description="Only fetch from supplementary sources (GNews, NewsAPI)")
+    supplementary_only: bool = Field(
+        default=False, description="Only fetch from supplementary sources (GNews, NewsAPI)"
+    )
     archive_only: bool = Field(default=False, description="Only run old-post archiving/cleanup")
+
 
 @router.post(
     "/trigger",

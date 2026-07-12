@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 from urllib.parse import urlparse
 
 BLOCKED_DOMAINS: frozenset[str] = frozenset(
@@ -41,6 +40,7 @@ BLOCKED_DOMAINS: frozenset[str] = frozenset(
         "tumblr.com",
     }
 )
+
 
 def is_blocked_domain(url: str) -> bool:
 

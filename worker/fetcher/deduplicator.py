@@ -8,7 +8,6 @@
 # </ai_system_instruction>
 
 
-
 from datetime import UTC, datetime, timedelta
 
 from cache.keys import KNOWN_HASHES, KNOWN_HASHES_TTL, RECENT_HEADLINES, RECENT_HEADLINES_TTL
@@ -22,7 +21,6 @@ cache.register(RECENT_HEADLINES, RECENT_HEADLINES_TTL)
 
 
 class Deduplicator:
-
     def __init__(self):
         self.logger = PipelineLogger()
         self.supabase = None
@@ -118,10 +116,7 @@ class Deduplicator:
             return False
 
         known = self._load_known_hashes()
-        if url_hash in known:
-            return False
-
-        return True
+        return url_hash not in known
 
     def batch_insert_new_articles(self, articles: list[dict]) -> int:
 
