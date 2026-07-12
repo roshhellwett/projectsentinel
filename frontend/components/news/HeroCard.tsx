@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import Link from 'next/link';
 import { Post } from '@/types';
-import { formatTimeAgo } from '@/lib/utils/formatDate';
+import { useTimeAgo } from '@/lib/hooks/useTimeAgo';
 import { getHostname } from '@/lib/utils/getHostname';
 import { VerificationStamp } from '@/components/ui/VerificationStamp';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
@@ -61,7 +61,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = 'trending' }: Her
               {post.category}
             </span>
             <span className="w-px h-2.5 sm:h-3 bg-rule flex-shrink-0" />
-            <span className="font-mono text-[10px] sm:text-[11px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+            <span className="font-mono text-[10px] sm:text-[11px] text-ink-soft" suppressHydrationWarning>{useTimeAgo(post.published_at)}</span>
             {isVideo && (
               <span className="inline-flex items-center gap-1 px-1.5 py-1 sm:py-0.5 border border-ink/15 text-ink-soft font-body text-[10px] sm:text-[10px] font-bold tracking-wider uppercase">
                 <YoutubeIcon />

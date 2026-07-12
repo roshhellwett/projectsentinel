@@ -19,10 +19,11 @@ function YoutubeIcon() {
   );
 }
 
-function CheckIcon() {
+function EyeIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M5 13l4 4L19 7" />
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -183,9 +184,9 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                         </div>
 
                         {read && (
-                          <span className="inline-flex items-center gap-1 text-xs text-ink-soft font-body">
-                            <CheckIcon />
-                            {t('card.read')}
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-rule/80 rounded-full text-[9px] font-medium text-ink-soft/80 bg-paper-2/40">
+                            <EyeIcon />
+                            {t('card.viewed')}
                           </span>
                         )}
                       </div>
@@ -208,7 +209,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                         onClick={() => haptic.light()}
                         className="inline-flex items-center gap-1 font-body text-[11px] text-ink-soft hover:text-ink transition-colors"
                       >
-                        {t('card.read')} <ArrowRight />
+                        {t('card.read_full')} <ArrowRight />
                       </Link>
                     </div>
                   </div>

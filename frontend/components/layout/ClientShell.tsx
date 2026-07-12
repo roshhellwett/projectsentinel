@@ -28,12 +28,12 @@ export default function ClientShell({ children }: { children: ReactNode }) {
           <Footer />
           <MobileBottomNav />
         </PageEntrance>
+        <CookieConsent />
+        <ToastProvider />
       </I18nProvider>
       <ScrollToTop />
       <KeyboardShortcuts />
       <ScrollRestorer />
-      <CookieConsent />
-      <ToastProvider />
     </>
   );
 }

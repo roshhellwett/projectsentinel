@@ -37,16 +37,7 @@ module.exports = {
         hand:    ['var(--font-hand)', 'cursive'],
         mono:    ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
-      animation: {
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'shimmer': 'shimmer 1.8s linear infinite',
-        'entrance': 'entranceFade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both',
-      },
-      keyframes: {
-        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
-        entranceFade: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-      },
+
     },
   },
   plugins: [],

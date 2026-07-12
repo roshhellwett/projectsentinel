@@ -2,7 +2,7 @@
 
 import { memo, useCallback } from 'react';
 import type { Post } from '@/types';
-import { formatTimeAgo } from '@/lib/utils/formatDate';
+import { useTimeAgo } from '@/lib/hooks/useTimeAgo';
 import { truncateWords } from '@/lib/utils/truncate';
 import { cn } from '@/lib/utils/cn';
 import { BookmarkButton } from './BookmarkButton';
@@ -14,6 +14,15 @@ function ShieldIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -111,7 +120,7 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
             {post.category}
           </span>
           <span className="text-ink-soft/40" aria-hidden="true">·</span>
-          <span className="font-mono text-[9px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+          <span className="font-mono text-[9px] sm:text-[10px] text-ink-soft" suppressHydrationWarning>{useTimeAgo(post.published_at)}</span>
           {smartLabel && (
             <span
               className={cn(
@@ -156,7 +165,10 @@ const NewsCardComponent = ({ post, onClick, isNew = false, isRead = false }: New
       </div>
 
       {isRead && (
-        <span className="font-body text-[10px] sm:text-[11px] text-ink-soft/60 mt-1 sm:mt-1.5">{t('card.read')}</span>
+        <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 mt-1.5 border border-rule/80 rounded-full text-[9px] sm:text-[10px] font-medium text-ink-soft/80 bg-paper-2/40">
+          <EyeIcon />
+          {t('card.viewed')}
+        </span>
       )}
     </div>
   );

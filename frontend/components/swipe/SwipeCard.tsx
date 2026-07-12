@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ShieldCheck, BookOpen, Globe, AlertTriangle } from 'lucide-react';
 import type { Post, Source } from '@/types';
-import { formatTimeAgo } from '@/lib/utils/formatDate';
+import { useTimeAgo } from '@/lib/hooks/useTimeAgo';
 import { summaryToBullets } from '@/lib/utils/summaryToBullets';
 import { getCategoryTheme } from '@/lib/theme/categoryTheme';
 import { Z_INDEX } from '@/lib/theme/zIndex';
@@ -145,6 +145,7 @@ export function SwipeCard({
 }: SwipeCardProps) {
   const { isSaved, toggleSaved } = useSavedPosts();
   const theme = getCategoryTheme(post.category);
+  const timeAgo = useTimeAgo(post.published_at);
 
   const bullets = useMemo(() => summaryToBullets(post.summary, 2), [post.summary]);
   const { topSources, sourcesTotal, extraSources, uniqueHostCount, sourcesNoun } = useMemo(() => {
@@ -345,7 +346,7 @@ export function SwipeCard({
                 aria-hidden="true"
                 suppressHydrationWarning
               />
-              <span suppressHydrationWarning>{formatTimeAgo(post.published_at)}</span>
+              <span suppressHydrationWarning>{timeAgo}</span>
             </span>
 
             <span className="inline-flex items-center gap-1 text-[10px] text-muted font-medium">
