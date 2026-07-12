@@ -20,9 +20,7 @@ export function getSupabaseServer() {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error(
-      'Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and a Supabase key (SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY) are required.'
-    );
+    return null;
   }
 
   supabaseServerInstance = createClient(supabaseUrl, supabaseKey, {
@@ -64,11 +62,15 @@ export async function fetchPostsCursor(
   limit: number = 20,
   category?: string
 ): Promise<PostsCursorResponse> {
+  if (!getSupabaseServer()) {
+    return { posts: [], nextCursor: null, hasMore: false };
+  }
+
   const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
   const fetchLimit = safeLimit + 1;
 
   return withRetry(async () => {
-    let query = getSupabaseServer()
+    let query = getSupabaseServer()!
       .from('posts')
       .select(FEED_COLUMNS)
       .eq('status', 'published')
@@ -112,13 +114,17 @@ export const fetchPosts = cache(async (
   limit: number = 20,
   category?: string
 ): Promise<{ posts: Post[]; count: number }> => {
+  if (!getSupabaseServer()) {
+    return { posts: [], count: 0 };
+  }
+
   const safePage = Math.max(1, Math.floor(page || 1));
   const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
   const start = (safePage - 1) * safeLimit;
   const end = start + safeLimit - 1;
 
   return withRetry(async () => {
-    let query = getSupabaseServer()
+    let query = getSupabaseServer()!
       .from('posts')
       .select(FEED_COLUMNS, { count: 'estimated' })
       .eq('status', 'published');
@@ -148,12 +154,12 @@ export const fetchPosts = cache(async (
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const fetchPostById = cache(async (id: string): Promise<Post | null> => {
-  if (!UUID_RE.test(id)) {
+  if (!UUID_RE.test(id) || !getSupabaseServer()) {
     return null;
   }
 
   return withRetry(async () => {
-    const { data, error } = await getSupabaseServer()
+    const { data, error } = await getSupabaseServer()!
       .from('posts')
       .select(DETAIL_COLUMNS)
       .eq('id', id)
@@ -170,12 +176,13 @@ export const fetchPostById = cache(async (id: string): Promise<Post | null> => {
 });
 
 export const fetchLatestPost = cache(async (): Promise<Post | null> => {
+  if (!getSupabaseServer()) return null;
+
   return withRetry(async () => {
-    const { data, error } = await getSupabaseServer()
+    const { data, error } = await getSupabaseServer()!
       .from('posts')
       .select(FEED_COLUMNS)
       .eq('status', 'published')
-      .order('published_at', { ascending: false })
       .limit(1)
       .single();
 
@@ -189,8 +196,8 @@ export async function updatePostStatus(
   status: string,
   correctionNote?: string | null
 ): Promise<void> {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('updatePostStatus requires SUPABASE_SERVICE_ROLE_KEY environment variable to perform admin mutations.');
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    throw new Error('Supabase environment variables are required for admin mutations.');
   }
   if (!UUID_RE.test(id)) {
     throw new Error('Invalid post ID');
@@ -204,7 +211,7 @@ export async function updatePostStatus(
     payload.correction_note = correctionNote;
   }
 
-  const { error } = await getSupabaseServer()
+  const { error } = await getSupabaseServer()!
     .from('posts')
     .update(payload as unknown as never)
     .eq('id', id);
@@ -219,7 +226,7 @@ export async function searchPosts(
   limit: number = 20
 ): Promise<{ posts: Post[]; count: number }> {
   const safeQuery = query.trim().slice(0, 200);
-  if (!safeQuery) return { posts: [], count: 0 };
+  if (!safeQuery || !getSupabaseServer()) return { posts: [], count: 0 };
 
   const safeLimit = Math.min(50, Math.max(1, limit));
 
@@ -232,7 +239,7 @@ export async function searchPosts(
   if (!ftsTerm) return { posts: [], count: 0 };
 
   return withRetry(async () => {
-    const { data, error, count } = await getSupabaseServer()
+    const { data, error, count } = await getSupabaseServer()!
       .from('posts')
       .select(FEED_COLUMNS, { count: 'estimated' })
       .eq('status', 'published')
@@ -242,7 +249,7 @@ export async function searchPosts(
 
     if (error) {
       const escapedForIlike = safeQuery.replace(/%/g, '\\%').replace(/_/g, '\\_');
-      const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()
+      const { data: fallback, error: fallbackErr, count: fallbackCount } = await getSupabaseServer()!
         .from('posts')
         .select(FEED_COLUMNS, { count: 'estimated' })
         .eq('status', 'published')
@@ -259,8 +266,10 @@ export async function searchPosts(
 }
 
 export async function fetchAllPosts(): Promise<Post[]> {
+  if (!getSupabaseServer()) return [];
+
   return withRetry(async () => {
-    const { data, error } = await getSupabaseServer()
+    const { data, error } = await getSupabaseServer()!
       .from('posts')
       .select(FEED_COLUMNS)
       .order('published_at', { ascending: false })
@@ -278,8 +287,10 @@ export async function fetchAllPosts(): Promise<Post[]> {
 }
 
 export const fetchSitemapArticles = cache(async (): Promise<{ id: string; published_at: string; category: string }[]> => {
+  if (!getSupabaseServer()) return [];
+
   return withRetry(async () => {
-    const { data, error } = await getSupabaseServer()
+    const { data, error } = await getSupabaseServer()!
       .from('posts')
       .select('id, published_at, category')
       .eq('status', 'published')

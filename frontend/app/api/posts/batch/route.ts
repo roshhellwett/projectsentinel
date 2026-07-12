@@ -52,9 +52,13 @@ export async function POST(request: Request) {
     });
   }
 
+  if (!getSupabaseServer()) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
+  }
+
   try {
     const data = await withRetry(async () => {
-      const { data: res, error } = await getSupabaseServer()
+      const { data: res, error } = await getSupabaseServer()!
         .from('posts')
         .select('*')
         .in('id', valid);
