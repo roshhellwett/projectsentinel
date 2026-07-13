@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Post, PostsCursorResponse } from "@/types";
+import { getServerCache, setServerCache } from "@/lib/api/serverCache";
 
 const VALID_CATEGORIES = new Set([
   "politics",
@@ -76,53 +77,64 @@ export async function withRetry<T>(
  * Fetch posts using cursor-based pagination.
  * Uses lightweight queries to minimize free-tier Supabase usage.
  */
-export async function fetchPostsCursor(
-  cursor?: string,
-  limit: number = 20,
-  category?: string,
-): Promise<PostsCursorResponse> {
-  if (!getSupabaseServer()) {
-    return { posts: [], nextCursor: null, hasMore: false };
-  }
+export const fetchPostsCursor = cache(
+  async (
+    cursor?: string,
+    limit: number = 20,
+    category?: string,
+  ): Promise<PostsCursorResponse> => {
+    const cacheKey = `posts_cursor_${cursor || "init"}_${limit}_${category || "all"}`;
+    const cached = getServerCache<PostsCursorResponse>(cacheKey);
+    if (cached) return cached;
 
-  const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
-  const fetchLimit = safeLimit + 1;
-
-  return withRetry(async () => {
-    let query = getSupabaseServer()!
-      .from("posts")
-      .select(FEED_COLUMNS)
-      .eq("status", "published")
-      .order("published_at", { ascending: false })
-      .limit(fetchLimit);
-
-    if (category && category !== "all" && VALID_CATEGORIES.has(category)) {
-      query = query.eq("category", category);
-    }
-
-    if (cursor) {
-      query = query.lt("published_at", cursor);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
+    if (!getSupabaseServer()) {
       return { posts: [], nextCursor: null, hasMore: false };
     }
 
-    const posts = (data || []) as Post[];
-    const hasMore = posts.length >= fetchLimit;
+    const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
+    const fetchLimit = safeLimit + 1;
 
-    if (hasMore) {
-      posts.pop();
-    }
+    const result = await withRetry(async () => {
+      let query = getSupabaseServer()!
+        .from("posts")
+        .select(FEED_COLUMNS)
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+        .limit(fetchLimit);
 
-    const nextCursor =
-      hasMore && posts.length > 0 ? posts[posts.length - 1].published_at : null;
+      if (category && category !== "all" && VALID_CATEGORIES.has(category)) {
+        query = query.eq("category", category);
+      }
 
-    return { posts, nextCursor, hasMore };
-  });
-}
+      if (cursor) {
+        query = query.lt("published_at", cursor);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        return { posts: [], nextCursor: null, hasMore: false };
+      }
+
+      const posts = (data || []) as Post[];
+      const hasMore = posts.length >= fetchLimit;
+
+      if (hasMore) {
+        posts.pop();
+      }
+
+      const nextCursor =
+        hasMore && posts.length > 0
+          ? posts[posts.length - 1].published_at
+          : null;
+
+      return { posts, nextCursor, hasMore };
+    });
+
+    setServerCache(cacheKey, result, 45_000);
+    return result;
+  },
+);
 
 /**
  * Legacy offset-based pagination (kept for backward compatibility).
@@ -133,6 +145,10 @@ export const fetchPosts = cache(
     limit: number = 20,
     category?: string,
   ): Promise<{ posts: Post[]; count: number }> => {
+    const cacheKey = `posts_page_${page}_${limit}_${category || "all"}`;
+    const cached = getServerCache<{ posts: Post[]; count: number }>(cacheKey);
+    if (cached) return cached;
+
     if (!getSupabaseServer()) {
       return { posts: [], count: 0 };
     }
@@ -142,7 +158,7 @@ export const fetchPosts = cache(
     const start = (safePage - 1) * safeLimit;
     const end = start + safeLimit - 1;
 
-    return withRetry(async () => {
+    const result = await withRetry(async () => {
       let query = getSupabaseServer()!
         .from("posts")
         .select(FEED_COLUMNS, { count: "estimated" })
@@ -167,6 +183,9 @@ export const fetchPosts = cache(
 
       return { posts: data as Post[], count: count || 0 };
     });
+
+    setServerCache(cacheKey, result, 45_000);
+    return result;
   },
 );
 
@@ -178,7 +197,11 @@ export const fetchPostById = cache(async (id: string): Promise<Post | null> => {
     return null;
   }
 
-  return withRetry(async () => {
+  const cacheKey = `post_id_${id}`;
+  const cached = getServerCache<Post | null>(cacheKey);
+  if (cached !== null) return cached;
+
+  const result = await withRetry(async () => {
     const { data, error } = await getSupabaseServer()!
       .from("posts")
       .select(DETAIL_COLUMNS)
@@ -192,12 +215,21 @@ export const fetchPostById = cache(async (id: string): Promise<Post | null> => {
 
     return data as Post;
   }).catch(() => null);
+
+  if (result) {
+    setServerCache(cacheKey, result, 60_000);
+  }
+  return result;
 });
 
 export const fetchLatestPost = cache(async (): Promise<Post | null> => {
+  const cacheKey = "latest_post";
+  const cached = getServerCache<Post | null>(cacheKey);
+  if (cached !== null) return cached;
+
   if (!getSupabaseServer()) return null;
 
-  return withRetry(async () => {
+  const result = await withRetry(async () => {
     const { data, error } = await getSupabaseServer()!
       .from("posts")
       .select(FEED_COLUMNS)
@@ -208,6 +240,11 @@ export const fetchLatestPost = cache(async (): Promise<Post | null> => {
     if (error) return null;
     return data as Post;
   }).catch(() => null);
+
+  if (result) {
+    setServerCache(cacheKey, result, 45_000);
+  }
+  return result;
 });
 
 export async function updatePostStatus(

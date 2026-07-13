@@ -140,11 +140,11 @@ const NewsCardComponent = ({
       aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}`}
       data-read={isRead ? "true" : "false"}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-3 sm:p-4 flex flex-col h-full transition-all duration-200",
-        "hover:shadow-[0_2px_8px_rgb(var(--c-ink)/0.08)] hover:border-ink/20",
+        "group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-3.5 sm:p-5 flex flex-col h-full rounded-xl border border-rule transition-all duration-200",
+        "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgb(var(--c-ink)/0.07)] hover:border-ink/25",
         "focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:outline-none",
-        isNew && "border-l-[3px] border-ink",
-        isVideo && "border-amber-500/10",
+        isNew && "border-l-[3.5px] border-l-ink",
+        isVideo && "border-amber-500/20",
       )}
     >
       {isVideo && (
@@ -205,15 +205,17 @@ const NewsCardComponent = ({
             {sourcesCount}{" "}
             {t(sourcesCount === 1 ? "card.source" : "card.sources")}
           </span>
-          <button
-            type="button"
-            onClick={handleYoutubeClick}
-            className="inline-flex items-center gap-1 px-1.5 sm:px-1.5 py-1 sm:py-0.5 min-h-[28px] border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-colors"
-            aria-label={t("news.aria_youtube", { headline: post.headline })}
-          >
-            <YoutubeIcon className="text-ink" />
-            {t("card.youtube")}
-          </button>
+          {(isVideo || post.video_url) && (
+            <button
+              type="button"
+              onClick={handleYoutubeClick}
+              className="inline-flex items-center gap-1 px-1.5 sm:px-1.5 py-1 sm:py-0.5 min-h-[28px] border border-ink/20 text-ink bg-ink/5 hover:bg-ink/10 active:bg-ink/15 font-body text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-colors"
+              aria-label={t("news.aria_youtube", { headline: post.headline })}
+            >
+              <YoutubeIcon className="text-ink" />
+              {t("card.youtube")}
+            </button>
+          )}
         </div>
         <BookmarkButton postId={post.id} variant="icon" />
       </div>

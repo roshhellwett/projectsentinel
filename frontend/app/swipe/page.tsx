@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchPosts } from "@/lib/supabase/server";
+import { fetchPostsCursor } from "@/lib/supabase/server";
 import { dedupe } from "@/lib/utils/dedupe";
 import { SwipeStack } from "@/components/swipe/SwipeStack";
 import { DesktopRedirect } from "@/components/swipe/DesktopRedirect";
@@ -25,13 +25,13 @@ export default async function SwipePage() {
   const locale = await getServerLocale();
   const messages = messagesMap[locale];
 
-  const { posts } = await fetchPosts(1, 20);
+  const { posts } = await fetchPostsCursor(undefined, 30);
   const deduped = dedupe(posts ?? []);
 
   return (
     <>
       <DesktopRedirect />
-      <main className="md:hidden flex flex-col items-center pt-3 pb-28 min-h-[calc(100dvh-3.5rem)]">
+      <main className="md:hidden flex flex-col items-center pt-3 pb-24 min-h-[calc(100dvh-3.5rem)] overscroll-none">
         <header className="w-full max-w-md px-4 mb-2 sm:mb-3">
           <span
             className="block w-8 h-[2px] bg-accent rounded-full mb-2"

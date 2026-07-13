@@ -234,8 +234,8 @@ export function SwipeStack({ initialPosts }: SwipeStackProps) {
         </div>
       </div>
 
-      <p className="mt-3 px-4 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-subtle">
-        {queue.canRewind ? "↑ → next • ↓ ← previous" : "↑ → next"}
+      <p className="mt-3 px-4 text-center font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted/80">
+        {queue.canRewind ? "↑ → next • ↓ ← previous" : "↑ → swipe to next"}
       </p>
 
       <SwipeHint />

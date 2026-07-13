@@ -86,7 +86,7 @@ export const HeroCard = memo(function HeroCard({
 
   return (
     <div
-      className="w-full max-w-full border border-rule/50 bg-paper-2/65 backdrop-blur-md rounded-[8px] p-3 sm:p-6 md:p-8 relative overflow-hidden"
+      className="w-full max-w-full border border-rule bg-paper-2/80 backdrop-blur-xl rounded-2xl p-4 sm:p-7 md:p-9 relative overflow-hidden shadow-[0_12px_36px_rgb(var(--c-ink)/0.06)] hover:shadow-[0_16px_44px_rgb(var(--c-ink)/0.09)] transition-all duration-300"
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 300px" }}
     >
       <Link

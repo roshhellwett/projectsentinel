@@ -200,12 +200,12 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
               <div
                 key={post.id}
-                className="flex-shrink-0 w-[80vw] sm:w-[300px] md:w-[315px] snap-start animate-slide-up"
+                className="flex-shrink-0 w-[76vw] sm:w-[300px] md:w-[320px] snap-start animate-slide-up"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div
                   data-read={read ? "true" : "false"}
-                  className={`ink-card glass-card flex flex-col justify-between h-full p-4 sm:p-5 overflow-hidden w-full max-w-full ${read ? "opacity-60" : ""}`}
+                  className={`ink-card glass-card flex flex-col justify-between h-full p-4.5 sm:p-5 overflow-hidden w-full max-w-full rounded-xl border border-rule hover:border-ink/30 transition-all duration-200 ${read ? "opacity-60" : ""}`}
                 >
                   <div className="relative z-10">
                     <div className="flex items-center justify-between gap-2 mb-3">

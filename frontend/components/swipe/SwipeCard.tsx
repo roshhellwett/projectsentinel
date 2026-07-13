@@ -308,12 +308,12 @@ export function SwipeCard({
       data-swipe-depth={depth}
     >
       <article
-        className="relative w-full np-card overflow-hidden"
+        className="relative w-full np-card paper-card glass-card shadow-[0_10px_32px_rgb(var(--c-ink)/0.08)] border border-rule/80 overflow-hidden rounded-xl transition-shadow duration-300"
         role="article"
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
         <div
-          className={`p-5 ${interactive ? "cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset" : ""}`}
+          className={`p-5 sm:p-6 ${interactive ? "cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset" : ""}`}
           role={interactive ? "button" : undefined}
           tabIndex={interactive ? 0 : undefined}
           aria-label={

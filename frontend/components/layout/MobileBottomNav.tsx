@@ -175,17 +175,27 @@ export function MobileBottomNav() {
         >
           <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
           <div
-            className={`absolute left-3 right-3 max-[380px]:left-2 max-[380px]:right-2 bg-paper/80 backdrop-blur-xl border border-rule/50 transition-transform duration-300 ${
+            className={`absolute left-2 right-2 max-[380px]:left-1.5 max-[380px]:right-1.5 bg-paper/95 backdrop-blur-2xl border border-rule shadow-2xl rounded-t-2xl transition-transform duration-300 ${
               topicsOpen ? "translate-y-0" : "translate-y-full"
             }`}
             style={{
-              bottom: "calc(4.75rem + env(safe-area-inset-bottom, 0px))",
+              bottom: "calc(4.5rem + env(safe-area-inset-bottom, 0px))",
             }}
           >
             <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
-              <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-3 px-1">
-                {t("nav.browse_topics")}
-              </p>
+              <div className="flex items-center justify-between mb-3 px-1">
+                <p className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+                  {t("nav.browse_topics")}
+                </p>
+                <button
+                  type="button"
+                  onClick={closeTopics}
+                  className="p-1 text-muted hover:text-ink min-touch flex items-center justify-center rounded"
+                  aria-label="Close topics"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CATEGORIES.map((cat) => {
                   const active = pathname === `/category/${cat.slug}/`;
@@ -195,10 +205,10 @@ export function MobileBottomNav() {
                       href={`/category/${cat.slug}/`}
                       prefetch={true}
                       onClick={closeTopics}
-                      className={`flex items-center justify-center px-3 py-3 sm:py-3 text-center text-xs sm:text-sm transition-colors min-h-[44px] ${
+                      className={`flex items-center justify-center px-3 py-3 text-center text-xs sm:text-sm transition-all rounded-lg min-h-[44px] ${
                         active
-                          ? "bg-ink text-paper border border-ink"
-                          : "text-ink border border-rule hover:bg-paper-2"
+                          ? "bg-ink text-paper font-bold shadow-sm"
+                          : "text-ink bg-paper-2/60 border border-rule/60 hover:border-ink/30 hover:bg-paper-2"
                       }`}
                     >
                       {t(`nav.${cat.slug}`)}
@@ -220,7 +230,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? "none" : "auto" }}
       >
         <div
-          className="relative border-t border-rule/50 bg-paper/70 backdrop-blur-md select-none touch-manipulation"
+          className="relative border-t border-rule bg-paper/90 backdrop-blur-xl shadow-[0_-2px_14px_rgb(var(--c-ink)/0.04)] select-none touch-manipulation"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">
@@ -230,16 +240,18 @@ export function MobileBottomNav() {
               const isTopics = tab.id === "topics";
 
               const inner = (
-                <div className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[48px] sm:min-w-[56px] active:scale-95 transition-transform duration-100 min-touch">
+                <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-95 transition-all duration-150">
+                  {active && (
+                    <span className="absolute top-0 w-6 h-[2.5px] rounded-full bg-ink animate-fade-in" />
+                  )}
                   <Icon />
                   <span
-                    className={`text-[11px] sm:text-xs leading-none ${active ? "text-ink font-semibold" : "text-muted"}`}
+                    className={`text-[11px] leading-none tracking-tight ${
+                      active ? "text-ink font-bold" : "text-muted font-medium"
+                    }`}
                   >
                     {t(tab.key)}
                   </span>
-                  {active && (
-                    <span className="absolute -top-1 inset-x-3 sm:inset-x-4 h-px bg-ink" />
-                  )}
                 </div>
               );
 
@@ -248,7 +260,7 @@ export function MobileBottomNav() {
                   <button
                     key={tab.id}
                     onClick={toggleTopics}
-                    className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
+                    className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                     aria-label="Browse topics"
                     aria-expanded={topicsOpen}
                     aria-controls="mobile-topics-sheet"
@@ -266,7 +278,7 @@ export function MobileBottomNav() {
                       window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
                     }}
                     aria-label="Open search"
-                    className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
+                    className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                   >
                     {inner}
                   </button>
@@ -279,7 +291,7 @@ export function MobileBottomNav() {
                   prefetch={true}
                   onClick={closeTopics}
                   aria-label={t(tab.key)}
-                  className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
+                  className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                 >
                   {inner}
                 </Link>

@@ -221,10 +221,10 @@ export function Navbar() {
                     href={link.href}
                     prefetch={true}
                     aria-current={active ? "page" : undefined}
-                    className={`relative inline-flex items-center px-3.5 py-2 text-xs font-body transition-all rounded-sm ${
+                    className={`relative inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-body font-medium transition-all rounded-lg ${
                       active
-                        ? "text-ink bg-paper-2 border border-rule"
-                        : "text-muted hover:text-ink border border-transparent hover:border-rule"
+                        ? "text-ink bg-paper-2 font-bold shadow-sm border border-rule"
+                        : "text-muted hover:text-ink hover:bg-paper-2/60 border border-transparent"
                     }`}
                   >
                     {link.labelKey === "nav.saved" && <BookmarkIcon />}
@@ -234,7 +234,7 @@ export function Navbar() {
               })}
             </nav>
 
-            <div className="flex items-center gap-0.5 sm:gap-1 lg:gap-2">
+            <div className="flex items-center gap-0.5 sm:gap-1.5 lg:gap-2.5">
               <div className="hidden sm:inline">
                 <LastRefreshed />
               </div>
@@ -246,9 +246,13 @@ export function Navbar() {
                 onClick={openSearch}
                 aria-label="Search articles (press /)"
                 title="Search"
-                className="text-muted hover:text-ink transition-colors p-2 sm:p-1.5 min-touch"
+                className="inline-flex items-center gap-2 text-muted hover:text-ink transition-all p-2 sm:px-2.5 sm:py-1.5 sm:border sm:border-rule sm:bg-paper-2/50 sm:hover:bg-paper-2 rounded-lg min-touch"
               >
                 <SearchIcon />
+                <span className="hidden sm:inline text-xs font-body">Search</span>
+                <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-mono border border-rule rounded bg-paper">
+                  /
+                </kbd>
               </button>
 
               <div className="hidden lg:block">
