@@ -52,7 +52,10 @@
     "node_modules",
     "build",
     "dist",
-    ".next"
+    ".next",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "vitest.setup.ts"
   ]
 }
 

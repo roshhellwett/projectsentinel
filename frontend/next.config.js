@@ -1,26 +1,10 @@
 /** @type {import('next').NextConfig} */
 
-/**
- * Derive the Supabase storage host from env so we aren't pinned to a single
- * project. Falls back to the previous hardcoded host so existing deploys
- * continue to work if NEXT_PUBLIC_SUPABASE_URL is not set at build time.
- */
-let supabaseHost = '';
-try {
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    supabaseHost = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname;
-  }
-} catch {
-  // leave empty — will be validated at request time
-}
+const { withSentryConfig } = require('@sentry/nextjs');
 
-const supabaseConnectSources = supabaseHost
-  ? [`https://${supabaseHost}`, 'https://*.supabase.co', 'wss://*.supabase.co']
-  : ['https://*.supabase.co', 'wss://*.supabase.co'];
-
-const supabaseImageSources = supabaseHost
-  ? [`https://${supabaseHost}`, 'https://*.supabase.co']
-  : ['https://*.supabase.co'];
+const withBundleAnalyzer = process.env.ANALYZE === 'true'
+  ? require('@next/bundle-analyzer')()
+  : (config) => config;
 
 const nextConfig = {
   // ─────────────────────────────────────────────────────────────────────
@@ -28,10 +12,10 @@ const nextConfig = {
   // ─────────────────────────────────────────────────────────────────────
   images: {
     remotePatterns: [
-      ...(supabaseHost ? [{
+      {
         protocol: 'https',
-        hostname: supabaseHost,
-      }] : []),
+        hostname: '*.supabase.co',
+      },
       {
         protocol: 'https',
         hostname: 'www.google.com',
@@ -49,6 +33,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.youtube.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.shields.io',
+      },
     ],
     // Cache images aggressively
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
@@ -62,6 +50,7 @@ const nextConfig = {
   trailingSlash: false,
   poweredByHeader: false,
   compress: true,
+  output: 'standalone',
   reactStrictMode: true,
   httpAgentOptions: {
     keepAlive: true,
@@ -71,26 +60,10 @@ const nextConfig = {
   // Security Headers & Caching
   // ─────────────────────────────────────────────────────────────────────
   async headers() {
-    const csp = [
-      "default-src 'self'",
-      `connect-src 'self' ${supabaseConnectSources.join(' ')} https://www.googletagmanager.com https://*.google-analytics.com`,
-      "script-src 'self' https://www.googletagmanager.com https://*.google-analytics.com 'unsafe-inline' 'unsafe-eval'",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com https://*.perplexity.ai",
-      `img-src 'self' data: blob: ${supabaseImageSources.join(' ')} https://www.google.com https://*.googleusercontent.com https://www.googletagmanager.com https://i.ytimg.com https://*.ytimg.com https://*.youtube.com`,
-      "frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.youtube-nocookie.com",
-          "manifest-src 'self'",
-          "base-uri 'self'",
-          "form-action 'self'",
-          "frame-ancestors 'none'",
-          "worker-src 'self' blob:",
-    ].join('; ');
-
     return [
       {
         source: '/(.*)',
         headers: [
-          // Security headers
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
@@ -98,8 +71,6 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-          { key: 'Content-Security-Policy', value: csp },
-          // Performance hints
           { key: 'Link', value: '<https://www.googletagmanager.com>; rel=preconnect' },
         ],
       },
@@ -206,12 +177,12 @@ const nextConfig = {
   staticPageGenerationTimeout: 120,
 };
 
-module.exports = nextConfig;
+const sentryOptions = {
+  widenClientFileUpload: true,
+  hideSourceMaps: process.env.NODE_ENV === 'production',
+  tunnelRoute: '/monitoring',
+  telemetry: false,
+};
 
-// ═══════════════════════════════════════════════════════════════════
-// CSP note:
-//   Adding a strict CSP to a SPA that loads GTM is non-trivial.
-//   For now we rely on X-XSS-Protection + X-Content-Type-Options.
-//   A full strict CSP (nonce/hash-based) requires GTM to also be
-//   configured for nonce injection — tracked as a future improvement.
-// ═══════════════════════════════════════════════════════════════════
+module.exports = withSentryConfig(withBundleAnalyzer(nextConfig), sentryOptions);
+

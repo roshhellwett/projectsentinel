@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Source_Serif_4, Caveat, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+import { headers } from "next/headers";
 
 import "./globals.css";
 import dynamic from "next/dynamic";
@@ -122,12 +123,15 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const headersList = await headers();
+  const nonce = headersList.get("x-nonce") || undefined;
+  const locale = headersList.get("x-locale") || "en";
 
   const supabaseOrigin = (() => {
     try {
@@ -139,7 +143,7 @@ export default function RootLayout({
   })();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+      <html lang={locale} suppressHydrationWarning>
       <head>
         {supabaseOrigin && (
           <>
@@ -166,16 +170,18 @@ export default function RootLayout({
 
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: jsonLdToString(websiteJsonLd()) }}
         />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: jsonLdToString(organizationJsonLd()),
           }}
         />
         {gtmId && (
-          <Script id="gtm-script" strategy="afterInteractive">
+          <Script id="gtm-script" strategy="afterInteractive" nonce={nonce}>
             {`
               (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
               new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -185,7 +191,7 @@ export default function RootLayout({
             `}
           </Script>
         )}
-        <Script id="sw-register" strategy="afterInteractive">
+        <Script id="sw-register" strategy="afterInteractive" nonce={nonce}>
           {`if('serviceWorker'in navigator&&'https:'===location.protocol){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});});}`}
         </Script>
       </head>

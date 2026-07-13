@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchPostById, fetchPosts } from "@/lib/supabase/server";
+import { fetchPostById, fetchPostsCursor } from "@/lib/supabase/server";
 import { CategoryTag } from "@/components/news/CategoryTag";
 import { CredibilityBar } from "@/components/news/CredibilityBar";
 import { SourceLinks } from "@/components/news/SourceLinks";
@@ -91,7 +91,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
     notFound();
   }
 
-  const [relatedPosts] = await Promise.all([fetchPosts(1, 4, post.category)]);
+  const [{ posts: relatedPosts }] = await Promise.all([fetchPostsCursor(undefined, 4, post.category)]);
 
   const isCorrected = post.status === "corrected";
   const isRetracted = post.status === "retracted";
@@ -288,10 +288,10 @@ export default async function NewsPage({ params }: NewsPageProps) {
         <div id="related-news" className="mt-8 sm:mt-14 pt-6 sm:pt-10 relative">
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rule to-transparent" />
           <h2 className="section-heading mb-5 sm:mb-7">Related stories</h2>
-          <RelatedStories posts={relatedPosts.posts} currentPostId={post.id} />
+          <RelatedStories posts={relatedPosts} currentPostId={post.id} />
         </div>
       </PageShell>
-      <NextStoryPrompt posts={relatedPosts.posts} currentPostId={post.id} />
+      <NextStoryPrompt posts={relatedPosts} currentPostId={post.id} />
     </div>
   );
 }

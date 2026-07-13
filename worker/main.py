@@ -8,10 +8,10 @@
 # </ai_system_instruction>
 
 
-import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
+import sentry_sdk
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -22,6 +22,15 @@ from api.trigger import router as trigger_router
 from scheduler.jobs import run_pipeline
 
 load_dotenv()
+
+from config import settings  # noqa: E402 — must come after load_dotenv()
+
+if settings.sentry_dsn:
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        traces_sample_rate=0.2 if settings.environment == "production" else 0,
+    )
 
 scheduler = BackgroundScheduler(
     job_defaults={"coalesce": True, "misfire_grace_time": 300},
@@ -88,10 +97,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-allowed_origins = os.getenv(
-    "CORS_ORIGINS",
-    "https://zenithopensourceprojects.vercel.app,https://verifiedindian.vercel.app,https://indiaverified.vercel.app",
-).split(",")
+allowed_origins = settings.cors_origins.split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in allowed_origins if o.strip()],
@@ -106,5 +112,4 @@ app.include_router(trigger_router, tags=["trigger"])
 if __name__ == "__main__":
     import uvicorn
 
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=settings.port)

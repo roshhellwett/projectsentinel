@@ -136,58 +136,7 @@ export const fetchPostsCursor = cache(
   },
 );
 
-/**
- * Legacy offset-based pagination (kept for backward compatibility).
- */
-export const fetchPosts = cache(
-  async (
-    page: number = 1,
-    limit: number = 20,
-    category?: string,
-  ): Promise<{ posts: Post[]; count: number }> => {
-    const cacheKey = `posts_page_${page}_${limit}_${category || "all"}`;
-    const cached = getServerCache<{ posts: Post[]; count: number }>(cacheKey);
-    if (cached) return cached;
 
-    if (!getSupabaseServer()) {
-      return { posts: [], count: 0 };
-    }
-
-    const safePage = Math.max(1, Math.floor(page || 1));
-    const safeLimit = Math.min(50, Math.max(1, Math.floor(limit || 20)));
-    const start = (safePage - 1) * safeLimit;
-    const end = start + safeLimit - 1;
-
-    const result = await withRetry(async () => {
-      let query = getSupabaseServer()!
-        .from("posts")
-        .select(FEED_COLUMNS, { count: "estimated" })
-        .eq("status", "published");
-
-      if (category && category !== "all" && VALID_CATEGORIES.has(category)) {
-        query = query.eq("category", category);
-      }
-
-      query = query
-        .order("published_at", { ascending: false })
-        .range(start, end);
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        if (error.message?.includes("Requested range not satisfiable")) {
-          return { posts: [], count: 0 };
-        }
-        throw new Error(`fetchPosts error: ${error.message}`);
-      }
-
-      return { posts: data as Post[], count: count || 0 };
-    });
-
-    setServerCache(cacheKey, result, 45_000);
-    return result;
-  },
-);
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

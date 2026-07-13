@@ -1,0 +1,283 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "India Verified Worker",
+    "description": "AI-powered news verification and publishing pipeline",
+    "version": "1.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health check",
+        "description": "Returns a simple OK status to confirm the service is running.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Pipeline status",
+        "description": "Returns the last pipeline run time, today's story count, and whether the pipeline is healthy (ran within last 45 minutes).",
+        "operationId": "pipeline_status_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trigger": {
+      "post": {
+        "tags": [
+          "trigger"
+        ],
+        "summary": "Manually trigger the news pipeline",
+        "description": "Triggers a pipeline run with optional mode flags. Requires X-Admin-Token header. Returns immediately \u2014 the pipeline runs in a background thread.",
+        "operationId": "trigger_pipeline_trigger_post",
+        "parameters": [
+          {
+            "name": "X-Admin-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "X-Admin-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TriggerRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing admin token"
+          },
+          "500": {
+            "description": "Admin token not configured on server"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Always 'ok' when the service is running",
+            "default": "ok"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp",
+            "description": "ISO 8601 timestamp of the check"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp"
+        ],
+        "title": "HealthResponse",
+        "description": "Response from the /health endpoint."
+      },
+      "StatusResponse": {
+        "properties": {
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At",
+            "description": "ISO 8601 timestamp of the last pipeline run, or null if none"
+          },
+          "stories_today": {
+            "type": "integer",
+            "title": "Stories Today",
+            "description": "Number of posts published today",
+            "default": 0
+          },
+          "pipeline_healthy": {
+            "type": "boolean",
+            "title": "Pipeline Healthy",
+            "description": "True if the pipeline ran within the last 45 minutes",
+            "default": false
+          },
+          "checked_at": {
+            "type": "string",
+            "title": "Checked At",
+            "description": "ISO 8601 timestamp of this status check"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checked_at"
+        ],
+        "title": "StatusResponse",
+        "description": "Detailed pipeline status including last run time and today's story count."
+      },
+      "TriggerRequest": {
+        "properties": {
+          "supplementary_only": {
+            "type": "boolean",
+            "title": "Supplementary Only",
+            "description": "Only fetch from supplementary sources (GNews, NewsAPI)",
+            "default": false
+          },
+          "archive_only": {
+            "type": "boolean",
+            "title": "Archive Only",
+            "description": "Only run old-post archiving/cleanup",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "TriggerRequest",
+        "description": "Optional parameters for triggering the pipeline."
+      },
+      "TriggerResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "description": "Whether the pipeline was successfully triggered"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable status message"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp",
+            "description": "ISO 8601 timestamp of the trigger attempt"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message",
+          "timestamp"
+        ],
+        "title": "TriggerResponse",
+        "description": "Response from a pipeline trigger request."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

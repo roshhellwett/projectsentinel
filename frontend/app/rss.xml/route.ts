@@ -1,4 +1,4 @@
-import { fetchPosts } from "@/lib/supabase/server";
+import { fetchPostsCursor } from "@/lib/supabase/server";
 import type { Post } from "@/types";
 import { getServerCache, setServerCache } from "@/lib/api/serverCache";
 
@@ -22,7 +22,7 @@ export async function GET() {
     "https://zenithopensourceprojects.vercel.app";
   let posts: Post[] = [];
   try {
-    const result = await fetchPosts(1, 50);
+    const result = await fetchPostsCursor(undefined, 50);
     posts = result.posts ?? [];
   } catch {
     // Supabase unreachable during build — render empty feed
