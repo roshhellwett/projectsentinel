@@ -36,8 +36,8 @@ describe("Breadcrumb", () => {
         ]}
       />,
     );
-    const separators = container.querySelectorAll('[aria-hidden="true"]');
-    expect(separators).toHaveLength(3);
+    const icons = container.querySelectorAll(".lucide-chevron-right");
+    expect(icons).toHaveLength(3);
   });
 
   it("applies className", () => {

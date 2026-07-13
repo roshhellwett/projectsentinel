@@ -1,3 +1,4 @@
+import type { RealtimePostgresInsertPayload } from "@supabase/realtime-js";
 import { createBrowserClient } from "@supabase/ssr";
 import { Post } from "@/types";
 
@@ -131,8 +132,8 @@ class SharedRealtimeManager {
             table: "posts",
             filter: "status=eq.published",
           },
-          (payload) => {
-            const newPost = payload.new as Post;
+          (payload: RealtimePostgresInsertPayload<Post>) => {
+            const newPost = payload.new;
             this.listeners.forEach((cb) => {
               try {
                 cb(newPost);
@@ -150,8 +151,8 @@ class SharedRealtimeManager {
             table: "posts",
             filter: "status=eq.published",
           },
-          (payload) => {
-            const updatedPost = payload.new as Post;
+          (payload: RealtimePostgresInsertPayload<Post>) => {
+            const updatedPost = payload.new;
             this.listeners.forEach((cb) => {
               try {
                 cb(updatedPost);
@@ -161,7 +162,7 @@ class SharedRealtimeManager {
             });
           },
         )
-        .subscribe((status, err) => {
+        .subscribe((status: string, err: unknown) => {
           if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
             console.warn(
               "[realtime] Singleton subscription error:",

@@ -7,7 +7,6 @@ import {
   Shield,
   Database,
   Clock,
-  Github,
   Zap,
   ArrowDown,
 } from "lucide-react";
@@ -248,7 +247,7 @@ export default function HowItWorksPage() {
 
       <div className="np-card glass-card text-center p-5 sm:p-10">
         <div className="w-10 h-10 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-3 sm:mb-5">
-          <Github className="w-5 h-5 sm:w-8 sm:h-8 text-ink" />
+          <GitHubIcon className="w-5 h-5 sm:w-8 sm:h-8 text-ink" />
         </div>
         <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">
           Open source
@@ -263,11 +262,28 @@ export default function HowItWorksPage() {
           rel="noopener noreferrer"
           className="tap-target min-h-[44px] inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-ink hover:bg-ink/90 text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
         >
-          <Github className="w-4 h-4 sm:w-5 sm:h-5" />
+          <GitHubIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           View on GitHub
         </a>
       </div>
     </div>
+  );
+}
+
+function GitHubIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.338c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"
+      />
+    </svg>
   );
 }
 
