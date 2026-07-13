@@ -43,7 +43,7 @@ jobs:
         run: python -c "import json; json.load(open('openapi.json')); print('Valid OpenAPI schema')"
 
       - name: Upload schema artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: openapi-schema
           path: worker/openapi.json
