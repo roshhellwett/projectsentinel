@@ -33,7 +33,7 @@ jobs:
 
       - name: Create Issue if Unhealthy
         if: steps.status.outputs.healthy == 'false'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const status = ${{ toJson(steps.status.outputs.status) }};
