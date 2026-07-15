@@ -8,10 +8,15 @@ on:
   schedule:
     - cron: "0 6 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   lighthouse:
     name: Lighthouse audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     defaults:
       run:

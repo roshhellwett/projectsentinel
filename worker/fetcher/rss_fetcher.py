@@ -221,8 +221,14 @@ class RSSFetcher:
                     article["video_thumbnail"] = thumb[0].get("url")
 
             # Ensure YouTube video URL uses the standard watch format
-            if "youtube.com" in url and "/watch" not in url and "/v/" in url:
-                video_id = url.rstrip("/").split("/")[-1]
+            parsed_url = urlparse(url)
+            hostname = (parsed_url.hostname or "").lower()
+            if (
+                (hostname == "youtube.com" or hostname.endswith(".youtube.com"))
+                and "/watch" not in parsed_url.path
+                and "/v/" in parsed_url.path
+            ):
+                video_id = parsed_url.path.rstrip("/").split("/")[-1]
                 article["url"] = f"https://www.youtube.com/watch?v={video_id}"
 
         return article

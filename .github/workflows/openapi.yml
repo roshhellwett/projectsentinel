@@ -10,10 +10,15 @@ on:
     paths:
       - "worker/**"
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate OpenAPI schema
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     defaults:
       run:

@@ -241,7 +241,7 @@ export async function searchPosts(
   const safeLimit = Math.min(50, Math.max(1, limit));
 
   const ftsTerm = safeQuery
-    .replace(/[\\&|!():*'"<>,.;]/g, " ")
+    .replace(/[^a-zA-Z0-9\u0900-\u0D7F\s]/g, " ")
     .split(/\s+/)
     .filter(Boolean)
     .join(" & ");
@@ -259,6 +259,7 @@ export async function searchPosts(
 
     if (error) {
       const escapedForIlike = safeQuery
+        .replace(/\\/g, "\\\\")
         .replace(/%/g, "\\%")
         .replace(/_/g, "\\_");
       const {

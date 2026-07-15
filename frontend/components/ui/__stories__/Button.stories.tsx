@@ -5,8 +5,8 @@ const meta: Meta<typeof Button> = {
   title: "UI/Button",
   component: Button,
   argTypes: {
-    variant: { control: "select", options: ["primary", "secondary", "outline", "ghost", "danger"] },
-    size: { control: "select", options: ["sm", "md", "lg"] },
+    variant: { control: "select", options: ["default", "secondary", "outline", "ghost", "destructive", "link"] },
+    size: { control: "select", options: ["default", "sm", "lg", "icon"] },
     disabled: { control: "boolean" },
   },
 };
@@ -14,8 +14,8 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-export const Primary: Story = {
-  args: { children: "Click me", variant: "primary" },
+export const Default: Story = {
+  args: { children: "Click me", variant: "default" },
 };
 
 export const Secondary: Story = {
@@ -30,8 +30,8 @@ export const Ghost: Story = {
   args: { children: "Dismiss", variant: "ghost" },
 };
 
-export const Danger: Story = {
-  args: { children: "Delete", variant: "danger" },
+export const Destructive: Story = {
+  args: { children: "Delete", variant: "destructive" },
 };
 
 export const Disabled: Story = {

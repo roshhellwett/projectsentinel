@@ -715,9 +715,9 @@ DA:119,1
 DA:121,1
 DA:122,1
 DA:127,1
-DA:129,0
-DA:130,0
-DA:131,0
+DA:129,1
+DA:130,1
+DA:131,1
 DA:132,0
 DA:133,0
 DA:134,0
@@ -745,7 +745,7 @@ DA:174,1
 DA:175,0
 DA:176,0
 LF:101
-LH:88
+LH:91
 FN:31,33,GNewsFetcher.__init__
 FNDA:1,GNewsFetcher.__init__
 FN:36,42,GNewsFetcher._ensure_pool
@@ -850,9 +850,9 @@ DA:135,1
 DA:137,1
 DA:138,1
 DA:143,1
-DA:145,0
-DA:146,0
-DA:147,0
+DA:145,1
+DA:146,1
+DA:147,1
 DA:148,0
 DA:149,0
 DA:150,0
@@ -880,7 +880,7 @@ DA:190,1
 DA:191,0
 DA:192,0
 LF:113
-LH:97
+LH:100
 FN:35,37,NewsAPIFetcher.__init__
 FNDA:1,NewsAPIFetcher.__init__
 FN:40,46,NewsAPIFetcher._ensure_pool
@@ -1545,7 +1545,7 @@ DA:203,1
 DA:204,1
 DA:205,1
 DA:206,1
-DA:207,0
+DA:207,1
 DA:209,1
 DA:210,1
 DA:211,1
@@ -1561,7 +1561,7 @@ DA:220,0
 DA:222,1
 DA:223,1
 DA:224,1
-DA:225,0
+DA:225,1
 DA:227,0
 DA:229,1
 DA:230,1
@@ -1736,7 +1736,7 @@ DA:494,1
 DA:495,1
 DA:496,1
 LF:318
-LH:224
+LH:226
 FN:43,83,_budgeted_groups_per_run
 FNDA:0,_budgeted_groups_per_run
 FN:86,98,_record_run_start
