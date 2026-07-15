@@ -27,7 +27,7 @@ describe("Button", () => {
     expect(screen.getByRole("button")).toHaveClass("text-ink");
 
     rerender(<Button variant="outline">Cancel</Button>);
-    expect(screen.getByRole("button")).toHaveClass("border-rule");
+    expect(screen.getByRole("button")).toHaveClass("border-ink");
 
     rerender(<Button variant="ghost">Ghost</Button>);
     expect(screen.getByRole("button")).toHaveClass("text-ink-soft");

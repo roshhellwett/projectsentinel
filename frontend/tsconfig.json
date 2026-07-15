@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["vitest/globals"],
     "lib": [
       "dom",
       "dom.iterable",
@@ -53,9 +54,6 @@
     "node_modules",
     "build",
     "dist",
-    ".next",
-    "**/*.test.*",
-    "**/*.spec.*",
-    "vitest.setup.ts"
+    ".next"
   ]
 }
