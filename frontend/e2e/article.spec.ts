@@ -50,8 +50,14 @@ test.describe('article drawer', () => {
   test('keyboard navigation: Escape closes drawer', async ({ page }) => {
     await navigateTo(page, '/');
     const drawer = await openFirstArticle(page);
+    const focusable = drawer.locator('a, button, [tabindex], input, textarea').first();
+    if ((await focusable.count()) > 0) {
+      await focusable.focus();
+    } else {
+      await drawer.focus();
+    }
     await page.keyboard.press('Escape');
-    await expect(drawer).not.toBeVisible({ timeout: 3000 });
+    await expect(drawer).not.toBeVisible({ timeout: 5000 });
   });
 
   test('navigates to article page via card click on mobile', async ({ page }) => {

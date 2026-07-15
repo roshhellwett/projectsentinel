@@ -143,6 +143,15 @@ export function NewsDrawer({
     }
   }, []);
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onCloseRef.current();
+      return;
+    }
+    handleTabKey(e);
+  }, [handleTabKey]);
+
   const handleDragStart = useCallback(
     (e: React.PointerEvent) => {
       if (!canDrag) return;
@@ -205,7 +214,7 @@ export function NewsDrawer({
           aria-modal="true"
           aria-label={`Article: ${displayPost.headline}`}
           tabIndex={-1}
-          onKeyDown={handleTabKey}
+          onKeyDown={handleKeyDown}
           className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper/80 backdrop-blur-xl border-l border-rule/50 lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(500px,42vw)] 2xl:w-[min(540px,32vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-all duration-300 ease-out ${show ? "opacity-100 translate-y-0 lg:translate-x-0" : "opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full"}`}
           style={{
             paddingTop: "env(safe-area-inset-top, 0px)",
