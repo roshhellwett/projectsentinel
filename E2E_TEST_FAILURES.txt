@@ -1,198 +1,283 @@
-================================================================================
-                    E2E TEST FAILURES - ROOT CAUSE ANALYSIS
-================================================================================
-
-JOB: E2E (Playwright) Tests
-BRANCH: c150f1bf59619b0d382118249ae15d2eb5977a8f
-FAILURES: 42 failed, 30 passed
-
-================================================================================
-                              PRIMARY ISSUES
-================================================================================
-
-ISSUE #1: MISSING SERVER
-───────────────────────
-DESCRIPTION:
-The CI/CD workflow builds the Next.js application but never starts a development
-or production server before running Playwright tests. This causes the BASE_URL
-(http://localhost:3000) to be unreachable, resulting in timeouts and missing
-DOM elements.
-
-AFFECTED TESTS:
-- All 42 failing tests in article.spec.ts and navigation.spec.ts
-- Tests timeout waiting for elements that never render because the app isn't running
-
-ERROR MESSAGES:
-- "element(s) not found" timeouts
-- Playwright cannot find [role="article"][aria-label^="Read article"]
-- Cannot find h1, nav, and other page elements
-
-HOW TO FIX:
-1. In .github/workflows/ci.yml, add these steps AFTER the "Build" step:
-
-   - name: Start server
-     run: npm run start &
-     env:
-       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
-   - name: Wait for server
-     run: npx wait-on http://localhost:3000 --timeout 30000
-
-2. Verify your package.json has a "start" script (for production build):
-   "start": "next start"
-
-================================================================================
-
-ISSUE #2: PLAYWRIGHT STRICT MODE VIOLATIONS - MULTIPLE ELEMENT MATCHES
-────────────────────────────────────────────────────────────────────────
-DESCRIPTION:
-Playwright strict mode requires locators to match exactly ONE element. Generic
-selectors like 'h1' or 'nav[aria-label="Breadcrumb"]' match MULTIPLE elements
-on the page, causing strict mode to fail.
-
-AFFECTED TESTS:
-- navigation.spec.ts line 7: locator('h1') → resolved to 2 elements
-- navigation.spec.ts line 19: nav[aria-label="Breadcrumb"] → resolved to 2 elements
-- navigation.spec.ts line 34: locator('h1') → resolved to 2 elements
-- navigation.spec.ts line 39: locator('h1') → resolved to 2 elements
-- navigation.spec.ts line 44: locator('h1') → resolved to 2 elements
-- navigation.spec.ts line 45: locator('h1') → resolved to 2 elements
-- navigation.spec.ts line 46: locator('h1') → resolved to 2 elements
-- navigation.spec.ts line 50: locator('h1') → resolved to 2 elements
-
-ERROR MESSAGE EXAMPLE:
-Error: expect(locator).toBeVisible() failed
-Locator: locator('h1')
-Expected: visible
-Error: strict mode violation: locator('h1') resolved to 2 elements:
-  1) <h1 class="...">Satyamev Jayate</h1>
-  2) <h1 class="...">Satyamev Jayate</h1>
-
-HOW TO FIX:
-Replace all generic h1 selectors with role-based selectors that specify which h1.
-
-IN frontend/e2e/navigation.spec.ts:
-
-Line 7: Replace:
-  await expect(page.locator('h1')).toBeVisible();
-With:
-  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
-
-Line 14: Replace:
-  await expect(page.locator('h1')).toContainText('Tech');
-With:
-  await expect(page.getByRole('heading', { level: 1 }).first()).toContainText('Tech');
-
-Line 19: Replace:
-  await expect(page.locator('nav[aria-label="Breadcrumb"]')).toBeVisible();
-With:
-  await expect(page.getByRole('navigation', { name: 'Breadcrumb' }).first()).toBeVisible();
-
-Lines 29, 34, 39, 44, 45, 46, 50: Replace all:
-  await expect(page.locator('h1')).toBeVisible();
-With:
-  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
-
-================================================================================
-
-ISSUE #3: MISSING ARTICLE ELEMENTS - CONTENT NOT LOADING
-──────────────────────────────────────────────────────────
-DESCRIPTION:
-The test expects to find article cards with [role="article"][aria-label^="Read article"]
-but these elements are not rendering. This is a consequence of Issue #1 (no server running),
-but also indicates potential problems with data loading or dynamic content rendering.
-
-AFFECTED TESTS:
-- article.spec.ts line 61 (mobile test)
-- navigation.spec.ts line 24 (category page feed grid test)
-
-ERROR MESSAGE:
-Error: expect(locator).toBeVisible() failed
-Locator: locator('[role="article"][aria-label^="Read article"]').first()
-Expected: visible
-Timeout: 10000ms
-Error: element(s) not found
-
-HOW TO FIX:
-1. First, ensure Issue #1 is fixed (server is running)
-2. Add explicit wait for network idle before checking for articles:
-
-In frontend/e2e/article.spec.ts line 60-62, replace:
-  const card = page.locator('[role="article"][aria-label^="Read article"]').first();
-  await expect(card).toBeVisible({ timeout: 10000 });
-With:
-  await page.waitForLoadState('networkidle');
-  const card = page.locator('[role="article"][aria-label^="Read article"]').first();
-  await expect(card).toBeVisible({ timeout: 10000 });
-
-3. In frontend/e2e/navigation.spec.ts line 24, update:
-  await expect(page.locator('[role="article"][aria-label^="Read article"]').first()).toBeAttached({ timeout: 10000 });
-With:
-  await page.waitForLoadState('networkidle');
-  await expect(page.locator('[role="article"][aria-label^="Read article"]').first()).toBeVisible({ timeout: 10000 });
-
-================================================================================
-
-ISSUE #4: MISSING DATA/MOCK SERVER
-──────────────────────────────────
-DESCRIPTION:
-The E2E tests rely on Supabase credentials (NEXT_PUBLIC_SUPABASE_URL, etc.) to
-fetch real data. If these secrets aren't configured or the backend is unavailable,
-the page won't render any content.
-
-AFFECTED TESTS:
-- All tests that expect dynamic content (articles, categories, etc.)
-
-HOW TO FIX:
-1. Ensure GitHub secrets are properly configured:
-   - NEXT_PUBLIC_SUPABASE_URL
-   - NEXT_PUBLIC_SUPABASE_ANON_KEY
-   - SUPABASE_SERVICE_ROLE_KEY
-
-2. Check that these values are being passed to the build step (they are in ci.yml)
-
-3. Consider adding mock data or a test database for E2E tests:
-   - Use environment variable to switch to test/mock mode
-   - Example: NEXT_ENV=test npm run build
-
-================================================================================
-                          COMPLETE SOLUTION CHECKLIST
-================================================================================
-
-STEP 1: Fix CI/CD Workflow
-[ ] Update .github/workflows/ci.yml
-    [ ] Add "Start server" step after Build step
-    [ ] Add "Wait for server" step to ensure it's ready
-    [ ] Pass environment variables to server startup
-
-STEP 2: Fix Playwright Strict Mode Violations
-[ ] Update frontend/e2e/navigation.spec.ts
-    [ ] Replace all page.locator('h1') with page.getByRole('heading', { level: 1 }).first()
-    [ ] Replace page.locator('nav[aria-label="Breadcrumb"]') with page.getByRole('navigation', { name: 'Breadcrumb' }).first()
-
-STEP 3: Fix Missing Elements
-[ ] Update frontend/e2e/article.spec.ts
-    [ ] Add page.waitForLoadState('networkidle') before checking for articles
-    [ ] Ensure timeouts are sufficient (10000ms is reasonable)
-
-STEP 4: Verify Configuration
-[ ] Check GitHub Secrets are set
-[ ] Verify package.json has "start" and "build" scripts
-[ ] Test locally: npm run build && npm run start
-
-================================================================================
-                            TEST EXPECTATIONS
-================================================================================
-
-After applying these fixes:
-- All 42 failing tests should pass
-- Tests will properly wait for the server to start
-- DOM elements will be found with unique, non-strict-mode-violating selectors
-- Article content will load from Supabase
-- Mobile and desktop variants will all pass
-
-Current Status: 42 failed, 30 passed
-Expected Status: 72 passed, 0 failed
-
-================================================================================
+1| ================================================================================
+2|                     E2E TEST FAILURES - ROOT CAUSE ANALYSIS
+3| ================================================================================
+4| 
+5| JOB: E2E (Playwright) Tests
+6| BRANCH: c150f1bf59619b0d382118249ae15d2eb5977a8f
+7| FAILURES: 42 failed, 30 passed
+8| 
+9| ================================================================================
+10|                               PRIMARY ISSUES
+11| ================================================================================
+12| 
+13| ISSUE #1: MISSING SERVER
+14| ───────────────────────
+15| DESCRIPTION:
+16| The CI/CD workflow builds the Next.js application but never starts a development
+17| or production server before running Playwright tests. This causes the BASE_URL
+18| (http://localhost:3000) to be unreachable, resulting in timeouts and missing
+19| DOM elements.
+20| 
+21| AFFECTED TESTS:
+22| - All 42 failing tests in article.spec.ts and navigation.spec.ts
+23| - Tests timeout waiting for elements that never render because the app isn't running
+24| 
+25| ERROR MESSAGES:
+26| - "element(s) not found" timeouts
+27| - Playwright cannot find [role="article"][aria-label^="Read article"]
+28| - Cannot find h1, nav, and other page elements
+29| 
+30| HOW TO FIX:
+31| 1. In .github/workflows/ci.yml, add these steps AFTER the "Build" step:
+32| 
+33|    - name: Start server
+34|      run: npm run start &
+35|      env:
+36|        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+37|        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+38| 
+39|    - name: Wait for server
+40|      run: npx wait-on http://localhost:3000 --timeout 30000
+41| 
+42| 2. Verify your package.json has a "start" script (for production build):
+43|    "start": "next start"
+44| 
+45| ================================================================================
+46| 
+47| ISSUE #2: PLAYWRIGHT STRICT MODE VIOLATIONS - MULTIPLE ELEMENT MATCHES
+48| ─────────────────────────────────────────────────────────────────
+49| DESCRIPTION:
+50| Playwright strict mode requires locators to match exactly ONE element. Generic
+51| selectors like 'h1' or 'nav[aria-label="Breadcrumb"]' match MULTIPLE elements
+52| on the page, causing strict mode to fail.
+53| 
+54| AFFECTED TESTS:
+55| - navigation.spec.ts line 7: locator('h1') → resolved to 2 elements
+56| - navigation.spec.ts line 19: nav[aria-label="Breadcrumb"] → resolved to 2 elements
+57| - navigation.spec.ts line 34: locator('h1') → resolved to 2 elements
+58| - navigation.spec.ts line 39: locator('h1') → resolved to 2 elements
+59| - navigation.spec.ts line 44: locator('h1') → resolved to 2 elements
+60| - navigation.spec.ts line 45: locator('h1') → resolved to 2 elements
+61| - navigation.spec.ts line 46: locator('h1') → resolved to 2 elements
+62| - navigation.spec.ts line 50: locator('h1') → resolved to 2 elements
+63| 
+64| ERROR MESSAGE EXAMPLE:
+65| Error: expect(locator).toBeVisible() failed
+66| Locator: locator('h1')
+67| Expected: visible
+68| Error: strict mode violation: locator('h1') resolved to 2 elements:
+69|   1) <h1 class="...">Satyamev Jayate</h1>
+70|   2) <h1 class="...">Satyamev Jayate</h1>
+71| 
+72| HOW TO FIX:
+73| Replace all generic h1 selectors with role-based selectors that specify which h1.
+74| 
+75| IN frontend/e2e/navigation.spec.ts:
+76| 
+77| Line 7: Replace:
+78|   await expect(page.locator('h1')).toBeVisible();
+79| With:
+80|   await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+81| 
+82| Line 14: Replace:
+83|   await expect(page.locator('h1')).toContainText('Tech');
+84| With:
+85|   await expect(page.getByRole('heading', { level: 1 }).first()).toContainText('Tech');
+86| 
+87| Line 19: Replace:
+88|   await expect(page.locator('nav[aria-label="Breadcrumb"]')).toBeVisible();
+89| With:
+90|   await expect(page.getByRole('navigation', { name: 'Breadcrumb' }).first()).toBeVisible();
+91| 
+92| Lines 29, 34, 39, 44, 45, 46, 50: Replace all:
+93|   await expect(page.locator('h1')).toBeVisible();
+94| With:
+95|   await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+96| 
+97| ================================================================================
+98| 
+99| ISSUE #3: MISSING ARTICLE ELEMENTS - CONTENT NOT LOADING
+100| ──────────────────────────────────────────────────────────
+101| DESCRIPTION:
+102| The test expects to find article cards with [role="article"][aria-label^="Read article"]
+103| but these elements are not rendering. This is a consequence of Issue #1 (no server running),
+104| but also indicates potential problems with data loading or dynamic content rendering.
+105| 
+106| AFFECTED TESTS:
+107| - article.spec.ts line 61 (mobile test)
+108| - navigation.spec.ts line 24 (category page feed grid test)
+109| 
+110| ERROR MESSAGE:
+111| Error: expect(locator).toBeVisible() failed
+112| Locator: locator('[role="article"][aria-label^="Read article"]').first()
+113| Expected: visible
+114| Timeout: 10000ms
+115| Error: element(s) not found
+116| 
+117| HOW TO FIX:
+118| 1. First, ensure Issue #1 is fixed (server is running)
+119| 2. Add explicit wait for network idle before checking for articles:
+120| 
+121| In frontend/e2e/article.spec.ts line 60-62, replace:
+122|   const card = page.locator('[role="article"][aria-label^="Read article"]').first();
+123|   await expect(card).toBeVisible({ timeout: 10000 });
+124| With:
+125|   await page.waitForLoadState('networkidle');
+126|   const card = page.locator('[role="article"][aria-label^="Read article"]').first();
+127|   await expect(card).toBeVisible({ timeout: 10000 });
+128| 
+129| 3. In frontend/e2e/navigation.spec.ts line 24, update:
+130|   await expect(page.locator('[role="article"][aria-label^="Read article"]').first()).toBeAttached({ timeout: 10000 });
+131| With:
+132|   await page.waitForLoadState('networkidle');
+133|   await expect(page.locator('[role="article"][aria-label^="Read article"]').first()).toBeVisible({ timeout: 10000 });
+134| 
+135| ================================================================================
+136| 
+137| ISSUE #4: MISSING DATA/MOCK SERVER
+138| ──────────────────────────────────
+139| DESCRIPTION:
+140| The E2E tests rely on Supabase credentials (NEXT_PUBLIC_SUPABASE_URL, etc.) to
+141| fetch real data. If these secrets aren't configured or the backend is unavailable,
+142| the page won't render any content.
+143| 
+144| AFFECTED TESTS:
+145| - All tests that expect dynamic content (articles, categories, etc.)
+146| 
+147| HOW TO FIX:
+148| 1. Ensure GitHub secrets are properly configured:
+149|    - NEXT_PUBLIC_SUPABASE_URL
+150|    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+151|    - SUPABASE_SERVICE_ROLE_KEY
+152| 
+153| 2. Check that these values are being passed to the build step (they are in ci.yml)
+154| 
+155| 3. Consider adding mock data or a test database for E2E tests:
+156|    - Use environment variable to switch to test/mock mode
+157|    - Example: NEXT_ENV=test npm run build
+158| 
+159| ================================================================================
+160|                           COMPLETE SOLUTION CHECKLIST
+161| ================================================================================
+162| 
+163| STEP 1: Fix CI/CD Workflow
+164| [ ] Update .github/workflows/ci.yml
+165|     [ ] Add "Start server" step after Build step
+166|     [ ] Add "Wait for server" step to ensure it's ready
+167|     [ ] Pass environment variables to server startup
+168| 
+169| STEP 2: Fix Playwright Strict Mode Violations
+170| [ ] Update frontend/e2e/navigation.spec.ts
+171|     [ ] Replace all page.locator('h1') with page.getByRole('heading', { level: 1 }).first()
+172|     [ ] Replace page.locator('nav[aria-label="Breadcrumb"]') with page.getByRole('navigation', { name: 'Breadcrumb' }).first()
+173| 
+174| STEP 3: Fix Missing Elements
+175| [ ] Update frontend/e2e/article.spec.ts
+176|     [ ] Add page.waitForLoadState('networkidle') before checking for articles
+177|     [ ] Ensure timeouts are sufficient (10000ms is reasonable)
+178| 
+179| STEP 4: Verify Configuration
+180| [ ] Check GitHub Secrets are set
+181| [ ] Verify package.json has "start" and "build" scripts
+182| [ ] Test locally: npm run build && npm run start
+183| 
+184| ================================================================================
+185|                             TEST EXPECTATIONS
+186| ================================================================================
+187| 
+188| After applying these fixes:
+189| - All 42 failing tests should pass
+190| - Tests will properly wait for the server to start
+191| - DOM elements will be found with unique, non-strict-mode-violating selectors
+192| - Article content will load from Supabase
+193| - Mobile and desktop variants will all pass
+194| 
+195| Current Status: 42 failed, 30 passed
+196| Expected Status: 72 passed, 0 failed
+197| 
+198| ================================================================================
+199| 
+200| ================================================================================
+201| ADDITIONAL FAILURES — run: 87284751022 (2026-07-15)
+202| ─────────────────────────────────────────────────────────────────
+203| SUMMARY FROM JOB LOGS:
+204| - 22 failing tests were recorded in the Playwright job 87284751022.
+205| - Primary new failure classes: Axe accessibility violations (critical/serious) across multiple pages, and one failing/flaky UI test: article drawer Escape behaviour.
+206| 
+207| FAILING TESTS (explicitly observed in the job logs):
+208| - [mobile] accessibility: terms — "terms should have no critical or serious violations"
+209| - [mobile] accessibility: corrections — "corrections should have no critical or serious violations"
+210| - [mobile] accessibility: contact — "contact should have no critical or serious violations"
+211| - [mobile] accessibility: saved — "saved should have no critical or serious violations" (1 flaky)
+212| - [desktop] accessibility: homepage — "homepage should have no critical or serious violations"
+213| - [desktop] accessibility: category tech — "category tech should have no critical or serious violations"
+214| - [mobile] article drawer: keyboard navigation — "Escape closes drawer" (failed/flaky)
+215| 
+216| WHY THESE FAILURES HAPPEN:
+217| - The Axe assertions expect zero critical/serious violations but Axe reported one or more; the test previously did not print the violations which made triage difficult.
+218| - The article drawer test likely fails due to focus/timing issues or missing Escape handler in the app.
+219| 
+220| SUGGESTED IMMEDIATE TEST UPDATES (make triage easier)
+221| 1) Instrument accessibility test to print violations:
+222|   Replace the analyze/assert block in frontend/e2e/a11y.spec.ts with:
+223|
+224|   const results = await new AxeBuilder({ page })
+225|     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+226|     .analyze();
+227|   const violations = results.violations.filter(
+228|     (v) => v.impact === "critical" || v.impact === "serious"
+229|   );
+230|   if (violations.length > 0) {
+231|     console.error('Axe found critical/serious violations:\n', JSON.stringify(violations, null, 2));
+232|   }
+233|   expect(violations).toHaveLength(0);
+234|
+235| 2) Add a short settle delay after networkidle (e.g., await page.waitForTimeout(250)) to allow client-side render to finish before Axe runs.
+236|
+237| 3) Make article drawer test more robust (frontend/e2e/article.spec.ts):
+238|   - Ensure dialog is visible and focus is inside it before pressing Escape.
+239|   - Focus a focusable element inside the dialog or the dialog itself.
+240|   - Press Escape and wait for dialog to not be visible with a timeout.
+241|
+242| Example code snippet for the drawer test:
+243|
+244|   const dialog = page.getByRole('dialog', { name: /^Article:/ }).first();
+245|   await expect(dialog).toBeVisible({ timeout: 5000 });
+246|   const focusable = dialog.locator('a, button, [tabindex], input, textarea').first();
+247|   if ((await focusable.count()) > 0) {
+248|     await focusable.focus();
+249|   } else {
+250|     await dialog.focus();
+251|   }
+252|   await page.keyboard.press('Escape');
+|   await expect(dialog).not.toBeVisible({ timeout: 5000 });
+253| 
+254| REMEDIATION GUIDANCE (how to fix app-level issues):
+255| - For each Axe violation, consult the generated JSON (rule ID, nodes, selectors) and apply targeted fixes:
+256|   - Add missing alt text to images
+257|   - Fix color contrast in CSS
+258|   - Add aria-labels/roles where interactive elements are missing accessible names
+259|   - Ensure form inputs have associated <label> or aria-label
+260| - For dialog Escape behaviour:
+261|   - Implement/verify Escape key handler to close the drawer
+262|   - Ensure focus trap on open and restore focus on close
+263|   - If multiple overlays exist, ensure only the top-level overlay handles Escape
+264| 
+265| DIAGNOSTIC ACTIONS:
+266| - Re-run CI after adding logging to a11y.spec.ts; download error-context.md and trace.zip artifacts for the failing tests to get exact rule IDs and DOM nodes.
+| - Run the failing tests locally with Playwright in the matching project (mobile/desktop) to reproduce quickly:
+267|   npx playwright test frontend/e2e/a11y.spec.ts --project=mobile --grep "terms"
+268| 
+269| TEMPORARY MITIGATIONS (not recommended long-term):
+270| - Limit Axe checks to only 'critical' impacts while remediating 'serious' issues.
+271| - Add retries in Playwright config for flaky tests temporarily.
+272| - Mark known failing tests as test.skip with TODO comments while fixing the app.
+273|
+274| NEXT STEPS RECOMMENDED:
+275| [ ] Update frontend/e2e/a11y.spec.ts to log violations and add a brief render-settle delay
+276| [ ] Update frontend/e2e/article.spec.ts to ensure focus before Escape and robust waiting
+277| [ ] Re-run CI to capture Axe JSON in artifacts and triage each rule
+278| [ ] Apply app fixes for each reported Axe rule and for drawer Escape handling
+279| [ ] Remove any temporary test relaxations
+280| 
+281| Recorded: 2026-07-15 by GitHub Copilot (roshhellwett)
