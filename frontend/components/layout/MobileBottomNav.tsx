@@ -230,7 +230,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? "none" : "auto" }}
       >
         <div
-          className="relative border-t border-rule/60 glass shadow-[0_-4px_24px_rgb(var(--c-ink)/0.04)] select-none touch-manipulation transition-all duration-300"
+          className="relative border-t-2 border-ink bg-paper/60 backdrop-blur-2xl select-none touch-manipulation transition-all duration-300"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">

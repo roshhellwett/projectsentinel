@@ -145,23 +145,17 @@ const NewsCardComponent = ({
       aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}${typeof rank === "number" ? ` (Rank #${rank})` : ""}`}
       data-read={isRead ? "true" : "false"}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation p-4 sm:p-6 flex flex-col h-full rounded-2xl border border-ink bg-paper shadow-[4px_4px_0px_rgb(var(--c-ink))] transition-all duration-300 transform-gpu",
-        "hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_rgb(var(--c-ink))]",
+        "group relative cursor-pointer select-none touch-manipulation p-4 sm:p-6 flex flex-col h-full bg-paper transform-gpu transition-all duration-300 ease-out",
+        "rounded-[20px] sm:rounded-[24px] border-2 border-ink",
+        "shadow-[4px_4px_0px_rgb(var(--c-ink))]",
+        "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",
+        "active:translate-y-0.5 active:translate-x-0.5 active:shadow-[2px_2px_0px_rgb(var(--c-ink))]",
         "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none",
-        isNew && "border-l-[4px] border-l-ink",
+        isNew && "border-l-[6px] border-l-ink",
         isRead && "opacity-65 hover:opacity-100",
       )}
     >
-      <span className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
-        <span
-          className="absolute top-[-2px] right-[-12px] h-5 w-12 bg-amber-500/20 rotate-45"
-          style={{
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            backgroundColor: "rgba(217, 119, 6, 0.2)",
-          }}
-        />
-      </span>
+
 
       <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3 min-h-[18px] sm:min-h-[20px]">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">

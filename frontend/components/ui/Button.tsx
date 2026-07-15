@@ -4,16 +4,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap text-sm font-body ring-offset-paper transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap text-sm font-bold font-body ring-offset-paper rounded-lg transition-all transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-0 active:translate-x-0 active:shadow-none",
   {
     variants: {
       variant: {
-        default: "border border-ink bg-ink text-paper hover:bg-ink/90",
-        destructive: "border border-ink text-ink hover:bg-ink hover:text-paper",
+        default: "border-2 border-ink bg-ink text-paper shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:bg-ink/90",
+        destructive: "border-2 border-ink text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:bg-ink hover:text-paper",
         outline:
-          "border border-rule bg-paper text-ink-soft hover:text-ink hover:border-ink",
-        secondary: "border border-rule text-ink-soft hover:text-ink",
-        ghost: "text-ink-soft hover:text-ink",
+          "border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:bg-paper-2",
+        secondary: "border-2 border-ink text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))]",
+        ghost: "text-ink-soft hover:text-ink hover:bg-ink/5",
         link: "text-ink underline underline-offset-4",
       },
       size: {

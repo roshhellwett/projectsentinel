@@ -128,7 +128,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("left")}
               disabled={!canScrollLeft}
-              className="p-2 border border-rule/80 bg-paper-2 text-ink hover:bg-paper hover:border-ink disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 rounded-lg min-touch active:scale-95 shadow-2xs"
+              className="p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 transform-gpu rounded-lg min-touch"
               aria-label={t("trending.aria_scroll_left")}
             >
               <ArrowLeft />
@@ -136,7 +136,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("right")}
               disabled={!canScrollRight}
-              className="p-2 border border-rule/80 bg-paper-2 text-ink hover:bg-paper hover:border-ink disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 rounded-lg min-touch active:scale-95 shadow-2xs"
+              className="p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 transform-gpu rounded-lg min-touch"
               aria-label={t("trending.aria_scroll_right")}
             >
               <ArrowRight />
@@ -148,7 +148,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       <ErrorBoundary>
         <div
           ref={carouselRef}
-          className="flex gap-4 sm:gap-5 overflow-x-auto pb-6 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
+          className="flex gap-4 sm:gap-5 overflow-x-auto pb-6 pt-4 -mt-4 pl-4 -ml-4 pr-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {trending.map((post, index) => {

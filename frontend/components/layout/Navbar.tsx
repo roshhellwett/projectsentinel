@@ -182,7 +182,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} glass border-b border-rule/60 shadow-[0_4px_24px_rgb(var(--c-ink)/0.03)] transform-gpu select-none transition-all duration-300`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/60 backdrop-blur-2xl border-b-2 border-ink shadow-[0_4px_0_rgb(var(--c-ink)/0.05)] transform-gpu select-none transition-all duration-300`}
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 lg:px-10">

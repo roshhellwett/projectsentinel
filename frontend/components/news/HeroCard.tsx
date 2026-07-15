@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Post } from "@/types";
 import { useTimeAgo } from "@/lib/hooks/useTimeAgo";
 import { getHostname } from "@/lib/utils/getHostname";
+import { cn } from "@/lib/utils/cn";
 import { VerificationStamp } from "@/components/ui/VerificationStamp";
 import { BookmarkButton } from "@/components/news/BookmarkButton";
 import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
@@ -68,20 +69,14 @@ export const HeroCard = memo(function HeroCard({
     <div
       role="article"
       aria-label={`Featured article: ${post.headline}`}
-      className="group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-5 sm:p-7 md:p-8 flex flex-col rounded-2xl border border-rule transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-[0_16px_48px_rgb(var(--c-ink)/0.1)] hover:border-ink/40 focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none overflow-hidden"
+      className={cn(
+        "group relative cursor-pointer select-none touch-manipulation p-5 sm:p-7 md:p-8 flex flex-col rounded-[20px] sm:rounded-[24px] border-2 border-ink bg-paper shadow-[4px_4px_0px_rgb(var(--c-ink))] transform-gpu transition-all duration-300 ease-out overflow-hidden",
+        "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",
+        "active:translate-y-0 active:translate-x-0 active:shadow-[2px_2px_0px_rgb(var(--c-ink))]",
+        "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
+      )}
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 320px" }}
     >
-      <span className="absolute top-0 right-0 w-14 h-14 overflow-hidden pointer-events-none">
-        <span
-          className="absolute top-[-2px] right-[-14px] h-6 w-14 bg-amber-500/20 rotate-45"
-          style={{
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            backgroundColor: "rgba(217, 119, 6, 0.2)",
-          }}
-        />
-      </span>
-
       <div className="flex items-start justify-between gap-2 sm:gap-3 mb-3 sm:mb-4 min-h-[20px]">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">
           <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink bg-paper/80 px-2.5 py-0.5 rounded border border-rule/70 shadow-2xs">

@@ -263,7 +263,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("search.placeholder")}
-              className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper-2 text-ink border border-rule focus:border-ink outline-none transition-all font-body placeholder:text-muted text-sm sm:text-base"
+              className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper text-ink border-2 border-ink rounded-lg shadow-[2px_2px_0px_rgb(var(--c-ink))] focus:shadow-[4px_4px_0px_rgb(var(--c-ink))] focus:-translate-y-0.5 focus:-translate-x-0.5 outline-none transition-all transform-gpu font-body placeholder:text-muted text-sm sm:text-base"
               aria-label={t("search.aria_query")}
               aria-controls="search-results"
             />

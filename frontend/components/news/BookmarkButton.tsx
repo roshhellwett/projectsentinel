@@ -59,10 +59,10 @@ export function BookmarkButton({
         aria-label={saved ? t("bookmark.aria_unsave") : t("bookmark.aria_save")}
         className={cn(
           buttonVariants({ variant: saved ? "secondary" : "outline" }),
-          "relative tap-target gap-2 px-4 py-2 rounded-xl font-bold shadow-sm transition-all duration-200 active:scale-95",
+          "relative tap-target gap-2 px-4 py-2 font-bold transition-all duration-200",
           saved
             ? "bg-accent/10 border-accent text-accent hover:bg-accent/15"
-            : "text-muted border-rule hover:border-ink hover:bg-paper-2 hover:text-ink",
+            : "",
           className,
         )}
       >

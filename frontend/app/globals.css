@@ -9,23 +9,23 @@
   --font-hand: 'Caveat', 'Segoe Print', cursive;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  --c-paper:        242 239 233;
-  --c-paper-2:      234 230 222;
-  --c-paper-tint:   248 245 240;
+  --c-paper:        255 255 255;
+  --c-paper-2:      250 250 250;
+  --c-paper-tint:   255 253 248;
 
   --c-ink:          26 26 26;
   --c-ink-soft:     92 92 92;
   --c-muted:        102 98 90;
   --c-subtle:       112 108 100;
 
-  --c-rule:         201 196 184;
+  --c-rule:         220 220 220;
   --c-rule-strong:  180 174 160;
 
   --c-shadow:       0 0 0;
 
   --c-accent:       26 26 26;
   --c-accent-hover: 60 60 60;
-  --c-accent-soft:  242 239 233;
+  --c-accent-soft:  255 255 255;
 
   --c-stamp:        26 26 26;
   --c-gold:         110 100 85;
@@ -65,10 +65,11 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.045;
+  opacity: 0.08;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 400px 400px;
+  filter: sepia(100%) saturate(400%) hue-rotate(5deg);
 }
 
 
@@ -79,6 +80,11 @@ body::before {
   body {
     @apply leading-relaxed antialiased;
     background-color: rgb(var(--c-paper));
+    background-image: 
+      linear-gradient(to right, rgb(var(--c-ink) / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--c-ink) / 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: top left;
     color: rgb(var(--c-ink));
     font-family: var(--font-body);
     font-feature-settings: 'kern', 'liga', 'calt';
@@ -119,6 +125,11 @@ body::before {
     border: 1px solid rgb(var(--c-rule));
     color: rgb(var(--c-ink));
     font-family: var(--font-body);
+  }
+
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
   }
 }
 

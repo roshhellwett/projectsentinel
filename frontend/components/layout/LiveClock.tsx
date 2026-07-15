@@ -87,18 +87,17 @@ export function LiveClock({
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-2 px-3 py-2 border border-rule/50 bg-paper/70 backdrop-blur-sm",
+          "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-rule bg-paper-2/60 shadow-2xs",
           className,
         )}
         role="status"
       >
-        <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">
-          {date}
+        <span className="font-body text-xs tracking-wider text-ink-soft uppercase font-semibold">
+          {date}:
         </span>
-        <span className="w-px h-3 bg-rule" aria-hidden="true" />
         <time
           dateTime={isoLabel}
-          className="font-mono text-sm text-ink tabular-nums"
+          className="text-ink font-mono font-bold text-sm bg-ink/5 px-2 py-0.5 rounded border border-rule/50 flex items-center tabular-nums"
         >
           {time} IST
         </time>
