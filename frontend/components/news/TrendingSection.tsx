@@ -1,52 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { Post } from "@/types";
 import { useReadPosts } from "@/lib/utils/readPosts";
 import { useI18n } from "@/lib/i18n/context";
 
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { VerificationStamp } from "@/components/ui/VerificationStamp";
 import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
-
-function YoutubeIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="2" y="5" width="20" height="14" rx="3" />
-      <path d="M10 9l6 4-6 4z" />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
+import { NewsCard } from "@/components/news/NewsCard";
+import { NewsDrawer } from "@/components/news/NewsDrawer";
 
 function ArrowLeft() {
   return (
@@ -84,14 +46,6 @@ function ArrowRight() {
   );
 }
 
-function RankBadge({ rank }: { rank: number }) {
-  return (
-    <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border-2 border-ink text-ink font-mono font-bold text-xs sm:text-sm bg-paper shadow-[2px_2px_0px_rgb(var(--c-ink))]">
-      {rank < 10 ? `0${rank}` : rank}
-    </span>
-  );
-}
-
 interface TrendingSectionProps {
   posts: Post[];
 }
@@ -110,6 +64,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
 
   const { isRead } = useReadPosts();
   const [hydrated, setHydrated] = useState(false);
+  const [selected, setSelected] = useState<Post | null>(null);
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -203,79 +158,25 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
               <div
                 key={post.id}
-                className="flex-shrink-0 w-[80vw] sm:w-[320px] md:w-[340px] snap-start animate-slide-up"
+                className="flex-shrink-0 w-[85vw] sm:w-[350px] md:w-[370px] snap-start animate-slide-up"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <div
-                  data-read={read ? "true" : "false"}
-                  className={`ink-card glass-card flex flex-col justify-between h-full p-5 sm:p-6 overflow-hidden w-full max-w-full rounded-2xl border border-rule hover:border-ink/40 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgb(var(--c-ink)/0.08)] transition-all duration-250 transform-gpu ${
-                    read ? "opacity-60" : ""
-                  }`}
-                >
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between gap-2 mb-4">
-                      <div className="flex items-center gap-2.5">
-                        <RankBadge rank={rank} />
-                        <span className="font-mono text-[11px] font-bold tracking-wider uppercase text-ink-soft bg-paper/80 px-2 py-0.5 rounded border border-rule/60">
-                          {post.category}
-                        </span>
-                        {post.content_type === "video" && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/20 rounded text-ink font-body text-[10px] font-bold tracking-wider uppercase bg-ink/5">
-                            <svg
-                              width="10"
-                              height="10"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <rect x="2" y="5" width="20" height="14" rx="3" />
-                              <path d="M10 9l6 4-6 4z" />
-                            </svg>
-                            {t("card.video")}
-                          </span>
-                        )}
-                      </div>
-
-                      {read && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 border border-rule rounded-full text-[10px] font-mono font-medium text-ink-soft bg-paper-2">
-                          <EyeIcon />
-                          {t("card.viewed")}
-                        </span>
-                      )}
-                    </div>
-
-                    <Link
-                      href={`/news/${post.id}/`}
-                      onClick={() => haptic.light()}
-                      aria-label={`${post.headline} (Rank ${rank})`}
-                      className="block group"
-                    >
-                      <p className="font-body font-[800] text-[15px] sm:text-[17px] leading-[1.3] text-ink line-clamp-3 mb-4 group-hover:text-ink/80 transition-colors">
-                        {post.headline}
-                      </p>
-                    </Link>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3.5 border-t border-rule mt-auto relative z-10">
-                    <VerificationStamp score={post.credibility_score} compact />
-                    <Link
-                      href={`/news/${post.id}/`}
-                      onClick={() => haptic.light()}
-                      className="inline-flex items-center gap-1 font-mono text-xs font-bold text-ink hover:translate-x-1 transition-all"
-                    >
-                      {t("card.read_full")} <ArrowRight />
-                    </Link>
-                  </div>
-                </div>
+                <NewsCard
+                  post={post}
+                  rank={rank}
+                  onClick={() => setSelected(post)}
+                  isRead={read}
+                />
               </div>
             );
           })}
         </div>
       </ErrorBoundary>
+      <NewsDrawer
+        post={selected}
+        onClose={() => setSelected(null)}
+        onSelectRelated={(next) => setSelected(next)}
+      />
     </section>
   );
 }

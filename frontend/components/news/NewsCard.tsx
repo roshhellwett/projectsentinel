@@ -86,6 +86,8 @@ interface NewsCardProps {
   onClick?: () => void;
   isNew?: boolean;
   isRead?: boolean;
+  rank?: number;
+  customBadge?: { text: string; priority?: number };
 }
 
 const NewsCardComponent = ({
@@ -93,10 +95,13 @@ const NewsCardComponent = ({
   onClick,
   isNew = false,
   isRead = false,
+  rank,
+  customBadge,
 }: NewsCardProps) => {
   const { t } = useI18n();
   const haptic = useHapticFeedback();
   const smartLabel = getSmartLabel(post);
+  const labelToDisplay = customBadge || smartLabel;
   const sourcesCount = post.source_count ?? post.sources?.length ?? 0;
   const isVideo = post.content_type === "video";
 
@@ -137,7 +142,7 @@ const NewsCardComponent = ({
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}`}
+      aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}${typeof rank === "number" ? ` (Rank #${rank})` : ""}`}
       data-read={isRead ? "true" : "false"}
       className={cn(
         "group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-4 sm:p-6 flex flex-col h-full rounded-2xl border border-rule transition-all duration-300 transform-gpu",
@@ -163,6 +168,11 @@ const NewsCardComponent = ({
 
       <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3 min-h-[18px] sm:min-h-[20px]">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">
+          {typeof rank === "number" && (
+            <span className="flex items-center justify-center h-5 px-1.5 rounded border border-ink text-ink font-mono font-bold text-[10px] bg-paper shadow-[1.5px_1.5px_0px_rgb(var(--c-ink))]">
+              {rank < 10 ? `#0${rank}` : `#${rank}`}
+            </span>
+          )}
           <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink bg-paper/80 px-2 py-0.5 rounded border border-rule/70 shadow-2xs">
             {post.category}
           </span>
@@ -175,16 +185,16 @@ const NewsCardComponent = ({
           >
             {useTimeAgo(post.published_at)}
           </span>
-          {smartLabel && (
+          {labelToDisplay && (
             <span
               className={cn(
                 "font-mono text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded shadow-2xs border",
-                smartLabel.priority >= 3
+                (labelToDisplay.priority ?? 1) >= 3
                   ? "text-paper bg-red-600 border-red-700 animate-pulse"
                   : "text-ink bg-amber-400/30 border-amber-500/40",
               )}
             >
-              {smartLabel.text}
+              {labelToDisplay.text}
             </span>
           )}
         </div>
