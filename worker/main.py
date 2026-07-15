@@ -9,7 +9,7 @@
 
 
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import sentry_sdk
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
         id="news_pipeline",
         replace_existing=True,
         max_instances=1,
-        next_run_time=datetime.now(UTC),
+        next_run_time=datetime.now(UTC) + timedelta(seconds=15),
     )
 
     scheduler.add_job(
