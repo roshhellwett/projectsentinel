@@ -18,6 +18,7 @@ export async function dismissCookieDialog(page: Page) {
 /** Open the first article card on the page and return the drawer locator. */
 export async function openFirstArticle(page: Page) {
   await dismissCookieDialog(page);
+  await page.waitForLoadState('networkidle');
   const card = page.locator('[role="article"][aria-label^="Read article"]').first();
   await expect(card).toBeVisible({ timeout: 10000 });
   await card.click();

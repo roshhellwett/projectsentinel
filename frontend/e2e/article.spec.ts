@@ -57,6 +57,7 @@ test.describe('article drawer', () => {
   test('navigates to article page via card click on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await navigateTo(page, '/');
+    await page.waitForLoadState('networkidle');
     const card = page.locator('[role="article"][aria-label^="Read article"]').first();
     await expect(card).toBeVisible({ timeout: 10000 });
     await card.click();

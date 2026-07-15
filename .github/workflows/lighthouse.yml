@@ -15,6 +15,7 @@ jobs:
   lighthouse:
     name: Lighthouse audit
     runs-on: ubuntu-latest
+    environment: github-pages
     permissions:
       contents: read
 
