@@ -14,9 +14,9 @@ export default async function Image() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#fbfbfd",
+        backgroundColor: "#ffffff",
         position: "relative",
-        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontFamily: "Georgia, serif",
       }}
     >
       <div
@@ -24,7 +24,7 @@ export default async function Image() {
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)",
+            "linear-gradient(to right, rgba(26,26,26,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(26,26,26,0.04) 1px, transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />
@@ -41,23 +41,22 @@ export default async function Image() {
           style={{
             width: 140,
             height: 140,
-            borderRadius: 32,
-            background: "linear-gradient(145deg, #111111, #0a0a0a)",
+            borderRadius: 6,
+            backgroundColor: "#fafafa",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 32px 64px rgba(0,0,0,0.18)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            border: "1px solid #dcdcdc",
             marginBottom: 40,
           }}
         >
           <span
             style={{
-              color: "rgba(255,255,255,0.92)",
-              fontSize: 52,
-              fontWeight: 200,
-              letterSpacing: "6px",
-              marginLeft: "6px",
+              color: "#1a1a1a",
+              fontSize: 60,
+              fontWeight: 700,
+              letterSpacing: "4px",
+              marginLeft: "4px",
             }}
           >
             IV
@@ -68,8 +67,8 @@ export default async function Image() {
           style={{
             fontSize: 64,
             fontWeight: 700,
-            color: "#0d0d0d",
-            letterSpacing: "0",
+            color: "#1a1a1a",
+            letterSpacing: "-0.015em",
             lineHeight: 1,
             marginBottom: 20,
           }}
@@ -80,8 +79,8 @@ export default async function Image() {
         <div
           style={{
             fontSize: 28,
-            fontWeight: 300,
-            color: "#666666",
+            fontWeight: 400,
+            color: "#5c5c5c",
             letterSpacing: "0.2px",
           }}
         >
@@ -90,12 +89,10 @@ export default async function Image() {
 
         <div
           style={{
-            width: 48,
-            height: 3,
-            borderRadius: 99,
-            backgroundColor: "#0d0d0d",
-            marginTop: 36,
-            opacity: 0.12,
+            width: 80,
+            height: 1,
+            backgroundColor: "#dcdcdc",
+            marginTop: 40,
           }}
         />
       </div>
