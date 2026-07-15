@@ -149,22 +149,20 @@ const NewsCardComponent = ({
         "hover:-translate-y-1 hover:shadow-[0_12px_36px_rgb(var(--c-ink)/0.09)] hover:border-ink/40",
         "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none",
         isNew && "border-l-[4px] border-l-ink",
-        isVideo && "border-amber-500/30 bg-amber-500/[0.02]",
+        "border-amber-500/30 bg-amber-500/[0.02]",
         isRead && "opacity-65 hover:opacity-100",
       )}
     >
-      {isVideo && (
-        <span className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
-          <span
-            className="absolute top-[-2px] right-[-12px] h-5 w-12 bg-amber-500/20 rotate-45"
-            style={{
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              backgroundColor: "rgba(217, 119, 6, 0.2)",
-            }}
-          />
-        </span>
-      )}
+      <span className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
+        <span
+          className="absolute top-[-2px] right-[-12px] h-5 w-12 bg-amber-500/20 rotate-45"
+          style={{
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            backgroundColor: "rgba(217, 119, 6, 0.2)",
+          }}
+        />
+      </span>
 
       <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3 min-h-[18px] sm:min-h-[20px]">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">
@@ -218,17 +216,15 @@ const NewsCardComponent = ({
             {sourcesCount}{" "}
             {t(sourcesCount === 1 ? "card.source" : "card.sources")}
           </span>
-          {(isVideo || post.video_url) && (
-            <button
-              type="button"
-              onClick={handleYoutubeClick}
-              className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 hover:bg-ink/15 active:scale-95 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-all shadow-2xs"
-              aria-label={t("news.aria_youtube", { headline: post.headline })}
-            >
-              <YoutubeIcon className="text-ink" />
-              {t("card.youtube")}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleYoutubeClick}
+            className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 hover:bg-ink/15 active:scale-95 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-all shadow-2xs"
+            aria-label={t("news.aria_youtube", { headline: post.headline })}
+          >
+            <YoutubeIcon className="text-ink" />
+            {t("card.youtube")}
+          </button>
         </div>
         <BookmarkButton postId={post.id} variant="icon" />
       </div>

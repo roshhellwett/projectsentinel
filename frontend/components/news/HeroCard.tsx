@@ -71,18 +71,16 @@ export const HeroCard = memo(function HeroCard({
       className="group relative cursor-pointer select-none touch-manipulation paper-card glass-card p-5 sm:p-7 md:p-8 flex flex-col rounded-2xl border border-rule transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-[0_16px_48px_rgb(var(--c-ink)/0.1)] hover:border-ink/40 focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none overflow-hidden"
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 320px" }}
     >
-      {isVideo && (
-        <span className="absolute top-0 right-0 w-14 h-14 overflow-hidden pointer-events-none">
-          <span
-            className="absolute top-[-2px] right-[-14px] h-6 w-14 bg-amber-500/20 rotate-45"
-            style={{
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              backgroundColor: "rgba(217, 119, 6, 0.2)",
-            }}
-          />
-        </span>
-      )}
+      <span className="absolute top-0 right-0 w-14 h-14 overflow-hidden pointer-events-none">
+        <span
+          className="absolute top-[-2px] right-[-14px] h-6 w-14 bg-amber-500/20 rotate-45"
+          style={{
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            backgroundColor: "rgba(217, 119, 6, 0.2)",
+          }}
+        />
+      </span>
 
       <div className="flex items-start justify-between gap-2 sm:gap-3 mb-3 sm:mb-4 min-h-[20px]">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">
@@ -139,12 +137,10 @@ export const HeroCard = memo(function HeroCard({
             {sourcesCount}{" "}
             {t(sourcesCount === 1 ? "card.source" : "card.sources")}
           </span>
-          {isVideo && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded shadow-2xs">
-              <YoutubeIcon className="text-ink" />
-              {t("card.youtube")}
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded shadow-2xs">
+            <YoutubeIcon className="text-ink" />
+            {t("card.youtube")}
+          </span>
         </div>
         <BookmarkButton postId={post.id} variant="icon" />
       </div>
