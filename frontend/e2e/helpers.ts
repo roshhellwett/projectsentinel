@@ -40,5 +40,5 @@ export async function closeDrawer(page: Page, drawer: Locator) {
     }, { timeout: 5000 })
     .toBe(true);
   await closeBtn.click({ force: true });
-  await expect(drawer).not.toBeVisible({ timeout: 3000 });
+  await expect(drawer).not.toBeVisible({ timeout: 5000 });
 }

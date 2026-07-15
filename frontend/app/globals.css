@@ -15,8 +15,8 @@
 
   --c-ink:          26 26 26;
   --c-ink-soft:     92 92 92;
-  --c-muted:        154 150 141;
-  --c-subtle:       201 196 184;
+  --c-muted:        102 98 90;
+  --c-subtle:       112 108 100;
 
   --c-rule:         201 196 184;
   --c-rule-strong:  180 174 160;
@@ -28,11 +28,11 @@
   --c-accent-soft:  242 239 233;
 
   --c-stamp:        26 26 26;
-  --c-gold:         154 150 141;
+  --c-gold:         110 100 85;
 
   --c-cred-high:    26 26 26;
   --c-cred-mid:     92 92 92;
-  --c-cred-low:     154 150 141;
+  --c-cred-low:     110 100 85;
 
   --cred-s: 0%;
   --cred-l: 10%;

@@ -24,7 +24,7 @@ test.describe("accessibility", () => {
       await navigateTo(page, path);
       await dismissCookieDialog(page);
       await page.waitForLoadState("networkidle");
-      await page.waitForTimeout(250);
+      await page.waitForTimeout(300);
 
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -35,7 +35,7 @@ test.describe("accessibility", () => {
       );
       if (violations.length > 0) {
         console.error(
-          `Axe found critical/serious violations on ${name} (${path}):\n`,
+          `Axe found ${violations.length} critical/serious violations on ${path}:\n`,
           JSON.stringify(violations, null, 2)
         );
       }
