@@ -24,12 +24,26 @@ test.describe("accessibility", () => {
       await navigateTo(page, path);
       await dismissCookieDialog(page);
       await page.waitForLoadState("networkidle");
+      // allow a short settle time for client-side rendering
+      await page.waitForTimeout(300);
 
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
         .analyze();
 
-      expect(results.violations.filter((v) => v.impact === "critical" || v.impact === "serious")).toEqual([]);
+      const violations = results.violations.filter((v) =>
+        v.impact === "critical" || v.impact === "serious"
+      );
+
+      if (violations.length > 0) {
+        console.error(
+          `Axe found ${violations.length} critical/serious violations on ${path}:`,
+          JSON.stringify(violations, null, 2)
+        );
+      }
+
+      // Fail the test if any critical or serious violations exist
+      expect(violations).toHaveLength(0);
     });
   }
 });
