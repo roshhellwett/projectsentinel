@@ -23,18 +23,18 @@ export function DrawerHeader({
   const haptic = useHapticFeedback();
 
   return (
-    <header className="pointer-events-none relative flex flex-col flex-shrink-0 border-b border-rule">
-      <div className="pointer-events-none flex items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-3">
-        <div className="pointer-events-auto flex flex-1 items-center gap-2 sm:gap-2.5 min-w-0">
+    <header className="pointer-events-none relative flex flex-col flex-shrink-0 border-b-2 border-rule/80 bg-paper/60 backdrop-blur-md">
+      <div className="pointer-events-none flex items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-3.5">
+        <div className="pointer-events-auto flex flex-1 items-center gap-2.5 min-w-0">
           <CategoryTag category={category} />
-          <span className="np-dateline hidden sm:inline rounded-md bg-paper-2 px-2 py-0.5 text-[11px] font-medium text-muted">
+          <span className="np-dateline hidden sm:inline-block rounded-lg border border-rule/80 bg-paper-2/80 px-2.5 py-1 font-mono text-[11px] font-bold text-ink-soft shadow-2xs">
             {formatDate(publishedAt)}
           </span>
         </div>
 
-        <div className="pointer-events-auto relative z-20 flex flex-shrink-0 items-center gap-1.5">
+        <div className="pointer-events-auto relative z-20 flex flex-shrink-0 items-center gap-2">
           {(onPrev || onNext) && (
-            <div className="hidden sm:flex items-center gap-1 border border-rule">
+            <div className="hidden sm:flex items-center gap-1 border border-rule/80 rounded-lg bg-paper-2/80 p-0.5 shadow-2xs">
               <button
                 type="button"
                 onClick={() => {
@@ -42,7 +42,7 @@ export function DrawerHeader({
                   onPrev?.();
                 }}
                 disabled={!onPrev}
-                className="p-1.5 text-ink hover:bg-paper-2 active:scale-90 disabled:opacity-30 disabled:pointer-events-none transition-all touch-manipulation"
+                className="p-2 text-ink hover:bg-paper rounded-md active:scale-95 disabled:opacity-30 disabled:pointer-events-none transition-all touch-manipulation min-touch"
                 aria-label="Previous story"
               >
                 <svg
@@ -51,7 +51,7 @@ export function DrawerHeader({
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.8"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -65,7 +65,7 @@ export function DrawerHeader({
                   onNext?.();
                 }}
                 disabled={!onNext}
-                className="p-1.5 text-ink hover:bg-paper-2 active:scale-90 disabled:opacity-30 disabled:pointer-events-none transition-all touch-manipulation"
+                className="p-2 text-ink hover:bg-paper rounded-md active:scale-95 disabled:opacity-30 disabled:pointer-events-none transition-all touch-manipulation min-touch"
                 aria-label="Next story"
               >
                 <svg
@@ -74,7 +74,7 @@ export function DrawerHeader({
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.8"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -89,10 +89,10 @@ export function DrawerHeader({
               haptic.light();
               onClose();
             }}
-            className="tap-target min-w-[44px] min-h-[44px] flex items-center justify-center p-1.5 text-muted hover:text-ink hover:bg-paper-2 active:scale-90 transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="tap-target min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl border border-rule/80 bg-paper-2/80 text-ink-soft hover:text-ink hover:bg-paper active:scale-95 transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 shadow-2xs"
             aria-label="Close article"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
       </div>

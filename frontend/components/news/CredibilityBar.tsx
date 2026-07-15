@@ -45,46 +45,48 @@ export function CredibilityBar({
       <div
         className={cn(
           "flex items-center justify-between gap-3",
-          compact ? "mb-1" : "mb-1.5",
+          compact ? "mb-1" : "mb-2",
         )}
       >
         <span
           className={cn(
-            "truncate font-semibold text-muted",
-            compact ? "text-[9px]" : "text-[10px]",
+            "truncate font-mono font-bold tracking-wider uppercase text-ink-soft",
+            compact ? "text-[9px]" : "text-[11px]",
           )}
         >
-          {compact ? label : t("credibility.score")}
+          {compact ? label : `${t("credibility.score")} (${label})`}
         </span>
         <span
           className={cn(
-            "flex-shrink-0 font-bold tabular-nums text-ink",
-            compact ? "text-[10px]" : "text-[11px]",
+            "flex-shrink-0 font-mono font-extrabold tabular-nums text-ink bg-ink/5 px-2 py-0.5 rounded border border-rule",
+            compact ? "text-[10px]" : "text-xs",
           )}
         >
           {clamped}
-          {!compact && <span className="font-semibold text-subtle">/100</span>}
+          {!compact && <span className="font-normal text-ink-soft/80">/100</span>}
         </span>
       </div>
 
-      <div className="relative w-full flex items-center">
+      <div className="relative w-full flex items-center py-1">
         <div
-          className={cn("w-full overflow-hidden", compact ? "h-1.5" : "h-2")}
+          className={cn("w-full overflow-hidden rounded-full border border-rule/80 shadow-inner", compact ? "h-2" : "h-3")}
           style={{ background: "rgb(var(--c-rule))" }}
         >
           <div
-            className="h-full transition-[width] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+            className="h-full transition-[width] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] rounded-full relative overflow-hidden"
             style={{
               width: `${animatedScore}%`,
               background: "rgb(var(--c-ink))",
             }}
             aria-hidden="true"
-          />
+          >
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-paper/20 to-transparent animate-shimmer" />
+          </div>
         </div>
         <div
           className={cn(
-            "absolute top-1/2 pointer-events-none transition-[left,opacity] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]",
-            compact ? "h-2.5 w-2.5" : "h-3.5 w-3.5",
+            "absolute top-1/2 pointer-events-none transition-[left] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] shadow-sm border-2 border-paper",
+            compact ? "h-3.5 w-3.5" : "h-4 w-4",
           )}
           style={{
             left: `${animatedScore}%`,
@@ -96,7 +98,7 @@ export function CredibilityBar({
       </div>
 
       {!compact && (
-        <div className="mt-1 flex items-center justify-between text-[9px] font-semibold text-muted">
+        <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] font-semibold text-ink-soft/80 uppercase tracking-widest">
           <span>{t("credibility.low")}</span>
           <span>{t("credibility.moderate")}</span>
           <span>{t("credibility.high")}</span>

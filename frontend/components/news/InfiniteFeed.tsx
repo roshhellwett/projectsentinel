@@ -38,24 +38,25 @@ interface InfiniteFeedProps {
 export function FeedSkeleton() {
   return (
     <div
-      className="animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3 overflow-hidden border border-rule bg-paper-2 rounded-[6px]"
+      className="animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3.5 overflow-hidden border border-rule bg-paper-2/90 rounded-2xl shadow-sm"
       aria-hidden="true"
     >
-      <div className="flex items-center gap-3">
-        <div className="h-3 w-16 bg-rule/60 border border-rule" />
-        <div className="h-3 w-12 bg-rule/40 border border-rule" />
+      <div className="flex items-center justify-between gap-3">
+        <div className="h-4 w-20 bg-rule/70 rounded-md border border-rule/50" />
+        <div className="h-4 w-12 bg-rule/50 rounded-md border border-rule/50" />
       </div>
-      <div className="space-y-2 mt-2">
-        <div className="h-5 w-full bg-rule/50 border border-rule" />
-        <div className="h-5 w-3/4 bg-rule/40 border border-rule" />
+      <div className="space-y-2.5 mt-2">
+        <div className="h-5 w-full bg-rule/60 rounded-md border border-rule/50" />
+        <div className="h-5 w-4/5 bg-rule/50 rounded-md border border-rule/50" />
       </div>
-      <div className="space-y-1.5 mt-1">
-        <div className="h-3 w-full bg-rule/30 border border-rule" />
-        <div className="h-3 w-5/6 bg-rule/30 border border-rule" />
+      <div className="space-y-2 mt-1">
+        <div className="h-3 w-full bg-rule/40 rounded border border-rule/50" />
+        <div className="h-3 w-5/6 bg-rule/40 rounded border border-rule/50" />
       </div>
-      <div className="mt-auto pt-4 border-t border-rule/50">
-        <div className="flex items-center gap-2">
-          <div className="h-2 w-full bg-rule/30 border border-rule" />
+      <div className="mt-auto pt-4 border-t border-rule/60">
+        <div className="flex items-center justify-between">
+          <div className="h-3 w-28 bg-rule/40 rounded border border-rule/50" />
+          <div className="h-4 w-5 bg-rule/50 rounded-full border border-rule/50" />
         </div>
       </div>
     </div>
@@ -192,12 +193,12 @@ export function InfiniteFeed({
   return (
     <>
       <ErrorBoundary>
-        <div className="flex items-center justify-between gap-3 mb-3 sm:mb-6">
-          <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+          <span className="font-mono text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink bg-paper-2 px-3 py-1 rounded-full border border-rule/80 shadow-2xs">
             {dailyCount} read today
           </span>
           {readCount > 0 && (
-            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            <span className="font-mono text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft bg-paper-2/60 px-3 py-1 rounded-full border border-rule/60">
               {readCount} / {posts.length} read
             </span>
           )}
@@ -205,7 +206,7 @@ export function InfiniteFeed({
 
         <div
           ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 items-stretch touch-pan-y"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 items-stretch touch-pan-y"
         >
           {posts.map((post, index) => (
             <FeedItem
@@ -220,7 +221,7 @@ export function InfiniteFeed({
         </div>
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={`skeleton-${i}`}
@@ -236,16 +237,20 @@ export function InfiniteFeed({
         {!exhausted && (
           <div
             ref={sentinelRef}
-            className="h-12 w-full mt-8"
+            className="h-16 w-full mt-8"
             aria-hidden="true"
           />
         )}
 
         {exhausted && posts.length > pageSize && (
-          <p className="text-center font-body text-xs text-ink-soft mt-12">
-            {readCount}/{posts.length} {t("feed.stories_read")} ·{" "}
-            {t("feed.reached_end")}
-          </p>
+          <div className="mt-14 p-6 rounded-2xl border border-rule/80 bg-paper-2/60 text-center max-w-xl mx-auto shadow-2xs">
+            <p className="font-mono font-bold text-xs sm:text-sm text-ink mb-1">
+              {readCount}/{posts.length} {t("feed.stories_read")}
+            </p>
+            <p className="font-body text-xs text-ink-soft">
+              {t("feed.reached_end")}
+            </p>
+          </div>
         )}
       </ErrorBoundary>
 

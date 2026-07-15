@@ -25,6 +25,7 @@ const IGNORE_PATTERNS = [
   /favicon/i,
   /webmanifest/i,
   /Failed to load resource.*status of 404/i,
+  /modulepreload/i,
 ];
 
 const findings = [];
@@ -78,7 +79,7 @@ async function runOn(label, contextOpts) {
   try {
     await page.goto(BASE + '/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(500);
-    const card = page.locator('[role="button"][aria-label^="Read article"]').first();
+    const card = page.locator('[role="article"][aria-label^="Read article"]').first();
     if (await card.count()) {
       await card.click();
       const drawer = page.locator('[role="dialog"][aria-label^="Article"]');

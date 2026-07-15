@@ -222,7 +222,7 @@ export function MobileBottomNav() {
       )}
 
       <nav
-        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transition-transform duration-300 ${
+        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transition-transform duration-300 ease-out transform-gpu ${
           hideForOverlay ? "translate-y-full" : "translate-y-0"
         }`}
         aria-hidden={hideForOverlay ? "true" : "false"}
@@ -230,7 +230,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? "none" : "auto" }}
       >
         <div
-          className="relative border-t border-rule bg-paper/90 backdrop-blur-xl shadow-[0_-2px_14px_rgb(var(--c-ink)/0.04)] select-none touch-manipulation"
+          className="relative border-t border-rule/60 glass shadow-[0_-4px_24px_rgb(var(--c-ink)/0.04)] select-none touch-manipulation transition-all duration-300"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">
@@ -240,13 +240,15 @@ export function MobileBottomNav() {
               const isTopics = tab.id === "topics";
 
               const inner = (
-                <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-95 transition-all duration-150">
+                <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-90 transition-all duration-150">
                   {active && (
-                    <span className="absolute top-0 w-6 h-[2.5px] rounded-full bg-ink animate-fade-in" />
+                    <span className="absolute top-0 w-8 h-[2.5px] rounded-full bg-ink shadow-2xs animate-fade-in" />
                   )}
-                  <Icon />
+                  <div className={`transition-transform duration-200 ${active ? "scale-110 text-ink" : "text-muted"}`}>
+                    <Icon />
+                  </div>
                   <span
-                    className={`text-[11px] leading-none tracking-tight ${
+                    className={`text-[11px] leading-none tracking-tight transition-colors duration-150 ${
                       active ? "text-ink font-bold" : "text-muted font-medium"
                     }`}
                   >

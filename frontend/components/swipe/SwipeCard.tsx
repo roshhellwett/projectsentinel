@@ -308,12 +308,12 @@ export function SwipeCard({
       data-swipe-depth={depth}
     >
       <article
-        className="relative w-full np-card paper-card glass-card shadow-[0_10px_32px_rgb(var(--c-ink)/0.08)] border border-rule/80 overflow-hidden rounded-xl transition-shadow duration-300"
+        className="relative w-full np-card paper-card glass-card shadow-[0_14px_44px_rgb(var(--c-ink)/0.12)] border-2 border-ink/50 overflow-hidden rounded-2xl transition-shadow duration-300"
         role="article"
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
         <div
-          className={`p-5 sm:p-6 ${interactive ? "cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset" : ""}`}
+          className={`p-6 sm:p-8 ${interactive ? "cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:ring-inset" : ""}`}
           role={interactive ? "button" : undefined}
           tabIndex={interactive ? 0 : undefined}
           aria-label={
@@ -382,40 +382,40 @@ export function SwipeCard({
             )}
           </AnimatePresence>
 
-          <div className="flex items-center gap-2 flex-wrap mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+          <div className="flex items-center gap-2.5 flex-wrap mb-4">
+            <span className="font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-ink bg-paper/80 px-2.5 py-1 rounded border border-rule/80 shadow-2xs">
               {theme.label}
             </span>
 
             {breaking && (
               <span
-                className="label-tag bg-accent text-paper border-accent"
+                className="font-mono text-[10px] font-extrabold tracking-widest uppercase bg-red-600 text-paper px-2.5 py-1 rounded-full border border-red-700 shadow-2xs animate-pulse flex items-center gap-1.5"
                 suppressHydrationWarning
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-paper animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-paper animate-ping" />
                 Live
               </span>
             )}
 
-            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted font-medium">
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs text-ink-soft">
               <span
-                className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${ageDot}`}
+                className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${ageDot}`}
                 aria-hidden="true"
                 suppressHydrationWarning
               />
               <span suppressHydrationWarning>{timeAgo}</span>
             </span>
 
-            <span className="inline-flex items-center gap-1 text-[10px] text-muted font-medium">
-              <BookOpen className="w-2.5 h-2.5" aria-hidden="true" />
-              <span className="tabular-nums">{readMinutes}</span>
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-ink-soft">
+              <BookOpen className="w-3 h-3 text-ink-soft" aria-hidden="true" />
+              <span className="tabular-nums font-bold text-ink">{readMinutes}</span>
               <span>min</span>
             </span>
           </div>
 
           <h2
             id={`swipe-card-headline-${post.id}`}
-            className="font-display text-[21px] sm:text-[23px] font-extrabold leading-[1.22] tracking-[-0.02em] text-ink mb-4"
+            className="font-display text-[22px] sm:text-[25px] font-[900] leading-[1.18] tracking-[-0.025em] text-ink mb-5 drop-shadow-2xs"
           >
             {post.headline}
           </h2>

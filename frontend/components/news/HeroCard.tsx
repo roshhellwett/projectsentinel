@@ -86,28 +86,30 @@ export const HeroCard = memo(function HeroCard({
 
   return (
     <div
-      className="w-full max-w-full border border-rule bg-paper-2/80 backdrop-blur-xl rounded-2xl p-4 sm:p-7 md:p-9 relative overflow-hidden shadow-[0_12px_36px_rgb(var(--c-ink)/0.06)] hover:shadow-[0_16px_44px_rgb(var(--c-ink)/0.09)] transition-all duration-300"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 300px" }}
+      role="article"
+      aria-label={`Featured article: ${post.headline}`}
+      className="w-full max-w-full border-2 border-ink/80 bg-paper-2/90 glass-card rounded-2xl p-5 sm:p-8 md:p-10 relative overflow-hidden shadow-[0_16px_48px_rgb(var(--c-ink)/0.08)] hover:shadow-[0_24px_64px_rgb(var(--c-ink)/0.12)] hover:border-ink transition-all duration-300 transform-gpu group"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 320px" }}
     >
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
-        className="block group"
+        className="block"
       >
-        <div className="flex items-start justify-between gap-2 sm:gap-4 mb-2 sm:mb-4">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 min-w-0">
-            <span className="font-body text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+        <div className="flex items-start justify-between gap-3 sm:gap-4 mb-3 sm:mb-5">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-rule bg-paper font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-ink" />
               {post.category}
             </span>
-            <span className="w-px h-2.5 sm:h-3 bg-rule flex-shrink-0" />
             <span
-              className="font-mono text-[10px] sm:text-[11px] text-ink-soft"
+              className="font-mono text-xs text-ink-soft"
               suppressHydrationWarning
             >
               {useTimeAgo(post.published_at)}
             </span>
             {isVideo && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-1 sm:py-0.5 border border-ink/15 text-ink-soft font-body text-[10px] sm:text-[10px] font-bold tracking-wider uppercase">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 border border-ink/30 rounded text-ink font-body text-xs font-bold tracking-wider uppercase bg-ink/5 shadow-2xs">
                 <YoutubeIcon />
                 {t("hero.video")}
               </span>
@@ -117,35 +119,40 @@ export const HeroCard = memo(function HeroCard({
         </div>
 
         {badge && (
-          <span className="inline-block font-body text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink mb-2 sm:mb-4">
-            {badge === "breaking" ? t("hero.breaking") : t("hero.top_story")}
-          </span>
+          <div className="mb-2 sm:mb-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono text-[11px] sm:text-xs font-extrabold tracking-widest uppercase text-paper bg-ink shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-paper animate-ping" />
+              {badge === "breaking" ? t("hero.breaking") : t("hero.top_story")}
+            </span>
+          </div>
         )}
 
-        <h2 className="font-body font-[800] text-ink leading-[1.08] tracking-[-0.02em] mb-1.5 sm:mb-3 text-[clamp(1.15rem,4vw,2.2rem)]">
+        <h2 className="font-display font-[900] text-ink leading-[1.06] tracking-[-0.025em] mb-3 sm:mb-4 text-[clamp(1.4rem,4.5vw,2.6rem)] group-hover:text-ink/90 transition-colors">
           {post.headline}
         </h2>
 
-        <p className="font-body text-[13px] sm:text-[14px] text-ink-soft leading-[1.5] sm:leading-[1.6] line-clamp-3 max-w-3xl mb-2 sm:mb-4">
+        <p className="font-body text-[14px] sm:text-[16px] text-ink-soft leading-[1.65] line-clamp-3 max-w-4xl mb-4 sm:mb-6 font-normal">
           {post.summary}
         </p>
 
         {firstHost && (
-          <p className="font-body text-[11px] sm:text-[12px] text-ink-soft mb-2 sm:mb-4">
-            {t("hero.first_reported")}{" "}
-            <span className="font-semibold text-ink">{firstHost}</span>
-            {otherSourceCount > 0 && (
-              <> · {t("hero.verified_by", { count: otherSourceCount })}</>
-            )}
-          </p>
+          <div className="inline-block p-2.5 px-3.5 rounded-lg border border-rule/80 bg-paper/60 mb-4 sm:mb-6">
+            <p className="font-body text-xs sm:text-[13px] text-ink-soft">
+              {t("hero.first_reported")}{" "}
+              <span className="font-mono font-bold text-ink underline decoration-rule-strong">{firstHost}</span>
+              {otherSourceCount > 0 && (
+                <> · <span className="font-semibold text-ink">{t("hero.verified_by", { count: otherSourceCount })}</span></>
+              )}
+            </p>
+          </div>
         )}
 
-        <div className="flex items-center justify-between pt-2 sm:pt-4 border-t border-rule">
-          <span className="font-body text-[10px] sm:text-[11px] text-ink-soft flex items-center gap-1 sm:gap-1.5">
+        <div className="flex items-center justify-between pt-3 sm:pt-5 border-t-2 border-rule">
+          <span className="font-body text-xs text-ink-soft flex items-center gap-1.5 font-medium">
             <ShieldIcon />
-            {t("hero.sources_count", { n: post.source_count || 1 })}
+            {t("hero.sources_count", { n: post.source_count || 1 })} cross-referenced
           </span>
-          <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-ink-soft group-hover:text-ink transition-colors font-body font-semibold">
+          <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-ink group-hover:translate-x-1 transition-all duration-200 font-mono font-bold bg-paper px-3.5 py-1.5 rounded border border-rule shadow-2xs">
             {t("hero.read_article")} <ArrowRight />
           </span>
         </div>

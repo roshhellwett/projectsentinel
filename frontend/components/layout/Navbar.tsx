@@ -182,7 +182,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/70 backdrop-blur-md border-b border-rule/50 transform-gpu select-none`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} glass border-b border-rule/60 shadow-[0_4px_24px_rgb(var(--c-ink)/0.03)] transform-gpu select-none transition-all duration-300`}
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 lg:px-10">
@@ -191,19 +191,19 @@ export function Navbar() {
               href="/"
               prefetch={true}
               aria-label="India Verified — home"
-              className="flex items-center gap-1.5 sm:gap-2.5 group rounded shrink min-w-0"
+              className="flex items-center gap-1.5 sm:gap-2.5 group rounded shrink min-w-0 transition-transform duration-200 active:scale-95"
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border border-ink text-ink font-display font-bold text-[13px] sm:text-[15px]"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border border-ink text-ink font-display font-bold text-[13px] sm:text-[15px] shadow-[2px_2px_0px_rgb(var(--c-ink))] group-hover:bg-ink group-hover:text-paper transition-all duration-200"
               >
                 IV
               </span>
               <span className="flex flex-col leading-none whitespace-nowrap">
-                <span className="font-display text-base sm:text-xl text-ink truncate max-w-[130px] sm:max-w-none">
+                <span className="font-display text-base sm:text-xl text-ink truncate max-w-[130px] sm:max-w-none tracking-tight">
                   India Verified
                 </span>
-                <span className="hidden md:inline text-[11px] text-ink-soft font-body mt-0.5">
+                <span className="hidden md:inline text-[11px] text-ink-soft font-body mt-0.5 tracking-wide">
                   AI-cross-referenced Indian news
                 </span>
               </span>
@@ -221,10 +221,10 @@ export function Navbar() {
                     href={link.href}
                     prefetch={true}
                     aria-current={active ? "page" : undefined}
-                    className={`relative inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-body font-medium transition-all rounded-lg ${
+                    className={`relative inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-body font-medium transition-all duration-200 rounded-lg ${
                       active
-                        ? "text-ink bg-paper-2 font-bold shadow-sm border border-rule"
-                        : "text-muted hover:text-ink hover:bg-paper-2/60 border border-transparent"
+                        ? "text-ink bg-paper-2 font-bold shadow-sm border border-rule/80 scale-[1.02]"
+                        : "text-muted hover:text-ink hover:bg-paper-2/60 border border-transparent active:scale-95"
                     }`}
                   >
                     {link.labelKey === "nav.saved" && <BookmarkIcon />}
@@ -246,11 +246,11 @@ export function Navbar() {
                 onClick={openSearch}
                 aria-label="Search articles (press /)"
                 title="Search"
-                className="inline-flex items-center gap-2 text-muted hover:text-ink transition-all p-2 sm:px-2.5 sm:py-1.5 sm:border sm:border-rule sm:bg-paper-2/50 sm:hover:bg-paper-2 rounded-lg min-touch"
+                className="inline-flex items-center gap-2 text-muted hover:text-ink transition-all duration-200 p-2 sm:px-3 sm:py-1.5 sm:border sm:border-rule sm:bg-paper-2/60 sm:hover:bg-paper-2 sm:shadow-sm rounded-lg min-touch active:scale-95"
               >
                 <SearchIcon />
-                <span className="hidden sm:inline text-xs font-body">Search</span>
-                <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-mono border border-rule rounded bg-paper">
+                <span className="hidden sm:inline text-xs font-body font-medium">Search</span>
+                <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-mono font-bold border border-rule rounded bg-paper shadow-2xs">
                   /
                 </kbd>
               </button>
@@ -261,7 +261,7 @@ export function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Source code on GitHub"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted hover:text-ink border border-transparent hover:border-rule transition-all rounded-sm"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted hover:text-ink border border-transparent hover:border-rule transition-all duration-200 rounded-sm active:scale-95"
                 >
                   <GithubIcon />
                   GitHub
@@ -274,7 +274,7 @@ export function Navbar() {
                 aria-label={isMobileOpen ? "Close menu" : "Open menu"}
                 aria-expanded={isMobileOpen}
                 aria-controls="mobile-nav-drawer"
-                className="lg:hidden text-muted hover:text-ink p-2 sm:p-1.5 rounded-sm min-touch"
+                className="lg:hidden text-muted hover:text-ink p-2 sm:p-1.5 rounded-sm min-touch active:scale-90 transition-transform duration-150"
               >
                 {isMobileOpen ? <CloseIcon /> : <MenuIcon />}
               </button>
@@ -284,7 +284,7 @@ export function Navbar() {
       </header>
 
       <div
-        className={`lg:hidden fixed inset-0 ${Z_INDEX.modalBackdrop} bg-ink/40 transition-opacity duration-200 ${
+        className={`lg:hidden fixed inset-0 ${Z_INDEX.modalBackdrop} bg-ink/50 backdrop-blur-xs transition-opacity duration-300 ${
           isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsMobileOpen(false)}
@@ -292,7 +292,7 @@ export function Navbar() {
 
       <aside
         id="mobile-nav-drawer"
-        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-full max-w-sm bg-paper/80 backdrop-blur-xl border-l border-rule/50 flex flex-col overflow-x-hidden transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-full max-w-sm glass-drawer border-l border-rule/60 shadow-2xl flex flex-col overflow-x-hidden transition-transform duration-300 ease-out transform-gpu ${
           isMobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
@@ -300,14 +300,14 @@ export function Navbar() {
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
-        <div className="flex items-center justify-between h-14 px-4 border-b border-rule">
+        <div className="flex items-center justify-between h-14 px-4 border-b border-rule/60">
           <span className="text-[10px] font-bold tracking-wider uppercase font-body text-ink-soft px-2">
             Sections
           </span>
           <button
             onClick={() => setIsMobileOpen(false)}
             aria-label="Close menu"
-            className="text-muted hover:text-ink p-1.5 rounded-sm"
+            className="text-muted hover:text-ink p-1.5 rounded-sm active:scale-90 transition-transform"
           >
             <CloseIcon />
           </button>
@@ -321,8 +321,8 @@ export function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileOpen(false)}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center justify-between px-3 min-h-[48px] border-b border-rule font-display text-base sm:text-lg transition-colors ${
-                  active ? "text-ink" : "text-ink-soft hover:text-ink"
+                className={`flex items-center justify-between px-3 min-h-[48px] border-b border-rule/40 font-display text-base sm:text-lg transition-all duration-150 rounded-lg ${
+                  active ? "text-ink bg-paper-2 font-bold px-4" : "text-ink-soft hover:text-ink hover:bg-paper-2/40"
                 }`}
               >
                 <span className="inline-flex items-center gap-2">
@@ -334,7 +334,7 @@ export function Navbar() {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-rule flex flex-col gap-3">
+        <div className="p-4 border-t border-rule/60 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold tracking-wider uppercase text-ink-soft font-body px-2">
               Language
@@ -345,7 +345,7 @@ export function Navbar() {
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-rule text-sm text-ink hover:bg-paper-2 transition-all rounded-sm"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-rule/80 text-sm font-medium text-ink hover:bg-paper-2 transition-all duration-200 rounded-lg active:scale-98 shadow-2xs"
           >
             <GithubIcon />
             View source on GitHub

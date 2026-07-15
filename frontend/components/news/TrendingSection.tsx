@@ -86,8 +86,8 @@ function ArrowRight() {
 
 function RankBadge({ rank }: { rank: number }) {
   return (
-    <span className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 border border-ink text-ink font-mono text-[10px] sm:text-xs">
-      #{rank}
+    <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg border-2 border-ink text-ink font-mono font-bold text-xs sm:text-sm bg-paper shadow-[2px_2px_0px_rgb(var(--c-ink))]">
+      {rank < 10 ? `0${rank}` : rank}
     </span>
   );
 }
@@ -157,20 +157,23 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   if (trending.length === 0) return null;
 
   return (
-    <section aria-label={t("trending.title")} className="mb-6 sm:mb-10">
-      <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5">
-        <h2 className="font-body font-bold text-base sm:text-xl text-ink">
-          {t("trending.title")}
-        </h2>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <span className="font-body text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+    <section aria-label={t("trending.title")} className="mb-8 sm:mb-12">
+      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6 pb-3 border-b-2 border-ink/40">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-2xs animate-pulse" />
+          <h2 className="font-display font-bold text-lg sm:text-2xl text-ink tracking-tight">
+            {t("trending.title")}
+          </h2>
+        </div>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <span className="font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft bg-paper-2 px-2.5 py-1 rounded border border-rule">
             {t("trending.top_count", { n: trending.length })}
           </span>
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1.5">
             <button
               onClick={() => scrollBy("left")}
               disabled={!canScrollLeft}
-              className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px] min-touch"
+              className="p-2 border border-rule/80 bg-paper-2 text-ink hover:bg-paper hover:border-ink disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 rounded-lg min-touch active:scale-95 shadow-2xs"
               aria-label={t("trending.aria_scroll_left")}
             >
               <ArrowLeft />
@@ -178,7 +181,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("right")}
               disabled={!canScrollRight}
-              className="p-1.5 border border-rule text-muted hover:text-ink disabled:opacity-30 disabled:pointer-events-none transition-all rounded-[4px] min-touch"
+              className="p-2 border border-rule/80 bg-paper-2 text-ink hover:bg-paper hover:border-ink disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 rounded-lg min-touch active:scale-95 shadow-2xs"
               aria-label={t("trending.aria_scroll_right")}
             >
               <ArrowRight />
@@ -190,7 +193,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       <ErrorBoundary>
         <div
           ref={carouselRef}
-          className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
+          className="flex gap-4 sm:gap-5 overflow-x-auto pb-6 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {trending.map((post, index) => {
@@ -200,22 +203,24 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
               <div
                 key={post.id}
-                className="flex-shrink-0 w-[76vw] sm:w-[300px] md:w-[320px] snap-start animate-slide-up"
+                className="flex-shrink-0 w-[80vw] sm:w-[320px] md:w-[340px] snap-start animate-slide-up"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div
                   data-read={read ? "true" : "false"}
-                  className={`ink-card glass-card flex flex-col justify-between h-full p-4.5 sm:p-5 overflow-hidden w-full max-w-full rounded-xl border border-rule hover:border-ink/30 transition-all duration-200 ${read ? "opacity-60" : ""}`}
+                  className={`ink-card glass-card flex flex-col justify-between h-full p-5 sm:p-6 overflow-hidden w-full max-w-full rounded-2xl border border-rule hover:border-ink/40 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgb(var(--c-ink)/0.08)] transition-all duration-250 transform-gpu ${
+                    read ? "opacity-60" : ""
+                  }`}
                 >
                   <div className="relative z-10">
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                      <div className="flex items-center gap-2.5">
                         <RankBadge rank={rank} />
-                        <span className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft">
+                        <span className="font-mono text-[11px] font-bold tracking-wider uppercase text-ink-soft bg-paper/80 px-2 py-0.5 rounded border border-rule/60">
                           {post.category}
                         </span>
                         {post.content_type === "video" && (
-                          <span className="inline-flex items-center gap-1 px-1 py-0.5 border border-ink/15 text-ink-soft font-body text-[9px] font-bold tracking-wider uppercase">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-ink/20 rounded text-ink font-body text-[10px] font-bold tracking-wider uppercase bg-ink/5">
                             <svg
                               width="10"
                               height="10"
@@ -236,7 +241,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                       </div>
 
                       {read && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-rule/80 rounded-full text-[9px] font-medium text-ink-soft/80 bg-paper-2/40">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 border border-rule rounded-full text-[10px] font-mono font-medium text-ink-soft bg-paper-2">
                           <EyeIcon />
                           {t("card.viewed")}
                         </span>
@@ -247,19 +252,20 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
                       href={`/news/${post.id}/`}
                       onClick={() => haptic.light()}
                       aria-label={`${post.headline} (Rank ${rank})`}
+                      className="block group"
                     >
-                      <p className="font-body font-bold text-[13px] sm:text-[15px] leading-[1.25] text-ink line-clamp-3 mb-3 sm:mb-4">
+                      <p className="font-body font-[800] text-[15px] sm:text-[17px] leading-[1.3] text-ink line-clamp-3 mb-4 group-hover:text-ink/80 transition-colors">
                         {post.headline}
                       </p>
                     </Link>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-rule mt-auto relative z-10">
-                    <VerificationStamp score={post.credibility_score} xsmall />
+                  <div className="flex items-center justify-between pt-3.5 border-t border-rule mt-auto relative z-10">
+                    <VerificationStamp score={post.credibility_score} compact />
                     <Link
                       href={`/news/${post.id}/`}
                       onClick={() => haptic.light()}
-                      className="inline-flex items-center gap-1 font-body text-[11px] text-ink-soft hover:text-ink transition-colors"
+                      className="inline-flex items-center gap-1 font-mono text-xs font-bold text-ink hover:translate-x-1 transition-all"
                     >
                       {t("card.read_full")} <ArrowRight />
                     </Link>

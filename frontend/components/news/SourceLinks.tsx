@@ -56,7 +56,7 @@ export const SourceLinks = memo(function SourceLinks({
   }
 
   return (
-    <ul className="space-y-2" role="list">
+    <ul className="space-y-2.5" role="list">
       {sources.map((source, index) => {
         const label = getSourceLabel(source);
         return (
@@ -65,14 +65,14 @@ export const SourceLinks = memo(function SourceLinks({
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="tap-target min-h-[44px] touch-polish flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm text-ink-soft hover:border-rule hover:bg-paper-2 hover:text-ink active:scale-[0.99] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="tap-target min-h-[44px] touch-polish flex items-center gap-3 rounded-xl border border-rule/80 bg-paper-2/60 px-4 py-3 text-sm text-ink hover:border-ink hover:bg-paper hover:shadow-2xs active:scale-[0.98] transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/40"
               aria-label={`Read full article on ${label} (opens in new tab)`}
             >
               <SourceFavicon url={source.url} />
-              <span className="flex-1 min-w-0 truncate font-medium">
+              <span className="flex-1 min-w-0 truncate font-mono font-bold text-[13px] tracking-tight">
                 {label}
               </span>
-              <ExternalLink className="w-3.5 h-3.5 text-accent opacity-65 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+              <ExternalLink className="w-4 h-4 text-ink-soft group-hover:text-ink group-hover:translate-x-0.5 transition-all flex-shrink-0" />
             </a>
           </li>
         );

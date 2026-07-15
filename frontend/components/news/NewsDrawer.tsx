@@ -199,7 +199,7 @@ export function NewsDrawer({
   return createPortal(
     <>
       <div
-        className={`fixed inset-0 bg-ink/50 transition-opacity duration-200 ${Z_INDEX.modalBackdrop} ${show ? "opacity-100" : "opacity-0"}`}
+        className={`fixed inset-0 bg-ink/60 backdrop-blur-xs transition-opacity duration-300 transform-gpu ${Z_INDEX.modalBackdrop} ${show ? "opacity-100" : "opacity-0"}`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -215,19 +215,19 @@ export function NewsDrawer({
           aria-label={`Article: ${displayPost.headline}`}
           tabIndex={-1}
           onKeyDown={handleKeyDown}
-          className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper/80 backdrop-blur-xl border-l border-rule/50 lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(500px,42vw)] 2xl:w-[min(540px,32vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-all duration-300 ease-out ${show ? "opacity-100 translate-y-0 lg:translate-x-0" : "opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full"}`}
+          className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper-2/95 glass border-l-2 border-ink/30 shadow-2xl lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(520px,44vw)] 2xl:w-[min(580px,34vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-all duration-300 ease-out ${show ? "opacity-100 translate-y-0 lg:translate-x-0" : "opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full"}`}
           style={{
             paddingTop: "env(safe-area-inset-top, 0px)",
             paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
         >
           <div
-            className="pointer-events-auto lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none"
+            className="pointer-events-auto lg:hidden flex-shrink-0 flex flex-col items-center pt-3 pb-1.5 cursor-grab active:cursor-grabbing touch-none"
             onPointerDown={handleDragStart}
             onPointerMove={handleDragMove}
             onPointerUp={handleDragEnd}
           >
-            <div className="w-10 h-1 rounded-full bg-rule-strong" />
+            <div className="w-12 h-1.5 rounded-full bg-rule-strong shadow-inner transition-transform active:scale-95" />
           </div>
 
           <DrawerHeader
