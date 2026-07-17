@@ -183,6 +183,7 @@ export const fetchLatestPost = cache(async (): Promise<Post | null> => {
       .from("posts")
       .select(FEED_COLUMNS)
       .eq("status", "published")
+      .order("published_at", { ascending: false })
       .limit(1)
       .single();
 

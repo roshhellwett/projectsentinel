@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Share2, Link as LinkIcon, X, Check } from "lucide-react";
 import { Z_INDEX } from "@/lib/theme/zIndex";
 import { cn } from "@/lib/utils/cn";
+import { buttonVariants } from "@/components/ui/Button";
 import { showToast } from "@/lib/utils/toast";
 import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
 import { useI18n } from "@/lib/i18n/context";
@@ -173,8 +174,9 @@ export function ShareButtons({
         type="button"
         onClick={handleShareClick}
         className={cn(
-          "tap-target inline-flex items-center gap-2 px-3.5 py-2 rounded bg-paper border border-rule text-muted hover:text-ink hover:border-ink transition-all hover-lift active:scale-95 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-          (isInline || isSheet) && "w-full justify-center",
+          buttonVariants({ variant: "outline" }),
+          "gap-2 font-bold transition-all duration-200 active:scale-95 max-w-full",
+          (isInline || isSheet) && "w-full justify-center px-3 py-2.5",
           buttonClassName,
         )}
         aria-label={t("share.aria_button")}
