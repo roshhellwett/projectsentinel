@@ -104,50 +104,68 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
       ) : (
         <ul className="space-y-3">
           {related.map((post, i) => (
-            <li
+            <DrawerRelatedItem
               key={post.id}
-              className="animate-slide-up"
-              style={{
-                animationDelay: `${i * 40}ms`,
-                animationFillMode: "both",
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => onSelect(post)}
-                className="group relative flex w-full flex-col justify-between gap-2.5 rounded-[16px] border-2 border-ink bg-paper p-4 text-left shadow-[3px_3px_0px_rgb(var(--c-ink))] transition-all duration-200 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_rgb(var(--c-ink))] active:translate-y-0.5 active:translate-x-0.5 active:shadow-[1.5px_1.5px_0px_rgb(var(--c-ink))] focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 min-h-[90px]"
-              >
-                <div className="flex w-full items-start justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
-                    <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink bg-paper/80 px-2 py-0.5 rounded border border-rule/70 shadow-2xs">
-                      {post.category}
-                    </span>
-                    <span className="text-ink-soft/40" aria-hidden="true">
-                      ·
-                    </span>
-                    <span
-                      className="font-mono text-[10px] sm:text-[11px] text-ink-soft"
-                      suppressHydrationWarning
-                    >
-                      {useTimeAgo(post.published_at)}
-                    </span>
-                  </div>
-                  <VerificationStamp score={post.credibility_score} compact />
-                </div>
-                <div className="flex w-full items-start justify-between gap-3 mt-1">
-                  <p className="font-display font-[800] text-[15px] sm:text-[16px] leading-[1.25] tracking-[-0.015em] text-ink line-clamp-2 group-hover:text-ink/90 transition-colors flex-1">
-                    {post.headline}
-                  </p>
-                  <ArrowUpRight
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-ink-soft transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
-                    aria-hidden="true"
-                  />
-                </div>
-              </button>
-            </li>
+              post={post}
+              index={i}
+              onSelect={onSelect}
+            />
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+interface DrawerRelatedItemProps {
+  post: Post;
+  index: number;
+  onSelect: (post: Post) => void;
+}
+
+function DrawerRelatedItem({ post, index, onSelect }: DrawerRelatedItemProps) {
+  const timeAgo = useTimeAgo(post.published_at);
+
+  return (
+    <li
+      className="animate-slide-up"
+      style={{
+        animationDelay: `${index * 40}ms`,
+        animationFillMode: "both",
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => onSelect(post)}
+        className="group relative flex w-full flex-col justify-between gap-2.5 rounded-[16px] border-2 border-ink bg-paper p-4 text-left shadow-[3px_3px_0px_rgb(var(--c-ink))] transition-all duration-200 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_rgb(var(--c-ink))] active:translate-y-0.5 active:translate-x-0.5 active:shadow-[1.5px_1.5px_0px_rgb(var(--c-ink))] focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 min-h-[90px]"
+      >
+        <div className="flex w-full items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink bg-paper/80 px-2 py-0.5 rounded border border-rule/70 shadow-2xs">
+              {post.category}
+            </span>
+            <span className="text-ink-soft/40" aria-hidden="true">
+              ·
+            </span>
+            <span
+              className="font-mono text-[10px] sm:text-[11px] text-ink-soft"
+              suppressHydrationWarning
+            >
+              {timeAgo}
+            </span>
+          </div>
+          <VerificationStamp score={post.credibility_score} compact />
+        </div>
+        <div className="flex w-full items-start justify-between gap-3 mt-1">
+          <p className="font-display font-[800] text-[15px] sm:text-[16px] leading-[1.25] tracking-[-0.015em] text-ink line-clamp-2 group-hover:text-ink/90 transition-colors flex-1">
+            {post.headline}
+          </p>
+          <ArrowUpRight
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-ink-soft transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
+            aria-hidden="true"
+          />
+        </div>
+      </button>
+    </li>
   );
 }
