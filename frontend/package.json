@@ -41,7 +41,7 @@
     "@next/bundle-analyzer": "^16.2.10",
     "@playwright/test": "^1.60.0",
     "@sentry/nextjs": "^10.65.0",
-    "@storybook/addon-a11y": "^8.6.18",
+    "@storybook/addon-a11y": "^10.5.2",
     "@storybook/addon-essentials": "^8.6.18",
     "@storybook/addon-interactions": "^8.6.18",
     "@storybook/blocks": "^8.6.18",
