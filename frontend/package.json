@@ -56,7 +56,7 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.1",
+    "eslint": "^10.7.0",
     "eslint-config-next": "^15.5.20",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.10",
