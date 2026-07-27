@@ -256,11 +256,19 @@ export function ChatBubble() {
           role="dialog"
           aria-modal="false"
           aria-label="India Verified desk assistant"
-          className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+8.25rem)] right-3 z-[74] flex w-[min(23rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-[rgb(var(--c-rule-strong))] bg-[rgb(var(--c-paper-tint))]/85 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_24px_60px_-24px_rgb(var(--c-shadow)/0.55)] sm:bottom-24 sm:right-6"
-          style={{ maxHeight: "min(32rem, calc(100dvh - 11rem))" }}
+          className="fixed inset-0 z-[80] flex w-full flex-col overflow-hidden bg-[rgb(var(--c-paper))]/95 backdrop-blur-2xl backdrop-saturate-150 pb-safe pt-safe sm:bottom-24 sm:right-6 sm:left-auto sm:top-auto sm:w-[23rem] sm:rounded-lg sm:border sm:border-[rgb(var(--c-rule-strong))] sm:bg-[rgb(var(--c-paper-tint))]/85 sm:shadow-[0_24px_60px_-24px_rgb(var(--c-shadow)/0.55)] h-dynamic sm:h-auto sm:max-h-[min(32rem,calc(100dvh-11rem))]"
         >
-          <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[rgb(var(--c-rule))] bg-[rgb(var(--c-paper))]/70 px-4 py-3 backdrop-blur-md">
-            <div className="min-w-0">
+          <header className="flex items-center gap-3 border-b border-[rgb(var(--c-rule))] bg-[rgb(var(--c-paper))]/95 px-4 py-3 backdrop-blur-md">
+            <button
+              onClick={() => setOpen(false)}
+              className="sm:hidden tap-target -ml-2 text-[rgb(var(--c-ink-soft))] hover:text-[rgb(var(--c-ink))]"
+              aria-label="Close chat"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="min-w-0 flex-1">
               <p className="truncate text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--c-muted))]">
                 India Verified
               </p>
