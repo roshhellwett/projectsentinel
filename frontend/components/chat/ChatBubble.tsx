@@ -31,8 +31,7 @@ function uid() {
 }
 
 function AssistantText({ text }: { text: string }) {
-  const cleanText = text.replace(/\(\/news\/([0-9a-fA-F-]{36})\)/g, '/news/$1');
-  const lines = cleanText.split('\n');
+  const lines = text.split('\n');
 
   return (
     <div className="flex flex-col gap-3.5">
@@ -42,17 +41,22 @@ function AssistantText({ text }: { text: string }) {
         const isList = line.trim().startsWith('* ') || line.trim().startsWith('- ');
         const content = isList ? line.trim().substring(2) : line;
 
-        const parts = content.split(/(\/news\/[0-9a-fA-F-]{36}|\*\*.*?\*\*)/g);
+        const parts = content.split(/(\[.*?\]\(\/news\/[0-9a-fA-F-]{36}\)|\/news\/[0-9a-fA-F-]{36}|\*\*.*?\*\*)/g);
 
         const renderedContent = parts.map((part, j) => {
-          if (/^\/news\/[0-9a-fA-F-]{36}$/.test(part)) {
+          const mdLinkMatch = part.match(/^\[(.*?)\]\(\/news\/([0-9a-fA-F-]{36})\)$/);
+          const rawLinkMatch = part.match(/^\/news\/([0-9a-fA-F-]{36})$/);
+          
+          if (mdLinkMatch || rawLinkMatch) {
+            const headline = mdLinkMatch ? mdLinkMatch[1].toUpperCase() : "READ STORY";
+            const id = mdLinkMatch ? mdLinkMatch[2] : rawLinkMatch![1];
             return (
               <Link
                 key={j}
-                href={part}
+                href={`/news/${id}`}
                 className="mt-1 mb-1 ml-2 inline-flex items-center justify-center rounded-full bg-ink px-3.5 py-1 text-[0.65rem] font-bold uppercase tracking-widest text-paper shadow-sm transition-all hover:-translate-y-0.5 hover:bg-accent hover:shadow-md focus:outline-none focus:ring-2 focus:ring-accent align-middle"
               >
-                Read Story
+                {headline}
                 <svg className="ml-1.5 h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
