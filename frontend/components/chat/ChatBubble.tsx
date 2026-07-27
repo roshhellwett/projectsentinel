@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useChatContext } from "@/components/chat/ChatContext";
 
 type Role = "user" | "assistant";
 type Message = { id: string; role: Role; content: string; degraded?: boolean };
@@ -14,6 +15,12 @@ const PROMPTS = [
   "What's new today?",
   "How is the credibility score decided?",
   "Latest in tech",
+] as const;
+
+const CONTEXTUAL_PROMPTS = [
+  "Is this news true?",
+  "Summarize this story",
+  "Show related stories",
 ] as const;
 
 const MAX_CHARS = 800;
@@ -92,6 +99,7 @@ function AssistantText({ text }: { text: string }) {
 }
 
 export function ChatBubble() {
+  const { activeArticle } = useChatContext();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -136,9 +144,14 @@ export function ChatBubble() {
         .slice(-HISTORY_TURNS)
         .map((m) => ({ role: m.role, content: m.content }));
 
+      const displayMessage = text;
+      const backendMessage = activeArticle
+        ? `[Context: Regarding the article "${activeArticle.headline}" (ID: ${activeArticle.id})]\n${text}`
+        : text;
+
       setMessages((prev) => [
         ...prev,
-        { id: uid(), role: "user", content: text },
+        { id: uid(), role: "user", content: displayMessage },
       ]);
       setInput("");
       setBusy(true);
@@ -147,7 +160,7 @@ export function ChatBubble() {
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, history }),
+          body: JSON.stringify({ message: backendMessage, history }),
         });
         const data = (await res.json()) as {
           reply?: string;
@@ -192,7 +205,7 @@ export function ChatBubble() {
         aria-label={
           open ? "Close the desk assistant" : "Ask the desk assistant"
         }
-        className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+4.75rem)] right-4 z-[60] grid place-items-center rounded-full border border-[rgb(var(--c-ink))] bg-[rgb(var(--c-paper))] text-[rgb(var(--c-ink))] shadow-[0_6px_24px_-8px_rgb(var(--c-shadow)/0.45)] transition-transform duration-300 [transition-timing-function:var(--ease-apple)] hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--c-ink))] active:scale-95 sm:bottom-6 sm:right-6"
+        className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+4.75rem)] right-4 z-[75] grid place-items-center rounded-full border border-[rgb(var(--c-ink))] bg-[rgb(var(--c-paper))] text-[rgb(var(--c-ink))] shadow-[0_6px_24px_-8px_rgb(var(--c-shadow)/0.45)] transition-transform duration-300 [transition-timing-function:var(--ease-apple)] hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--c-ink))] active:scale-95 sm:bottom-6 sm:right-6"
         style={{ height: "3.25rem", width: "3.25rem" }}
       >
         <span className="sr-only">Desk assistant</span>
@@ -239,7 +252,7 @@ export function ChatBubble() {
           role="dialog"
           aria-modal="false"
           aria-label="India Verified desk assistant"
-          className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+8.25rem)] right-3 z-[59] flex w-[min(23rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-[rgb(var(--c-rule-strong))] bg-[rgb(var(--c-paper-tint))]/85 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_24px_60px_-24px_rgb(var(--c-shadow)/0.55)] sm:bottom-24 sm:right-6"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+8.25rem)] right-3 z-[74] flex w-[min(23rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-[rgb(var(--c-rule-strong))] bg-[rgb(var(--c-paper-tint))]/85 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_24px_60px_-24px_rgb(var(--c-shadow)/0.55)] sm:bottom-24 sm:right-6"
           style={{ maxHeight: "min(32rem, calc(100dvh - 11rem))" }}
         >
           <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[rgb(var(--c-rule))] bg-[rgb(var(--c-paper))]/70 px-4 py-3 backdrop-blur-md">
@@ -325,7 +338,7 @@ export function ChatBubble() {
                 transition={{ delay: 0.2 }}
                 className="flex flex-wrap gap-2 pt-1 pl-[2.125rem]"
               >
-                {PROMPTS.map((p) => (
+                {(activeArticle ? CONTEXTUAL_PROMPTS : PROMPTS).map((p) => (
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}

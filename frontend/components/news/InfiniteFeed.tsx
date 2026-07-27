@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo, memo } from "react";
+import { useState, useRef, useCallback, useMemo, memo, useEffect } from "react";
 import { Post } from "@/types";
 import { cn } from "@/lib/utils/cn";
 import { dedupe } from "@/lib/utils/dedupe";
@@ -13,6 +13,7 @@ import { useReadPosts } from "@/lib/utils/readPosts";
 import { useDailyReadCount } from "@/lib/hooks/useDailyReadCount";
 import { useI18n } from "@/lib/i18n/i18n-shared";
 import dynamic from "next/dynamic";
+import { useChatContext } from "@/components/chat/ChatContext";
 
 const NewsDrawer = dynamic(
   () => import("./NewsDrawer").then((m) => m.NewsDrawer),
@@ -119,6 +120,11 @@ export function InfiniteFeed({
 
   const { t } = useI18n();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  
+  const { setActiveArticle } = useChatContext();
+  useEffect(() => {
+    setActiveArticle(selectedPost);
+  }, [selectedPost, setActiveArticle]);
 
   const { readIds, markRead } = useReadPosts();
   const { dailyCount, streak, milestone, recordRead } = useDailyReadCount();
