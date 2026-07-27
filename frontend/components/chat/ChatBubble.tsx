@@ -190,7 +190,7 @@ export function ChatBubble() {
         inputRef.current?.focus();
       }
     },
-    [busy, messages],
+    [busy, messages, activeArticle],
   );
 
   return (
