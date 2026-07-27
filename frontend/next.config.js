@@ -50,7 +50,6 @@ const nextConfig = {
   trailingSlash: false,
   poweredByHeader: false,
   compress: true,
-  output: 'standalone',
   reactStrictMode: true,
   httpAgentOptions: {
     keepAlive: true,
