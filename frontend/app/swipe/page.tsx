@@ -32,15 +32,15 @@ export default async function SwipePage() {
     <>
       <DesktopRedirect />
       <main className="md:hidden flex flex-col items-center pt-3 pb-24 min-h-[calc(100dvh-3.5rem)] overscroll-none">
-        <header className="w-full max-w-md px-4 mb-2 sm:mb-3">
+        <header className="w-full max-w-md px-fluid-sm mb-fluid-3xs min-w-0">
           <span
-            className="block w-8 h-[2px] bg-accent rounded-full mb-2"
+            className="block w-8 h-[2px] bg-accent rounded-full mb-fluid-3xs"
             aria-hidden="true"
           />
-          <h1 className="font-display text-base sm:text-lg font-bold text-ink leading-tight">
+          <h1 className="font-display text-fluid-md font-bold text-ink leading-tight">
             {messages["swipe.page_title"]}
           </h1>
-          <p className="text-[10px] sm:text-[11px] text-muted mt-0.5">
+          <p className="text-fluid-2xs text-muted mt-0.5">
             {messages["swipe.page_subtitle"]}
           </p>
         </header>
@@ -50,11 +50,11 @@ export default async function SwipePage() {
       </main>
 
       <div className="hidden md:flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] px-4">
-        <div className="max-w-md text-center">
-          <h1 className="font-display text-3xl font-bold text-ink mb-3">
+        <div className="max-w-prose-fluid text-center">
+          <h1 className="font-display text-fluid-2xl font-bold text-ink mb-fluid-2xs">
             {messages["swipe.mobile_only"]}
           </h1>
-          <p className="text-muted mb-6">
+          <p className="text-muted mb-fluid-md">
             {messages["swipe.mobile_only_desc"]}
           </p>
           <Link

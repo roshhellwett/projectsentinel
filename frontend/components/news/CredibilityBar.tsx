@@ -44,22 +44,22 @@ export function CredibilityBar({
     >
       <div
         className={cn(
-          "flex items-center justify-between gap-3",
+          "flex items-center justify-between gap-fluid-xs",
           compact ? "mb-1" : "mb-2",
         )}
       >
         <span
           className={cn(
             "truncate font-mono font-bold tracking-wider uppercase text-ink-soft",
-            compact ? "text-[9px]" : "text-[11px]",
+            compact ? "text-fluid-2xs" : "text-fluid-xs",
           )}
         >
           {compact ? label : `${t("credibility.score")} (${label})`}
         </span>
         <span
           className={cn(
-            "flex-shrink-0 font-mono font-extrabold tabular-nums text-ink bg-ink/5 px-2 py-0.5 rounded border border-rule",
-            compact ? "text-[10px]" : "text-xs",
+            "flex-shrink-0 font-mono font-extrabold tabular-nums text-ink bg-ink/5 px-2 py-0.5 rounded-token-xs border border-rule",
+            compact ? "text-fluid-2xs" : "text-fluid-xs",
           )}
         >
           {clamped}
@@ -98,7 +98,7 @@ export function CredibilityBar({
       </div>
 
       {!compact && (
-        <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] font-semibold text-ink-soft/80 uppercase tracking-widest">
+        <div className="mt-1.5 flex items-center justify-between font-mono text-fluid-2xs font-semibold text-ink-soft/80 uppercase tracking-widest">
           <span>{t("credibility.low")}</span>
           <span>{t("credibility.moderate")}</span>
           <span>{t("credibility.high")}</span>

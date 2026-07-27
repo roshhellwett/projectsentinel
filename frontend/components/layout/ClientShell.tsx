@@ -32,6 +32,10 @@ const ToastProvider = dynamic(
   () => import("@/components/ui/ToastProvider").then((m) => m.ToastProvider),
   { ssr: false },
 );
+const ChatBubble = dynamic(
+  () => import("@/components/chat/ChatBubble").then((m) => m.ChatBubble),
+  { ssr: false },
+);
 
 export default function ClientShell({ children }: { children: ReactNode }) {
   return (
@@ -52,6 +56,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
         </PageEntrance>
         <CookieConsent />
         <ToastProvider />
+        <ChatBubble />
       </I18nProvider>
       <ScrollToTop />
       <KeyboardShortcuts />

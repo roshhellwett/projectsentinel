@@ -105,16 +105,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-        <header className="mb-6 sm:mb-10 pb-5 sm:pb-8 border-b border-rule">
+        <header className="mb-fluid-lg pb-fluid-md border-b border-rule">
           <span
             aria-hidden="true"
-            className="block w-8 sm:w-10 h-[2px] bg-accent rounded-full mb-3 sm:mb-5"
+            className="block w-8 sm:w-10 h-[2px] bg-accent rounded-full mb-fluid-xs"
           />
-          <p className="editorial-kicker mb-1.5 sm:mb-3">Category</p>
-          <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-bold tracking-tight text-ink mb-2 sm:mb-4">
+          <p className="editorial-kicker mb-fluid-2xs">Category</p>
+          <h1 className="font-display text-fluid-3xl sm:text-fluid-4xl font-bold tracking-tight text-ink mb-fluid-2xs">
             {categoryName}
           </h1>
-          <p className="text-xs sm:text-sm md:text-base text-muted max-w-xl leading-relaxed">
+          <p className="text-fluid-sm text-muted max-w-prose-fluid leading-relaxed">
             AI-verified {slug} stories cross-referenced across multiple trusted
             sources.
           </p>
@@ -122,7 +122,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
         <Suspense
           fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-fluid-sm items-stretch">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i}>
                   <FeedSkeleton />

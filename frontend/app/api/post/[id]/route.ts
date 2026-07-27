@@ -7,6 +7,7 @@ import {
   invalidateServerCache,
 } from "@/lib/api/serverCache";
 
+export const maxDuration = 10;
 export const dynamic = "force-dynamic";
 
 const VALID_STATUSES = ["published", "corrected", "retracted"] as const;

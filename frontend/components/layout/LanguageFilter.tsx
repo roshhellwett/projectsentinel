@@ -30,13 +30,13 @@ export function LanguageFilter() {
   const { locale, setLocale, t } = useI18n();
 
   return (
-    <div className="relative flex items-center gap-1.5">
+    <div className="relative flex items-center gap-fluid-3xs shrink-0">
       <LangIcon />
       <select
         value={locale}
         onChange={(e) => setLocale(e.target.value as Locale)}
         aria-label={t("lang.switch_to", { language: t(`lang.${locale}`) })}
-        className="appearance-none bg-paper/70 backdrop-blur-sm border border-rule/60 rounded-sm px-2.5 py-1.5 sm:px-2 sm:py-1 pr-5 font-body text-xs text-muted hover:text-ink cursor-pointer transition-colors"
+        className="appearance-none bg-paper/70 backdrop-blur-sm border border-rule/60 rounded-token-sm min-h-[44px] sm:min-h-0 px-fluid-2xs py-fluid-3xs pr-5 font-body text-fluid-2xs text-muted hover:text-ink cursor-pointer transition-colors duration-base"
       >
         {LOCALES.map((l) => (
           <option key={l.code} value={l.code}>

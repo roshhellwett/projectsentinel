@@ -39,11 +39,11 @@ export function ScrollToTop() {
       onClick={scrollToTop}
       className={`
         tap-target min-w-[44px] min-h-[44px] flex items-center justify-center
-        scroll-to-top fixed right-3 sm:right-4 p-3
-        bottom-[calc(7rem+env(safe-area-inset-bottom,0px))] md:bottom-[calc(2rem+env(safe-area-inset-bottom,0px))]
+        scroll-to-top fixed right-4 sm:right-6 p-3
+        bottom-[calc(9rem+env(safe-area-inset-bottom,0px))] sm:bottom-24
         bg-accent hover:bg-accent/90 text-paper rounded-full
         shadow-paper-lift hover-lift
-        touch-polish transition-all duration-300 ${Z_INDEX.dropdown}
+        touch-polish transition-all duration-slow ${Z_INDEX.dropdown}
         active:scale-90
         focus:outline-none focus-visible:ring-2 focus-visible:ring-accent
         ${isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-90 pointer-events-none"}

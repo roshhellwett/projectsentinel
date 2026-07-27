@@ -20,40 +20,42 @@ export default async function StatusPage() {
     : null;
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold mb-8">System Status</h1>
+    <main className="max-w-prose-fluid mx-auto px-fluid-sm py-fluid-lg">
+      <h1 className="font-display text-fluid-2xl font-bold text-ink mb-fluid-lg">
+        System Status
+      </h1>
 
-      <section className="space-y-4">
-        <div className="border border-rule rounded-lg p-4">
-          <h2 className="font-semibold text-sm text-muted mb-1">
+      <section className="space-y-fluid-sm">
+        <div className="border border-rule rounded-token-md p-fluid-sm min-w-0">
+          <h2 className="font-semibold text-fluid-xs text-muted mb-fluid-3xs">
             Latest Article
           </h2>
-          <p className="text-lg font-bold truncate">
+          <p className="text-fluid-lg font-bold text-ink truncate min-w-0">
             {latest?.headline || "No articles found"}
           </p>
           {uptime !== null && (
-            <p className="text-xs text-muted mt-1">
+            <p className="text-fluid-2xs text-muted mt-1">
               Published {uptime} minutes ago
             </p>
           )}
         </div>
 
-        <div className="border border-rule rounded-lg p-4">
-          <h2 className="font-semibold text-sm text-muted mb-1">
+        <div className="border border-rule rounded-token-md p-fluid-sm">
+          <h2 className="font-semibold text-fluid-xs text-muted mb-fluid-3xs">
             Pipeline Status
           </h2>
-          <p className="text-sm">
+          <p className="text-fluid-sm text-ink">
             {feed?.posts?.length
               ? "Active — articles being published"
               : "Waiting for pipeline data"}
           </p>
         </div>
 
-        <div className="border border-rule rounded-lg p-4">
-          <h2 className="font-semibold text-sm text-muted mb-1">
+        <div className="border border-rule rounded-token-md p-fluid-sm">
+          <h2 className="font-semibold text-fluid-xs text-muted mb-fluid-3xs">
             CI/CD Badges
           </h2>
-          <div className="flex flex-wrap gap-2 mt-2">
+          <div className="flex flex-wrap gap-fluid-3xs mt-2">
             <Image
               alt="CI status"
               src="https://img.shields.io/badge/CI-passing-green"

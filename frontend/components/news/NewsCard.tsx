@@ -145,8 +145,8 @@ const NewsCardComponent = ({
       aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}${typeof rank === "number" ? ` (Rank #${rank})` : ""}`}
       data-read={isRead ? "true" : "false"}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation p-4 sm:p-6 flex flex-col h-full bg-paper transform-gpu transition-all duration-300 ease-out",
-        "rounded-[20px] sm:rounded-[24px] border-2 border-ink",
+        "group relative cursor-pointer select-none touch-manipulation p-fluid-sm sm:p-fluid-md flex flex-col h-full bg-paper transform-gpu transition-all duration-base ease-apple",
+        "rounded-token-lg border-2 border-ink",
         "shadow-[4px_4px_0px_rgb(var(--c-ink))]",
         "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",
         "active:translate-y-0.5 active:translate-x-0.5 active:shadow-[2px_2px_0px_rgb(var(--c-ink))]",
@@ -157,21 +157,21 @@ const NewsCardComponent = ({
     >
 
 
-      <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3 min-h-[18px] sm:min-h-[20px]">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">
+      <div className="flex items-start justify-between gap-fluid-3xs sm:gap-fluid-2xs mb-fluid-2xs sm:mb-fluid-xs min-h-[20px]">
+        <div className="flex flex-wrap items-center gap-fluid-3xs sm:gap-fluid-2xs min-w-0">
           {typeof rank === "number" && (
-            <span className="flex items-center justify-center h-5 px-1.5 rounded border border-ink text-ink font-mono font-bold text-[10px] bg-paper shadow-[1.5px_1.5px_0px_rgb(var(--c-ink))]">
+            <span className="flex items-center justify-center h-5 px-1.5 rounded-token-xs border border-ink text-ink font-mono font-bold text-fluid-2xs bg-paper shadow-[1.5px_1.5px_0px_rgb(var(--c-ink))] shrink-0">
               {rank < 10 ? `#0${rank}` : `#${rank}`}
             </span>
           )}
-          <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink bg-paper/80 px-2 py-0.5 rounded border border-rule/70 shadow-2xs">
+          <span className="font-mono text-fluid-2xs font-bold tracking-wider uppercase text-ink bg-paper/80 px-2 py-0.5 rounded-token-xs border border-rule/70 shadow-2xs shrink-0">
             {post.category}
           </span>
           <span className="text-ink-soft/40" aria-hidden="true">
             ·
           </span>
           <span
-            className="font-mono text-[10px] sm:text-[11px] text-ink-soft"
+            className="font-mono text-fluid-2xs text-ink-soft shrink-0"
             suppressHydrationWarning
           >
             {useTimeAgo(post.published_at)}
@@ -179,7 +179,7 @@ const NewsCardComponent = ({
           {labelToDisplay && (
             <span
               className={cn(
-                "font-mono text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded shadow-2xs border",
+                "font-mono text-fluid-2xs font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-token-xs shadow-2xs border shrink-0",
                 (labelToDisplay.priority ?? 1) >= 3
                   ? "text-paper bg-red-600 border-red-700 animate-pulse"
                   : "text-ink bg-amber-400/30 border-amber-500/40",
@@ -189,22 +189,22 @@ const NewsCardComponent = ({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <VerificationStamp score={post.credibility_score} compact />
         </div>
       </div>
 
-      <h3 className="font-display font-[800] text-[16px] sm:text-[19px] leading-[1.22] tracking-[-0.015em] text-ink line-clamp-3 mb-2 sm:mb-2.5 flex-shrink-0 group-hover:text-ink/90 transition-colors">
+      <h3 className="font-display font-[800] text-fluid-md leading-[1.22] tracking-[-0.015em] text-ink line-clamp-3 mb-fluid-2xs sm:mb-2.5 flex-shrink-0 group-hover:text-ink/90 transition-colors duration-base">
         {post.headline}
       </h3>
 
-      <p className="font-body text-[13px] sm:text-[14.5px] leading-[1.55] text-ink-soft line-clamp-2 mb-3 sm:mb-4 flex-shrink-0 font-normal">
+      <p className="font-body text-fluid-sm leading-[1.55] text-ink-soft line-clamp-2 mb-fluid-xs sm:mb-fluid-sm flex-shrink-0 font-normal">
         {truncateWords(post.summary, 22)}
       </p>
 
-      <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-rule/70">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ink-soft font-medium shrink-0">
+      <div className="flex items-center justify-between gap-fluid-2xs mt-auto pt-fluid-xs border-t border-rule/70">
+        <div className="flex items-center gap-fluid-2xs sm:gap-fluid-xs min-w-0">
+          <span className="inline-flex items-center gap-1 font-mono text-fluid-xs text-ink-soft font-medium shrink-0">
             <ShieldIcon />
             {sourcesCount}{" "}
             {t(sourcesCount === 1 ? "card.source" : "card.sources")}
@@ -212,7 +212,7 @@ const NewsCardComponent = ({
           <button
             type="button"
             onClick={handleYoutubeClick}
-            className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 hover:bg-ink/15 active:scale-95 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded transition-all shadow-2xs"
+            className="inline-flex items-center gap-1 px-2 py-2 min-h-[44px] sm:min-h-[36px] border border-ink/25 text-ink bg-ink/5 hover:bg-ink/15 active:scale-95 font-body text-fluid-2xs font-bold tracking-wider uppercase rounded-token-xs transition-all duration-base shadow-2xs shrink-0"
             aria-label={t("news.aria_youtube", { headline: post.headline })}
           >
             <YoutubeIcon className="text-ink" />
@@ -223,7 +223,7 @@ const NewsCardComponent = ({
       </div>
 
       {isRead && (
-        <span className="inline-flex items-center gap-1 self-start px-2.5 py-0.5 mt-2 border border-rule rounded-full text-[10px] font-mono font-medium text-ink-soft bg-paper-2">
+        <span className="inline-flex items-center gap-1 self-start px-2.5 py-0.5 mt-fluid-2xs border border-rule rounded-full text-fluid-2xs font-mono font-medium text-ink-soft bg-paper-2">
           <EyeIcon />
           {t("card.viewed")}
         </span>

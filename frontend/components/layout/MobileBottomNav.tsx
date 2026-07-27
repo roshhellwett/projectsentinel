@@ -169,34 +169,34 @@ export function MobileBottomNav() {
       {topicsOpen && (
         <div
           id="mobile-topics-sheet"
-          className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay} transition-opacity duration-200 ${
+          className={`md:hidden fixed inset-0 ${Z_INDEX.mobileNavOverlay} transition-opacity duration-base ${
             topicsOpen ? "opacity-100" : "opacity-0"
           }`}
         >
           <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
           <div
-            className={`absolute left-2 right-2 max-[380px]:left-1.5 max-[380px]:right-1.5 bg-paper/95 backdrop-blur-2xl border border-rule shadow-2xl rounded-t-2xl transition-transform duration-300 ${
+            className={`absolute left-2 right-2 max-[380px]:left-1.5 max-[380px]:right-1.5 bg-paper/95 backdrop-blur-2xl border border-rule shadow-2xl rounded-t-2xl transition-transform duration-slow ${
               topicsOpen ? "translate-y-0" : "translate-y-full"
             }`}
             style={{
               bottom: "calc(4.5rem + env(safe-area-inset-bottom, 0px))",
             }}
           >
-            <div className="p-4 pb-5 max-h-[70vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <p className="font-body text-[11px] font-bold tracking-wider uppercase text-ink-soft">
+            <div className="p-fluid-sm pb-fluid-md max-h-[70vh] overflow-y-auto">
+              <div className="flex items-center justify-between gap-fluid-2xs mb-fluid-2xs px-1">
+                <p className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft min-w-0 truncate">
                   {t("nav.browse_topics")}
                 </p>
                 <button
                   type="button"
                   onClick={closeTopics}
-                  className="p-1 text-muted hover:text-ink min-touch flex items-center justify-center rounded"
+                  className="p-1 text-muted hover:text-ink min-touch shrink-0 flex items-center justify-center rounded-token-sm transition-colors duration-base"
                   aria-label="Close topics"
                 >
                   <CloseIcon />
                 </button>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-fluid-3xs">
                 {CATEGORIES.map((cat) => {
                   const active = pathname === `/category/${cat.slug}/`;
                   return (
@@ -205,7 +205,7 @@ export function MobileBottomNav() {
                       href={`/category/${cat.slug}/`}
                       prefetch={true}
                       onClick={closeTopics}
-                      className={`flex items-center justify-center px-3 py-3 text-center text-xs sm:text-sm transition-all rounded-lg min-h-[44px] ${
+                      className={`flex items-center justify-center px-3 py-3 text-center text-fluid-xs transition-all duration-base rounded-token-md min-h-[44px] ${
                         active
                           ? "bg-ink text-paper font-bold shadow-sm"
                           : "text-ink bg-paper-2/60 border border-rule/60 hover:border-ink/30 hover:bg-paper-2"
@@ -222,7 +222,7 @@ export function MobileBottomNav() {
       )}
 
       <nav
-        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transition-transform duration-300 ease-out transform-gpu ${
+        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transition-transform duration-slow ease-out transform-gpu ${
           hideForOverlay ? "translate-y-full" : "translate-y-0"
         }`}
         aria-hidden={hideForOverlay ? "true" : "false"}
@@ -230,7 +230,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? "none" : "auto" }}
       >
         <div
-          className="relative border-t-2 border-ink bg-paper/60 backdrop-blur-2xl select-none touch-manipulation transition-all duration-300"
+          className="relative border-t-2 border-ink bg-paper/60 backdrop-blur-2xl select-none touch-manipulation transition-all duration-slow"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">
@@ -240,15 +240,15 @@ export function MobileBottomNav() {
               const isTopics = tab.id === "topics";
 
               const inner = (
-                <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-90 transition-all duration-150">
+                <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-90 transition-all duration-fast">
                   {active && (
                     <span className="absolute top-0 w-8 h-[2.5px] rounded-full bg-ink shadow-2xs animate-fade-in" />
                   )}
-                  <div className={`transition-transform duration-200 ${active ? "scale-110 text-ink" : "text-muted"}`}>
+                  <div className={`transition-transform duration-base ${active ? "scale-110 text-ink" : "text-muted"}`}>
                     <Icon />
                   </div>
                   <span
-                    className={`text-[11px] leading-none tracking-tight transition-colors duration-150 ${
+                    className={`text-fluid-2xs leading-none tracking-tight transition-colors duration-fast ${
                       active ? "text-ink font-bold" : "text-muted font-medium"
                     }`}
                   >
@@ -262,7 +262,7 @@ export function MobileBottomNav() {
                   <button
                     key={tab.id}
                     onClick={toggleTopics}
-                    className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
+                    className="rounded-token-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                     aria-label="Browse topics"
                     aria-expanded={topicsOpen}
                     aria-controls="mobile-topics-sheet"
@@ -280,7 +280,7 @@ export function MobileBottomNav() {
                       window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT));
                     }}
                     aria-label="Open search"
-                    className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
+                    className="rounded-token-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                   >
                     {inner}
                   </button>
@@ -293,7 +293,7 @@ export function MobileBottomNav() {
                   prefetch={true}
                   onClick={closeTopics}
                   aria-label={t(tab.key)}
-                  className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
+                  className="rounded-token-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/50"
                 >
                   {inner}
                 </Link>

@@ -40,6 +40,44 @@
   --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
+  /* Fluid type scale — interpolates continuously between 360px and 1440px */
+  --fs-2xs: clamp(0.6875rem, 0.665rem + 0.10vw, 0.75rem);
+  --fs-xs:  clamp(0.75rem,  0.722rem + 0.12vw, 0.8125rem);
+  --fs-sm:  clamp(0.8125rem, 0.775rem + 0.17vw, 0.9375rem);
+  --fs-base:clamp(0.9375rem, 0.900rem + 0.17vw, 1.0625rem);
+  --fs-md:  clamp(1.0625rem, 1.006rem + 0.25vw, 1.1875rem);
+  --fs-lg:  clamp(1.25rem,  1.157rem + 0.42vw, 1.5rem);
+  --fs-xl:  clamp(1.5rem,   1.333rem + 0.74vw, 2rem);
+  --fs-2xl: clamp(1.875rem, 1.597rem + 1.23vw, 2.75rem);
+  --fs-3xl: clamp(2.25rem,  1.787rem + 2.06vw, 3.625rem);
+  --fs-4xl: clamp(2.75rem,  2.009rem + 3.30vw, 4.75rem);
+
+  /* Fluid space scale */
+  --sp-3xs: clamp(0.125rem, 0.111rem + 0.06vw, 0.1875rem);
+  --sp-2xs: clamp(0.25rem,  0.222rem + 0.12vw, 0.375rem);
+  --sp-xs:  clamp(0.5rem,   0.454rem + 0.21vw, 0.625rem);
+  --sp-sm:  clamp(0.75rem,  0.657rem + 0.42vw, 1rem);
+  --sp-md:  clamp(1rem,     0.815rem + 0.82vw, 1.5rem);
+  --sp-lg:  clamp(1.5rem,   1.130rem + 1.65vw, 2.5rem);
+  --sp-xl:  clamp(2rem,     1.352rem + 2.88vw, 3.75rem);
+  --sp-2xl: clamp(2.75rem,  1.732rem + 4.53vw, 5.5rem);
+  --sp-3xl: clamp(3.5rem,   1.833rem + 7.41vw, 8rem);
+
+  /* Reading measures */
+  --measure-prose: 68ch;
+  --measure-narrow: 46ch;
+
+  /* Rounding ladder */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Motion durations */
+  --dur-fast: 140ms;
+  --dur-base: 260ms;
+  --dur-slow: 480ms;
+
   color-scheme: light;
 }
 

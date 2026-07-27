@@ -114,10 +114,10 @@ export class ErrorBoundary extends Component<
               <AlertOctagon className="w-6 h-6 text-accent" strokeWidth={1.5} />
             )}
           </div>
-          <h3 className="text-base font-bold text-ink mb-1">
-            {isOffline ? "You are offline" : "Section Unavailable"}
+          <h3 className="text-fluid-md font-bold text-ink mb-1 text-balance">
+            {isOffline ? "You are offline" : "Sorry to disturb your reading"}
           </h3>
-          <p className="text-sm text-muted max-w-sm mb-5">
+          <p className="text-fluid-sm text-muted max-w-narrow-fluid mb-fluid-sm">
             {isOffline
               ? "Connect to the internet to refresh this content. Cached stories are still available."
               : "Something went wrong loading this content. This may be due to a temporary network issue or stale browser cache."}

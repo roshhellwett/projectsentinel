@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { checkRateLimit, getClientIp } from "@/lib/api/rateLimit";
 
+export const maxDuration = 10;
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_SECRET = process.env.ADMIN_SECRET_TOKEN || "";
 

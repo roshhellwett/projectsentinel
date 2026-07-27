@@ -108,7 +108,7 @@ const PIPELINE_STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="relative px-4 sm:px-6 lg:px-10 pb-24 md:pb-20 py-8 sm:py-12 max-w-5xl mx-auto">
+    <div className="relative px-fluid-sm lg:px-fluid-lg pb-24 md:pb-20 py-fluid-lg max-w-5xl mx-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -145,44 +145,44 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <div className="text-center mb-10 sm:mb-16 pb-8 sm:pb-10 border-b border-rule">
+      <div className="text-center mb-fluid-xl pb-fluid-lg border-b border-rule">
         <span
           aria-hidden="true"
-          className="block w-10 sm:w-12 h-[2px] bg-accent mb-4 sm:mb-5 mx-auto"
+          className="block w-10 sm:w-12 h-[2px] bg-accent mb-fluid-xs mx-auto"
         />
-        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-accent/10 text-accent text-xs sm:text-sm font-semibold rounded-full mb-4 sm:mb-6 border border-accent/20">
-          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        <div className="inline-flex items-center gap-2 px-fluid-sm py-fluid-3xs bg-accent/10 text-accent text-fluid-sm font-semibold rounded-full mb-fluid-sm border border-accent/20 min-h-[44px]">
+          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
           Fully Automated
         </div>
-        <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-bold mb-3 sm:mb-5 text-ink leading-[1.05] tracking-tight">
+        <h1 className="font-display text-fluid-3xl sm:text-fluid-4xl font-bold mb-fluid-xs text-ink leading-[1.05] tracking-tight">
           How India <span className="text-accent">Verified</span> works
         </h1>
-        <p className="text-sm sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
+        <p className="text-fluid-md text-muted max-w-prose-fluid mx-auto leading-relaxed">
           Every story goes through a rigorous 7-step AI verification pipeline
           before reaching you.
         </p>
       </div>
 
-      <div className="space-y-3 mb-12 sm:mb-20">
+      <div className="space-y-fluid-2xs mb-fluid-xl">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.number}>
-            <div className="np-card glass-card group flex gap-4 sm:gap-5 p-4 sm:p-6 transition-all duration-300">
-              <div className="relative z-10 flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors">
+            <div className="np-card glass-card group flex gap-fluid-xs sm:gap-fluid-sm p-fluid-sm sm:p-fluid-md transition-all duration-base">
+              <div className="relative z-10 flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors shrink-0">
                 <step.icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
               </div>
               <div className="relative z-10 flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1.5">
-                  <span className="text-[10px] font-bold text-accent uppercase tracking-[0.18em]">
+                  <span className="text-fluid-2xs font-bold text-accent uppercase tracking-[0.18em]">
                     Step {step.number}
                   </span>
-                  <span className="text-[11px] text-muted font-medium">
+                  <span className="text-fluid-2xs text-muted font-medium">
                     {step.subtitle}
                   </span>
                 </div>
-                <h2 className="font-display text-base sm:text-lg font-bold text-ink mb-1">
+                <h2 className="font-display text-fluid-md font-bold text-ink mb-1">
                   {step.title}
                 </h2>
-                <p className="text-sm text-ink-soft leading-relaxed">
+                <p className="text-fluid-sm text-ink-soft leading-relaxed">
                   {step.description}
                 </p>
               </div>
@@ -196,19 +196,19 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <div className="np-card glass-card p-4 sm:p-8 md:p-10 mb-8 sm:mb-12">
-        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">
+      <div className="np-card glass-card p-fluid-sm sm:p-fluid-lg mb-fluid-lg">
+        <h2 className="font-display text-fluid-lg sm:text-fluid-xl font-bold mb-fluid-2xs text-ink tracking-tight">
           Trusted sources
         </h2>
-        <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6">
+        <p className="text-fluid-sm text-muted mb-fluid-sm">
           We only pull from established Indian news organizations with editorial
           standards.
         </p>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+        <div className="flex flex-wrap gap-fluid-3xs">
           {TRUSTED_SOURCES.map((source) => (
             <span
               key={source}
-              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-paper/70 backdrop-blur-sm border border-rule/50 rounded text-[11px] sm:text-sm font-medium text-ink hover:border-ink transition-colors"
+              className="px-fluid-2xs py-1.5 bg-paper/70 backdrop-blur-sm border border-rule/50 rounded text-fluid-xs font-medium text-ink hover:border-ink transition-colors"
             >
               {source}
             </span>
@@ -216,11 +216,11 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="mb-8 sm:mb-12">
-        <h2 className="font-display text-lg sm:text-2xl font-bold mb-3 sm:mb-6 text-ink tracking-tight">
+      <div className="mb-fluid-lg">
+        <h2 className="font-display text-fluid-lg sm:text-fluid-xl font-bold mb-fluid-sm text-ink tracking-tight">
           Credibility scoring
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-fluid-xs sm:gap-fluid-sm">
           <ScoreCard
             range="90-100"
             label="High Credibility"
@@ -245,14 +245,14 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="np-card glass-card text-center p-5 sm:p-10">
-        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-3 sm:mb-5">
+      <div className="np-card glass-card text-center p-fluid-sm sm:p-fluid-lg">
+        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded bg-paper-2 border border-rule flex items-center justify-center mx-auto mb-fluid-xs shrink-0">
           <GitHubIcon className="w-5 h-5 sm:w-8 sm:h-8 text-ink" />
         </div>
-        <h2 className="font-display text-lg sm:text-2xl font-bold mb-2 sm:mb-3 text-ink tracking-tight">
+        <h2 className="font-display text-fluid-lg sm:text-fluid-xl font-bold mb-fluid-2xs text-ink tracking-tight">
           Open source
         </h2>
-        <p className="text-xs sm:text-base text-muted mb-4 sm:mb-6 max-w-md mx-auto leading-relaxed">
+        <p className="text-fluid-sm text-muted mb-fluid-sm max-w-prose-fluid mx-auto leading-relaxed">
           The entire codebase is public. Anyone can audit how we work, suggest
           improvements, or run their own instance.
         </p>
@@ -260,7 +260,7 @@ export default function HowItWorksPage() {
           href="https://github.com/roshhellwett/projectsentinel"
           target="_blank"
           rel="noopener noreferrer"
-          className="tap-target min-h-[44px] inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-ink hover:bg-ink/90 text-paper text-sm font-semibold rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
+          className="tap-target min-h-[44px] inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-ink hover:bg-ink/90 text-paper text-fluid-sm font-semibold rounded transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-accent hover-lift"
         >
           <GitHubIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           View on GitHub
@@ -301,16 +301,16 @@ function ScoreCard({
   description: string;
 }) {
   return (
-    <div className={`np-card glass-card p-5 sm:p-6 ${borderColor}`}>
+    <div className={`np-card glass-card p-fluid-sm ${borderColor} min-w-0`}>
       <div
-        className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-[11px] sm:text-xs font-bold rounded mb-3 tabular-nums tracking-wider`}
+        className={`relative z-10 inline-block px-2.5 py-1 bg-paper-2 border border-rule ${color} text-fluid-2xs font-bold rounded mb-fluid-2xs tabular-nums tracking-wider`}
       >
         {range}
       </div>
-      <h3 className="font-display relative z-10 font-bold text-ink mb-2 text-base sm:text-lg">
+      <h3 className="font-display relative z-10 font-bold text-ink mb-fluid-3xs text-fluid-md">
         {label}
       </h3>
-      <p className="relative z-10 text-sm text-muted leading-relaxed">
+      <p className="relative z-10 text-fluid-sm text-muted leading-relaxed">
         {description}
       </p>
     </div>

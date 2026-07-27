@@ -158,7 +158,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
         <article
           id="article-body"
-          className={`relative max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-14 ${isRetracted ? "opacity-60" : ""}`}
+          className={`relative max-w-3xl mx-auto mb-fluid-xl ${isRetracted ? "opacity-60" : ""}`}
         >
           <span
             aria-hidden="true"
@@ -178,7 +178,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
 
           <h1
-            className={`font-display font-bold text-ink tracking-[-0.03em] leading-[1.04] mb-4 sm:mb-9 text-[clamp(1.4rem,5.5vw,4rem)] ${isRetracted ? "line-through text-muted" : ""}`}
+            className={`font-display font-bold text-ink tracking-[-0.03em] leading-[1.04] mb-fluid-md text-fluid-4xl ${isRetracted ? "line-through text-muted" : ""}`}
           >
             {post.headline}
           </h1>
@@ -213,7 +213,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </div>
 
-          <p className="font-display text-[15px] sm:text-[19px] md:text-[22px] leading-[1.6] sm:leading-[1.75] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[2.8em] sm:first-letter:text-[3.5em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 sm:first-letter:mr-3 first-letter:mt-1 first-letter:text-accent">
+          <p className="font-display max-w-prose-fluid text-fluid-md leading-[1.75] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[2.8em] sm:first-letter:text-[3.5em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 sm:first-letter:mr-3 first-letter:mt-1 first-letter:text-accent">
             {post.summary}
           </p>
         </article>
@@ -224,7 +224,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               aria-hidden="true"
               className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full"
             />
-            <h2 className="font-display flex items-center gap-2 text-base sm:text-xl font-bold text-ink mb-2 sm:mb-4">
+            <h2 className="font-display flex items-center gap-2 text-fluid-lg font-bold text-ink mb-fluid-xs">
               <ShieldCheck
                 className="w-4 h-4 sm:w-5 sm:h-5 text-accent"
                 strokeWidth={2.2}
@@ -237,7 +237,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </aside>
 
           <aside className="np-card glass-card p-3 sm:p-5 md:p-8">
-            <h2 className="font-display text-sm sm:text-base font-bold text-ink mb-3 sm:mb-5 flex items-center gap-2">
+            <h2 className="font-display text-fluid-md font-bold text-ink mb-fluid-sm flex items-center gap-2">
               <Database className="w-4 h-4 text-accent" />
               Original Sources
             </h2>

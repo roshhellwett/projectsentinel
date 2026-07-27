@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.chat import router as chat_router
 from api.health import router as health_router
 from api.trigger import router as trigger_router
 from scheduler.jobs import run_pipeline
@@ -108,6 +109,7 @@ app.add_middleware(
 
 app.include_router(health_router, tags=["health"])
 app.include_router(trigger_router, tags=["trigger"])
+app.include_router(chat_router, tags=["chat"])
 
 if __name__ == "__main__":
     import uvicorn

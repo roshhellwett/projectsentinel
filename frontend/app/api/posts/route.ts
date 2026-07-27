@@ -7,6 +7,7 @@ import {
 } from "@/lib/api/serverCache";
 import { checkRateLimit, getClientIp } from "@/lib/api/rateLimit";
 
+export const maxDuration = 10;
 export const dynamic = "force-dynamic";
 
 const CACHE_HEADERS = {

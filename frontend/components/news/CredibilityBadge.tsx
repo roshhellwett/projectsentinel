@@ -26,8 +26,8 @@ export function CredibilityBadge({
   return (
     <div
       className={cn(
-        "relative group inline-flex max-w-full items-center rounded border border-rule/50 bg-paper/70 backdrop-blur-sm",
-        compact ? "gap-2 px-2.5 py-1.5" : "gap-3 px-3 py-2",
+        "relative group inline-flex max-w-full items-center rounded-token-sm border border-rule/50 bg-paper/70 backdrop-blur-sm",
+        compact ? "gap-fluid-2xs px-fluid-2xs py-1.5" : "gap-fluid-xs px-fluid-xs py-2",
       )}
       aria-label={`${t("credibility.label")}: ${clamped}/100, ${label}`}
       role="img"
@@ -35,14 +35,14 @@ export function CredibilityBadge({
       <div className={cn("flex min-w-0 flex-col", compact ? "w-16" : "w-24")}>
         <div className="mb-1 flex items-center justify-between gap-2">
           {!compact && (
-            <span className="truncate text-[9px] font-bold uppercase tracking-wider text-muted">
+            <span className="truncate text-fluid-2xs font-bold uppercase tracking-wider text-muted">
               {label}
             </span>
           )}
           <span
             className={cn(
-              "font-bold tabular-nums text-ink",
-              compact ? "text-[11px]" : "text-xs",
+              "font-bold tabular-nums text-ink shrink-0",
+              compact ? "text-fluid-xs" : "text-fluid-xs",
             )}
           >
             {clamped}
@@ -69,7 +69,7 @@ export function CredibilityBadge({
 
       {!compact && (
         <span
-          className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-wider text-muted"
+          className="min-w-0 truncate text-fluid-2xs font-semibold uppercase tracking-wider text-muted"
           aria-hidden="true"
         >
           {t("credibility.label")}
@@ -78,7 +78,7 @@ export function CredibilityBadge({
 
       {showTooltip && (
         <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-ink text-paper text-xs font-medium rounded shadow-paper-lift opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-ink text-paper text-fluid-xs font-medium rounded-token-sm shadow-paper-lift opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-base pointer-events-none whitespace-nowrap z-50"
           role="tooltip"
         >
           {label} · {t("credibility.label")} {clamped}/100

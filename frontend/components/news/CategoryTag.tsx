@@ -11,7 +11,7 @@ export function CategoryTag({ category, className = "" }: CategoryTagProps) {
 
   return (
     <span
-      className={`inline-flex items-center max-w-full text-[10px] font-bold uppercase tracking-[0.18em] text-accent ${className}`}
+      className={`inline-flex items-center max-w-full min-w-0 text-fluid-2xs font-bold uppercase tracking-[0.18em] text-accent ${className}`}
     >
       <span className="truncate">{theme.label}</span>
     </span>

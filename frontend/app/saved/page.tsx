@@ -89,19 +89,19 @@ export default function SavedPage() {
           {t("saved.back")}
         </Link>
 
-        <div className="animate-slide-up mb-6 sm:mb-10 pb-5 sm:pb-8 border-b border-rule flex flex-wrap items-end justify-between gap-4">
-          <div>
+        <div className="animate-slide-up mb-fluid-lg pb-fluid-md border-b border-rule flex flex-wrap items-end justify-between gap-fluid-sm">
+          <div className="min-w-0">
             <span
               aria-hidden="true"
-              className="block w-10 h-[2px] bg-accent rounded-full mb-3 sm:mb-5"
+              className="block w-10 h-[2px] bg-accent rounded-full mb-fluid-xs"
             />
-            <p className="editorial-kicker mb-1.5 sm:mb-3">
+            <p className="editorial-kicker mb-fluid-2xs">
               {t("saved.your_list")}
             </p>
-            <h1 className="font-display text-xl sm:text-4xl md:text-5xl font-bold tracking-[-0.03em] text-ink mb-1.5 sm:mb-3 leading-[1.05]">
+            <h1 className="font-display text-fluid-2xl sm:text-fluid-4xl font-bold tracking-[-0.03em] text-ink mb-fluid-2xs leading-[1.05]">
               {t("saved.page_title")}
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-muted max-w-xl leading-relaxed">
+            <p className="text-fluid-sm text-muted max-w-prose-fluid leading-relaxed">
               {t("saved.page_desc")}
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function SavedPage() {
         </div>
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-fluid-sm items-stretch">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i}>
                 <FeedSkeleton />
@@ -132,17 +132,17 @@ export default function SavedPage() {
         )}
 
         {!loading && !error && posts.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+          <div className="flex flex-col items-center justify-center py-20 px-fluid-sm text-center">
             <div
-              className="w-16 h-16 rounded-full border border-rule flex items-center justify-center mb-5"
+              className="w-16 h-16 rounded-full border border-rule flex items-center justify-center mb-fluid-xs shrink-0"
               style={{ backgroundColor: "rgb(var(--c-paper-2))" }}
             >
               <Bookmark className="w-7 h-7 text-muted" />
             </div>
-            <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-1.5">
+            <h2 className="font-display text-fluid-lg font-bold text-ink tracking-[-0.015em] mb-fluid-3xs">
               {t("saved.empty_title")}
             </h2>
-            <p className="text-sm text-muted max-w-sm mb-6">
+            <p className="text-fluid-sm text-muted max-w-prose-fluid mb-fluid-md">
               {t("saved.empty_desc")}
             </p>
             <Link
@@ -156,7 +156,7 @@ export default function SavedPage() {
 
         {!loading && !error && posts.length > 0 && (
           <ErrorBoundary>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-fluid-sm items-stretch">
               {posts.map((post) => (
                 <NewsCard
                   key={post.id}

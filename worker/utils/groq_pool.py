@@ -51,6 +51,15 @@ WRITE_MODEL_CHAIN: list[str] = [
     "llama-3.3-70b-versatile",
 ]
 
+# Reader-facing assistant. Cheapest tool-capable model first so the public
+# chat surface can never starve the verification/writing pipeline.
+CHAT_MODEL_CHAIN: list[str] = [
+    "llama-3.1-8b-instant",
+    "openai/gpt-oss-20b",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "llama-3.3-70b-versatile",
+]
+
 
 def model_limits(model: str) -> tuple[int, int, int]:
 
@@ -68,8 +77,9 @@ def safe_model_limits(model: str) -> tuple[int, int, int]:
 
 def _build_model_limits_map() -> dict[str, tuple[int, int, int]]:
 
-    used = set(VERIFY_MODEL_CHAIN) | set(WRITE_MODEL_CHAIN)
+    used = set(VERIFY_MODEL_CHAIN) | set(WRITE_MODEL_CHAIN) | set(CHAT_MODEL_CHAIN)
     return {m: safe_model_limits(m) for m in used}
+
 
 
 def _load_groq_keys() -> list[tuple[int, str]]:
@@ -95,6 +105,13 @@ def get_verify_model_chain() -> list[str]:
 def get_write_model_chain() -> list[str]:
 
     return _env_chain("GROQ_WRITE_MODEL_CHAIN", "GROQ_WRITE_MODEL", WRITE_MODEL_CHAIN)
+
+
+def get_chat_model_chain() -> list[str]:
+
+    return _env_chain("GROQ_CHAT_MODEL_CHAIN", "GROQ_CHAT_MODEL", CHAT_MODEL_CHAIN)
+
+
 
 
 def _env_chain(chain_var: str, head_var: str, default: list[str]) -> list[str]:

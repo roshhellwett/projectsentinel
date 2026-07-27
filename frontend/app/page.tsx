@@ -83,12 +83,12 @@ async function TrendingAndFeedSection() {
   return (
     <>
       {trendingPosts.length > 0 && (
-        <div className="mb-6 sm:mb-10">
+        <div className="mb-fluid-lg">
           <TrendingSection posts={trendingPosts} />
         </div>
       )}
 
-      <section aria-label="Latest verified news" className="mt-6 sm:mt-10">
+      <section aria-label="Latest verified news" className="mt-fluid-lg">
         <FeedSectionHeader />
         <InfiniteFeed
           initialPosts={feedPosts}
@@ -134,7 +134,7 @@ export default function HomePage() {
         }}
       />
 
-      <div className="relative z-10 px-3 sm:px-6 lg:px-10 pb-24 max-w-[1600px] mx-auto">
+      <div className="relative z-10 px-fluid-md max-[360px]:px-3 pb-24 max-w-[1600px] mx-auto">
         <Suspense
           fallback={
             <div className="h-24 animate-pulse border border-rule bg-paper-2 rounded-[8px] mb-10" />

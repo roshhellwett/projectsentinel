@@ -112,23 +112,23 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
   if (trending.length === 0) return null;
 
   return (
-    <section aria-label={t("trending.title")} className="mb-8 sm:mb-12">
-      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6 pb-3 border-b-2 border-ink/40">
-        <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-2xs animate-pulse" />
-          <h2 className="font-display font-bold text-lg sm:text-2xl text-ink tracking-tight">
+    <section aria-label={t("trending.title")} className="mb-fluid-lg">
+      <div className="flex items-center justify-between gap-fluid-xs mb-fluid-sm sm:mb-fluid-md pb-3 border-b-2 border-ink/40">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-2xs animate-pulse shrink-0" />
+          <h2 className="font-display font-bold text-fluid-lg text-ink tracking-tight min-w-0 truncate">
             {t("trending.title")}
           </h2>
         </div>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <span className="font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft bg-paper-2 px-2.5 py-1 rounded border border-rule">
+        <div className="flex items-center gap-fluid-xs sm:gap-fluid-sm shrink-0">
+          <span className="font-mono text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft bg-paper-2 px-2.5 py-1 rounded-token-xs border border-rule">
             {t("trending.top_count", { n: trending.length })}
           </span>
           <div className="hidden sm:flex items-center gap-1.5">
             <button
               onClick={() => scrollBy("left")}
               disabled={!canScrollLeft}
-              className="p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 transform-gpu rounded-lg min-touch"
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-token-md"
               aria-label={t("trending.aria_scroll_left")}
             >
               <ArrowLeft />
@@ -136,7 +136,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("right")}
               disabled={!canScrollRight}
-              className="p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 transform-gpu rounded-lg min-touch"
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-token-md"
               aria-label={t("trending.aria_scroll_right")}
             >
               <ArrowRight />
@@ -148,7 +148,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       <ErrorBoundary>
         <div
           ref={carouselRef}
-          className="flex gap-4 sm:gap-5 overflow-x-auto pb-6 pt-4 -mt-4 pl-4 -ml-4 pr-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
+          className="flex gap-fluid-sm overflow-x-auto pb-6 pt-4 -mt-4 pl-4 -ml-4 pr-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {trending.map((post, index) => {

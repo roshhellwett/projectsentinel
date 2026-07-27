@@ -1,6 +1,7 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 CREATE TABLE IF NOT EXISTS raw_articles (
     id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -35,7 +36,13 @@ CREATE TABLE IF NOT EXISTS posts (
                            CHECK (status IN ('published','corrected','retracted')),
     correction_note    TEXT,
     published_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at         TIMESTAMPTZ DEFAULT NOW()
+    updated_at         TIMESTAMPTZ DEFAULT NOW(),
+    -- Added by migration 007_content_expansion.sql
+    language           TEXT        NOT NULL DEFAULT 'en',
+    content_type       TEXT        NOT NULL DEFAULT 'article'
+                           CHECK (content_type IN ('article','video')),
+    video_url          TEXT,
+    video_thumbnail    TEXT
 );
 
 CREATE TABLE IF NOT EXISTS discarded_articles (
@@ -88,6 +95,25 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_posts_story_fingerprint
     WHERE story_fingerprint IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_posts_fts
     ON posts USING GIN (to_tsvector('english', headline || ' ' || coalesce(summary, '')));
+
+-- Added by migration 006_feed_performance_indexes.sql
+CREATE INDEX IF NOT EXISTS idx_posts_headline_trgm
+    ON posts USING GIN (headline gin_trgm_ops)
+    WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_posts_feed_covering
+    ON posts (status, published_at DESC)
+    INCLUDE (id, headline, summary, category, credibility_score, credibility_reason, source_count, updated_at)
+    WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_posts_category_feed_covering
+    ON posts (category, status, published_at DESC)
+    INCLUDE (id, headline, summary, credibility_score, credibility_reason, source_count, updated_at)
+    WHERE status = 'published';
+
+-- Added by migration 007_content_expansion.sql
+CREATE INDEX IF NOT EXISTS idx_posts_language
+    ON posts (language) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_posts_content_type
+    ON posts (content_type) WHERE status = 'published';
 
 CREATE INDEX IF NOT EXISTS idx_discarded_at
     ON discarded_articles (discarded_at DESC);

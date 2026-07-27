@@ -232,14 +232,14 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       className="fixed inset-0 overflow-y-auto bg-paper/80 backdrop-blur-xl select-none overflow-x-hidden w-full max-w-full touch-manipulation"
       style={{ zIndex: 100 }}
     >
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8 md:py-10">
-        <div className="flex items-center justify-between mb-4 sm:mb-8">
-          <h2 className="font-display text-xl sm:text-3xl md:text-4xl text-ink">
+      <div className="max-w-4xl mx-auto px-fluid-xs py-fluid-lg">
+        <div className="flex items-center justify-between gap-fluid-xs mb-fluid-md">
+          <h2 className="font-display text-fluid-2xl text-ink min-w-0 truncate">
             {t("search.page_title")}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-paper-2 transition-colors tap-target"
+            className="p-2 hover:bg-paper-2 transition-colors duration-base tap-target rounded-token-sm shrink-0"
             aria-label={t("search.aria_close")}
           >
             <CloseIcon />
@@ -247,7 +247,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
         </div>
 
         <form
-          className="relative mb-6 sm:mb-8"
+          className="relative mb-fluid-md"
           onSubmit={(e) => {
             e.preventDefault();
           }}
@@ -263,7 +263,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("search.placeholder")}
-              className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper text-ink border-2 border-ink rounded-lg shadow-[2px_2px_0px_rgb(var(--c-ink))] focus:shadow-[4px_4px_0px_rgb(var(--c-ink))] focus:-translate-y-0.5 focus:-translate-x-0.5 outline-none transition-all transform-gpu font-body placeholder:text-muted text-sm sm:text-base"
+              className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper text-ink border-2 border-ink rounded-token-lg shadow-[2px_2px_0px_rgb(var(--c-ink))] focus:shadow-[4px_4px_0px_rgb(var(--c-ink))] focus:-translate-y-0.5 focus:-translate-x-0.5 outline-none transition-all duration-base transform-gpu font-body placeholder:text-muted text-fluid-sm"
               aria-label={t("search.aria_query")}
               aria-controls="search-results"
             />
@@ -274,7 +274,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                   setQuery("");
                   inputRef.current?.focus();
                 }}
-                className="absolute right-2 sm:right-3 p-1.5 text-muted hover:text-ink transition-colors"
+                className="absolute right-2 sm:right-3 p-1.5 min-touch flex items-center justify-center text-muted hover:text-ink transition-colors duration-base rounded-token-sm"
                 aria-label={t("search.aria_clear")}
               >
                 <CloseIcon />
@@ -291,7 +291,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           {isLoading && (
             <div className="space-y-4">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="p-4 border border-rule bg-paper-2">
+                <div key={n} className="p-fluid-sm border border-rule rounded-token-md bg-paper-2">
                   <Skeleton className="h-4 w-1/4 mb-3 bg-rule" />
                   <Skeleton className="h-6 w-3/4 mb-2 bg-rule" />
                   <Skeleton className="h-4 w-full bg-rule" />
@@ -301,8 +301,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           )}
 
           {error && (
-            <div className="text-center py-12 px-4 border border-rule bg-paper-2">
-              <p className="font-body text-sm text-ink mb-2">{error}</p>
+            <div className="text-center py-fluid-lg px-4 border border-rule rounded-token-md bg-paper-2">
+              <p className="font-body text-fluid-xs text-ink mb-fluid-3xs">{error}</p>
               <button
                 type="button"
                 onClick={() => setRetryKey((k) => k + 1)}
@@ -317,11 +317,11 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
             !error &&
             query.trim().length >= 2 &&
             results.length === 0 && (
-              <div className="text-center py-16 px-4">
-                <p className="font-display text-lg text-ink mb-1">
+              <div className="text-center py-fluid-xl px-4">
+                <p className="font-display text-fluid-md text-ink mb-1">
                   {t("search.no_stories")}
                 </p>
-                <p className="font-body text-sm text-ink-soft">
+                <p className="font-body text-fluid-xs text-ink-soft">
                   {t("search.no_stories_desc")}
                 </p>
               </div>
@@ -329,7 +329,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
 
           {!isLoading && !error && results.length > 0 && (
             <div>
-              <p className="font-body text-[10px] font-bold tracking-wider uppercase text-ink-soft mb-4 px-1">
+              <p className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-2xs px-1">
                 {t("search.found_count", { count: resultCount })}
               </p>
               <div className="space-y-4">
@@ -337,7 +337,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                   <div
                     key={post.id}
                     onClick={() => handleSelect(post)}
-                    className="cursor-pointer transition-opacity duration-200 hover:opacity-80 touch-manipulation select-none"
+                    className="cursor-pointer transition-opacity duration-base hover:opacity-80 touch-manipulation select-none"
                   >
                     <NewsCard post={post} />
                   </div>

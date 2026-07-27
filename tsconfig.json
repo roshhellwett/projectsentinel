@@ -1,0 +1,30 @@
+{
+  "extends": "./frontend/tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "paths": {
+      "@/*": [
+        "./frontend/*"
+      ]
+    }
+  },
+  "include": [
+    "frontend/next-env.d.ts",
+    "frontend/**/*.ts",
+    "frontend/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "frontend/node_modules",
+    "frontend/.next",
+    "frontend/build",
+    "frontend/**/__tests__/**",
+    "frontend/**/__stories__/**",
+    "frontend/**/*.test.ts",
+    "frontend/**/*.test.tsx",
+    "frontend/vitest.setup.ts",
+    "frontend/vitest.config.ts",
+    "frontend/e2e/**",
+    "dist"
+  ]
+}

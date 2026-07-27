@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/i18n-shared";
+import { InstallAppButton } from "@/components/ui/InstallAppButton";
 
 const NEWS_LINKS = [
   { href: "/category/politics/", key: "nav.politics" },
@@ -72,38 +73,39 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto border-t border-rule/50 overflow-x-hidden w-full max-w-full bg-paper/70 backdrop-blur-md">
-      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-8 sm:pt-10 pb-8">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 sm:gap-6 pb-6 sm:pb-8 mb-6 sm:mb-8 border-b border-rule">
+    <footer className="relative mt-auto border-t border-rule/50 overflow-x-hidden w-full max-w-full bg-paper/70 backdrop-blur-md transition-colors duration-base">
+      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 py-fluid-xl">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-fluid-sm pb-fluid-md mb-fluid-md border-b border-rule">
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2.5 group rounded"
+              className="inline-flex items-center gap-fluid-3xs group rounded-token-sm"
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 border border-ink text-ink font-display font-bold text-sm sm:text-base"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 shrink-0 border border-ink text-ink font-display font-bold text-fluid-sm"
               >
                 IV
               </span>
               <span className="flex flex-col leading-tight">
-                <span className="font-display text-lg sm:text-xl text-ink">
+                <span className="font-display text-fluid-lg text-ink">
                   India Verified
                 </span>
-                <span className="text-[11px] sm:text-xs text-ink-soft font-body">
+                <span className="text-fluid-2xs text-ink-soft font-body">
                   AI-cross-referenced Indian news
                 </span>
               </span>
             </Link>
-            <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-ink-soft leading-relaxed max-w-md">
+            <p className="mt-fluid-3xs text-fluid-xs text-ink-soft leading-relaxed max-w-prose-fluid">
               {t("footer.description")}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-fluid-3xs">
+            <InstallAppButton />
             <a
               href={RSS_URL}
-              className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm min-h-[44px]"
+              className="inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-2xs border border-rule text-fluid-2xs text-ink hover:bg-paper-2 transition-colors duration-base rounded-token-sm min-h-[44px]"
             >
               <RssIcon />
               {t("footer.rss_feed")}
@@ -112,7 +114,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-2 border border-rule text-xs text-ink hover:bg-paper-2 transition-all rounded-sm min-h-[44px]"
+              className="inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-2xs border border-rule text-fluid-2xs text-ink hover:bg-paper-2 transition-colors duration-base rounded-token-sm min-h-[44px]"
             >
               <svg
                 width="14"
@@ -133,17 +135,17 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-y-5 sm:gap-y-8 gap-x-4 sm:gap-x-10 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-y-fluid-sm gap-x-fluid-sm mb-fluid-md">
           <div>
-            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">
+            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
               {t("footer.news")}
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5">
+            <ul className="space-y-fluid-3xs">
               {NEWS_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-2 inline-block min-h-[44px] flex items-center"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-colors duration-base text-fluid-xs py-2 inline-block min-h-[44px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -153,15 +155,15 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">
+            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
               {t("footer.about")}
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5">
+            <ul className="space-y-fluid-3xs">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-2 inline-block min-h-[44px] flex items-center"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-colors duration-base text-fluid-xs py-2 inline-block min-h-[44px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -171,15 +173,15 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">
+            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
               {t("footer.legal")}
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5">
+            <ul className="space-y-fluid-3xs">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-all text-sm py-2 inline-block min-h-[44px] flex items-center"
+                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-colors duration-base text-fluid-xs py-2 inline-block min-h-[44px] flex items-center"
                   >
                     {t(link.key)}
                   </Link>
@@ -189,32 +191,32 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-body text-[10px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft mb-2 sm:mb-4">
+            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
               {t("footer.transparency")}
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5">
-              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+            <ul className="space-y-fluid-3xs">
+              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
                 <span
                   className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
                   aria-hidden="true"
                 />
                 <span>No advertising or sponsored content</span>
               </li>
-              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
                 <span
                   className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
                   aria-hidden="true"
                 />
                 <span>Every claim links back to its sources</span>
               </li>
-              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
                 <span
                   className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
                   aria-hidden="true"
                 />
                 <span>Open-source under the MIT licence</span>
               </li>
-              <li className="flex items-start gap-2 text-ink-soft text-sm leading-snug">
+              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
                 <span
                   className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
                   aria-hidden="true"
@@ -225,9 +227,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-2 sm:gap-4 pt-3 sm:pt-6 border-t border-rule">
-          <p className="text-[10px] sm:text-xs text-muted leading-relaxed">
-            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-paper-2 border border-rule text-[10px] sm:text-xs">
+        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-fluid-2xs pt-fluid-sm border-t border-rule">
+          <p className="text-fluid-2xs text-muted leading-relaxed">
+            <span className="inline-flex items-center gap-fluid-3xs px-2 py-1 bg-paper-2 border border-rule text-fluid-2xs">
               <span className="font-semibold text-ink-soft">
                 {t("footer.built_in_india")}
               </span>
@@ -246,7 +248,7 @@ export function Footer() {
             </a>
           </p>
           <p
-            className="text-[10px] sm:text-xs text-muted leading-relaxed"
+            className="text-fluid-2xs text-muted leading-relaxed"
             suppressHydrationWarning
           >
             &copy; {year} India Verified. MIT licence.

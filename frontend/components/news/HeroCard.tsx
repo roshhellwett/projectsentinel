@@ -70,34 +70,34 @@ export const HeroCard = memo(function HeroCard({
       role="article"
       aria-label={`Featured article: ${post.headline}`}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation p-5 sm:p-7 md:p-8 flex flex-col rounded-[20px] sm:rounded-[24px] border-2 border-ink bg-paper shadow-[4px_4px_0px_rgb(var(--c-ink))] transform-gpu transition-all duration-300 ease-out overflow-hidden",
+        "group relative cursor-pointer select-none touch-manipulation p-fluid-md sm:p-fluid-lg flex flex-col rounded-token-lg border-2 border-ink bg-paper shadow-[4px_4px_0px_rgb(var(--c-ink))] transform-gpu transition-all duration-base ease-apple overflow-hidden",
         "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",
         "active:translate-y-0 active:translate-x-0 active:shadow-[2px_2px_0px_rgb(var(--c-ink))]",
         "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
       )}
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 320px" }}
     >
-      <div className="flex items-start justify-between gap-2 sm:gap-3 mb-3 sm:mb-4 min-h-[20px]">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 min-w-0">
-          <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-ink bg-paper/80 px-2.5 py-0.5 rounded border border-rule/70 shadow-2xs">
+      <div className="flex items-start justify-between gap-fluid-3xs sm:gap-fluid-2xs mb-fluid-xs sm:mb-fluid-sm min-h-[20px]">
+        <div className="flex flex-wrap items-center gap-fluid-3xs sm:gap-fluid-2xs min-w-0">
+          <span className="font-mono text-fluid-2xs font-bold tracking-wider uppercase text-ink bg-paper/80 px-2.5 py-0.5 rounded-token-xs border border-rule/70 shadow-2xs shrink-0">
             {post.category}
           </span>
-          <span className="text-ink-soft/40" aria-hidden="true">
+          <span className="text-ink-soft/40 shrink-0" aria-hidden="true">
             ·
           </span>
           <span
-            className="font-mono text-[10px] sm:text-[11px] text-ink-soft"
+            className="font-mono text-fluid-2xs text-ink-soft shrink-0"
             suppressHydrationWarning
           >
             {useTimeAgo(post.published_at)}
           </span>
           {badge && (
-            <span className="font-mono text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded shadow-2xs border text-paper bg-red-600 border-red-700 animate-pulse">
+            <span className="font-mono text-fluid-2xs font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-token-xs shadow-2xs border text-paper bg-red-600 border-red-700 animate-pulse shrink-0">
               {badge === "breaking" ? t("hero.breaking") : t("hero.top_story")}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <VerificationStamp score={post.credibility_score} compact />
         </div>
       </div>
@@ -105,19 +105,19 @@ export const HeroCard = memo(function HeroCard({
       <Link
         href={`/news/${post.id}/`}
         onClick={() => haptic.medium()}
-        className="block group-hover:opacity-95 transition-opacity"
+        className="block group-hover:opacity-95 transition-opacity duration-base min-w-0"
       >
-        <h2 className="font-display font-[800] text-ink leading-[1.12] tracking-[-0.02em] mb-3 sm:mb-4 text-[clamp(1.4rem,4vw,2.3rem)] group-hover:text-ink/90 transition-colors">
+        <h2 className="font-display font-[800] text-ink leading-[1.12] tracking-[-0.02em] mb-fluid-xs sm:mb-fluid-sm text-fluid-2xl group-hover:text-ink/90 transition-colors duration-base">
           {post.headline}
         </h2>
 
-        <p className="font-body text-[14px] sm:text-[15.5px] leading-[1.6] text-ink-soft line-clamp-3 mb-4 sm:mb-5 font-normal">
+        <p className="font-body text-fluid-sm leading-[1.6] text-ink-soft line-clamp-3 mb-fluid-sm sm:mb-fluid-md font-normal">
           {post.summary}
         </p>
 
         {firstHost && (
-          <div className="inline-block px-3 py-1.5 rounded-lg border border-rule/80 bg-paper/60 mb-4 sm:mb-5">
-            <p className="font-body text-xs text-ink-soft">
+          <div className="inline-block max-w-full px-3 py-1.5 rounded-token-md border border-rule/80 bg-paper/60 mb-fluid-sm sm:mb-fluid-md">
+            <p className="font-body text-fluid-xs text-ink-soft truncate">
               {t("hero.first_reported")}{" "}
               <span className="font-mono font-bold text-ink underline decoration-rule-strong">{firstHost}</span>
             </p>
@@ -125,14 +125,14 @@ export const HeroCard = memo(function HeroCard({
         )}
       </Link>
 
-      <div className="flex items-center justify-between gap-2 mt-auto pt-3 sm:pt-4 border-t border-rule/70">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] sm:text-xs text-ink-soft font-medium shrink-0">
+      <div className="flex items-center justify-between gap-fluid-2xs mt-auto pt-fluid-xs sm:pt-fluid-sm border-t border-rule/70">
+        <div className="flex items-center gap-fluid-2xs sm:gap-fluid-xs min-w-0">
+          <span className="inline-flex items-center gap-1 font-mono text-fluid-xs text-ink-soft font-medium shrink-0">
             <ShieldIcon />
             {sourcesCount}{" "}
             {t(sourcesCount === 1 ? "card.source" : "card.sources")}
           </span>
-          <span className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 font-body text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded shadow-2xs">
+          <span className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 font-body text-fluid-2xs font-bold tracking-wider uppercase rounded-token-xs shadow-2xs shrink-0">
             <YoutubeIcon className="text-ink" />
             {t("card.youtube")}
           </span>

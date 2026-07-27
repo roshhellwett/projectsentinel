@@ -1,0 +1,19 @@
+{
+  "name": "india-verified",
+  "private": true,
+  "version": "1.0.0",
+  "description": "India Verified \u2014 monorepo root. The deployable Next.js app lives in frontend/, the Python pipeline in worker/.",
+  "scripts": {
+    "dev": "npm --prefix frontend exec -- next dev frontend -p 8080 -H 0.0.0.0",
+    "build": "npm --prefix frontend run build",
+    "build:dev": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start",
+    "lint": "npm --prefix frontend run lint",
+    "type-check": "npm --prefix frontend run type-check",
+    "test:unit": "npm --prefix frontend run test:unit",
+    "postinstall": "npm --prefix frontend install --no-audit --no-fund",
+    "emit-dist": "node -e \"const fs = require('fs'); fs.rmSync('dist', { recursive: true, force: true }); fs.mkdirSync('dist'); fs.writeFileSync('dist/index.html', '<!doctype html><meta charset=\\\"utf-8\\\"><title>India Verified</title><p>Next.js build output is in frontend/.next — deployed by Vercel from the frontend directory.')\"",
+    "postbuild": "npm run emit-dist",
+    "postbuild:dev": "npm run emit-dist"
+  }
+}

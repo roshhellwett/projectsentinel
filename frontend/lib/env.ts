@@ -8,6 +8,12 @@ const envSchema = z.object({
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_GA_ID: z.string().optional(),
+  // Python worker that backs the reader assistant. Absent = chat degrades
+  // to its fixed fallback sentence instead of erroring.
+  WORKER_URL: z.string().url().optional(),
+  WORKER_API_TOKEN: z.string().optional(),
+  ADMIN_PASSWORD: z.string().optional(),
+  ADMIN_JWT_SECRET: z.string().optional(),
   ANALYZE: z
     .enum(["true", "false"])
     .optional()

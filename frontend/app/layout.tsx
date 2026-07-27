@@ -108,9 +108,12 @@ export const metadata: Metadata = {
     types: { "application/rss+xml": `${siteUrl}/rss.xml` },
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
     shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.svg",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
 };
@@ -143,7 +146,7 @@ export default async function RootLayout({
   })();
 
   return (
-      <html lang={locale} suppressHydrationWarning>
+      <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {supabaseOrigin && (
           <>
@@ -194,7 +197,7 @@ export default async function RootLayout({
           </Script>
         )}
         <Script id="sw-register" strategy="afterInteractive" nonce={nonce}>
-          {`if('serviceWorker'in navigator&&'https:'===location.protocol){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});});}`}
+          {`(function(){if(!('serviceWorker'in navigator))return;var h=location.hostname;var blocked=location.protocol!=='https:'||window.top!==window.self||new URLSearchParams(location.search).has('sw=off'.split('=')[0])&&new URLSearchParams(location.search).get('sw')==='off'||h.indexOf('id-preview--')===0||h.indexOf('preview--')===0||h==='lovableproject.com'||/\\.lovableproject(-dev)?\\.com$/.test(h)||h==='lovableproject-dev.com'||h==='beta.lovable.dev'||/\\.beta\\.lovable\\.dev$/.test(h);if(blocked){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){if(r.active&&r.active.scriptURL.indexOf('/sw.js')!==-1)r.unregister();});}).catch(function(){});return;}window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});})();`}
         </Script>
       </head>
       <body

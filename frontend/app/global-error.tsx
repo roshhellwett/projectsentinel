@@ -2,6 +2,21 @@
 
 import { useEffect } from "react";
 
+function deriveCode(error: Error & { digest?: string }): string {
+  if (error?.digest) return String(error.digest).slice(0, 8).toUpperCase();
+  const seed = `${error?.name ?? "Error"}:${error?.message ?? ""}`;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(7, "0").slice(0, 7).toUpperCase();
+}
+
+/**
+ * Replaces the entire document when the root layout itself fails, so it must
+ * stay dependency-free: inline styles only, no design-token classes.
+ */
 export default function GlobalError({
   error,
   reset,
@@ -10,22 +25,51 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("Fatal error:", error);
+    console.error("[global] fatal error:", error);
   }, [error]);
 
+  const code = deriveCode(error);
+
   return (
-    <html>
-      <body className="bg-[#fbfbfd] text-[#1a1a2e]">
+    <html lang="en">
+      <body
+        style={{
+          margin: 0,
+          background: "#ffffff",
+          color: "#1a1a1a",
+          fontFamily: "Georgia, 'Times New Roman', serif",
+        }}
+      >
         <div
           role="alert"
-          className="min-h-[100dvh] flex flex-col items-center justify-center px-4 text-center"
+          style={{
+            minHeight: "100dvh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2rem 1.25rem",
+            textAlign: "center",
+          }}
         >
-          <div className="w-16 h-16 rounded-full bg-red-100 border border-red-200 flex items-center justify-center mb-6">
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: "9999px",
+              border: "1px solid rgba(26,26,26,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: "1.5rem",
+            }}
+          >
             <svg
-              className="w-8 h-8 text-red-500"
+              width="26"
+              height="26"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
+              stroke="#1a1a1a"
               strokeWidth={1.5}
             >
               <path
@@ -35,27 +79,73 @@ export default function GlobalError({
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold mb-3">Critical error</h1>
-          <p className="text-muted max-w-md mb-8">
-            A critical error occurred. Please try refreshing or come back later.
+
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              margin: "0 0 0.75rem",
+            }}
+          >
+            Critical error
           </p>
+
+          <h1
+            style={{
+              fontSize: "clamp(1.875rem, 1.6rem + 1.2vw, 2.75rem)",
+              lineHeight: 1.05,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              margin: "0 0 1rem",
+              maxWidth: "22ch",
+            }}
+          >
+            Sorry to disturb your reading
+          </h1>
+
+          <p
+            style={{
+              color: "#5c5c5c",
+              maxWidth: "46ch",
+              lineHeight: 1.65,
+              margin: "0 0 0.75rem",
+            }}
+          >
+            The page could not be rendered at all. Refresh in a moment — the
+            newsroom is still publishing.
+          </p>
+
+          <p
+            style={{
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontSize: 11,
+              letterSpacing: "0.14em",
+              color: "#706c64",
+              margin: "0 0 2rem",
+            }}
+          >
+            ERR &middot; {code}
+          </p>
+
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-[#1a1a2e] text-[#fbfbfd] text-sm font-semibold hover:opacity-90 transition-opacity"
+            style={{
+              minHeight: 44,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "0.75rem 1.25rem",
+              borderRadius: 3,
+              border: "1px solid #1a1a1a",
+              background: "#1a1a1a",
+              color: "#ffffff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"
-              />
-            </svg>
             Try again
           </button>
         </div>

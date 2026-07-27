@@ -43,14 +43,14 @@ async function SearchResults({
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mb-5">
+      <div className="flex flex-col items-center justify-center py-20 px-fluid-sm text-center">
+        <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mb-fluid-xs shrink-0">
           <SearchX className="w-7 h-7 text-muted" />
         </div>
-        <h2 className="font-display text-lg font-bold text-ink tracking-[-0.015em] mb-2">
+        <h2 className="font-display text-fluid-lg font-bold text-ink tracking-[-0.015em] mb-fluid-3xs">
           {messages["search.no_results"]?.replace("{query}", query)}
         </h2>
-        <p className="text-sm text-muted max-w-sm">
+        <p className="text-fluid-sm text-muted max-w-prose-fluid">
           {messages["search.try_different"]}
         </p>
       </div>
@@ -61,7 +61,7 @@ async function SearchResults({
 
   return (
     <>
-      <p className="text-sm text-muted mb-6">
+      <p className="text-fluid-sm text-muted mb-fluid-md break-words">
         {displayCount} result{displayCount !== 1 ? "s" : ""} for &ldquo;
         <span className="font-semibold text-ink">{query}</span>&rdquo;
       </p>
@@ -79,18 +79,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="relative min-h-screen">
       <PageShell>
-        <header className="mb-6 sm:mb-10 pb-6 sm:pb-8 border-b border-rule">
+        <header className="mb-fluid-lg pb-fluid-md border-b border-rule">
           <span
             aria-hidden="true"
-            className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-3 sm:mb-5"
+            className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-fluid-xs"
           />
-          <p className="editorial-kicker mb-2 sm:mb-3">
+          <p className="editorial-kicker mb-fluid-2xs">
             {query ? messages["search.title"] : messages["search.page_title"]}
           </p>
-          <h1 className="font-display text-xl sm:text-4xl md:text-5xl font-bold text-ink tracking-[-0.03em] mb-2 sm:mb-3 leading-[1.05]">
+          <h1 className="font-display text-fluid-2xl sm:text-fluid-4xl font-bold text-ink tracking-[-0.03em] mb-fluid-2xs leading-[1.05] break-words min-w-0">
             {query ? query : messages["search.page_subtitle"]}
           </h1>
-          <p className="text-xs sm:text-sm text-muted">
+          <p className="text-fluid-sm text-muted max-w-prose-fluid">
             {messages["search.page_desc"]}
           </p>
         </header>
@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {query ? (
           <Suspense
             fallback={
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-fluid-sm">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <Skeleton key={i} className="h-[218px] rounded-md" />
                 ))}

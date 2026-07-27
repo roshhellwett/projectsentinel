@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { fetchPostsCursor } from "@/lib/supabase/server";
 import { checkRateLimit, getClientIp } from "@/lib/api/rateLimit";
 
+export const maxDuration = 10;
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
