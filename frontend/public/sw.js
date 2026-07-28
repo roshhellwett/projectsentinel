@@ -1,69 +1,136 @@
-const CACHE = 'zenith-v1';
+/*
+ * India Verified — app-shell service worker.
+ *
+ * Registration is guarded in app/layout.tsx: it never installs inside a
+ * Lovable preview host, an iframe, a non-secure origin, or when ?sw=off is
+ * present. Bump CACHE whenever the caching rules change so old shells are
+ * evicted on activate.
+ *
+ * Strategy
+ *   HTML navigations   → network-first, cached copy then /offline as fallback
+ *   /_next/static/*    → cache-first (content-hashed, immutable)
+ *   other static GETs  → network-first with cache fallback
+ *   API / admin / maps → never touched
+ */
+
+const CACHE = 'iv-shell-v2';
+
+// Precache is best-effort: one missing entry must not fail the whole install.
 const STATIC_ASSETS = [
   '/offline',
   '/favicon.svg',
-  '/apple-touch-icon.svg',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    }),
+    (async () => {
+      const cache = await caches.open(CACHE);
+      await Promise.allSettled(STATIC_ASSETS.map((url) => cache.add(url)));
+      await self.skipWaiting();
+    })(),
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
-    ),
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.allSettled(
+        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)),
+      );
+      await self.clients.claim();
+    })(),
   );
-  self.clients.claim();
+});
+
+// Allow the page to force an immediate takeover after a deploy.
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
-  // Only handle same-origin GET requests
-  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (request.method !== 'GET') return;
 
-  // Don't cache Next.js internal routes or API
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch {
+    return;
+  }
+
+  if (url.origin !== self.location.origin) return;
+
+  // Never intercept: dynamic Next internals, API traffic, the admin console,
+  // sourcemaps, or data payloads.
   if (url.pathname.startsWith('/_next/') && !url.pathname.startsWith('/_next/static/')) return;
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin/')) return;
-  if (url.pathname.match(/\.(map|json)$/)) return;
+  if (url.pathname.startsWith('/api/')) return;
+  if (url.pathname.startsWith('/admin')) return;
+  if (/\.(map|json)$/.test(url.pathname)) return;
 
-  // HTML pages: always go to network, use cache only when offline
-  if (request.headers.get('Accept')?.includes('text/html')) {
+  const accept = request.headers.get('Accept') || '';
+
+  // HTML navigations: always try the network so readers get fresh news.
+  if (request.mode === 'navigate' || accept.includes('text/html')) {
     event.respondWith(
-      fetch(request).catch(() =>
-        caches.match(request).then((cached) =>
-          cached || caches.match('/offline'),
-        ),
-      ),
+      (async () => {
+        try {
+          const response = await fetch(request);
+          if (response && response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, clone)).catch(() => {});
+          }
+          return response;
+        } catch {
+          return (
+            (await caches.match(request)) ||
+            (await caches.match('/offline')) ||
+            new Response('Offline', {
+              status: 503,
+              headers: { 'Content-Type': 'text/plain' },
+            })
+          );
+        }
+      })(),
     );
     return;
   }
 
-  // Static assets: network-first with cache fallback
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (response.ok || response.status === 304) {
+  // Content-hashed build output is immutable — serve it from cache instantly.
+  if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(
+      (async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        const response = await fetch(request);
+        if (response && response.ok) {
           const clone = response.clone();
-          caches.open(CACHE).then((cache) => {
-            cache.put(request, clone);
-          });
+          caches.open(CACHE).then((cache) => cache.put(request, clone)).catch(() => {});
         }
         return response;
-      })
-      .catch(() =>
-        caches.match(request).then((cached) => {
-          if (cached) return cached;
-          return new Response('', { status: 503 });
-        }),
-      ),
+      })(),
+    );
+    return;
+  }
+
+  // Everything else (images, fonts, background plates): network-first.
+  event.respondWith(
+    (async () => {
+      try {
+        const response = await fetch(request);
+        if (response && (response.ok || response.status === 304)) {
+          const clone = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, clone)).catch(() => {});
+        }
+        return response;
+      } catch {
+        const cached = await caches.match(request);
+        return cached || new Response('', { status: 503 });
+      }
+    })(),
   );
 });

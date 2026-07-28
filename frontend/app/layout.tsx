@@ -116,6 +116,14 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "India Verified",
+    statusBarStyle: "default",
+  },
+  applicationName: "India Verified",
+  formatDetection: { telephone: false },
+
 };
 
 export const viewport: Viewport = {
@@ -165,12 +173,9 @@ export default async function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin=""
         />
-        <link
-          rel="modulepreload"
-          href="/manifest.webmanifest"
-          as="fetch"
-          crossOrigin=""
-        />
+        {/* Warm the install manifest without an invalid `modulepreload`. */}
+        <link rel="prefetch" href="/manifest.webmanifest" as="fetch" crossOrigin="" />
+
 
         <script
           type="application/ld+json"
@@ -197,9 +202,45 @@ export default async function RootLayout({
             `}
           </Script>
         )}
+        {/*
+          Service-worker registration.
+
+          Refused — and any previously installed /sw.js actively unregistered —
+          in every Lovable preview host, inside an iframe, on a non-secure
+          origin, or when ?sw=off is present. `localhost`/`127.0.0.1` count as
+          secure origins so a production build can be verified locally.
+        */}
         <Script id="sw-register" strategy="afterInteractive" nonce={nonce}>
-          {`(function(){if(!('serviceWorker'in navigator))return;var h=location.hostname;var blocked=location.protocol!=='https:'||window.top!==window.self||new URLSearchParams(location.search).has('sw=off'.split('=')[0])&&new URLSearchParams(location.search).get('sw')==='off'||h.indexOf('id-preview--')===0||h.indexOf('preview--')===0||h==='lovableproject.com'||/\\.lovableproject(-dev)?\\.com$/.test(h)||h==='lovableproject-dev.com'||h==='beta.lovable.dev'||/\\.beta\\.lovable\\.dev$/.test(h);if(blocked){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){if(r.active&&r.active.scriptURL.indexOf('/sw.js')!==-1)r.unregister();});}).catch(function(){});return;}window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});})();`}
+          {`(function(){
+  if (!('serviceWorker' in navigator)) return;
+  var h = location.hostname;
+  var isLocal = h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
+  var secure = location.protocol === 'https:' || isLocal;
+  var killed = new URLSearchParams(location.search).get('sw') === 'off';
+  var previewHost =
+    h.indexOf('id-preview--') === 0 ||
+    h.indexOf('preview--') === 0 ||
+    h === 'lovableproject.com' ||
+    /\\.lovableproject(-dev)?\\.com$/.test(h) ||
+    h === 'lovableproject-dev.com' ||
+    h === 'beta.lovable.dev' ||
+    /\\.beta\\.lovable\\.dev$/.test(h);
+  var blocked = !secure || window.top !== window.self || killed || previewHost;
+  if (blocked) {
+    navigator.serviceWorker.getRegistrations().then(function (rs) {
+      rs.forEach(function (r) {
+        var s = (r.active || r.waiting || r.installing || {}).scriptURL || '';
+        if (s.indexOf('/sw.js') !== -1) r.unregister();
+      });
+    }).catch(function () {});
+    return;
+  }
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+})();`}
         </Script>
+
       </head>
       <body
         className={`${sourceSerif.variable} ${caveat.variable} ${jetbrainsMono.variable} font-body bg-paper text-ink min-h-screen flex flex-col antialiased w-full relative`}

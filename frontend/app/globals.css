@@ -97,19 +97,87 @@ html {
   html { font-size: 14px; }
 }
 
-body::before {
-  content: '';
+/* ── Site background: newsprint collage plate + paper wash + vignette ─────
+   Three device tiers, all local under /public/bg. Each tier is rendered at
+   (or below) its native pixel size so the collage stays razor sharp instead
+   of being upscaled by the browser. */
+
+.nv-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.08;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 400px 400px;
-  filter: sepia(100%) saturate(400%) hue-rotate(5deg);
+  overflow: hidden;
+  contain: strict;
 }
 
+.nv-bg__plate,
+.nv-bg__wash,
+.nv-bg__vignette {
+  position: absolute;
+  inset: 0;
+}
+
+/* Mobile tier — 1080×1920 portrait crop, matches phone aspect exactly. */
+.nv-bg__plate {
+  background-image: url('/bg/newsprint-mobile.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  filter: grayscale(100%) contrast(1.14);
+  transform: none;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Tablet tier — 1440² square plate. */
+@media (min-width: 640px) {
+  .nv-bg__plate {
+    background-image: url('/bg/newsprint-tablet.webp');
+    opacity: 0.55;
+  }
+}
+
+/* Desktop tier — full 1920² plate, parallax-fixed. */
+@media (min-width: 1024px) {
+  .nv-bg__plate {
+    background-image: url('/bg/newsprint.webp');
+    background-attachment: fixed;
+    background-position: center center;
+    opacity: 0.6;
+  }
+}
+
+/* Paper wash — the plate stays sharp but faint; this keeps every floating
+   line of copy comfortably above AA contrast on the busiest part of the
+   collage. Text-bearing surfaces additionally carry their own opaque plane
+   (.paper-card / .glass-card / .reading-plane). */
+.nv-bg__wash {
+  background:
+    radial-gradient(120% 90% at 50% 0%,
+      rgb(var(--c-paper) / 0.74) 0%,
+      rgb(var(--c-paper) / 0.8) 55%,
+      rgb(var(--c-paper) / 0.84) 100%);
+}
+
+@media (max-width: 767px) {
+  .nv-bg__wash {
+    background:
+      linear-gradient(180deg,
+        rgb(var(--c-paper) / 0.82) 0%,
+        rgb(var(--c-paper) / 0.87) 100%);
+  }
+}
+
+/* Vignette — edge calm only. No noise overlay: it was softening the plate. */
+.nv-bg__vignette {
+  background:
+    radial-gradient(130% 100% at 50% 40%, transparent 42%, rgb(var(--c-ink) / 0.06) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-bg__plate { background-attachment: scroll; }
+}
 
 
 @layer base {
@@ -118,11 +186,7 @@ body::before {
   body {
     @apply leading-relaxed antialiased;
     background-color: rgb(var(--c-paper));
-    background-image: 
-      linear-gradient(to right, rgb(var(--c-ink) / 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--c-ink) / 0.04) 1px, transparent 1px);
-    background-size: 32px 32px;
-    background-position: top left;
+
     color: rgb(var(--c-ink));
     font-family: var(--font-body);
     font-feature-settings: 'kern', 'liga', 'calt';
@@ -269,6 +333,22 @@ body::before {
     mix-blend-mode: multiply;
     filter: blur(0.3px);
   }
+
+  /* Reading plane — for copy that would otherwise float straight on the
+     collage (empty states, standfirsts, inline notes). */
+  .reading-plane {
+    position: relative;
+    background-color: rgb(var(--c-paper) / 0.92);
+    backdrop-filter: blur(6px) saturate(105%);
+    border-radius: var(--radius-md);
+  }
+
+  .reading-plane-soft {
+    background-color: rgb(var(--c-paper) / 0.82);
+    backdrop-filter: blur(4px);
+    border-radius: var(--radius-md);
+  }
+
 
   .label-tag {
     display: inline-flex;
