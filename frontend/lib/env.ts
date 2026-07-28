@@ -21,7 +21,13 @@ const envSchema = z.object({
 });
 
 export function validateEnv() {
-  const parsed = envSchema.safeParse(process.env);
+  // In CI environments like GitHub Actions, unset secrets are injected as empty strings.
+  // We clean the env to convert empty strings to undefined so Zod's .optional() validation works.
+  const cleanEnv = Object.fromEntries(
+    Object.entries(process.env).filter(([_, v]) => v !== undefined && v !== "")
+  );
+
+  const parsed = envSchema.safeParse(cleanEnv);
   if (!parsed.success) {
     const warnings = parsed.error.issues
       .map((i) => `  ${i.path.join(".")}: ${i.message}`)
@@ -29,7 +35,7 @@ export function validateEnv() {
     if (warnings) {
       console.warn(`Environment validation warnings:\n${warnings}`);
     }
-    return envSchema.partial().parse(process.env);
+    return envSchema.partial().parse(cleanEnv);
   }
   return parsed.data;
 }
