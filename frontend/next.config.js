@@ -7,12 +7,6 @@ const withBundleAnalyzer = process.env.ANALYZE === 'true'
   : (config) => config;
 
 const nextConfig = {
-  // Pin the workspace root. The repo is a monorepo (frontend/ + worker/) with
-  // a lockfile at the root, which otherwise makes Next infer the wrong root
-  // and warn on every build.
-  turbopack: { root: __dirname },
-  outputFileTracingRoot: __dirname,
-
   // ─────────────────────────────────────────────────────────────────────
   // Image Optimization
   // ─────────────────────────────────────────────────────────────────────

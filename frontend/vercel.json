@@ -27,6 +27,12 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ],
   "functions": {
     "app/api/**/*.ts": {
       "memory": 256,
