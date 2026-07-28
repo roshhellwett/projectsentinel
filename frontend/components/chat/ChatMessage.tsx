@@ -25,11 +25,14 @@ export function ChatMessage({
 }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(content).then(() => {
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    });
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Ignore clipboard errors and keep the UI calm.
+    }
   };
 
   const isUser = role === "user";
@@ -39,28 +42,28 @@ export function ChatMessage({
       initial={{ opacity: 0, y: 12, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className={isUser ? "flex justify-end" : "flex gap-2.5"}
+      className={isUser ? "flex justify-end" : "flex items-start gap-2.5"}
     >
       {!isUser && (
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-          className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-[0.45rem] font-bold text-paper shadow-sm"
+          transition={{ delay: 0.1, type: "spring", stiffness: 220 }}
+          className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-[0.46rem] font-bold text-paper shadow-sm"
         >
           IV
         </motion.div>
       )}
 
-      <div className={`group flex max-w-[88%] flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`group flex max-w-[min(92%,38rem)] flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
         {isUser ? (
-          <p className="whitespace-pre-wrap break-words rounded-2xl rounded-tr-sm bg-ink px-3.5 py-2.5 text-[0.85rem] leading-relaxed text-paper shadow-md">
+          <p className="max-w-full whitespace-pre-wrap break-words rounded-[1.25rem] rounded-tr-sm bg-ink px-3.5 py-3 text-[0.95rem] leading-7 text-paper shadow-[0_12px_30px_-16px_rgba(15,23,42,0.35)] sm:px-4 sm:py-3.5">
             {content}
           </p>
         ) : (
           <div
-            className={`min-w-0 whitespace-pre-wrap break-words rounded-xl rounded-tl-sm bg-paper-2 px-4 py-2.5 shadow-xs ${
-              degraded ? "italic text-muted" : ""
+            className={`max-w-full whitespace-pre-wrap break-words rounded-[1.2rem] rounded-tl-sm border border-rule/80 bg-paper-2/90 px-3.5 py-3 shadow-[0_8px_20px_-16px_rgba(15,23,42,0.28)] sm:px-4 sm:py-3.5 ${
+              degraded ? "border-amber-300/70 bg-amber-50/70 italic text-ink-soft" : ""
             }`}
           >
             {typewriter && typewriterReveal !== undefined ? (
@@ -71,12 +74,12 @@ export function ChatMessage({
           </div>
         )}
 
-        <div className={`flex gap-1 px-1 ${isUser ? "flex-row-reverse" : ""}`}>
+        <div className={`flex items-center gap-1.5 px-1 ${isUser ? "flex-row-reverse" : ""}`}>
           {!isUser && !degraded && (
             <button
               type="button"
               onClick={handleCopy}
-              className="grid h-6 w-6 place-items-center rounded text-[0.6rem] text-subtle opacity-0 transition-all hover:bg-paper-2 hover:text-ink group-hover:opacity-100"
+              className="grid h-7 w-7 place-items-center rounded-full text-[0.62rem] text-subtle opacity-0 transition-all hover:bg-paper-2 hover:text-ink group-hover:opacity-100"
               aria-label={copied ? "Copied" : "Copy response"}
             >
               {copied ? (
@@ -95,7 +98,7 @@ export function ChatMessage({
             <button
               type="button"
               onClick={() => onRetry(id)}
-              className="grid h-6 w-6 place-items-center rounded text-[0.6rem] text-subtle opacity-0 transition-all hover:bg-paper-2 hover:text-ink group-hover:opacity-100"
+              className="grid h-7 w-7 place-items-center rounded-full text-[0.62rem] text-subtle opacity-0 transition-all hover:bg-paper-2 hover:text-ink group-hover:opacity-100"
               aria-label="Retry"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

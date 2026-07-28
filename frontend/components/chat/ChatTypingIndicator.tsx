@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 
 export function TypingDots() {
   return (
-    <div className="flex items-center gap-2.5 px-4">
-      <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-[0.45rem] font-bold text-paper shadow-sm">
+    <div className="flex items-center gap-2.5 self-start px-1 sm:px-0">
+      <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-[0.46rem] font-bold text-paper shadow-sm">
         IV
       </div>
-      <div className="flex h-8 items-center gap-1 rounded-xl rounded-tl-sm bg-paper-2 px-3.5 py-2 shadow-xs">
+      <div className="flex h-10 items-center gap-1 rounded-[1.1rem] rounded-tl-sm border border-rule/80 bg-paper-2/90 px-3.5 py-2.5 shadow-[0_8px_20px_-16px_rgba(15,23,42,0.28)]">
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}

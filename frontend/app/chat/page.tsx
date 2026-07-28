@@ -38,7 +38,13 @@ export default function ChatPage() {
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+
+    const tick = window.requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    return () => window.cancelAnimationFrame(tick);
   }, [messages, typingId, revealCount]);
 
   const send = useCallback(
@@ -133,40 +139,44 @@ export default function ChatPage() {
   const hasError = messages.some((m) => m.status === "error");
 
   return (
-    <div className="mx-auto flex min-h-dynamic w-full max-w-3xl flex-col bg-paper">
-      <ChatHeader onClear={clearMessages} messageCount={messages.length} />
+    <div className="mx-auto flex h-dynamic min-h-dynamic w-full max-w-5xl flex-col px-0 py-0 sm:px-3 sm:py-3 lg:px-4 lg:py-4">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-none border-0 bg-paper/95 shadow-none sm:rounded-[1.75rem] sm:border sm:border-rule/70 sm:shadow-[0_24px_70px_-40px_rgba(15,23,42,0.45)]">
+        <ChatHeader onClear={clearMessages} messageCount={messages.length} />
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain">
-        {showWelcome ? (
-          <ChatWelcome onPrompt={handlePrompt} hasArticleContext={!!activeArticle} />
-        ) : (
-          <div className="flex flex-col gap-4 px-4 py-5">
-            <AnimatePresence initial={false}>
-              {messages.map((m) => {
-                if (m.id === "greeting" && messages.length > 1) return null;
-                const isTyping = m.id === typingId;
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.03),transparent_45%)] px-3 py-4 sm:px-5 sm:py-5">
+          {showWelcome ? (
+            <div className="flex h-full items-center justify-center px-1 py-2 sm:px-2">
+              <ChatWelcome onPrompt={handlePrompt} hasArticleContext={!!activeArticle} />
+            </div>
+          ) : (
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
+              <AnimatePresence initial={false}>
+                {messages.map((m) => {
+                  if (m.id === "greeting" && messages.length > 1) return null;
+                  const isTyping = m.id === typingId;
 
-                return (
-                  <ChatMessage
-                    key={m.id}
-                    id={m.id}
-                    role={m.role}
-                    content={m.content}
-                    degraded={m.degraded}
-                    typewriter={isTyping}
-                    typewriterReveal={isTyping ? revealCount : undefined}
-                    onRetry={hasError ? retryMessage : undefined}
-                  />
-                );
-              })}
-            </AnimatePresence>
+                  return (
+                    <ChatMessage
+                      key={m.id}
+                      id={m.id}
+                      role={m.role}
+                      content={m.content}
+                      degraded={m.degraded}
+                      typewriter={isTyping}
+                      typewriterReveal={isTyping ? revealCount : undefined}
+                      onRetry={hasError ? retryMessage : undefined}
+                    />
+                  );
+                })}
+              </AnimatePresence>
 
-            {waiting && <TypingDots />}
-          </div>
-        )}
+              {waiting && <TypingDots />}
+            </div>
+          )}
+        </div>
+
+        <ChatInput value={input} onChange={setInput} onSend={() => send(input)} busy={busy} />
       </div>
-
-      <ChatInput value={input} onChange={setInput} onSend={() => send(input)} busy={busy} />
     </div>
   );
 }
