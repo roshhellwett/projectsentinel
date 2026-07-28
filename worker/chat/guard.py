@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import re
 
-CHAT_FALLBACK_MESSAGE = "Some error occurred, wait for a while"
+CHAT_FALLBACK_MESSAGE = "I’m still pulling together a helpful answer. Please try again in a moment."
 
 # Anything that even smells like a credential is scrubbed before the reply
 # leaves the process. Defence in depth: the model is never given a secret.
@@ -63,9 +63,8 @@ _INJECTION_PATTERNS: list[re.Pattern[str]] = [
 ]
 
 REFUSAL_MESSAGE = (
-    "I can only help with India Verified — our stories, how our verification works, "
-    "and how to use the site. I can't run commands, change anything, or share any "
-    "internal configuration. Ask me about the news instead?"
+    "I’m here to help with India Verified stories, credibility checks, and how the site works. "
+    "If you want, I can summarize a story, explain a score, or point you to today’s top stories."
 )
 
 

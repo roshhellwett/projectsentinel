@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { AssistantText } from "@/components/chat/AssistantText";
+import { AssistantAvatar } from "@/components/chat/AssistantAvatar";
 
 interface ChatMessageProps {
   id: string;
@@ -49,9 +50,9 @@ export function ChatMessage({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.1, type: "spring", stiffness: 220 }}
-          className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-[0.46rem] font-bold text-paper shadow-sm"
+          className="mt-0.5 shrink-0"
         >
-          IV
+          <AssistantAvatar className="h-8 w-8" />
         </motion.div>
       )}
 

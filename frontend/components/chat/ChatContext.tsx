@@ -28,7 +28,7 @@ const GREETING: Message = {
   id: "greeting",
   role: "assistant",
   content:
-    "Hello. I'm the India Verified desk assistant. Ask me about any story we've published, how our credibility scores work, or how to find your way around the site.",
+    "Hi! I’m your India Verified desk assistant. I can help you explore stories, explain credibility scores, or guide you around the site in a friendly, helpful way.",
   timestamp: Date.now(),
   status: "complete",
 };

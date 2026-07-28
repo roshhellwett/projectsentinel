@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { AssistantAvatar } from "@/components/chat/AssistantAvatar";
 
 export function ChatHeader({
   onClear,
@@ -24,11 +25,11 @@ export function ChatHeader({
         </Link>
 
         <motion.div
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-[0.5rem] font-bold text-paper shadow-sm"
+          className="shrink-0"
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          IV
+          <AssistantAvatar className="h-10 w-10" />
         </motion.div>
 
         <div className="min-w-0 flex-1">

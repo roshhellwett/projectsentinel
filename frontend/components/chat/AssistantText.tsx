@@ -84,12 +84,12 @@ function classifyLine(raw: string): LineType {
 export function AssistantText({ text, revealCount }: { text: string; revealCount?: number }) {
   if (!text) return null;
 
-  const lines = text.split("\n");
-  const visible = revealCount ?? lines.length;
+  const visibleText = revealCount === undefined ? text : text.slice(0, Math.max(0, revealCount));
+  const lines = visibleText.split("\n");
 
   return (
     <div className="flex flex-col gap-2.5">
-      {lines.slice(0, visible).map((raw, i) => {
+      {lines.map((raw, i) => {
         const line = classifyLine(raw);
         switch (line.kind) {
           case "empty":
