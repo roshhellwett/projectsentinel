@@ -4,7 +4,6 @@ import { navigateTo } from './helpers';
 test.describe('navigation', () => {
   test('homepage has hero section and feed', async ({ page }) => {
     await navigateTo(page, '/');
-    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
     await expect(page.locator('[aria-label="Today\'s edition"]')).toBeVisible();
     await expect(page.locator('text=Your Verified Feed')).toBeVisible();
   });

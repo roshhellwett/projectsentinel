@@ -23,7 +23,7 @@ export function MastheadClient({
       <div className="pb-6 sm:pb-8 border-b-2 border-ink/80 relative w-full min-w-0">
         <div className="flex flex-col gap-4 sm:gap-6 w-full min-w-0">
           <div className="min-w-0 flex-1 w-full">
-
+            <h1 className="sr-only">India Verified</h1>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 w-full">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-rule bg-paper-2/60 shadow-2xs">
