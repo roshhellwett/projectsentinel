@@ -2,10 +2,10 @@ module.exports = {
   ci: {
     collect: {
       url: [
-        "http://localhost:3000/",
-        "http://localhost:3000/category/tech/",
-        "http://localhost:3000/search",
-        "http://localhost:3000/how-it-works/",
+        "http://127.0.0.1:3000/",
+        "http://127.0.0.1:3000/category/tech/",
+        "http://127.0.0.1:3000/search",
+        "http://127.0.0.1:3000/how-it-works/",
       ],
       numberOfRuns: 2,
       settings: {
