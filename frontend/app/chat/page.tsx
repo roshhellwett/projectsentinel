@@ -68,16 +68,7 @@ export default function ChatPage() {
         timestamp: Date.now(),
         status: "complete",
       };
-      const placeholderId = uid();
-      const placeholder: Message = {
-        id: placeholderId,
-        role: "assistant",
-        content: "",
-        timestamp: Date.now(),
-        status: "sending",
-      };
-
-      setMessages((prev) => [...prev, userMsg, placeholder]);
+      setMessages((prev) => [...prev, userMsg]);
       setInput("");
       setBusy(true);
       setWaiting(true);
@@ -90,27 +81,32 @@ export default function ChatPage() {
         });
         const data = (await res.json()) as { reply?: string; degraded?: boolean };
 
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === placeholderId
-              ? {
-                  ...m,
-                  content: data.reply || "Some error occurred, wait for a while",
-                  degraded: Boolean(data.degraded),
-                }
-              : m,
-          ),
-        );
+        const placeholderId = uid();
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: placeholderId,
+            role: "assistant",
+            content: data.reply || "Some error occurred, wait for a while",
+            timestamp: Date.now(),
+            status: "sending",
+            degraded: Boolean(data.degraded),
+          }
+        ]);
         setWaiting(false);
         setTypingId(placeholderId);
       } catch {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === placeholderId
-              ? { ...m, content: "Some error occurred, wait for a while", status: "error" as const, degraded: true }
-              : m,
-          ),
-        );
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: uid(),
+            role: "assistant",
+            content: "Some error occurred, wait for a while",
+            timestamp: Date.now(),
+            status: "error",
+            degraded: true,
+          }
+        ]);
         setWaiting(false);
       } finally {
         setBusy(false);
