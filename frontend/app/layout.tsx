@@ -235,9 +235,14 @@ export default async function RootLayout({
     }).catch(function () {});
     return;
   }
-  window.addEventListener('load', function () {
+  function register() {
     navigator.serviceWorker.register('/sw.js').catch(function () {});
-  });
+  }
+  if (document.readyState === 'complete') {
+    register();
+  } else {
+    window.addEventListener('load', register);
+  }
 })();`}
         </Script>
 
