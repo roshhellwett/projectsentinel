@@ -52,7 +52,7 @@ export function useTypewriter(
       setRevealed(idx);
       if (idx < text.length) {
         const ch = text[idx] ?? "";
-        const delay = ch === " " ? 32 : /[.!?,;:]/.test(ch) ? 80 : /[\n]/.test(ch) ? 70 : 25;
+        const delay = ch === " " ? 6 : /[.!?,;:]/.test(ch) ? 16 : /[\n]/.test(ch) ? 14 : 5;
         window.setTimeout(tick, delay);
       }
     }
