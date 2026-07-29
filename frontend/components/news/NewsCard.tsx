@@ -145,7 +145,7 @@ const NewsCardComponent = ({
       aria-label={`${isVideo ? "Video: " : "Read article: "}${post.headline}${typeof rank === "number" ? ` (Rank #${rank})` : ""}`}
       data-read={isRead ? "true" : "false"}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation p-fluid-sm sm:p-fluid-md flex flex-col h-full bg-paper transform-gpu transition-all duration-base ease-apple",
+        "group relative cursor-pointer select-none touch-manipulation p-fluid-sm sm:p-fluid-md flex flex-col h-full bg-paper/80 backdrop-blur-sm transform-gpu transition-all duration-base ease-apple",
         "rounded-token-lg border-2 border-ink",
         "shadow-[4px_4px_0px_rgb(var(--c-ink))]",
         "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",

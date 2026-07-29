@@ -23,7 +23,7 @@ export function DrawerHeader({
   const haptic = useHapticFeedback();
 
   return (
-    <header className="pointer-events-none relative flex flex-col flex-shrink-0 border-b-2 border-rule/80 bg-paper/60 backdrop-blur-md">
+    <header className="pointer-events-none relative flex flex-col flex-shrink-0 border-b-2 border-rule/80 bg-paper/70 backdrop-blur-lg">
       <div className="pointer-events-none flex items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-3.5">
         <div className="pointer-events-auto flex flex-1 items-center gap-2.5 min-w-0">
           <CategoryTag category={category} />

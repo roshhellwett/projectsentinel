@@ -70,7 +70,7 @@ export const HeroCard = memo(function HeroCard({
       role="article"
       aria-label={`Featured article: ${post.headline}`}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation p-fluid-md sm:p-fluid-lg flex flex-col rounded-token-lg border-2 border-ink bg-paper shadow-[4px_4px_0px_rgb(var(--c-ink))] transform-gpu transition-all duration-base ease-apple overflow-hidden",
+        "group relative cursor-pointer select-none touch-manipulation p-fluid-md sm:p-fluid-lg flex flex-col rounded-token-lg border-2 border-ink bg-paper/80 backdrop-blur-sm shadow-[4px_4px_0px_rgb(var(--c-ink))] transform-gpu transition-all duration-base ease-apple overflow-hidden",
         "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",
         "active:translate-y-0 active:translate-x-0 active:shadow-[2px_2px_0px_rgb(var(--c-ink))]",
         "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
