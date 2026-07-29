@@ -38,13 +38,14 @@ const ChatBubble = dynamic(
   { ssr: false },
 );
 
-export default function ClientShell({ children }: { children: ReactNode }) {
+export default function ClientShell({ children, tickerNode }: { children: ReactNode, tickerNode?: ReactNode }) {
   return (
     <>
       <NewsBackground />
       <I18nProvider>
         <ChatProvider>
           <Navbar />
+          {tickerNode}
           <PageEntrance>
             <main
               id="main"

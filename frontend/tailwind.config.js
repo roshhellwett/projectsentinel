@@ -75,6 +75,15 @@ module.exports = {
         base: 'var(--dur-base)',
         slow: 'var(--dur-slow)',
       },
+      keyframes: {
+        ticker: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-33.3333%)' }, // Scrolls exactly 1/3 since we have 3 duplicated segments
+        }
+      },
+      animation: {
+        ticker: 'ticker 40s linear infinite',
+      },
 
     },
   },

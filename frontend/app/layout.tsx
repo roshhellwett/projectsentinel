@@ -11,6 +11,7 @@ import {
   organizationJsonLd,
   jsonLdToString,
 } from "@/lib/utils/structuredData";
+import { GlobalTicker } from "@/components/news/GlobalTicker";
 
 const ClientShell = dynamic(() => import("@/components/layout/ClientShell"));
 
@@ -267,7 +268,7 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <ClientShell>{children}</ClientShell>
+        <ClientShell tickerNode={<GlobalTicker />}>{children}</ClientShell>
       </body>
     </html>
   );
