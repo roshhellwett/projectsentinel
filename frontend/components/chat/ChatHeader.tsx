@@ -43,10 +43,10 @@ export function ChatHeader({
             </p>
           </div>
           <h2 className="truncate text-[0.95rem] font-semibold leading-snug sm:text-[1rem]">
-            Desk Assistant
+            AI News Assistant
           </h2>
           <p className="truncate text-[0.72rem] text-ink-soft sm:text-[0.78rem]">
-            Real-time answers from trusted stories and sources
+            Let me grind some news for you
           </p>
         </div>
 

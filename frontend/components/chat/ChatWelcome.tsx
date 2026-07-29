@@ -42,7 +42,7 @@ export function ChatWelcome({
 
         <div className="max-w-[34rem] space-y-2">
           <h2 className="text-[1.05rem] font-semibold leading-snug text-ink sm:text-[1.15rem]">
-            India Verified Desk Assistant
+            India Verified AI News Assistant
           </h2>
           <p className="text-[0.86rem] leading-7 text-ink-soft sm:text-[0.9rem]">
             Ask about any story we’ve published, how our credibility scores work, or what’s happening in Indian news today.
