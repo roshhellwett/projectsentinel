@@ -39,7 +39,7 @@
     "@eslint/eslintrc": "^3.3.6",
     "@lhci/cli": "^0.15.1",
     "@next/bundle-analyzer": "^16.2.12",
-    "@playwright/test": "^1.62.0",
+    "@playwright/test": "^1.62.1",
     "@sentry/nextjs": "^10.68.0",
     "@storybook/addon-a11y": "^8.6.18",
     "@storybook/addon-essentials": "^8.6.18",
