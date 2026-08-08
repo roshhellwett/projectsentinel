@@ -188,7 +188,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                 rss_fetcher.close()
 
         should_supplement = supplementary_only or (
-            len(rss_articles) < 50 and (GNewsFetcher.has_quota() or NewsAPIFetcher.has_quota())
+            len(rss_articles) == 0 and (GNewsFetcher.has_quota() or NewsAPIFetcher.has_quota())
         )
 
         if not should_supplement and len(rss_articles) == 0 and not supplementary_only:
