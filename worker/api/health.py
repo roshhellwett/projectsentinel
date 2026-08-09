@@ -91,3 +91,29 @@ async def pipeline_status():
         pipeline_healthy=pipeline_healthy,
         checked_at=now.isoformat(),
     )
+
+
+class ResetFeedsResponse(BaseModel):
+    """Response from the /reset-feeds endpoint."""
+
+    unparked: int = Field(description="Number of feeds that were unparked")
+    message: str = Field(description="Human-readable status message")
+    timestamp: str = Field(description="ISO 8601 timestamp of the reset")
+
+
+@router.get(
+    "/reset-feeds",
+    response_model=ResetFeedsResponse,
+    summary="Reset parked RSS feeds",
+    description="Unparks all RSS feeds that were parked due to repeated failures. Returns the number of feeds that were unparked.",
+)
+async def reset_feeds():
+
+    from fetcher.rss_fetcher import RSSFetcher
+
+    unparked = RSSFetcher.reset_all_parked()
+    return ResetFeedsResponse(
+        unparked=unparked,
+        message=f"Unparked {unparked} feed(s)" if unparked else "No feeds were parked",
+        timestamp=datetime.now(UTC).isoformat(),
+    )

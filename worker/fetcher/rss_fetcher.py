@@ -28,7 +28,7 @@ class RSSFetcher:
     _USER_AGENT = "IndiaVerified Bot/1.0 (+https://indiaverified.in/bot)"
 
     _FAIL_THRESHOLD = 3
-    _PARK_DURATION_SECONDS = 24 * 60 * 60
+    _PARK_DURATION_SECONDS = 6 * 60 * 60
 
     _feed_health: dict[str, dict] = {}
     _feed_health_lock = threading.Lock()
@@ -72,6 +72,19 @@ class RSSFetcher:
 
         with cls._feed_health_lock:
             cls._feed_health.clear()
+
+    @classmethod
+    def reset_all_parked(cls) -> int:
+        """Clear parking state for all feeds. Returns count of feeds that were unparked."""
+        now = time.time()
+        unparked = 0
+        with cls._feed_health_lock:
+            for url, state in list(cls._feed_health.items()):
+                if state.get("parked_until", 0) > now:
+                    unparked += 1
+                    state["parked_until"] = 0.0
+                    state["fails"] = 0
+        return unparked
 
     def _get_session(self) -> requests.Session:
 

@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.chat import router as chat_router
 from api.health import router as health_router
 from api.trigger import router as trigger_router
+from fetcher.rss_fetcher import RSSFetcher
 from scheduler.jobs import run_pipeline
 
 load_dotenv()
@@ -41,6 +42,10 @@ scheduler = BackgroundScheduler(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
+    unparked = RSSFetcher.reset_all_parked()
+    if unparked:
+        print(f"Reset {unparked} parked feed(s) on startup")
 
     scheduler.add_job(
         run_pipeline,
