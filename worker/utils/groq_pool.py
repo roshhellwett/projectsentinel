@@ -28,6 +28,7 @@ GROQ_MODEL_LIMITS: dict[str, tuple[int, int, int]] = {
     "llama-3.3-70b-versatile": (1000, 30, 12000),
     "meta-llama/llama-4-scout-17b-16e-instruct": (1000, 30, 30000),
     "qwen/qwen3-32b": (1000, 60, 6000),
+    "qwen/qwen3.6-27b": (1000, 30, 8000),
     "openai/gpt-oss-20b": (1000, 30, 8000),
     "openai/gpt-oss-120b": (1000, 30, 8000),
     "groq/compound": (250, 30, 70000),
@@ -37,27 +38,32 @@ GROQ_MODEL_LIMITS: dict[str, tuple[int, int, int]] = {
 }
 
 VERIFY_MODEL_CHAIN: list[str] = [
-    "llama-3.3-70b-versatile",
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "qwen/qwen3-32b",
+    "qwen/qwen3.6-27b",
+    "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
-    "llama-3.1-8b-instant",
+    "groq/compound",
+    "groq/compound-mini",
+    "allam-2-7b",
 ]
 
 WRITE_MODEL_CHAIN: list[str] = [
-    "llama-3.1-8b-instant",
-    "allam-2-7b",
+    "qwen/qwen3.6-27b",
+    "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
-    "llama-3.3-70b-versatile",
+    "groq/compound",
+    "groq/compound-mini",
+    "allam-2-7b",
 ]
 
 # Reader-facing assistant. Cheapest tool-capable model first so the public
 # chat surface can never starve the verification/writing pipeline.
 CHAT_MODEL_CHAIN: list[str] = [
-    "llama-3.1-8b-instant",
     "openai/gpt-oss-20b",
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "llama-3.3-70b-versatile",
+    "qwen/qwen3.6-27b",
+    "groq/compound-mini",
+    "groq/compound",
+    "allam-2-7b",
+    "openai/gpt-oss-120b",
 ]
 
 
