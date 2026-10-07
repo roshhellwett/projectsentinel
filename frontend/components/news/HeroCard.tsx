@@ -10,6 +10,8 @@ import { VerificationStamp } from "@/components/ui/VerificationStamp";
 import { BookmarkButton } from "./BookmarkButton";
 import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
 import { useI18n } from "@/lib/i18n/context";
+import { TopicIllustration } from "@/components/visual/TopicIllustration";
+import { MaterialIcon } from "@/components/visual/MaterialIcon";
 
 interface HeroCardProps { post: Post; badge?: "breaking" | "trending" | null }
 
@@ -21,6 +23,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = "trending" }: Her
   const host = post.sources?.[0] ? getHostname(post.sources[0].url) : "";
   return (
     <article className="lead-story" role="article" aria-label={`Featured article: ${post.headline}`}>
+      <TopicIllustration category={post.category} compact className="!h-[150px] !mb-0" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="story-meta">
           <Link href={`/category/${post.category}`} className="story-meta__category">{t(`nav.${post.category}`)}</Link>
@@ -36,7 +39,7 @@ export const HeroCard = memo(function HeroCard({ post, badge = "trending" }: Her
       <p className="lead-story__summary">{post.summary}</p>
       {post.credibility_reason && (
         <div className="lead-story__evidence">
-          <ShieldCheck size={20} className="text-stamp mt-0.5" aria-hidden="true" />
+          <MaterialIcon icon={ShieldCheck} tone="sage" size="sm" />
           <div>
             <span className="editorial-kicker !text-stamp mb-1">Behind the headline</span>
             <p className="line-clamp-3">{post.credibility_reason}</p>

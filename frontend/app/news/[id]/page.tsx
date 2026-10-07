@@ -28,6 +28,7 @@ import {
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { NextStoryPrompt } from "@/components/news/NextStoryPrompt";
 import { PageShell } from "@/components/layout/PageShell";
+import { MaterialIcon, CategoryIcon } from "@/components/visual/MaterialIcon";
 
 export const revalidate = 300;
 
@@ -166,6 +167,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           />
 
           <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-4 gap-y-1.5 mb-3 sm:mb-6">
+            <CategoryIcon category={post.category} size="sm" />
             <CategoryTag category={post.category} />
             <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium text-muted">
               <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -183,7 +185,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
             {post.headline}
           </h1>
 
-          <div className="mb-6 sm:mb-10 rounded border border-rule bg-paper-2/50 p-4 sm:p-6">
+          <div className="reader-verification mb-6 sm:mb-10">
+            <MaterialIcon icon={ShieldCheck} tone={post.credibility_score >= 90 ? "sage" : "gold"} size="lg" />
+            <div className="reader-verification__score">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-3 sm:mt-5 flex flex-col gap-2 sm:gap-4 border-t border-rule pt-3 sm:pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
@@ -211,6 +215,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                 />
               </div>
             </div>
+            </div>
           </div>
 
           <p className="article-summary max-w-prose-fluid">
@@ -225,10 +230,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               className="absolute top-0 left-0 w-1 h-full bg-accent rounded-r-full"
             />
             <h2 className="font-display flex items-center gap-2 text-fluid-lg font-bold text-ink mb-fluid-xs">
-              <ShieldCheck
-                className="w-4 h-4 sm:w-5 sm:h-5 text-accent"
-                strokeWidth={2.2}
-              />
+              <MaterialIcon icon={ShieldCheck} tone="sage" size="sm" />
               AI Credibility Analysis
             </h2>
             <p className="text-ink-soft leading-[1.6] sm:leading-[1.7] text-sm sm:text-base">
@@ -238,7 +240,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
           <aside className="np-card glass-card p-3 sm:p-5 md:p-8">
             <h2 className="font-display text-fluid-md font-bold text-ink mb-fluid-sm flex items-center gap-2">
-              <Database className="w-4 h-4 text-accent" />
+              <MaterialIcon icon={Database} tone="sky" size="sm" />
               Original Sources
             </h2>
             <SourceLinks sources={post.sources} />

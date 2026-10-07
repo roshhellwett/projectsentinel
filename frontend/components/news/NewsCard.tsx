@@ -10,6 +10,8 @@ import { BookmarkButton } from "./BookmarkButton";
 import { VerificationStamp } from "@/components/ui/VerificationStamp";
 import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
 import { useI18n } from "@/lib/i18n/context";
+import { TopicIllustration } from "@/components/visual/TopicIllustration";
+import { CategoryIcon } from "@/components/visual/MaterialIcon";
 
 interface NewsCardProps {
   post: Post;
@@ -33,9 +35,11 @@ export const NewsCard = memo(function NewsCard({ post, onClick, isNew = false, i
 
   return (
     <article role="article" aria-label={`Read article: ${post.headline}${rank ? ` (Rank #${rank})` : ""}`} data-read={isRead} data-new={isNew} className="story-card">
+      <TopicIllustration category={post.category} compact />
       <div className="story-card__top">
         <div className="flex items-center gap-2.5 min-w-0">
           {rank !== undefined && <span className="story-card__rank">{String(rank).padStart(2, "0")}</span>}
+          <CategoryIcon category={post.category} size="xs" />
           <span className="story-meta__category font-mono text-[9px] tracking-[0.08em]">{t(`nav.${post.category}`)}</span>
         </div>
         <VerificationStamp score={post.credibility_score} xsmall />

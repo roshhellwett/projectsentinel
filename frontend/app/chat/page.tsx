@@ -41,7 +41,8 @@ export default function ChatPage() {
     if (!el) return;
 
     const tick = window.requestAnimationFrame(() => {
-      el.scrollTop = el.scrollHeight;
+      const greetingOnly = messages.length === 1 && messages[0].id === "greeting";
+      el.scrollTop = greetingOnly ? 0 : el.scrollHeight;
     });
 
     return () => window.cancelAnimationFrame(tick);
@@ -141,7 +142,7 @@ export default function ChatPage() {
 
         <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-4 sm:px-5 sm:py-5">
           {showWelcome ? (
-            <div className="flex h-full items-center justify-center px-1 py-2 sm:px-2">
+            <div className="flex min-h-full items-center justify-center px-1 py-2 sm:px-2">
               <ChatWelcome onPrompt={handlePrompt} hasArticleContext={!!activeArticle} />
             </div>
           ) : (

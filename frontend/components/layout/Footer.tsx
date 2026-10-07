@@ -5,6 +5,7 @@ import { ArrowUpRight, Code2, Rss } from "lucide-react";
 import { useI18n } from "@/lib/i18n/i18n-shared";
 import { InstallAppButton } from "@/components/ui/InstallAppButton";
 import { Brand } from "./Brand";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 
 const GROUPS = [
   { title: "footer.news", links: [
@@ -36,7 +37,7 @@ export function Footer() {
       <div className="site-container">
         <div className="site-footer__statement">
           <div><p className="editorial-kicker mb-3">A considered perspective</p><h2>Stay curious.<br />Stay <em>well-informed.</em></h2></div>
-          <Link href="/how-it-works" className="editorial-link">Built on transparency <ArrowUpRight size={16} aria-hidden="true" /></Link>
+          <div className="flex items-center gap-5"><EditorialIllustration variant="contact" className="illustration-small hidden md:block" /><Link href="/how-it-works" className="editorial-link">Built on transparency <ArrowUpRight size={16} aria-hidden="true" /></Link></div>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-[1.7fr_1fr_1fr_1fr] gap-x-8 gap-y-9 py-10">
           <div className="col-span-2 lg:col-span-1">

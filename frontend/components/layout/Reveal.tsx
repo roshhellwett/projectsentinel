@@ -10,7 +10,7 @@ export function Reveal({ children, className = "" }: { children: ReactNode; clas
     if (!element || !window.IntersectionObserver || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
-      element.classList.add("animate-slide-up");
+      element.classList.add("animate-reveal");
       observer.disconnect();
     }, { threshold: 0.06 });
     observer.observe(element);

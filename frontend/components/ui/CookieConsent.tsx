@@ -49,10 +49,10 @@ export function CookieConsent() {
         <div
           role="region"
           aria-label={t("cookie.aria_preferences")}
-          className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:right-auto md:left-6 md:bottom-6 md:w-[360px] ${Z_INDEX.cookieConsent} transform-gpu`}
+          className={`frosted-panel rounded-[22px] shadow-[0_8px_40px_rgb(var(--c-shadow)/0.1)] animate-slide-up-fade fixed left-3 right-3 bottom-[calc(5.8rem+env(safe-area-inset-bottom,0px))] md:right-auto md:left-6 md:bottom-6 md:w-[360px] ${Z_INDEX.cookieConsent} transform-gpu`}
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
-          <div className="bg-paper border border-rule rounded-md px-5 py-4 shadow-[0_8px_40px_rgb(var(--c-shadow)/0.1)]">
+          <div className="border border-white rounded-[22px] px-5 py-4">
             <button
               type="button"
               onClick={reject}

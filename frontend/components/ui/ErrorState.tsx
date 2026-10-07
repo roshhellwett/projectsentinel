@@ -10,6 +10,7 @@ import {
   TerminalSquare,
 } from "lucide-react";
 import { I18nContext } from "@/lib/i18n/i18n-shared";
+import { MaterialIcon } from "@/components/visual/MaterialIcon";
 
 export interface ErrorStateProps {
   /** The thrown error handed down by the Next.js error boundary. */
@@ -70,12 +71,7 @@ export default function ErrorState({
       aria-live="assertive"
       className="min-h-[70vh] flex flex-col items-center justify-center px-fluid-md py-fluid-xl text-center"
     >
-      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-accent-soft/50 border border-accent/20 flex items-center justify-center mb-fluid-md shrink-0">
-        <AlertOctagon
-          className="w-7 h-7 sm:w-8 sm:h-8 text-accent"
-          strokeWidth={1.5}
-        />
-      </div>
+      <MaterialIcon icon={AlertOctagon} tone="coral" size="lg" className="mb-fluid-md" />
 
       <p className="text-accent text-fluid-2xs font-bold tracking-[0.18em] uppercase mb-fluid-xs">
         {t("common.system_error", "System error")}
@@ -90,7 +86,7 @@ export default function ErrorState({
         still running — try again, or head back to the front page.
       </p>
 
-      <p className="font-mono text-fluid-2xs tracking-[0.14em] text-subtle uppercase mb-fluid-lg">
+      <p className="font-mono text-fluid-2xs tracking-[0.14em] text-muted uppercase mb-fluid-lg">
         ERR &middot; {code}
       </p>
 

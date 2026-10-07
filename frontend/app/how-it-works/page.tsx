@@ -11,6 +11,8 @@ import {
 import { PageShell } from "@/components/layout/PageShell";
 import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
 import { Reveal } from "@/components/layout/Reveal";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
+import { MaterialIcon } from "@/components/visual/MaterialIcon";
 
 export const metadata: Metadata = {
   title: "How It Works - India Verified",
@@ -146,7 +148,7 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <EditorialPageHeader kicker="The method / Open by design" title={<>A story is only as good<br />as its <em className="text-accent">sources.</em></>} description="Look behind the headlines. Here is the seven-step process that collects, cross-references, and publishes the stories you read." />
+      <EditorialPageHeader kicker="The method / Open by design" title={<>A story is only as good<br />as its <em className="text-accent">sources.</em></>} description="Look behind the headlines. Here is the seven-step process that collects, cross-references, and publishes the stories you read." artwork={<EditorialIllustration variant="verify" />} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 lg:gap-20 mb-14">
         <div><div className="lg:sticky lg:top-28"><p className="editorial-kicker mb-4">From report to perspective</p><h2 className="font-display text-3xl font-normal mb-5">No black box.<br />Follow the process.</h2><p className="text-sm text-ink-soft max-w-[34ch]">The credibility score is a starting point. Original sources and the reasoning behind every score are always there for you to explore.</p></div></div>
@@ -154,7 +156,7 @@ export default function HowItWorksPage() {
           {PIPELINE_STEPS.map(step => (
             <Reveal key={step.number} className="pipeline-step">
               <span className="pipeline-step__number">{step.number}</span>
-              <div className="min-w-0"><div className="flex items-center justify-between gap-3 mb-2"><span className="editorial-kicker !text-muted">{step.subtitle}</span><step.icon size={17} className="text-accent" aria-hidden="true" /></div><h2 className="font-display text-2xl font-medium mb-3">{step.title}</h2><p className="text-sm text-ink-soft leading-relaxed">{step.description}</p></div>
+              <div className="min-w-0"><div className="flex items-center justify-between gap-3 mb-2"><span className="editorial-kicker !text-muted">{step.subtitle}</span><MaterialIcon icon={step.icon} tone={Number(step.number) % 2 ? "sage" : "sky"} size="sm" /></div><h2 className="font-display text-2xl font-medium mb-3">{step.title}</h2><p className="text-sm text-ink-soft leading-relaxed">{step.description}</p></div>
             </Reveal>
           ))}
         </div>

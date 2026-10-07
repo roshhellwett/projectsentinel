@@ -8,6 +8,7 @@ import { I18nProvider } from "@/lib/i18n/context";
 import dynamic from "next/dynamic";
 import { PageEntrance } from "@/components/layout/PageEntrance";
 import { ChatProvider } from "@/components/chat/ChatContext";
+import { MaterialBackdrop } from "./MaterialBackdrop";
 
 const ScrollToTop = dynamic(
   () => import("@/components/ui/ScrollToTop").then((m) => m.ScrollToTop),
@@ -40,6 +41,7 @@ const ChatBubble = dynamic(
 export default function ClientShell({ children, tickerNode }: { children: ReactNode, tickerNode?: ReactNode }) {
   return (
     <>
+      <MaterialBackdrop />
       <I18nProvider>
         <ChatProvider>
           <Navbar />

@@ -7,6 +7,8 @@ import { Search, SearchX, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/PageShell";
 import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
+import { MaterialIcon } from "@/components/visual/MaterialIcon";
 import Link from "next/link";
 import { getServerLocale } from "@/lib/i18n/server";
 import en from "@/messages/en.json";
@@ -45,10 +47,8 @@ async function SearchResults({
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-fluid-sm text-center">
-        <div className="w-16 h-16 rounded-full bg-paper/70 backdrop-blur-sm border border-rule/50 flex items-center justify-center mb-fluid-xs shrink-0">
-          <SearchX className="w-7 h-7 text-muted" />
-        </div>
+      <div className="glass-empty flex flex-col items-center justify-center py-16 px-fluid-sm text-center">
+        <MaterialIcon icon={SearchX} tone="sky" size="lg" className="mb-5" />
         <h2 className="font-display text-fluid-lg font-bold text-ink tracking-[-0.015em] mb-fluid-3xs">
           {messages["search.no_results"]?.replace("{query}", query)}
         </h2>
@@ -81,9 +81,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="relative min-h-screen">
       <PageShell>
-        <EditorialPageHeader kicker={query ? messages["search.title"] : messages["search.page_title"]} title={query || messages["search.page_subtitle"]} description={messages["search.page_desc"]} />
+        <EditorialPageHeader kicker={query ? messages["search.title"] : messages["search.page_title"]} title={query || messages["search.page_subtitle"]} description={messages["search.page_desc"]} artwork={<EditorialIllustration variant="search" />} />
         <form action="/search" method="get" className="search-field" role="search">
-          <Search size={19} className="text-muted shrink-0" aria-hidden="true" />
+          <MaterialIcon icon={Search} tone="sky" size="sm" />
           <label htmlFor="news-search-query" className="sr-only">Search verified news</label>
           <input id="news-search-query" type="search" name="q" defaultValue={query} placeholder="A topic, a question, a story…" required maxLength={200} />
           <button type="submit" className="editorial-button">Search <ArrowRight size={14} aria-hidden="true" /></button>

@@ -13,6 +13,7 @@ import {
   isBodyScrollLocked,
 } from "@/lib/utils/bodyScrollLock";
 import { Z_INDEX } from "@/lib/theme/zIndex";
+import { CategoryIcon } from "@/components/visual/MaterialIcon";
 
 function HomeIcon() {
   return (
@@ -173,13 +174,13 @@ export function MobileBottomNav() {
             topicsOpen ? "opacity-100" : "opacity-0"
           }`}
         >
-          <div className="absolute inset-0 bg-ink/40" onClick={closeTopics} />
+          <div className="glass-overlay absolute inset-0" onClick={closeTopics} />
           <div
-            className={`absolute left-2 right-2 max-[380px]:left-1.5 max-[380px]:right-1.5 bg-paper/95 backdrop-blur-2xl border border-rule shadow-2xl rounded-t-2xl transition-transform duration-slow ${
+            className={`glass-menu absolute left-2 right-2 max-[380px]:left-1.5 max-[380px]:right-1.5 rounded-[26px] transition-transform duration-slow ${
               topicsOpen ? "translate-y-0" : "translate-y-full"
             }`}
             style={{
-              bottom: "calc(4.5rem + env(safe-area-inset-bottom, 0px))",
+              bottom: "calc(5.4rem + env(safe-area-inset-bottom, 0px))",
             }}
           >
             <div className="p-fluid-sm pb-fluid-md max-h-[70vh] overflow-y-auto">
@@ -205,12 +206,13 @@ export function MobileBottomNav() {
                       href={`/category/${cat.slug}/`}
                       prefetch={true}
                       onClick={closeTopics}
-                      className={`flex items-center justify-center px-3 py-3 text-center text-fluid-xs transition-all duration-base rounded-token-md min-h-[44px] ${
+                      className={`flex items-center justify-start gap-2 px-3 py-3 text-center text-fluid-xs transition-all duration-base rounded-[14px] min-h-[44px] ${
                         active
                           ? "bg-ink text-paper font-bold shadow-sm"
                           : "text-ink bg-paper-2/60 border border-rule/60 hover:border-ink/30 hover:bg-paper-2"
                       }`}
                     >
+                      <CategoryIcon category={cat.slug} size="xs" />
                       {t(`nav.${cat.slug}`)}
                     </Link>
                   );
@@ -222,7 +224,7 @@ export function MobileBottomNav() {
       )}
 
       <nav
-        className={`mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 ${Z_INDEX.mobileNav} transition-transform duration-slow ease-out transform-gpu ${
+        className={`mobile-bottom-nav md:hidden fixed ${Z_INDEX.mobileNav} transition-transform duration-slow ease-out transform-gpu ${
           hideForOverlay ? "translate-y-full" : "translate-y-0"
         }`}
         aria-hidden={hideForOverlay ? "true" : "false"}
@@ -230,7 +232,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? "none" : "auto" }}
       >
         <div
-          className="relative border-t border-rule bg-paper/95 backdrop-blur-xl select-none touch-manipulation transition-all duration-slow"
+          className="glass-dock relative select-none touch-manipulation transition-all duration-slow"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">
@@ -241,10 +243,7 @@ export function MobileBottomNav() {
 
               const inner = (
                 <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-90 transition-all duration-fast">
-                  {active && (
-                    <span className="absolute top-0 w-5 h-[2px] rounded-full bg-accent animate-fade-in" />
-                  )}
-                   <div className={`transition-transform duration-base ${active ? "scale-110 text-accent" : "text-muted"}`}>
+                  <div className={`mobile-tab__icon ${active ? "text-accent" : "text-muted"}`} data-active={active}>
                     <Icon />
                   </div>
                   <span

@@ -5,13 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Bookmark, Menu, Search, X } from "lucide-react";
+import { ArrowUpRight, Bookmark, Menu, Search, ShieldCheck, X } from "lucide-react";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/utils/bodyScrollLock";
 import { OPEN_SEARCH_EVENT } from "@/components/ui/KeyboardShortcuts";
 import { useI18n } from "@/lib/i18n/i18n-shared";
 import { LanguageFilter } from "./LanguageFilter";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { Brand } from "./Brand";
+import { CategoryIcon, MaterialIcon } from "@/components/visual/MaterialIcon";
 
 const SearchBar = dynamic(() => import("@/components/ui/SearchBar").then(module => module.SearchBar), { ssr: false });
 
@@ -87,12 +88,12 @@ export function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <>
-            <motion.div key="menu-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="fixed inset-0 z-[100] bg-ink/25 backdrop-blur-sm" onClick={() => setMenuOpen(false)} aria-hidden="true" />
-            <motion.aside key="menu-panel" ref={panelRef} id="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Site navigation" initial={{ x: reduceMotion ? 0 : "100%" }} animate={{ x: 0 }} exit={{ x: reduceMotion ? 0 : "100%" }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 38, mass: 0.9 }} className="fixed inset-y-0 right-0 z-[110] w-full max-w-[420px] bg-paper border-l border-rule flex flex-col shadow-2xl" style={{ paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+            <motion.div key="menu-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="glass-overlay fixed inset-0 z-[100]" onClick={() => setMenuOpen(false)} aria-hidden="true" />
+            <motion.aside key="menu-panel" ref={panelRef} id="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Site navigation" initial={{ x: reduceMotion ? 0 : "100%" }} animate={{ x: 0 }} exit={{ x: reduceMotion ? 0 : "100%" }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 38, mass: 0.9 }} className="glass-menu fixed inset-y-0 right-0 z-[110] w-full max-w-[420px] flex flex-col" style={{ paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
               <div className="flex items-center justify-between p-5 border-b border-rule"><Brand /><button type="button" className="icon-button" aria-label="Close menu" onClick={() => setMenuOpen(false)}><X size={18} aria-hidden="true" /></button></div>
               <nav className="p-6 flex-1 overflow-y-auto" aria-label="Sections">
                 <p className="editorial-kicker mb-5">Your daily perspective</p>
-                {NAV_LINKS.map((link, index) => <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} aria-current={active(link.href) ? "page" : undefined} className="flex items-center justify-between py-4 border-b border-rule group"><span className="flex items-center gap-4"><span className="font-mono text-[9px] text-muted">{String(index + 1).padStart(2, "0")}</span><span className="font-display text-[25px] tracking-tight group-hover:text-accent">{t(link.key)}</span></span><ArrowUpRight size={17} className="text-accent" aria-hidden="true" /></Link>)}
+                {NAV_LINKS.map(link => <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} aria-current={active(link.href) ? "page" : undefined} className="flex items-center justify-between py-4 border-b border-rule group"><span className="flex items-center gap-4">{link.key === "nav.saved" ? <MaterialIcon icon={Bookmark} tone="coral" /> : link.key === "nav.how_it_works" ? <MaterialIcon icon={ShieldCheck} tone="sage" /> : <CategoryIcon category={link.href.split("/").pop() ?? ""} size="md" />}<span className="font-display text-[25px] tracking-tight group-hover:text-accent">{t(link.key)}</span></span><ArrowUpRight size={17} className="text-accent" aria-hidden="true" /></Link>)}
                 <Link href="/chat" onClick={() => setMenuOpen(false)} className="editorial-link mt-5">Ask the news assistant <ArrowUpRight size={15} aria-hidden="true" /></Link>
               </nav>
               <div className="flex items-center justify-between border-t border-rule p-5"><LanguageFilter /><ConnectionStatus /><a href="https://github.com/roshhellwett/projectsentinel" target="_blank" rel="noopener noreferrer" className="editorial-link text-muted">Open-source <ArrowUpRight size={13} aria-hidden="true" /></a></div>

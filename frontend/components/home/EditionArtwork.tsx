@@ -1,12 +1,15 @@
 "use client";
 
 import { useId } from "react";
+import { Layers3, ShieldCheck } from "lucide-react";
+import { MaterialIcon } from "@/components/visual/MaterialIcon";
 
 /** A local, resolution-independent illustration of the cross-reference process. */
 export function EditionArtwork() {
   const id = useId();
   return (
     <figure className="edition-art" aria-label="Multiple source reports becoming one cross-referenced story">
+      <div className="edition-art__chip edition-art__chip--top" aria-hidden="true"><MaterialIcon icon={Layers3} tone="sky" size="sm" /><span><strong>Every angle matters.</strong><small>Multiple sources. One perspective.</small></span></div>
       <svg viewBox="0 0 460 360" fill="none" aria-hidden="true">
         <defs>
           <filter id={`${id}-shadow`} x="-30%" y="-30%" width="170%" height="180%">
@@ -16,12 +19,12 @@ export function EditionArtwork() {
             <circle cx="1" cy="1" r="0.6" fill="#c8cbc0" />
           </pattern>
         </defs>
-        <circle cx="239" cy="177" r="145" fill="#f7f7f2" />
+        <circle cx="239" cy="177" r="145" fill="#f5f8fa" opacity="0.6" />
         <path d="M47 231h35M64 214v35M380 79h28M394 65v28" stroke="#bfc4b6" strokeWidth="1" />
         <rect x="73" y="83" width="92" height="195" fill={`url(#${id}-dots)`} />
         <g className="edition-art__page edition-art__page--back">
           <g transform="rotate(-15 206 177)" filter={`url(#${id}-shadow)`}>
-            <rect x="114" y="53" width="176" height="237" rx="2" fill="#f0eee7" stroke="#c7c8bc" />
+            <rect x="114" y="53" width="176" height="237" rx="10" fill="#e6eff6" stroke="#c7d6e1" />
             <path d="M132 80h96M132 91h65M132 112h140M132 122h140M132 132h114" stroke="#b6b9aa" strokeWidth="3" />
             <rect x="132" y="151" width="61" height="57" fill="#dfe3d6" />
             <path d="M203 155h67M203 167h67M203 179h54M203 191h61M132 229h135M132 242h118M132 254h128" stroke="#c2c5b7" strokeWidth="3" />
@@ -29,7 +32,7 @@ export function EditionArtwork() {
         </g>
         <g className="edition-art__page edition-art__page--middle">
           <g transform="rotate(13 276 178)" filter={`url(#${id}-shadow)`}>
-            <rect x="188" y="51" width="176" height="238" rx="2" fill="#f7f6f0" stroke="#bfc2b6" />
+            <rect x="188" y="51" width="176" height="238" rx="10" fill="#eaf1e9" stroke="#c8d6c7" />
             <path d="M208 80h112M208 91h78" stroke="#a6ae99" strokeWidth="4" />
             <path d="M208 119h136M208 131h136M208 143h117M208 165h136M208 177h129M208 189h136M208 201h111M208 229h136M208 241h112M208 253h120" stroke="#d0d4c5" strokeWidth="3" />
           </g>
@@ -61,6 +64,7 @@ export function EditionArtwork() {
         <path d="M283 337h20m-4-3 4 3-4 3" stroke="#b73a25" />
         <text x="314" y="340" fill="#6e7466" fontFamily="monospace" fontSize="8" letterSpacing="1">03 / CLARIFY</text>
       </svg>
+      <div className="edition-art__chip edition-art__chip--bottom" aria-hidden="true"><MaterialIcon icon={ShieldCheck} tone="sage" size="sm" /><span><strong>Clarity, with context.</strong><small>The evidence stays in view.</small></span></div>
     </figure>
   );
 }

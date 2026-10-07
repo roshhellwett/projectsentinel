@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { fetchLatestPost, fetchPostsCursor } from "@/lib/supabase/server";
+import { PageShell } from "@/components/layout/PageShell";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 
 export const metadata: Metadata = {
   title: "Status - India Verified",
@@ -20,13 +23,11 @@ export default async function StatusPage() {
     : null;
 
   return (
-    <main className="max-w-prose-fluid mx-auto px-fluid-sm py-fluid-lg">
-      <h1 className="font-display text-fluid-2xl font-bold text-ink mb-fluid-lg">
-        System Status
-      </h1>
+    <PageShell>
+      <EditorialPageHeader kicker="Behind the scenes / System health" title="System Status" description="A view into the latest published stories and the pipeline behind them." artwork={<EditorialIllustration variant="verify" />} />
 
       <section className="space-y-fluid-sm">
-        <div className="border border-rule rounded-token-md p-fluid-sm min-w-0">
+        <div className="glass-card p-fluid-md min-w-0">
           <h2 className="font-semibold text-fluid-xs text-muted mb-fluid-3xs">
             Latest Article
           </h2>
@@ -40,7 +41,7 @@ export default async function StatusPage() {
           )}
         </div>
 
-        <div className="border border-rule rounded-token-md p-fluid-sm">
+        <div className="glass-card p-fluid-md">
           <h2 className="font-semibold text-fluid-xs text-muted mb-fluid-3xs">
             Pipeline Status
           </h2>
@@ -51,7 +52,7 @@ export default async function StatusPage() {
           </p>
         </div>
 
-        <div className="border border-rule rounded-token-md p-fluid-sm">
+        <div className="glass-card p-fluid-md">
           <h2 className="font-semibold text-fluid-xs text-muted mb-fluid-3xs">
             CI/CD Badges
           </h2>
@@ -87,6 +88,6 @@ export default async function StatusPage() {
           </div>
         </div>
       </section>
-    </main>
+    </PageShell>
   );
 }

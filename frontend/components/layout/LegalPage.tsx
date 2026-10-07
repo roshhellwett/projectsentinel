@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 
 interface LegalPageProps {
   kicker: string;
@@ -31,7 +32,8 @@ export function LegalPage({
           Back to all news
         </Link>
 
-        <header className="mb-fluid-lg">
+        <header className="mb-fluid-lg flow-root">
+          <EditorialIllustration variant={kicker.toLowerCase().includes("contact") ? "contact" : kicker.toLowerCase().includes("correction") ? "verify" : "privacy"} className="legal-art" />
           <span
             aria-hidden="true"
             className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-fluid-sm"

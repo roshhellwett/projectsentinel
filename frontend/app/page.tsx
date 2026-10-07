@@ -10,6 +10,8 @@ import { Briefing } from "@/components/home/Briefing";
 import { FeedSectionHeader } from "@/components/home/FeedSectionHeader";
 import { TopicIndex } from "@/components/layout/TopicIndex";
 import { Reveal } from "@/components/layout/Reveal";
+import { TopicGallery } from "@/components/home/TopicGallery";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from "@/lib/utils/structuredData";
 import { dedupe } from "@/lib/utils/dedupe";
 
@@ -54,8 +56,10 @@ async function NewsroomSection() {
         </Reveal>
       )}
       {trending.length > 0 && <Reveal className="mt-4"><TrendingSection posts={trending} /></Reveal>}
+      <Reveal><TopicGallery /></Reveal>
       <Reveal>
         <section className="method-note" aria-label="Our approach">
+          <EditorialIllustration variant="verify" />
           <div><span className="editorial-kicker mb-2">The thinking behind the reading</span><h2>Trust is in the details.</h2></div>
           <p>Every story comes with its sources and an AI credibility analysis. You can follow the evidence, understand the score, and form your own view.</p>
           <Link href="/how-it-works" className="editorial-link">See how it works <ArrowUpRight size={16} aria-hidden="true" /></Link>

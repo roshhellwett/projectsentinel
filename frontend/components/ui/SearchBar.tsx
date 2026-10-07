@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/utils/bodyScrollLock";
 import { cachedFetch } from "@/lib/utils/fetchCache";
 import { useI18n } from "@/lib/i18n/context";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 
 function SearchIcon() {
   return (
@@ -229,11 +230,12 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       role="dialog"
       aria-modal="true"
       aria-label={t("search.aria_dialog")}
-      className="fixed inset-0 overflow-y-auto bg-paper/98 backdrop-blur-md overflow-x-hidden w-full max-w-full touch-manipulation animate-fade-in"
+      className="glass-search fixed inset-0 overflow-y-auto overflow-x-hidden w-full max-w-full touch-manipulation animate-fade-in"
       style={{ zIndex: 100 }}
     >
       <div className="max-w-4xl mx-auto px-5 sm:px-8 py-6 sm:py-12">
         <div className="flex items-center justify-between gap-fluid-xs mb-fluid-md">
+          <EditorialIllustration variant="search" className="!w-24 !m-0 hidden sm:block" />
           <h2 className="font-display text-fluid-2xl text-ink min-w-0 truncate">
             {t("search.page_title")}
           </h2>

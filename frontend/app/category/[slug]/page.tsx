@@ -7,6 +7,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PageShell } from "@/components/layout/PageShell";
 import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
 import { TopicIndex } from "@/components/layout/TopicIndex";
+import { TopicIllustration } from "@/components/visual/TopicIllustration";
 
 export const revalidate = 60;
 export const dynamicParams = false;
@@ -107,7 +108,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-        <EditorialPageHeader kicker="The perspective / By topic" title={<>{categoryName}<span className="text-accent">.</span></>} description={`The latest in ${slug}, with the sources and context behind every headline.`} />
+        <EditorialPageHeader kicker="The perspective / By topic" title={<>{categoryName}<span className="text-accent">.</span></>} description={`The latest in ${slug}, with the sources and context behind every headline.`} artwork={<TopicIllustration category={slug} />} />
         <div className="mb-8"><TopicIndex /></div>
 
         <Suspense

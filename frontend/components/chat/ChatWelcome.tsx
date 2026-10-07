@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 
 const PROMPTS = [
   "What's new today?",
@@ -29,17 +30,7 @@ export function ChatWelcome({
   return (
     <div className="w-full max-w-2xl p-4 sm:p-8">
       <div className="flex flex-col items-center justify-center gap-4 text-center">
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
-          className="grid h-14 w-14 place-items-center rounded-full border border-rule bg-paper-2 text-accent"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 5.5h16v10H8.5L4 19V5.5Z" />
-            <path d="M8 9.5h8M8 12.5h5" />
-          </svg>
-        </motion.div>
+        <EditorialIllustration variant="assistant" className="assistant-scene" />
 
         <div className="max-w-[34rem] space-y-2">
           <p className="editorial-kicker">The news desk / Your questions</p>
@@ -70,7 +61,7 @@ export function ChatWelcome({
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               type="button"
               onClick={() => onPrompt(p)}
-              className="relative overflow-hidden rounded border border-rule bg-paper px-3.5 py-3 min-h-[44px] text-[0.72rem] font-medium text-ink-soft transition-colors hover:border-accent/40 hover:text-accent"
+              className="assistant-prompt relative overflow-hidden px-3.5 py-3 min-h-[44px] text-[0.72rem] font-medium text-ink-soft transition-colors hover:text-accent"
             >
               {p}
             </motion.button>

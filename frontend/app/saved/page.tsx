@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Bookmark, ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { Post } from "@/types";
 import { NewsCard } from "@/components/news/NewsCard";
 import { FeedSkeleton } from "@/components/news/InfiniteFeed";
@@ -10,6 +10,7 @@ import { useReadPosts, useSavedPosts } from "@/lib/utils/readPosts";
 import { showToast } from "@/lib/utils/toast";
 import { PageShell } from "@/components/layout/PageShell";
 import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
+import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import dynamic from "next/dynamic";
 
@@ -90,7 +91,7 @@ export default function SavedPage() {
           {t("saved.back")}
         </Link>
 
-        <EditorialPageHeader kicker={t("saved.your_list")} title={t("saved.page_title")} description={t("saved.page_desc")}>
+        <EditorialPageHeader kicker={t("saved.your_list")} title={t("saved.page_title")} description={t("saved.page_desc")} artwork={idList.length > 0 ? <EditorialIllustration variant="saved" /> : undefined}>
           {idList.length > 0 && (
             <button
               onClick={() => setConfirmingClear(true)}
@@ -118,13 +119,8 @@ export default function SavedPage() {
         )}
 
         {!loading && !error && posts.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 px-fluid-sm text-center">
-            <div
-              className="w-20 h-24 rounded border border-rule flex items-center justify-center mb-6 shrink-0 -rotate-6 shadow-[8px_8px_0_rgb(var(--c-paper-2))]"
-              style={{ backgroundColor: "rgb(var(--c-paper-2))" }}
-            >
-              <Bookmark className="w-7 h-7 text-muted" />
-            </div>
+          <div className="glass-empty flex flex-col items-center justify-center px-fluid-sm text-center">
+            <EditorialIllustration variant="saved" />
             <h2 className="font-display text-fluid-lg font-bold text-ink tracking-[-0.015em] mb-fluid-3xs">
               {t("saved.empty_title")}
             </h2>
@@ -133,7 +129,7 @@ export default function SavedPage() {
             </p>
             <Link
               href="/"
-              className="tap-target min-h-[44px] inline-flex items-center gap-2 px-4 pt-[9px] pb-[11px] rounded border border-ink bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-all hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="editorial-button"
             >
               {t("saved.browse_latest")}
             </Link>
