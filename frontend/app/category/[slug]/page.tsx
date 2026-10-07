@@ -5,6 +5,8 @@ import { InfiniteFeed, FeedSkeleton } from "@/components/news/InfiniteFeed";
 import { CATEGORY_SLUGS } from "@/lib/constants/categories";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PageShell } from "@/components/layout/PageShell";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
+import { TopicIndex } from "@/components/layout/TopicIndex";
 
 export const revalidate = 60;
 export const dynamicParams = false;
@@ -105,20 +107,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <PageShell>
         <Breadcrumb items={[{ label: categoryName }]} className="mb-6" />
 
-        <header className="mb-fluid-lg pb-fluid-md border-b border-rule">
-          <span
-            aria-hidden="true"
-            className="block w-8 sm:w-10 h-[2px] bg-accent rounded-full mb-fluid-xs"
-          />
-          <p className="editorial-kicker mb-fluid-2xs">Category</p>
-          <h1 className="font-display text-fluid-3xl sm:text-fluid-4xl font-bold tracking-tight text-ink mb-fluid-2xs">
-            {categoryName}
-          </h1>
-          <p className="text-fluid-sm text-muted max-w-prose-fluid leading-relaxed">
-            AI-verified {slug} stories cross-referenced across multiple trusted
-            sources.
-          </p>
-        </header>
+        <EditorialPageHeader kicker="The perspective / By topic" title={<>{categoryName}<span className="text-accent">.</span></>} description={`The latest in ${slug}, with the sources and context behind every headline.`} />
+        <div className="mb-8"><TopicIndex /></div>
 
         <Suspense
           fallback={

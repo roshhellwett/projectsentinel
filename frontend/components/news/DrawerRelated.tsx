@@ -93,7 +93,7 @@ export function DrawerRelated({ currentPost, onSelect }: DrawerRelatedProps) {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-[104px] rounded-[16px] border-2 border-ink/40 bg-paper-2 animate-pulse"
+              className="h-[104px] rounded border border-rule bg-paper-2 animate-pulse"
             />
           ))}
         </div>
@@ -137,7 +137,7 @@ function DrawerRelatedItem({ post, index, onSelect }: DrawerRelatedItemProps) {
       <button
         type="button"
         onClick={() => onSelect(post)}
-        className="group relative flex w-full flex-col justify-between gap-2.5 rounded-[16px] border-2 border-ink bg-paper p-4 text-left shadow-[3px_3px_0px_rgb(var(--c-ink))] transition-all duration-200 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_rgb(var(--c-ink))] active:translate-y-0.5 active:translate-x-0.5 active:shadow-[1.5px_1.5px_0px_rgb(var(--c-ink))] focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 min-h-[90px]"
+        className="group relative flex w-full flex-col justify-between gap-2.5 rounded border border-rule bg-paper p-4 text-left transition-all duration-300 hover:border-accent/40 hover:bg-paper-2/50 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 min-h-[90px]"
       >
         <div className="flex w-full items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">

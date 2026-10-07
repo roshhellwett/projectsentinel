@@ -1,258 +1,58 @@
 "use client";
+
 import Link from "next/link";
+import { ArrowUpRight, Code2, Rss } from "lucide-react";
 import { useI18n } from "@/lib/i18n/i18n-shared";
 import { InstallAppButton } from "@/components/ui/InstallAppButton";
+import { Brand } from "./Brand";
 
-const NEWS_LINKS = [
-  { href: "/category/politics/", key: "nav.politics" },
-  { href: "/category/business/", key: "nav.business" },
-  { href: "/category/sports/", key: "nav.sports" },
-  { href: "/category/tech/", key: "nav.tech" },
-  { href: "/category/world/", key: "nav.world" },
-  { href: "/category/entertainment/", key: "nav.entertainment" },
-];
-
-const ABOUT_LINKS = [
-  { href: "/how-it-works/", key: "nav.how_it_works" },
-  { href: "/saved/", key: "nav.saved" },
-  { href: "/swipe/", key: "nav.swipe" },
-];
-
-const LEGAL_LINKS = [
-  { href: "/privacy/", key: "footer.privacy" },
-  { href: "/terms/", key: "footer.terms" },
-  { href: "/corrections/", key: "footer.corrections" },
-  { href: "/contact/", key: "footer.contact" },
-];
-
-function RssIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M4 11a9 9 0 019 9" />
-      <path d="M4 4a16 16 0 0116 16" />
-      <circle cx="5" cy="19" r="1" />
-    </svg>
-  );
-}
-
-function ExternalLinkIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-      <polyline points="15 3 21 3 21 9" />
-      <line x1="10" y1="14" x2="21" y2="3" />
-    </svg>
-  );
-}
-
-const REPO_URL = "https://github.com/roshhellwett/projectsentinel";
-const RSS_URL = "/rss.xml";
+const GROUPS = [
+  { title: "footer.news", links: [
+    { href: "/category/politics", key: "nav.politics" },
+    { href: "/category/business", key: "nav.business" },
+    { href: "/category/world", key: "nav.world" },
+    { href: "/category/sports", key: "nav.sports" },
+    { href: "/category/tech", key: "nav.tech" },
+    { href: "/category/entertainment", key: "nav.entertainment" },
+  ] },
+  { title: "footer.about", links: [
+    { href: "/how-it-works", key: "nav.how_it_works" },
+    { href: "/saved", key: "nav.saved" },
+    { href: "/swipe", key: "nav.swipe" },
+    { href: "/chat", key: "nav.assistant" },
+  ] },
+  { title: "footer.legal", links: [
+    { href: "/privacy", key: "footer.privacy" },
+    { href: "/terms", key: "footer.terms" },
+    { href: "/corrections", key: "footer.corrections" },
+    { href: "/contact", key: "footer.contact" },
+  ] },
+] as const;
 
 export function Footer() {
   const { t } = useI18n();
-  const year = new Date().getFullYear();
-
   return (
-    <footer className="relative mt-auto border-t border-rule/50 overflow-x-hidden w-full max-w-full bg-paper/70 backdrop-blur-md transition-colors duration-base">
-      <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-10 py-fluid-xl">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-fluid-sm pb-fluid-md mb-fluid-md border-b border-rule">
-          <div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-fluid-3xs group rounded-token-sm"
-            >
-              <span
-                aria-hidden="true"
-                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 shrink-0 border border-accent/60 rounded-xl text-accent font-display font-bold text-fluid-sm bg-accent/5"
-              >
-                IV
-              </span>
-              <span className="flex flex-col leading-tight">
-                <span className="font-display text-fluid-lg text-ink">
-                  India Verified
-                </span>
-                <span className="text-fluid-2xs text-ink-soft font-body">
-                  AI-cross-referenced Indian news
-                </span>
-              </span>
-            </Link>
-            <p className="mt-fluid-3xs text-fluid-xs text-ink-soft leading-relaxed max-w-prose-fluid">
-              {t("footer.description")}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-fluid-3xs">
-            <InstallAppButton />
-            <a
-              href={RSS_URL}
-              className="inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-2xs border border-rule text-fluid-2xs text-ink hover:bg-paper-2 transition-colors duration-base rounded-token-sm min-h-[44px]"
-            >
-              <RssIcon />
-              {t("footer.rss_feed")}
-            </a>
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-2xs border border-rule text-fluid-2xs text-ink hover:bg-paper-2 transition-colors duration-base rounded-token-sm min-h-[44px]"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
-              </svg>
-              {t("footer.github")}
-              <ExternalLinkIcon />
-            </a>
-          </div>
+    <footer className="site-footer mt-auto">
+      <div className="site-container">
+        <div className="site-footer__statement">
+          <div><p className="editorial-kicker mb-3">A considered perspective</p><h2>Stay curious.<br />Stay <em>well-informed.</em></h2></div>
+          <Link href="/how-it-works" className="editorial-link">Built on transparency <ArrowUpRight size={16} aria-hidden="true" /></Link>
         </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-y-fluid-sm gap-x-fluid-sm mb-fluid-md">
-          <div>
-            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
-              {t("footer.news")}
-            </h3>
-            <ul className="space-y-fluid-3xs">
-              {NEWS_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-colors duration-base text-fluid-xs py-2 inline-block min-h-[44px] flex items-center"
-                  >
-                    {t(link.key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        <div className="grid grid-cols-2 lg:grid-cols-[1.7fr_1fr_1fr_1fr] gap-x-8 gap-y-9 py-10">
+          <div className="col-span-2 lg:col-span-1">
+            <Brand />
+            <p className="text-[12px] text-ink-soft max-w-[34ch] mt-5 mb-5">{t("footer.description")}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <a href="/rss.xml" className="icon-button bg-paper" aria-label={t("footer.rss_feed")}><Rss size={15} aria-hidden="true" /></a>
+              <a href="https://github.com/roshhellwett/projectsentinel" target="_blank" rel="noopener noreferrer" className="icon-button bg-paper" aria-label="Source code on GitHub"><Code2 size={16} aria-hidden="true" /></a>
+              <InstallAppButton />
+            </div>
           </div>
-
-          <div>
-            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
-              {t("footer.about")}
-            </h3>
-            <ul className="space-y-fluid-3xs">
-              {ABOUT_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-colors duration-base text-fluid-xs py-2 inline-block min-h-[44px] flex items-center"
-                  >
-                    {t(link.key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
-              {t("footer.legal")}
-            </h3>
-            <ul className="space-y-fluid-3xs">
-              {LEGAL_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-ink-soft hover:text-ink border-b border-transparent hover:border-ink transition-colors duration-base text-fluid-xs py-2 inline-block min-h-[44px] flex items-center"
-                  >
-                    {t(link.key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-body text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft mb-fluid-3xs">
-              {t("footer.transparency")}
-            </h3>
-            <ul className="space-y-fluid-3xs">
-              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
-                <span
-                  className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
-                  aria-hidden="true"
-                />
-                <span>No advertising or sponsored content</span>
-              </li>
-              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
-                <span
-                  className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
-                  aria-hidden="true"
-                />
-                <span>Every claim links back to its sources</span>
-              </li>
-              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
-                <span
-                  className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
-                  aria-hidden="true"
-                />
-                <span>Open-source under the MIT licence</span>
-              </li>
-              <li className="flex items-start gap-fluid-3xs text-ink-soft text-fluid-xs leading-snug">
-                <span
-                  className="mt-2 w-1.5 h-px bg-ink-soft flex-shrink-0"
-                  aria-hidden="true"
-                />
-                <span>AI cross-verifies before publishing</span>
-              </li>
-            </ul>
-          </div>
+          {GROUPS.map(group => <div key={group.title}><h3 className="font-mono font-normal text-[10px] tracking-wider text-muted uppercase mb-3">{t(group.title)}</h3><ul>{group.links.map(link => <li key={link.href}><Link href={link.href} className="inline-flex items-center min-h-[44px] text-[12px] text-ink-soft hover:text-accent transition-colors">{t(link.key)}</Link></li>)}</ul></div>)}
         </div>
-
-        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-fluid-2xs pt-fluid-sm border-t border-rule">
-          <p className="text-fluid-2xs text-muted leading-relaxed">
-            <span className="inline-flex items-center gap-fluid-3xs px-2 py-1 bg-paper-2 border border-rule text-fluid-2xs">
-              <span className="font-semibold text-ink-soft">
-                {t("footer.built_in_india")}
-              </span>
-            </span>
-            <span aria-hidden="true" className="mx-1 text-rule">
-              ·
-            </span>
-            Designed &amp; engineered by{" "}
-            <a
-              href="https://github.com/roshhellwett"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-ink underline decoration-rule underline-offset-2"
-            >
-              Roshhellwett
-            </a>
-          </p>
-          <p
-            className="text-fluid-2xs text-muted leading-relaxed"
-            suppressHydrationWarning
-          >
-            &copy; {year} India Verified. MIT licence.
-          </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5 border-t border-rule text-[10px] text-muted">
+          <p>© {new Date().getFullYear()} India Verified. Open-source, MIT licence.</p>
+          <p>{t("footer.built_in_india")} · Created by <a href="https://github.com/roshhellwett" target="_blank" rel="noopener noreferrer" className="text-ink underline decoration-rule-strong">Roshhellwett</a></p>
         </div>
       </div>
     </footer>

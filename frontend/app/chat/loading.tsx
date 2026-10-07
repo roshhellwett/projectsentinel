@@ -1,7 +1,7 @@
 export default function ChatLoading() {
   return (
-    <div className="mx-auto flex h-dynamic min-h-dynamic w-full max-w-5xl flex-col px-0 py-0 sm:px-3 sm:py-3 lg:px-4 lg:py-4">
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-none border-0 bg-paper/95 shadow-none sm:rounded-[1.75rem] sm:border sm:border-rule/70 sm:shadow-[0_24px_70px_-40px_rgba(15,23,42,0.45)]">
+    <div className="chat-workspace site-container flex flex-col py-4 sm:py-6">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded border border-rule bg-paper">
         <div className="flex items-center gap-3 border-b border-rule/80 bg-paper/95 px-3.5 py-3 backdrop-blur-xl sm:px-4 sm:py-4">
           <div className="h-9 w-9 rounded-full bg-paper-2 animate-pulse" />
           <div className="h-10 w-10 rounded-full bg-paper-2 animate-pulse" />

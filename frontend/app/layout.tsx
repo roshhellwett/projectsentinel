@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Source_Serif_4, Caveat, JetBrains_Mono } from "next/font/google";
+import { Source_Serif_4, Manrope, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { headers } from "next/headers";
 
@@ -16,7 +16,7 @@ import { GlobalTicker } from "@/components/news/GlobalTicker";
 const ClientShell = dynamic(() => import("@/components/layout/ClientShell"));
 
 const sourceSerif = Source_Serif_4({
-  variable: "--font-body",
+  variable: "--font-editorial",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "600", "700", "800", "900"],
@@ -25,17 +25,17 @@ const sourceSerif = Source_Serif_4({
   preload: true,
 });
 
-const caveat = Caveat({
-  variable: "--font-hand",
+const manrope = Manrope({
+  variable: "--font-ui",
   subsets: ["latin"],
   display: "swap",
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   adjustFontFallback: true,
   preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+  variable: "--font-code",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500"],
@@ -128,7 +128,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080c17",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -156,7 +156,7 @@ export default async function RootLayout({
   })();
 
   return (
-      <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
+      <html lang={locale} className={`${sourceSerif.variable} ${manrope.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {supabaseOrigin && (
           <>
@@ -249,7 +249,7 @@ export default async function RootLayout({
 
       </head>
       <body
-        className={`${sourceSerif.variable} ${caveat.variable} ${jetbrainsMono.variable} font-body bg-paper text-ink min-h-screen flex flex-col antialiased w-full relative`}
+        className="font-body bg-paper text-ink min-h-screen flex flex-col antialiased w-full relative"
       >
         {gtmId && (
           <noscript>

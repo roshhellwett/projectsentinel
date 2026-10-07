@@ -119,7 +119,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
         }}
       />
 
-      <PageShell>
+      <PageShell className="reading-layout">
         <div className="flex items-center justify-between gap-3 mb-4 sm:mb-7 flex-wrap">
           <Link
             href="/"
@@ -178,12 +178,12 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
 
           <h1
-            className={`font-display font-bold text-ink tracking-[-0.03em] leading-[1.04] mb-fluid-md text-fluid-4xl ${isRetracted ? "line-through text-muted" : ""}`}
+            className={`font-display font-semibold text-ink tracking-[-0.045em] leading-[1.1] mb-fluid-md text-fluid-4xl ${isRetracted ? "line-through text-muted" : ""}`}
           >
             {post.headline}
           </h1>
 
-          <div className="mb-6 sm:mb-10 rounded-2xl border border-rule/50 glass-sm p-3 sm:p-6">
+          <div className="mb-6 sm:mb-10 rounded border border-rule bg-paper-2/50 p-4 sm:p-6">
             <CredibilityBar score={post.credibility_score} />
             <div className="mt-3 sm:mt-5 flex flex-col gap-2 sm:gap-4 border-t border-rule pt-3 sm:pt-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-ink">
@@ -213,7 +213,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </div>
 
-          <p className="font-display max-w-prose-fluid text-fluid-md leading-[1.75] text-ink-soft first-letter:font-display first-letter:font-bold first-letter:text-[2.8em] sm:first-letter:text-[3.5em] first-letter:leading-[0.85] first-letter:float-left first-letter:mr-2 sm:first-letter:mr-3 first-letter:mt-1 first-letter:text-accent">
+          <p className="article-summary max-w-prose-fluid">
             {post.summary}
           </p>
         </article>

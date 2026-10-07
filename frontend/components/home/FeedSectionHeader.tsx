@@ -7,13 +7,13 @@ export function FeedSectionHeader() {
   return (
     <div className="section-header-premium">
       <div>
-        <span className="section-header-premium__mark">For your attention</span>
+        <span className="section-header-premium__mark">03 / Keep exploring</span>
         <h2 className="font-display font-bold text-ink">
           {t("feed.your_feed")}
         </h2>
       </div>
       <span className="text-[10px] font-mono tracking-[0.16em] text-muted uppercase hidden sm:inline-block">
-        Realtime synthesis / curated
+        Updated as the story develops
       </span>
     </div>
   );

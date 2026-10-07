@@ -135,11 +135,11 @@ export default function ChatPage() {
   const hasError = messages.some((m) => m.status === "error");
 
   return (
-    <div className="mx-auto flex h-dynamic min-h-dynamic w-full max-w-5xl flex-col px-0 py-0 sm:px-3 sm:py-3 lg:px-4 lg:py-4">
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-none border-0 bg-paper/95 shadow-none sm:rounded-[1.75rem] sm:border sm:border-rule/70 sm:shadow-[0_24px_70px_-40px_rgba(15,23,42,0.45)]">
+    <div className="chat-workspace site-container flex flex-col py-4 sm:py-6">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded border border-rule bg-paper">
         <ChatHeader onClear={clearMessages} messageCount={messages.length} />
 
-        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.03),transparent_45%)] px-3 py-4 sm:px-5 sm:py-5">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-4 sm:px-5 sm:py-5">
           {showWelcome ? (
             <div className="flex h-full items-center justify-center px-1 py-2 sm:px-2">
               <ChatWelcome onPrompt={handlePrompt} hasArticleContext={!!activeArticle} />

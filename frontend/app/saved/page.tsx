@@ -9,6 +9,7 @@ import { FeedSkeleton } from "@/components/news/InfiniteFeed";
 import { useReadPosts, useSavedPosts } from "@/lib/utils/readPosts";
 import { showToast } from "@/lib/utils/toast";
 import { PageShell } from "@/components/layout/PageShell";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import dynamic from "next/dynamic";
 
@@ -89,22 +90,7 @@ export default function SavedPage() {
           {t("saved.back")}
         </Link>
 
-        <div className="animate-slide-up mb-fluid-lg pb-fluid-md border-b border-rule flex flex-wrap items-end justify-between gap-fluid-sm">
-          <div className="min-w-0">
-            <span
-              aria-hidden="true"
-              className="block w-10 h-[2px] bg-accent rounded-full mb-fluid-xs"
-            />
-            <p className="editorial-kicker mb-fluid-2xs">
-              {t("saved.your_list")}
-            </p>
-            <h1 className="font-display text-fluid-2xl sm:text-fluid-4xl font-bold tracking-[-0.03em] text-ink mb-fluid-2xs leading-[1.05]">
-              {t("saved.page_title")}
-            </h1>
-            <p className="text-fluid-sm text-muted max-w-prose-fluid leading-relaxed">
-              {t("saved.page_desc")}
-            </p>
-          </div>
+        <EditorialPageHeader kicker={t("saved.your_list")} title={t("saved.page_title")} description={t("saved.page_desc")}>
           {idList.length > 0 && (
             <button
               onClick={() => setConfirmingClear(true)}
@@ -115,7 +101,7 @@ export default function SavedPage() {
               {t("saved.clear_all")}
             </button>
           )}
-        </div>
+        </EditorialPageHeader>
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-fluid-sm items-stretch">
@@ -134,7 +120,7 @@ export default function SavedPage() {
         {!loading && !error && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 px-fluid-sm text-center">
             <div
-              className="w-16 h-16 rounded-full border border-rule flex items-center justify-center mb-fluid-xs shrink-0"
+              className="w-20 h-24 rounded border border-rule flex items-center justify-center mb-6 shrink-0 -rotate-6 shadow-[8px_8px_0_rgb(var(--c-paper-2))]"
               style={{ backgroundColor: "rgb(var(--c-paper-2))" }}
             >
               <Bookmark className="w-7 h-7 text-muted" />
@@ -211,7 +197,7 @@ export default function SavedPage() {
                   showToast(t("saved.cleared_msg"), "success");
                   setConfirmingClear(false);
                 }}
-                className="tap-target min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded border border-transparent bg-like text-white text-sm font-semibold hover:bg-like/90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded border border-transparent bg-accent text-white text-sm font-semibold hover:bg-accent-hover transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {t("saved.clear_all")}
               </button>

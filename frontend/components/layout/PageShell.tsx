@@ -15,7 +15,7 @@ export function PageShell({
 }: PageShellProps) {
   return (
     <div
-      className={`relative px-fluid-md max-[360px]:px-3 pb-24 md:pb-20 ${className}`}
+      className={`page-shell site-container relative ${className}`}
     >
       {pageNumber && (
         <div className="absolute top-0 right-4 sm:right-6 lg:right-10 page-number">
@@ -24,12 +24,12 @@ export function PageShell({
       )}
       {narrow ? (
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card p-fluid-lg border border-rule/50 rounded-token-md">
+          <div className="py-2 sm:py-5">
             {children}
           </div>
         </div>
       ) : (
-        <div className="max-w-[1600px] mx-auto">{children}</div>
+        <div>{children}</div>
       )}
     </div>
   );

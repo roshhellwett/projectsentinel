@@ -39,7 +39,7 @@ interface InfiniteFeedProps {
 export function FeedSkeleton() {
   return (
     <div
-      className="animate-shimmer h-full flex flex-col p-5 md:p-6 gap-3.5 overflow-hidden border border-rule bg-paper-2/90 rounded-2xl shadow-sm"
+      className="animate-shimmer min-h-[280px] h-full flex flex-col p-5 md:p-6 gap-3.5 overflow-hidden border border-rule rounded-md"
       aria-hidden="true"
     >
       <div className="flex items-center justify-between gap-3">
@@ -88,7 +88,7 @@ const FeedItem = memo(function FeedItem({
   return (
     <div
       className={cn(
-        "h-full transition-opacity duration-200 select-none touch-manipulation",
+        "h-full min-w-0 transition-opacity duration-200 touch-manipulation",
         index < 6 && "animate-slide-up",
       )}
       style={
@@ -212,7 +212,7 @@ export function InfiniteFeed({
 
         <div
           ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 items-stretch touch-pan-y"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch touch-pan-y"
         >
           {posts.map((post, index) => (
             <FeedItem
@@ -227,7 +227,7 @@ export function InfiniteFeed({
         </div>
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={`skeleton-${i}`}

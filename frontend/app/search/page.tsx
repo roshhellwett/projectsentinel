@@ -3,9 +3,11 @@ import { searchPosts } from "@/lib/supabase/server";
 import { SearchResultsGrid } from "@/components/news/SearchResultsGrid";
 import { dedupe } from "@/lib/utils/dedupe";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { SearchX } from "lucide-react";
+import { Search, SearchX, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/PageShell";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
+import Link from "next/link";
 import { getServerLocale } from "@/lib/i18n/server";
 import en from "@/messages/en.json";
 import hi from "@/messages/hi.json";
@@ -79,21 +81,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="relative min-h-screen">
       <PageShell>
-        <header className="mb-fluid-lg pb-fluid-md border-b border-rule">
-          <span
-            aria-hidden="true"
-            className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-fluid-xs"
-          />
-          <p className="editorial-kicker mb-fluid-2xs">
-            {query ? messages["search.title"] : messages["search.page_title"]}
-          </p>
-          <h1 className="font-display text-fluid-2xl sm:text-fluid-4xl font-bold text-ink tracking-[-0.03em] mb-fluid-2xs leading-[1.05] break-words min-w-0">
-            {query ? query : messages["search.page_subtitle"]}
-          </h1>
-          <p className="text-fluid-sm text-muted max-w-prose-fluid">
-            {messages["search.page_desc"]}
-          </p>
-        </header>
+        <EditorialPageHeader kicker={query ? messages["search.title"] : messages["search.page_title"]} title={query || messages["search.page_subtitle"]} description={messages["search.page_desc"]} />
+        <form action="/search" method="get" className="search-field" role="search">
+          <Search size={19} className="text-muted shrink-0" aria-hidden="true" />
+          <label htmlFor="news-search-query" className="sr-only">Search verified news</label>
+          <input id="news-search-query" type="search" name="q" defaultValue={query} placeholder="A topic, a question, a story…" required maxLength={200} />
+          <button type="submit" className="editorial-button">Search <ArrowRight size={14} aria-hidden="true" /></button>
+        </form>
 
         {query ? (
           <Suspense
@@ -108,7 +102,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <SearchResults query={query} locale={locale} />
           </Suspense>
         ) : (
-          <p className="text-muted">{messages["search.use_search"]}</p>
+          <div><p className="editorial-kicker mb-3">Start somewhere interesting</p><div className="flex flex-wrap gap-3">{["India", "Science", "Economy", "Technology"].map(topic => <Link key={topic} href={`/search?q=${encodeURIComponent(topic)}`} className="editorial-link border-b border-rule hover:border-accent mr-5">{topic} <ArrowRight size={13} aria-hidden="true" /></Link>)}</div></div>
         )}
       </PageShell>
     </div>

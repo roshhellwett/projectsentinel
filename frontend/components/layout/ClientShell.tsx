@@ -5,7 +5,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { I18nProvider } from "@/lib/i18n/context";
-import { NewsBackground } from "@/components/layout/NewsBackground";
 import dynamic from "next/dynamic";
 import { PageEntrance } from "@/components/layout/PageEntrance";
 import { ChatProvider } from "@/components/chat/ChatContext";
@@ -41,7 +40,6 @@ const ChatBubble = dynamic(
 export default function ClientShell({ children, tickerNode }: { children: ReactNode, tickerNode?: ReactNode }) {
   return (
     <>
-      <NewsBackground />
       <I18nProvider>
         <ChatProvider>
           <Navbar />

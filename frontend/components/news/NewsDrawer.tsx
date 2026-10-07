@@ -81,7 +81,7 @@ export function NewsDrawer({
       return () => cancelAnimationFrame(frame);
     }
     setShow(false);
-    const t = setTimeout(() => setRender(false), 300);
+    const t = setTimeout(() => setRender(false), 560);
     return () => clearTimeout(t);
   }, [post]);
 
@@ -131,12 +131,12 @@ export function NewsDrawer({
     const last = focusableElements[focusableElements.length - 1];
 
     if (e.shiftKey) {
-      if (document.activeElement === first) {
+      if (document.activeElement === first || document.activeElement === drawerRef.current) {
         last.focus();
         e.preventDefault();
       }
     } else {
-      if (document.activeElement === last) {
+      if (document.activeElement === last || document.activeElement === drawerRef.current) {
         first.focus();
         e.preventDefault();
       }
@@ -215,7 +215,7 @@ export function NewsDrawer({
           aria-label={`Article: ${displayPost.headline}`}
           tabIndex={-1}
           onKeyDown={handleKeyDown}
-          className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper/90 backdrop-blur-xl border-l-[3px] border-ink lg:shadow-[-8px_0px_0px_rgb(var(--c-ink))] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(520px,44vw)] 2xl:w-[min(580px,34vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-all duration-300 ease-out ${show ? "opacity-100 translate-y-0 lg:translate-x-0" : "opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full"}`}
+          className={`pointer-events-none fixed ${Z_INDEX.drawerPanel} bg-paper border-l border-rule lg:shadow-[-24px_0_80px_rgb(31_33_31_/_0.1)] lg:left-auto lg:right-0 lg:top-0 lg:h-dynamic lg:w-[min(620px,52vw)] top-0 bottom-0 left-0 right-0 h-dynamic overflow-hidden flex flex-col transform-gpu will-change-transform transition-[transform,opacity] duration-[560ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${show ? "opacity-100 translate-y-0 lg:translate-x-0" : "opacity-0 translate-y-full lg:translate-y-0 lg:translate-x-full"}`}
           style={{
             paddingTop: "env(safe-area-inset-top, 0px)",
             paddingBottom: "env(safe-area-inset-bottom, 0px)",

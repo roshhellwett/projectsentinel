@@ -31,7 +31,7 @@ export default async function SwipePage() {
   return (
     <>
       <DesktopRedirect />
-      <main className="md:hidden flex flex-col items-center pt-3 pb-24 min-h-[calc(100dvh-3.5rem)] overscroll-none">
+      <div className="md:hidden flex flex-col items-center pt-6 pb-24 min-h-[calc(100dvh-3.5rem)] overscroll-none">
         <header className="w-full max-w-md px-fluid-sm mb-fluid-3xs min-w-0">
           <span
             className="block w-8 h-[2px] bg-accent rounded-full mb-fluid-3xs"
@@ -47,7 +47,7 @@ export default async function SwipePage() {
         <ErrorBoundary>
           <SwipeStack initialPosts={deduped} />
         </ErrorBoundary>
-      </main>
+      </div>
 
       <div className="hidden md:flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] px-4">
         <div className="max-w-prose-fluid text-center">

@@ -1,169 +1,85 @@
 import { Suspense } from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { fetchLatestPost, fetchPostsCursor } from "@/lib/supabase/server";
 import { HeroCard } from "@/components/news/HeroCard";
 import { TrendingSection } from "@/components/news/TrendingSection";
-import { InfiniteFeed } from "@/components/news/InfiniteFeed";
+import { InfiniteFeed, FeedSkeleton } from "@/components/news/InfiniteFeed";
 import { MastheadClient } from "@/components/home/MastheadClient";
+import { Briefing } from "@/components/home/Briefing";
 import { FeedSectionHeader } from "@/components/home/FeedSectionHeader";
-import { FeedSkeleton } from "@/components/news/InfiniteFeed";
-import {
-  websiteJsonLd,
-  organizationJsonLd,
-  jsonLdToString,
-} from "@/lib/utils/structuredData";
+import { TopicIndex } from "@/components/layout/TopicIndex";
+import { Reveal } from "@/components/layout/Reveal";
+import { websiteJsonLd, organizationJsonLd, jsonLdToString } from "@/lib/utils/structuredData";
 import { dedupe } from "@/lib/utils/dedupe";
 
 export const revalidate = 60;
 
 async function MastheadSection() {
-  const [heroPost, postsResult] = await Promise.all([
-    fetchLatestPost(),
-    fetchPostsCursor(undefined, 50),
-  ]);
-
-  const allPosts = dedupe(
-    heroPost
-      ? postsResult.posts.filter((post) => post.id !== heroPost.id)
-      : postsResult.posts,
-  );
-
-  const NOW = Date.now();
-  const DAY_AGO = NOW - 24 * 3_600_000;
-  const verifiedToday =
-    allPosts.filter((p) => new Date(p.published_at).getTime() >= DAY_AGO)
-      .length +
-    (heroPost && new Date(heroPost.published_at).getTime() >= DAY_AGO ? 1 : 0);
-
-  const avgScore =
-    allPosts.length > 0
-      ? Math.round(
-          allPosts.reduce((acc, p) => acc + p.credibility_score, 0) /
-            allPosts.length,
-        )
-      : 92;
-
+  const { posts } = await fetchPostsCursor(undefined, 50);
+  const uniquePosts = dedupe(posts);
+  const dayAgo = Date.now() - 24 * 3_600_000;
+  const verifiedToday = uniquePosts.filter(post => new Date(post.published_at).getTime() >= dayAgo).length;
+  const avgScore = uniquePosts.length ? Math.round(uniquePosts.reduce((sum, post) => sum + post.credibility_score, 0) / uniquePosts.length) : null;
   return <MastheadClient avgScore={avgScore} verifiedToday={verifiedToday} />;
 }
 
-async function HeroSection() {
-  const heroPost = await fetchLatestPost();
-  if (!heroPost) return null;
-
-  return (
-    <div id="latest" className="mb-8 sm:mb-12 scroll-mt-24 ambient-glow">
-      <HeroCard post={heroPost} badge="breaking" />
-    </div>
-  );
-}
-
-async function TrendingAndFeedSection() {
-  const [, postsResult] = await Promise.all([
-    fetchLatestPost(),
-    fetchPostsCursor(undefined, 24),
-  ]);
-
-  const NOW = Date.now();
-  const allPosts = dedupe(postsResult.posts);
-
-  const trendingPosts = [...allPosts]
-    .map((post) => {
-      const ageHours =
-        (NOW - new Date(post.published_at).getTime()) / 3_600_000;
-      const freshness = Math.max(0, 1 - ageHours / 12);
-      return { post, score: post.credibility_score * 0.6 + freshness * 40 };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 6)
-    .map(({ post }) => post);
-  const trendingIdList = trendingPosts.map((p) => p.id);
-  const trendingIds = new Set(trendingIdList);
-
-  const feedPosts = allPosts.filter((post) => !trendingIds.has(post.id));
+async function NewsroomSection() {
+  const [hero, result] = await Promise.all([fetchLatestPost(), fetchPostsCursor(undefined, 24)]);
+  const posts = dedupe(result.posts);
+  const briefing = posts.filter(post => post.id !== hero?.id).slice(0, 3);
+  const leadIds = new Set([...(hero ? [hero.id] : []), ...briefing.map(post => post.id)]);
+  const trending = posts.filter(post => !leadIds.has(post.id)).map(post => {
+    const ageHours = (Date.now() - new Date(post.published_at).getTime()) / 3_600_000;
+    return { post, rank: post.credibility_score * 0.6 + Math.max(0, 1 - ageHours / 12) * 40 };
+  }).sort((a, b) => b.rank - a.rank).slice(0, 6).map(item => item.post);
+  const excludeIds = [...leadIds, ...trending.map(post => post.id)];
+  const excluded = new Set(excludeIds);
+  const feed = posts.filter(post => !excluded.has(post.id));
 
   return (
     <>
-      {trendingPosts.length > 0 && (
-        <div className="mb-fluid-lg">
-          <TrendingSection posts={trendingPosts} />
-        </div>
-      )}
-
-       <section aria-label="Latest verified news" className="mt-fluid-xl">
-        <FeedSectionHeader />
-        <InfiniteFeed
-          initialPosts={feedPosts}
-          hasInitialMore={postsResult.hasMore}
-          excludeIds={trendingIdList}
-        />
-      </section>
-    </>
-  );
-}
-
-function TrendingFeedSkeleton() {
-  return (
-    <>
-      <div className="mb-10">
-        <div className="flex gap-4 overflow-hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="min-w-[280px] flex-shrink-0">
-              <FeedSkeleton />
+      {hero && (
+        <Reveal className="py-9 sm:py-12" >
+          <section id="latest" aria-label="The front page">
+            <div className="section-header-premium">
+              <div><span className="section-header-premium__mark">01 / In focus</span><h2>The front page</h2></div>
+              <span className="font-mono text-[9px] text-muted hidden sm:inline">A story. Its sources. The context.</span>
             </div>
-          ))}
-        </div>
-      </div>
-      <section aria-label="Latest verified news" className="mt-10">
+            <div className={briefing.length ? "lead-layout" : ""}>
+              <HeroCard post={hero} badge={null} />
+              <Briefing posts={briefing} />
+            </div>
+          </section>
+        </Reveal>
+      )}
+      {trending.length > 0 && <Reveal className="mt-4"><TrendingSection posts={trending} /></Reveal>}
+      <Reveal>
+        <section className="method-note" aria-label="Our approach">
+          <div><span className="editorial-kicker mb-2">The thinking behind the reading</span><h2>Trust is in the details.</h2></div>
+          <p>Every story comes with its sources and an AI credibility analysis. You can follow the evidence, understand the score, and form your own view.</p>
+          <Link href="/how-it-works" className="editorial-link">See how it works <ArrowUpRight size={16} aria-hidden="true" /></Link>
+        </section>
+      </Reveal>
+      <section id={!hero ? "latest" : "your-feed"} aria-label="Latest verified news">
         <FeedSectionHeader />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <FeedSkeleton key={i} />
-          ))}
-        </div>
+        <InfiniteFeed initialPosts={feed} hasInitialMore={result.hasMore} excludeIds={excludeIds} />
       </section>
     </>
   );
+}
+
+function NewsroomSkeleton() {
+  return <div className="py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-label="Loading stories">{Array.from({ length: 6 }, (_, index) => <FeedSkeleton key={index} />)}</div>;
 }
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLdToString([websiteJsonLd(), organizationJsonLd()]),
-        }}
-      />
-
-      <div className="relative z-10 px-fluid-md max-[360px]:px-3 pb-24 max-w-[1580px] mx-auto">
-        <Suspense
-          fallback={
-            <div className="h-24 animate-pulse border border-rule bg-paper-2 rounded-[8px] mb-10" />
-          }
-        >
-          <MastheadSection />
-        </Suspense>
-
-        <Suspense fallback={<HeroCardSkeleton />}>
-          <HeroSection />
-        </Suspense>
-
-        <Suspense fallback={<TrendingFeedSkeleton />}>
-          <TrendingAndFeedSection />
-        </Suspense>
-      </div>
-    </div>
-  );
-}
-
-function HeroCardSkeleton() {
-  return (
-    <div className="mb-8 sm:mb-12 animate-shimmer h-64 sm:h-[28rem] flex flex-col justify-end p-4 sm:p-8 border border-rule rounded-[1.25rem] bg-paper-2/70">
-      <div className="space-y-2 sm:space-y-3 max-w-2xl">
-        <div className="h-3 sm:h-4 w-16 sm:w-20 bg-rule/60 border border-rule" />
-        <div className="h-6 sm:h-8 w-full bg-rule/50 border border-rule" />
-        <div className="h-6 sm:h-8 w-3/4 bg-rule/40 border border-rule" />
-        <div className="h-3 sm:h-4 w-1/2 bg-rule/30 border border-rule" />
-      </div>
+    <div className="site-container pb-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdToString([websiteJsonLd(), organizationJsonLd()]) }} />
+      <Suspense fallback={<div className="animate-shimmer h-[460px] mt-6" aria-label="Loading today's edition" />}><MastheadSection /></Suspense>
+      <TopicIndex />
+      <Suspense fallback={<NewsroomSkeleton />}><NewsroomSection /></Suspense>
     </div>
   );
 }

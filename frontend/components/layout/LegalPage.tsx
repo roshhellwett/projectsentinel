@@ -37,7 +37,7 @@ export function LegalPage({
             className="block w-10 sm:w-12 h-[2px] bg-accent rounded-full mb-fluid-sm"
           />
           <p className="editorial-kicker mb-fluid-xs">{kicker}</p>
-          <h1 className="font-display text-fluid-2xl font-bold tracking-[-0.03em] text-ink leading-[1.08] mb-fluid-sm text-balance">
+          <h1 className="page-title mb-fluid-sm">
             {title}
           </h1>
           <p className="text-fluid-2xs font-semibold uppercase tracking-[0.18em] text-muted">

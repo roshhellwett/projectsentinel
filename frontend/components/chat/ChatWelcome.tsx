@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const PROMPTS = [
   "What's new today?",
@@ -24,15 +24,16 @@ export function ChatWelcome({
   hasArticleContext: boolean;
 }) {
   const prompts = hasArticleContext ? CONTEXTUAL_PROMPTS : PROMPTS;
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div className="w-full max-w-2xl rounded-[1.75rem] border border-rule/70 bg-paper-2/80 p-6 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.28)] sm:p-8">
+    <div className="w-full max-w-2xl p-4 sm:p-8">
       <div className="flex flex-col items-center justify-center gap-4 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="grid h-14 w-14 place-items-center rounded-full bg-ink text-paper shadow-md"
+          transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
+          className="grid h-14 w-14 place-items-center rounded-full border border-rule bg-paper-2 text-accent"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 5.5h16v10H8.5L4 19V5.5Z" />
@@ -41,8 +42,9 @@ export function ChatWelcome({
         </motion.div>
 
         <div className="max-w-[34rem] space-y-2">
-          <h2 className="text-[1.05rem] font-semibold leading-snug text-ink sm:text-[1.15rem]">
-            India Verified AI News Assistant
+          <p className="editorial-kicker">The news desk / Your questions</p>
+          <h2 className="font-display text-[2rem] font-normal leading-snug text-ink sm:text-[2.8rem] tracking-tight">
+            Let&apos;s get the <em className="text-accent">whole picture.</em>
           </h2>
           <p className="text-[0.86rem] leading-7 text-ink-soft sm:text-[0.9rem]">
             Ask about any story we’ve published, how our credibility scores work, or what’s happening in Indian news today.
@@ -50,7 +52,7 @@ export function ChatWelcome({
         </div>
 
         <motion.div
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={{
             visible: { transition: { staggerChildren: 0.06 } },
@@ -61,14 +63,14 @@ export function ChatWelcome({
             <motion.button
               key={p}
               variants={{
-                hidden: { opacity: 0, y: 12 },
+                hidden: { opacity: 1, y: reduceMotion ? 0 : 12 },
                 visible: { opacity: 1, y: 0 },
               }}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={reduceMotion ? undefined : { y: -2 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               type="button"
               onClick={() => onPrompt(p)}
-              className="relative overflow-hidden rounded-full border border-rule/80 bg-paper px-3.5 py-2 text-[0.72rem] font-medium text-ink-soft shadow-xs transition-colors hover:border-accent/40 hover:text-accent"
+              className="relative overflow-hidden rounded border border-rule bg-paper px-3.5 py-3 min-h-[44px] text-[0.72rem] font-medium text-ink-soft transition-colors hover:border-accent/40 hover:text-accent"
             >
               {p}
             </motion.button>

@@ -6,7 +6,6 @@ import { useReadPosts } from "@/lib/utils/readPosts";
 import { useI18n } from "@/lib/i18n/context";
 
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
 import { NewsCard } from "@/components/news/NewsCard";
 import { NewsDrawer } from "@/components/news/NewsDrawer";
 
@@ -52,7 +51,6 @@ interface TrendingSectionProps {
 
 export function TrendingSection({ posts }: TrendingSectionProps) {
   const { t } = useI18n();
-  const haptic = useHapticFeedback();
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -62,7 +60,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     return posts.slice(0, 6);
   }, [posts]);
 
-  const { isRead } = useReadPosts();
+  const { isRead, markRead } = useReadPosts();
   const [hydrated, setHydrated] = useState(false);
   const [selected, setSelected] = useState<Post | null>(null);
   useEffect(() => {
@@ -98,15 +96,17 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     const el = carouselRef.current;
     if (!el) return;
     updateScrollState();
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(el);
     el.addEventListener("scroll", updateScrollState, { passive: true });
-    return () => el.removeEventListener("scroll", updateScrollState);
-  }, [updateScrollState]);
+    return () => { observer.disconnect(); el.removeEventListener("scroll", updateScrollState); };
+  }, [updateScrollState, posts]);
 
   const scrollBy = useCallback((direction: "left" | "right") => {
     const el = carouselRef.current;
     if (!el) return;
-    const amount = direction === "left" ? -320 : 320;
-    el.scrollBy({ left: amount, behavior: "smooth" });
+    const step = (el.firstElementChild?.getBoundingClientRect().width ?? 320) + 20;
+    el.scrollBy({ left: direction === "left" ? -step : step, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, []);
 
   if (trending.length === 0) return null;
@@ -115,20 +115,20 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     <section aria-label={t("trending.title")} className="mb-fluid-lg">
       <div className="section-header-premium">
         <div>
-          <span className="section-header-premium__mark !text-gold">Live read</span>
+          <span className="section-header-premium__mark">02 / Worth a closer look</span>
           <h2 className="font-display font-bold text-ink min-w-0 truncate">
             {t("trending.title")}
           </h2>
         </div>
         <div className="flex items-center gap-fluid-xs sm:gap-fluid-sm shrink-0">
-          <span className="font-mono text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft bg-paper-2 px-2.5 py-1 rounded-token-xs border border-rule">
+          <span className="font-mono text-[9px] tracking-wider uppercase text-muted hidden sm:inline">
             {t("trending.top_count", { n: trending.length })}
           </span>
-          <div className="hidden sm:flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => scrollBy("left")}
               disabled={!canScrollLeft}
-              className="flex items-center justify-center min-h-[42px] min-w-[42px] p-2 border border-rule bg-paper-2/70 text-ink shadow-sm hover:border-accent/60 hover:bg-paper-2 active:scale-95 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-full"
+              className="icon-button disabled:opacity-30 disabled:pointer-events-none"
               aria-label={t("trending.aria_scroll_left")}
             >
               <ArrowLeft />
@@ -136,7 +136,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("right")}
               disabled={!canScrollRight}
-              className="flex items-center justify-center min-h-[42px] min-w-[42px] p-2 border border-rule bg-paper-2/70 text-ink shadow-sm hover:border-accent/60 hover:bg-paper-2 active:scale-95 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-full"
+              className="icon-button disabled:opacity-30 disabled:pointer-events-none"
               aria-label={t("trending.aria_scroll_right")}
             >
               <ArrowRight />
@@ -148,7 +148,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       <ErrorBoundary>
         <div
           ref={carouselRef}
-          className="flex gap-fluid-sm overflow-x-auto pb-6 pt-4 -mt-4 pl-4 -ml-4 pr-4 snap-x snap-mandatory overscroll-x-contain scroll-smooth no-scrollbar scrollbar-hide"
+          className="flex gap-5 overflow-x-auto pb-5 pt-1 snap-x snap-mandatory overscroll-x-contain scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {trending.map((post, index) => {
@@ -158,13 +158,13 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             return (
               <div
                 key={post.id}
-                className="flex-shrink-0 w-[85vw] sm:w-[350px] md:w-[370px] snap-start animate-slide-up"
+                className="flex-shrink-0 w-[min(82vw,340px)] lg:w-[calc((100%_-_2.5rem)/3)] snap-start"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <NewsCard
                   post={post}
                   rank={rank}
-                  onClick={() => setSelected(post)}
+                  onClick={() => { markRead(post.id); setSelected(post); }}
                   isRead={read}
                 />
               </div>
@@ -175,7 +175,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
       <NewsDrawer
         post={selected}
         onClose={() => setSelected(null)}
-        onSelectRelated={(next) => setSelected(next)}
+        onSelectRelated={(next) => { markRead(next.id); setSelected(next); }}
       />
     </section>
   );

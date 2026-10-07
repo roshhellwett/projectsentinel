@@ -4,15 +4,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap text-sm font-bold font-body ring-offset-paper rounded-lg transition-all transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-0 active:translate-x-0 active:shadow-none",
+  "inline-flex min-h-[44px] items-center justify-center whitespace-nowrap text-sm font-semibold font-body ring-offset-paper rounded transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       variant: {
-        default: "border-2 border-ink bg-ink text-paper shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:bg-ink/90",
-        destructive: "border-2 border-ink text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:bg-ink hover:text-paper",
+        default: "border border-ink bg-ink text-paper hover:bg-ink/90",
+        destructive: "border border-accent/40 text-ink hover:bg-accent hover:text-paper",
         outline:
-          "border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:bg-paper-2",
-        secondary: "border-2 border-ink text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))]",
+          "border border-ink bg-paper text-ink hover:bg-paper-2",
+        secondary: "border border-rule bg-paper-2 text-ink hover:border-rule-strong",
         ghost: "text-ink-soft hover:text-ink hover:bg-ink/5",
         link: "text-ink underline underline-offset-4",
       },

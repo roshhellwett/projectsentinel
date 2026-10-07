@@ -34,7 +34,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           <CorrectionsNotice type="retracted" note={post.correction_note} />
         )}
 
-        <h2 className="font-display font-[900] text-[clamp(1.5rem,4.5vw,2.4rem)] leading-[1.08] tracking-[-0.025em] text-ink mb-5 drop-shadow-2xs">
+        <h2 className="font-display font-semibold text-[clamp(1.65rem,4.5vw,2.5rem)] leading-[1.12] tracking-[-0.035em] text-ink mb-6">
           {post.headline}
         </h2>
 
@@ -44,9 +44,9 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           </div>
         )}
 
-        <div className="mb-8 p-4 sm:p-5 rounded-2xl border-2 border-ink/80 bg-paper-2/80 glass-card shadow-2xs">
+        <div className="mb-8 p-4 sm:p-5 rounded border border-rule bg-paper-2/70">
           <div className="flex items-center gap-2.5 mb-3.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-stamp" />
             <span className="font-mono text-[11px] font-extrabold uppercase tracking-widest text-ink">
               {t("drawer.verified_sources")}
             </span>
@@ -61,7 +61,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
         </div>
 
         <div className="mb-8">
-          <p className="font-body text-[16px] sm:text-[18.5px] leading-[1.75] text-ink-soft font-normal">
+          <p className="article-summary">
             {post.summary}
           </p>
           <div className="flex justify-end items-center gap-2.5 mt-6 pt-4 border-t border-rule/50">
@@ -72,7 +72,7 @@ export function DrawerContent({ post, onSelectRelated }: DrawerContentProps) {
           </div>
         </div>
 
-        <div className="mb-8 p-4 sm:p-5 rounded-2xl border border-rule bg-paper-2/60">
+        <div className="mb-8 p-4 sm:p-5 rounded border border-rule bg-paper-2/60">
           <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-ink flex items-center gap-2 mb-2.5">
             <Info className="w-4 h-4 text-ink" />
             {t("drawer.why_score")}

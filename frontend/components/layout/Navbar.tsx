@@ -1,359 +1,106 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Z_INDEX } from "@/lib/theme/zIndex";
 import dynamic from "next/dynamic";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Bookmark, Menu, Search, X } from "lucide-react";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/utils/bodyScrollLock";
 import { OPEN_SEARCH_EVENT } from "@/components/ui/KeyboardShortcuts";
 import { useI18n } from "@/lib/i18n/i18n-shared";
+import { LanguageFilter } from "./LanguageFilter";
+import { ConnectionStatus } from "./ConnectionStatus";
+import { Brand } from "./Brand";
 
-const SearchBar = dynamic(
-  () => import("@/components/ui/SearchBar").then((m) => m.SearchBar),
-  { ssr: false },
-);
-import { ConnectionStatus } from "@/components/layout/ConnectionStatus";
-import { LastRefreshed } from "@/components/layout/LastRefreshed";
-import { LanguageFilter } from "@/components/layout/LanguageFilter";
+const SearchBar = dynamic(() => import("@/components/ui/SearchBar").then(module => module.SearchBar), { ssr: false });
 
 const NAV_LINKS = [
-  { href: "/category/politics/", labelKey: "nav.politics" },
-  { href: "/category/business/", labelKey: "nav.business" },
-  { href: "/category/sports/", labelKey: "nav.sports" },
-  { href: "/category/tech/", labelKey: "nav.tech" },
-  { href: "/category/world/", labelKey: "nav.world" },
-  { href: "/saved/", labelKey: "nav.saved" },
-  { href: "/how-it-works/", labelKey: "nav.how_it_works" },
+  { href: "/category/politics", key: "nav.politics" },
+  { href: "/category/business", key: "nav.business" },
+  { href: "/category/world", key: "nav.world" },
+  { href: "/category/tech", key: "nav.tech" },
+  { href: "/category/sports", key: "nav.sports" },
+  { href: "/saved", key: "nav.saved" },
+  { href: "/how-it-works", key: "nav.how_it_works" },
 ] as const;
-
-const REPO_URL = "https://github.com/roshhellwett/projectsentinel";
-
-function SearchIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="11" cy="11" r="7" />
-      <path d="M16.5 16.5L21 21" />
-    </svg>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M17.5 6.5l-11 11M6.5 6.5l11 11" />
-    </svg>
-  );
-}
-
-function BookmarkIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M18 4v16l-6-5-6 5V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1z" />
-    </svg>
-  );
-}
-
-function GithubIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
-    </svg>
-  );
-}
-
-function ArrowRight() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 12h14M12 5l7 7-7 7" />
-    </svg>
-  );
-}
 
 export function Navbar() {
   const pathname = usePathname();
   const { t } = useI18n();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const panelRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const reduceMotion = useReducedMotion();
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
 
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
   useEffect(() => {
-    if (!isMobileOpen) return;
-    lockBodyScroll();
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsMobileOpen(false);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      unlockBodyScroll();
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isMobileOpen]);
-
-  useEffect(() => {
-    setIsMobileOpen(false);
-  }, [pathname]);
-
-  const isActive = (href: string) => {
-    const normalize = (p: string) =>
-      (p.endsWith("/") ? p.slice(0, -1) : p) || "/";
-    const a = normalize(href);
-    const b = normalize(pathname);
-    if (a === "/") return b === "/";
-    return b === a || b.startsWith(a + "/");
-  };
-
-  const openSearch = useCallback(() => setIsSearchOpen(true), []);
-  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
-
-  useEffect(() => {
-    const handler = () => setIsSearchOpen(true);
-    window.addEventListener(OPEN_SEARCH_EVENT, handler);
-    return () => window.removeEventListener(OPEN_SEARCH_EVENT, handler);
+    const open = () => { setMenuOpen(false); setSearchOpen(true); };
+    window.addEventListener(OPEN_SEARCH_EVENT, open);
+    return () => window.removeEventListener(OPEN_SEARCH_EVENT, open);
   }, []);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    lockBodyScroll();
+    const timer = window.setTimeout(() => panelRef.current?.querySelector<HTMLButtonElement>("button")?.focus(), 0);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setMenuOpen(false); return; }
+      if (event.key !== "Tab") return;
+      const items = Array.from(panelRef.current?.querySelectorAll<HTMLElement>("a[href], button, select") ?? []).filter(item => item.offsetParent !== null);
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    const breakpoint = window.matchMedia("(min-width: 1200px)");
+    const closeOnDesktop = () => { if (breakpoint.matches) setMenuOpen(false); };
+    document.addEventListener("keydown", onKey);
+    breakpoint.addEventListener("change", closeOnDesktop);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("keydown", onKey);
+      breakpoint.removeEventListener("change", closeOnDesktop);
+      unlockBodyScroll();
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [menuOpen]);
 
+  const active = (href: string) => pathname.replace(/\/$/, "") === href;
   return (
     <>
-      <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/70 backdrop-blur-2xl border-b border-rule/80 shadow-[0_12px_34px_rgb(0_0_0_/_0.16)] transform-gpu select-none transition-all duration-slow`}
-        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
-      >
-        <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 lg:px-10">
-          <div className="flex items-center justify-between gap-fluid-2xs h-12 sm:h-14 lg:h-16">
-            <Link
-              href="/"
-              prefetch={true}
-              aria-label="India Verified — home"
-              className="flex items-center gap-fluid-3xs group rounded-token-sm shrink min-w-0 transition-transform duration-fast active:scale-95"
-            >
-              <span
-                aria-hidden="true"
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 shrink-0 border border-accent/70 rounded-xl text-accent font-display font-bold text-fluid-xs bg-accent/5 shadow-[0_0_22px_rgb(var(--c-accent)/0.14)] group-hover:bg-accent group-hover:text-paper transition-all duration-base"
-              >
-                IV
-              </span>
-              <span className="flex flex-col leading-none whitespace-nowrap">
-                <span className="font-display text-fluid-md text-ink truncate max-w-[130px] sm:max-w-none tracking-tight">
-                  India Verified
-                </span>
-                <span className="hidden md:inline text-fluid-2xs text-ink-soft font-body mt-0.5 tracking-wide">
-                  AI-cross-referenced Indian news
-                </span>
-              </span>
-            </Link>
-
-            <nav
-              aria-label="Main navigation"
-              className="hidden lg:flex items-center gap-1"
-            >
-              {NAV_LINKS.map((link) => {
-                const active = isActive(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    prefetch={true}
-                    aria-current={active ? "page" : undefined}
-                    className={`relative inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-3xs min-h-[44px] text-fluid-2xs font-body font-medium transition-all duration-base rounded-token-md ${
-                      active
-                        ? "text-accent bg-accent/10 font-bold shadow-sm border border-accent/20 scale-[1.02]"
-                        : "text-muted hover:text-ink hover:bg-paper-2/60 border border-transparent active:scale-95"
-                    }`}
-                  >
-                    {link.labelKey === "nav.saved" && <BookmarkIcon />}
-                    {t(link.labelKey)}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="flex items-center gap-fluid-3xs lg:gap-fluid-2xs">
-              <div className="hidden sm:inline">
-                <LastRefreshed />
-              </div>
-              <ConnectionStatus />
-              <LanguageFilter />
-
-              <button
-                type="button"
-                onClick={openSearch}
-                aria-label="Search articles (press /)"
-                title="Search"
-                 className="inline-flex items-center gap-fluid-3xs text-muted hover:text-accent transition-all duration-base p-2 sm:px-3 sm:py-1.5 sm:border sm:border-rule sm:bg-paper-2/60 sm:hover:bg-paper-2 sm:shadow-sm rounded-token-md min-touch active:scale-95"
-              >
-                <SearchIcon />
-                <span className="hidden sm:inline text-fluid-2xs font-body font-medium">Search</span>
-                <kbd className="hidden md:inline-block px-1.5 py-0.5 text-fluid-2xs font-mono font-bold border border-rule rounded-token-xs bg-paper shadow-2xs">
-                  /
-                </kbd>
-              </button>
-
-              <div className="hidden lg:block">
-                <a
-                  href={REPO_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Source code on GitHub"
-                  className="inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-3xs min-h-[44px] text-fluid-2xs text-muted hover:text-ink border border-transparent hover:border-rule transition-all duration-base rounded-token-sm active:scale-95"
-                >
-                  <GithubIcon />
-                  GitHub
-                </a>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsMobileOpen((v) => !v)}
-                aria-label={isMobileOpen ? "Close menu" : "Open menu"}
-                aria-expanded={isMobileOpen}
-                aria-controls="mobile-nav-drawer"
-                className="lg:hidden text-muted hover:text-ink p-2 sm:p-1.5 rounded-token-sm min-touch active:scale-90 transition-transform duration-fast"
-              >
-                {isMobileOpen ? <CloseIcon /> : <MenuIcon />}
-              </button>
-            </div>
+      <header className="site-header" style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
+        <div className="site-container site-header__inner">
+          <Brand />
+          <nav className="desktop-nav" aria-label="Main navigation">
+            {NAV_LINKS.map(link => <Link href={link.href} key={link.href} aria-current={active(link.href) ? "page" : undefined}>{link.key === "nav.saved" && <Bookmark size={12} aria-hidden="true" />}{t(link.key)}</Link>)}
+          </nav>
+          <div className="header-actions">
+            <div className="hidden sm:block"><LanguageFilter /></div>
+            <button type="button" onClick={() => setSearchOpen(true)} className="icon-button" aria-label="Search articles (press /)"><Search size={17} strokeWidth={1.5} aria-hidden="true" /></button>
+            <button ref={triggerRef} type="button" onClick={() => setMenuOpen(true)} className="icon-button min-[1200px]:hidden" aria-label="Open menu" aria-expanded={menuOpen} aria-controls="mobile-nav-drawer"><Menu size={19} strokeWidth={1.5} aria-hidden="true" /></button>
           </div>
         </div>
       </header>
-
-      <div
-        className={`lg:hidden fixed inset-0 ${Z_INDEX.modalBackdrop} bg-ink/50 backdrop-blur-xs transition-opacity duration-slow ${
-          isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={() => setIsMobileOpen(false)}
-      />
-
-      <aside
-        id="mobile-nav-drawer"
-        className={`lg:hidden fixed top-0 right-0 bottom-0 ${Z_INDEX.drawerPanel} w-full max-w-sm glass-drawer border-l border-rule/60 shadow-2xl flex flex-col overflow-x-hidden transition-transform duration-slow ease-out transform-gpu ${
-          isMobileOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-        style={{
-          paddingTop: "env(safe-area-inset-top, 0px)",
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        }}
-      >
-        <div className="flex items-center justify-between h-14 px-4 border-b border-rule/60">
-          <span className="text-fluid-2xs font-bold tracking-wider uppercase font-body text-ink-soft px-2">
-            Sections
-          </span>
-          <button
-            onClick={() => setIsMobileOpen(false)}
-            aria-label="Close menu"
-            className="text-muted hover:text-ink p-1.5 min-touch flex items-center justify-center rounded-token-sm active:scale-90 transition-transform duration-fast"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-        <nav className="flex-1 overflow-y-auto px-2 py-2">
-          {NAV_LINKS.map((link) => {
-            const active = isActive(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileOpen(false)}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center justify-between gap-fluid-2xs px-3 min-h-[48px] border-b border-rule/40 font-display text-fluid-md transition-all duration-fast rounded-token-md ${
-                  active ? "text-ink bg-paper-2 font-bold px-4" : "text-ink-soft hover:text-ink hover:bg-paper-2/40"
-                }`}
-              >
-                <span className="inline-flex items-center gap-fluid-3xs min-w-0 truncate">
-                  {link.labelKey === "nav.saved" && <BookmarkIcon />}
-                  {t(link.labelKey)}
-                </span>
-                <span className="shrink-0"><ArrowRight /></span>
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-4 border-t border-rule/60 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <span className="text-fluid-2xs font-bold tracking-wider uppercase text-ink-soft font-body px-2">
-              Language
-            </span>
-            <LanguageFilter />
-          </div>
-          <a
-            href={REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-fluid-3xs w-full px-4 py-3 min-h-[44px] border border-rule/80 text-fluid-sm font-medium text-ink hover:bg-paper-2 transition-all duration-base rounded-token-md active:scale-98 shadow-2xs"
-          >
-            <GithubIcon />
-            View source on GitHub
-          </a>
-        </div>
-      </aside>
-
-      <SearchBar isOpen={isSearchOpen} onClose={closeSearch} />
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            <motion.div key="menu-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="fixed inset-0 z-[100] bg-ink/25 backdrop-blur-sm" onClick={() => setMenuOpen(false)} aria-hidden="true" />
+            <motion.aside key="menu-panel" ref={panelRef} id="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Site navigation" initial={{ x: reduceMotion ? 0 : "100%" }} animate={{ x: 0 }} exit={{ x: reduceMotion ? 0 : "100%" }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 38, mass: 0.9 }} className="fixed inset-y-0 right-0 z-[110] w-full max-w-[420px] bg-paper border-l border-rule flex flex-col shadow-2xl" style={{ paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+              <div className="flex items-center justify-between p-5 border-b border-rule"><Brand /><button type="button" className="icon-button" aria-label="Close menu" onClick={() => setMenuOpen(false)}><X size={18} aria-hidden="true" /></button></div>
+              <nav className="p-6 flex-1 overflow-y-auto" aria-label="Sections">
+                <p className="editorial-kicker mb-5">Your daily perspective</p>
+                {NAV_LINKS.map((link, index) => <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} aria-current={active(link.href) ? "page" : undefined} className="flex items-center justify-between py-4 border-b border-rule group"><span className="flex items-center gap-4"><span className="font-mono text-[9px] text-muted">{String(index + 1).padStart(2, "0")}</span><span className="font-display text-[25px] tracking-tight group-hover:text-accent">{t(link.key)}</span></span><ArrowUpRight size={17} className="text-accent" aria-hidden="true" /></Link>)}
+                <Link href="/chat" onClick={() => setMenuOpen(false)} className="editorial-link mt-5">Ask the news assistant <ArrowUpRight size={15} aria-hidden="true" /></Link>
+              </nav>
+              <div className="flex items-center justify-between border-t border-rule p-5"><LanguageFilter /><ConnectionStatus /><a href="https://github.com/roshhellwett/projectsentinel" target="_blank" rel="noopener noreferrer" className="editorial-link text-muted">Open-source <ArrowUpRight size={13} aria-hidden="true" /></a></div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+      <SearchBar isOpen={searchOpen} onClose={closeSearch} />
     </>
   );
 }

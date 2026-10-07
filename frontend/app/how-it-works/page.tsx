@@ -7,9 +7,10 @@ import {
   Shield,
   Database,
   Clock,
-  Zap,
-  ArrowDown,
 } from "lucide-react";
+import { PageShell } from "@/components/layout/PageShell";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
+import { Reveal } from "@/components/layout/Reveal";
 
 export const metadata: Metadata = {
   title: "How It Works - India Verified",
@@ -108,7 +109,7 @@ const PIPELINE_STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="relative px-fluid-sm lg:px-fluid-lg pb-24 md:pb-20 py-fluid-lg max-w-5xl mx-auto">
+    <PageShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -145,55 +146,18 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <div className="text-center mb-fluid-xl pb-fluid-lg border-b border-rule">
-        <span
-          aria-hidden="true"
-          className="block w-10 sm:w-12 h-[2px] bg-accent mb-fluid-xs mx-auto"
-        />
-        <div className="inline-flex items-center gap-2 px-fluid-sm py-fluid-3xs bg-accent/10 text-accent text-fluid-sm font-semibold rounded-full mb-fluid-sm border border-accent/20 min-h-[44px]">
-          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-          Fully Automated
-        </div>
-        <h1 className="font-display text-fluid-3xl sm:text-fluid-4xl font-bold mb-fluid-xs text-ink leading-[1.05] tracking-tight">
-          How India <span className="text-accent">Verified</span> works
-        </h1>
-        <p className="text-fluid-md text-muted max-w-prose-fluid mx-auto leading-relaxed">
-          Every story goes through a rigorous 7-step AI verification pipeline
-          before reaching you.
-        </p>
-      </div>
+      <EditorialPageHeader kicker="The method / Open by design" title={<>A story is only as good<br />as its <em className="text-accent">sources.</em></>} description="Look behind the headlines. Here is the seven-step process that collects, cross-references, and publishes the stories you read." />
 
-      <div className="space-y-fluid-2xs mb-fluid-xl">
-        {PIPELINE_STEPS.map((step, i) => (
-          <div key={step.number}>
-            <div className="np-card glass-card group flex gap-fluid-xs sm:gap-fluid-sm p-fluid-sm sm:p-fluid-md transition-all duration-base">
-              <div className="relative z-10 flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded flex items-center justify-center bg-paper-2 border border-rule group-hover:border-ink transition-colors shrink-0">
-                <step.icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
-              </div>
-              <div className="relative z-10 flex-1 min-w-0">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1.5">
-                  <span className="text-fluid-2xs font-bold text-accent uppercase tracking-[0.18em]">
-                    Step {step.number}
-                  </span>
-                  <span className="text-fluid-2xs text-muted font-medium">
-                    {step.subtitle}
-                  </span>
-                </div>
-                <h2 className="font-display text-fluid-md font-bold text-ink mb-1">
-                  {step.title}
-                </h2>
-                <p className="text-fluid-sm text-ink-soft leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            </div>
-            {i < PIPELINE_STEPS.length - 1 && (
-              <div className="flex justify-center py-2">
-                <ArrowDown className="w-4 h-4 text-subtle" />
-              </div>
-            )}
-          </div>
-        ))}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 lg:gap-20 mb-14">
+        <div><div className="lg:sticky lg:top-28"><p className="editorial-kicker mb-4">From report to perspective</p><h2 className="font-display text-3xl font-normal mb-5">No black box.<br />Follow the process.</h2><p className="text-sm text-ink-soft max-w-[34ch]">The credibility score is a starting point. Original sources and the reasoning behind every score are always there for you to explore.</p></div></div>
+        <div>
+          {PIPELINE_STEPS.map(step => (
+            <Reveal key={step.number} className="pipeline-step">
+              <span className="pipeline-step__number">{step.number}</span>
+              <div className="min-w-0"><div className="flex items-center justify-between gap-3 mb-2"><span className="editorial-kicker !text-muted">{step.subtitle}</span><step.icon size={17} className="text-accent" aria-hidden="true" /></div><h2 className="font-display text-2xl font-medium mb-3">{step.title}</h2><p className="text-sm text-ink-soft leading-relaxed">{step.description}</p></div>
+            </Reveal>
+          ))}
+        </div>
       </div>
 
       <div className="np-card glass-card p-fluid-sm sm:p-fluid-lg mb-fluid-lg">
@@ -204,15 +168,8 @@ export default function HowItWorksPage() {
           We only pull from established Indian news organizations with editorial
           standards.
         </p>
-        <div className="flex flex-wrap gap-fluid-3xs">
-          {TRUSTED_SOURCES.map((source) => (
-            <span
-              key={source}
-              className="px-fluid-2xs py-1.5 bg-paper/70 backdrop-blur-sm border border-rule/50 rounded text-fluid-xs font-medium text-ink hover:border-ink transition-colors"
-            >
-              {source}
-            </span>
-          ))}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8">
+          {TRUSTED_SOURCES.map((source, index) => <span key={source} className="flex items-center gap-3 py-3 border-b border-rule text-[12px] text-ink"><span className="font-mono text-[9px] text-muted">{String(index + 1).padStart(2, "0")}</span>{source}</span>)}
         </div>
       </div>
 
@@ -266,7 +223,7 @@ export default function HowItWorksPage() {
           View on GitHub
         </a>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

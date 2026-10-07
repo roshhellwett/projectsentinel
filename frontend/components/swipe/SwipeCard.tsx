@@ -308,7 +308,7 @@ export function SwipeCard({
       data-swipe-depth={depth}
     >
       <article
-        className="relative w-full np-card paper-card glass-card shadow-[0_14px_44px_rgb(var(--c-ink)/0.12)] border-2 border-ink/50 overflow-hidden rounded-2xl transition-shadow duration-300"
+        className="relative w-full np-card paper-card shadow-[0_10px_36px_rgb(var(--c-shadow)/0.06)] border border-rule overflow-hidden rounded-lg transition-shadow duration-300"
         role="article"
         aria-labelledby={`swipe-card-headline-${post.id}`}
       >
@@ -415,7 +415,7 @@ export function SwipeCard({
 
           <h2
             id={`swipe-card-headline-${post.id}`}
-            className="font-display text-[22px] sm:text-[25px] font-[900] leading-[1.18] tracking-[-0.025em] text-ink mb-5 drop-shadow-2xs"
+            className="font-display text-[24px] sm:text-[27px] font-semibold leading-[1.18] tracking-[-0.035em] text-ink mb-5"
           >
             {post.headline}
           </h2>

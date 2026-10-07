@@ -184,7 +184,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         const cards = Array.from(
           containerRef.current?.querySelectorAll<HTMLElement>(
-            '#search-results [role="article"]',
+            '#search-results .story-card__link',
           ) || [],
         );
         const idx = cards.indexOf(document.activeElement as HTMLElement);
@@ -229,17 +229,17 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
       role="dialog"
       aria-modal="true"
       aria-label={t("search.aria_dialog")}
-      className="fixed inset-0 overflow-y-auto bg-paper/80 backdrop-blur-xl select-none overflow-x-hidden w-full max-w-full touch-manipulation"
+      className="fixed inset-0 overflow-y-auto bg-paper/98 backdrop-blur-md overflow-x-hidden w-full max-w-full touch-manipulation animate-fade-in"
       style={{ zIndex: 100 }}
     >
-      <div className="max-w-4xl mx-auto px-fluid-xs py-fluid-lg">
+      <div className="max-w-4xl mx-auto px-5 sm:px-8 py-6 sm:py-12">
         <div className="flex items-center justify-between gap-fluid-xs mb-fluid-md">
           <h2 className="font-display text-fluid-2xl text-ink min-w-0 truncate">
             {t("search.page_title")}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-paper-2 transition-colors duration-base tap-target rounded-token-sm shrink-0"
+            className="icon-button"
             aria-label={t("search.aria_close")}
           >
             <CloseIcon />
@@ -250,6 +250,8 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           className="relative mb-fluid-md"
           onSubmit={(e) => {
             e.preventDefault();
+            const value = query.trim();
+            if (value) { onClose(); router.push(`/search?q=${encodeURIComponent(value)}`); }
           }}
           role="search"
         >
@@ -261,9 +263,10 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
               ref={inputRef}
               type="search"
               value={query}
+              maxLength={200}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("search.placeholder")}
-              className="w-full pl-9 sm:pl-12 pr-9 sm:pr-12 py-3 sm:py-3.5 bg-paper text-ink border-2 border-ink rounded-token-lg shadow-[2px_2px_0px_rgb(var(--c-ink))] focus:shadow-[4px_4px_0px_rgb(var(--c-ink))] focus:-translate-y-0.5 focus:-translate-x-0.5 outline-none transition-all duration-base transform-gpu font-body placeholder:text-muted text-fluid-sm"
+              className="w-full pl-11 sm:pl-12 pr-14 py-4 bg-paper text-ink border border-rule-strong rounded focus:border-ink focus:ring-2 focus:ring-ink/5 outline-none transition-all duration-base font-body placeholder:text-muted text-sm"
               aria-label={t("search.aria_query")}
               aria-controls="search-results"
             />
@@ -288,6 +291,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
           className="max-w-3xl mx-auto"
           aria-live="polite"
         >
+          {!query && <p className="text-[12px] text-muted py-6">{t("search.use_search")}</p>}
           {isLoading && (
             <div className="space-y-4">
               {[1, 2, 3].map((n) => (
@@ -336,10 +340,9 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 {results.map((post) => (
                   <div
                     key={post.id}
-                    onClick={() => handleSelect(post)}
-                    className="cursor-pointer transition-opacity duration-base hover:opacity-80 touch-manipulation select-none"
+                    className="touch-manipulation"
                   >
-                    <NewsCard post={post} />
+                    <NewsCard post={post} onClick={() => handleSelect(post)} />
                   </div>
                 ))}
               </div>

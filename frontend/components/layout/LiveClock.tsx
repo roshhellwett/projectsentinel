@@ -52,10 +52,7 @@ export function LiveClock({
 
   if (!now) {
     return (
-      <div
-        aria-hidden="true"
-        className={`h-6 w-32 bg-paper-2 border border-rule ${className}`}
-      />
+      <span aria-hidden="true" className={`inline-block h-4 w-36 ${className}`} />
     );
   }
 
@@ -85,23 +82,9 @@ export function LiveClock({
 
   if (variant === "hero") {
     return (
-      <div
-        className={cn(
-          "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-rule bg-paper-2/60 shadow-2xs",
-          className,
-        )}
-        role="status"
-      >
-        <span className="font-body text-xs tracking-wider text-ink-soft uppercase font-semibold">
-          {date}:
-        </span>
-        <time
-          dateTime={isoLabel}
-          className="text-ink font-mono font-bold text-sm bg-ink/5 px-2 py-0.5 rounded border border-rule/50 flex items-center tabular-nums"
-        >
-          {time} IST
-        </time>
-      </div>
+      <time dateTime={isoLabel} className={cn("inline-flex items-center gap-2 whitespace-nowrap tabular-nums", className)}>
+        <span>{date}</span><span className="hidden sm:inline">/ {time.replace(/:\d\d(?=\s)/, "")} IST</span>
+      </time>
     );
   }
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Info, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Z_INDEX } from "@/lib/theme/zIndex";
 
 import { useI18n } from "@/lib/i18n/context";
@@ -24,7 +24,6 @@ function writeDecision(d: Decision) {
 export function CookieConsent() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const consentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (readDecision() !== null) return;
@@ -33,13 +32,6 @@ export function CookieConsent() {
     return () => window.clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    if (!open || !consentRef.current) return;
-    const firstFocusable = consentRef.current.querySelector<HTMLElement>(
-      'button, a, input, [tabindex]:not([tabindex="-1"])',
-    );
-    firstFocusable?.focus();
-  }, [open]);
 
   const accept = useCallback(() => {
     writeDecision("accepted");
@@ -55,14 +47,12 @@ export function CookieConsent() {
     <>
       {open && (
         <div
-          ref={consentRef}
-          role="dialog"
+          role="region"
           aria-label={t("cookie.aria_preferences")}
-          aria-modal="false"
-          className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:left-auto md:right-6 md:bottom-6 md:max-w-md ${Z_INDEX.cookieConsent} transform-gpu`}
+          className={`animate-slide-up-fade fixed left-3 right-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:right-auto md:left-6 md:bottom-6 md:w-[360px] ${Z_INDEX.cookieConsent} transform-gpu`}
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
-          <div className="glass border border-rule/50 rounded-lg px-5 py-4 md:px-6 md:py-5">
+          <div className="bg-paper border border-rule rounded-md px-5 py-4 shadow-[0_8px_40px_rgb(var(--c-shadow)/0.1)]">
             <button
               type="button"
               onClick={reject}
@@ -71,13 +61,13 @@ export function CookieConsent() {
             >
               <X className="w-5 h-5" />
             </button>
-            <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-accent mb-2">
+            <p className="editorial-kicker mb-2 pr-8">
               {t("cookie.title")}
             </p>
-            <h2 className="font-display text-lg font-bold text-ink mb-2 leading-snug">
+            <h2 className="font-body text-[12px] font-medium text-ink mb-3 leading-relaxed pr-4">
               {t("cookie.desc")}
             </h2>
-            <p className="text-sm text-muted leading-relaxed mb-4">
+            <details className="text-[11px] text-muted mb-3"><summary className="cursor-pointer min-h-[24px]">Cookie details &amp; privacy</summary><p className="pt-2">
               {t("cookie.body")}{" "}
               <Link
                 href="/privacy/"
@@ -86,19 +76,19 @@ export function CookieConsent() {
                 Privacy Policy
               </Link>
               .
-            </p>
-            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 sm:items-center">
+            </p></details>
+            <div className="flex gap-2 items-center">
               <button
                 type="button"
                 onClick={reject}
-                className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-medium text-ink border border-rule-strong rounded hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target min-h-[44px] px-4 py-2 text-[11px] font-medium text-ink border border-rule-strong rounded hover:bg-paper-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {t("cookie.dismiss")}
               </button>
               <button
                 type="button"
                 onClick={accept}
-                className="tap-target min-h-[48px] px-4 py-2.5 sm:py-2 text-sm font-semibold text-paper bg-ink rounded hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="tap-target min-h-[44px] px-4 py-2 text-[11px] font-semibold text-paper bg-ink rounded hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {t("cookie.accept")}
               </button>

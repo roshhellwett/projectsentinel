@@ -26,6 +26,7 @@ export function CredibilityBar({
   const { t } = useI18n();
   const clamped = clampScore(score);
   const label = getScoreLabel(clamped);
+  const scoreColor = `rgb(var(--c-cred-${clamped >= 90 ? "high" : clamped >= 70 ? "mid" : "low"}))`;
 
   const [animatedScore, setAnimatedScore] = useState(0);
 
@@ -63,42 +64,41 @@ export function CredibilityBar({
           )}
         >
           {clamped}
-          {!compact && <span className="font-normal text-ink-soft/80">/100</span>}
+          {!compact && <span className="font-normal text-ink-soft">/100</span>}
         </span>
       </div>
 
       <div className="relative w-full flex items-center py-1">
         <div
-          className={cn("w-full overflow-hidden rounded-full border border-rule/80 shadow-inner", compact ? "h-2" : "h-3")}
+          className={cn("w-full overflow-hidden rounded-sm", compact ? "h-1" : "h-1.5")}
           style={{ background: "rgb(var(--c-rule))" }}
         >
           <div
             className="h-full transition-[width] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] rounded-full relative overflow-hidden"
             style={{
               width: `${animatedScore}%`,
-              background: "rgb(var(--c-ink))",
+               background: scoreColor,
             }}
             aria-hidden="true"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-paper/20 to-transparent animate-shimmer" />
           </div>
         </div>
         <div
           className={cn(
             "absolute top-1/2 pointer-events-none transition-[left] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] shadow-sm border-2 border-paper",
-            compact ? "h-3.5 w-3.5" : "h-4 w-4",
+            compact ? "h-2.5 w-2.5" : "h-3 w-3",
           )}
           style={{
             left: `${animatedScore}%`,
             transform: "translate(-50%, -50%)",
-            background: "rgb(var(--c-ink))",
+            background: scoreColor,
             borderRadius: "50%",
           }}
         />
       </div>
 
       {!compact && (
-        <div className="mt-1.5 flex items-center justify-between font-mono text-fluid-2xs font-semibold text-ink-soft/80 uppercase tracking-widest">
+        <div className="mt-1.5 flex items-center justify-between font-mono text-fluid-2xs font-semibold text-ink-soft uppercase tracking-widest">
           <span>{t("credibility.low")}</span>
           <span>{t("credibility.moderate")}</span>
           <span>{t("credibility.high")}</span>

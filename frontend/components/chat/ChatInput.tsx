@@ -47,7 +47,7 @@ export function ChatInput({
 
   return (
     <div className="border-t border-rule/80 bg-paper/95 px-3 pb-[calc(0.8rem+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-xl sm:px-5 sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 rounded-[1.25rem] border border-rule/70 bg-paper-2/80 p-2 shadow-[0_10px_30px_-16px_rgba(15,23,42,0.25)] sm:p-2.5">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 rounded border border-rule bg-paper-2/60 p-2 sm:p-2.5">
         <div className="flex items-end gap-2">
           <div className="relative flex-1">
             <textarea
@@ -58,15 +58,16 @@ export function ChatInput({
               }}
               onKeyDown={handleKey}
               placeholder={placeholder}
+              aria-label="Ask the news assistant"
               maxLength={MAX_CHARS}
               rows={1}
               disabled={busy}
-              className="min-h-[46px] w-full resize-none overflow-hidden rounded-[1rem] border border-rule/70 bg-paper px-3.5 py-3 text-[0.95rem] leading-6 text-ink shadow-inner shadow-paper-2/60 placeholder:text-subtle/70 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/10 disabled:opacity-60 sm:min-h-[50px] sm:py-3.5"
+              className="min-h-[46px] w-full resize-none overflow-y-auto rounded border border-rule bg-paper px-3.5 py-3 text-[0.95rem] leading-6 text-ink placeholder:text-muted focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/10 disabled:opacity-60 sm:min-h-[50px] sm:py-3.5"
             />
             {value.length > MAX_CHARS * 0.85 && (
               <span
                 className={`pointer-events-none absolute bottom-2 right-2 text-[0.64rem] font-mono ${
-                  charsLeft < 20 ? "text-red-500" : "text-subtle"
+                  charsLeft < 20 ? "text-accent" : "text-muted"
                 }`}
               >
                 {charsLeft}
@@ -97,7 +98,7 @@ export function ChatInput({
             </svg>
           </button>
         </div>
-        <p className="px-2 text-[0.68rem] leading-relaxed text-subtle sm:text-[0.7rem]">
+        <p className="px-2 text-[0.68rem] leading-relaxed text-muted sm:text-[0.7rem]">
           Answers come from published India Verified stories. Always check the sources on the story page.
         </p>
       </div>

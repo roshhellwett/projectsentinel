@@ -2,151 +2,54 @@
 
 import { memo } from "react";
 import Link from "next/link";
-import { Post } from "@/types";
+import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import type { Post } from "@/types";
 import { useTimeAgo } from "@/lib/hooks/useTimeAgo";
 import { getHostname } from "@/lib/utils/getHostname";
-import { cn } from "@/lib/utils/cn";
 import { VerificationStamp } from "@/components/ui/VerificationStamp";
-import { BookmarkButton } from "@/components/news/BookmarkButton";
+import { BookmarkButton } from "./BookmarkButton";
 import { useHapticFeedback } from "@/lib/hooks/useHapticFeedback";
 import { useI18n } from "@/lib/i18n/context";
 
-function ShieldIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
+interface HeroCardProps { post: Post; badge?: "breaking" | "trending" | null }
 
-function YoutubeIcon({ className = "text-ink" }: { className?: string }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={className}
-    >
-      <rect x="2" y="5" width="20" height="14" rx="3" />
-      <path d="M10 9l6 4-6 4z" />
-    </svg>
-  );
-}
-
-interface HeroCardProps {
-  post: Post;
-  badge?: "breaking" | "trending" | null;
-}
-
-export const HeroCard = memo(function HeroCard({
-  post,
-  badge = "trending",
-}: HeroCardProps) {
+export const HeroCard = memo(function HeroCard({ post, badge = "trending" }: HeroCardProps) {
   const { t } = useI18n();
   const haptic = useHapticFeedback();
-  const isVideo = post.content_type === "video" || !!post.video_url;
-  const sourcesCount = post.source_count ?? post.sources?.length ?? 1;
-  const firstSource = (post.sources ?? [])[0];
-  const firstHost = firstSource ? getHostname(firstSource.url) : "";
-
+  const timeAgo = useTimeAgo(post.published_at);
+  const sourceCount = post.source_count ?? post.sources?.length ?? 0;
+  const host = post.sources?.[0] ? getHostname(post.sources[0].url) : "";
   return (
-    <div
-      role="article"
-      aria-label={`Featured article: ${post.headline}`}
-      className={cn(
-        "hero-card-premium group relative cursor-pointer select-none touch-manipulation p-fluid-md sm:p-fluid-lg flex flex-col lg:pr-[38%] transform-gpu transition-all duration-slow ease-apple",
-        "hover:-translate-y-1 hover:shadow-[0_30px_80px_rgb(0_0_0_/_0.34)]",
-        "active:translate-y-0 active:shadow-[0_14px_42px_rgb(0_0_0_/_0.24)]",
-        "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
-      )}
-      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 320px" }}
-    >
-      <div className="flex items-start justify-between gap-fluid-3xs sm:gap-fluid-2xs mb-fluid-xs sm:mb-fluid-sm min-h-[20px]">
-        <div className="flex flex-wrap items-center gap-fluid-3xs sm:gap-fluid-2xs min-w-0">
-          <span className="font-mono text-fluid-2xs font-bold tracking-wider uppercase text-ink bg-paper/80 px-2.5 py-0.5 rounded-token-xs border border-rule/70 shadow-2xs shrink-0">
-            {post.category}
-          </span>
-          <span className="text-ink-soft/40 shrink-0" aria-hidden="true">
-            ·
-          </span>
-          <span
-            className="font-mono text-fluid-2xs text-ink-soft shrink-0"
-            suppressHydrationWarning
-          >
-            {useTimeAgo(post.published_at)}
-          </span>
-          {badge && (
-            <span className="font-mono text-fluid-2xs font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-token-xs shadow-2xs border text-paper bg-red-600 border-red-700 animate-pulse shrink-0">
-              {badge === "breaking" ? t("hero.breaking") : t("hero.top_story")}
-            </span>
-          )}
+    <article className="lead-story" role="article" aria-label={`Featured article: ${post.headline}`}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="story-meta">
+          <Link href={`/category/${post.category}`} className="story-meta__category">{t(`nav.${post.category}`)}</Link>
+          <span aria-hidden="true">/</span>
+          <span suppressHydrationWarning>{timeAgo}</span>
+          {badge === "breaking" && <span className="text-accent">{t("hero.breaking")}</span>}
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          <VerificationStamp score={post.credibility_score} compact />
-        </div>
+        <VerificationStamp score={post.credibility_score} compact />
       </div>
-
-      <div className="hero-card__signal hidden lg:flex" aria-hidden="true">
-        <span className="hero-card__signal-index">VERIFIED / 001</span>
-        <div className="hero-card__signal-ring hero-card__signal-ring--outer" />
-        <div className="hero-card__signal-ring hero-card__signal-ring--inner" />
-        <div className="hero-card__signal-core"><ShieldIcon /></div>
-        <span className="hero-card__signal-label">source consensus<br /><strong>{sourcesCount} points of view</strong></span>
-      </div>
-
-      <Link
-        href={`/news/${post.id}/`}
-        onClick={() => haptic.medium()}
-        className="block group-hover:opacity-95 transition-opacity duration-base min-w-0"
-      >
-        <h2 className="font-display font-[800] text-ink leading-[1.12] tracking-[-0.02em] mb-fluid-xs sm:mb-fluid-sm text-fluid-2xl group-hover:text-ink/90 transition-colors duration-base">
-          {post.headline}
-        </h2>
-
-        <p className="font-body text-fluid-sm leading-[1.6] text-ink-soft line-clamp-3 mb-fluid-sm sm:mb-fluid-md font-normal">
-          {post.summary}
-        </p>
-
-        {firstHost && (
-          <div className="inline-block max-w-full px-3 py-1.5 rounded-token-md border border-rule/80 bg-paper/60 mb-fluid-sm sm:mb-fluid-md">
-            <p className="font-body text-fluid-xs text-ink-soft truncate">
-              {t("hero.first_reported")}{" "}
-              <span className="font-mono font-bold text-ink underline decoration-rule-strong">{firstHost}</span>
-            </p>
-          </div>
-        )}
+      <Link href={`/news/${post.id}`} onClick={() => haptic.medium()} className="group">
+        <h2 className="transition-colors duration-300 group-hover:text-accent">{post.headline}</h2>
       </Link>
-
-      <div className="flex items-center justify-between gap-fluid-2xs mt-auto pt-fluid-xs sm:pt-fluid-sm border-t border-rule/70">
-        <div className="flex items-center gap-fluid-2xs sm:gap-fluid-xs min-w-0">
-          <span className="inline-flex items-center gap-1 font-mono text-fluid-xs text-ink-soft font-medium shrink-0">
-            <ShieldIcon />
-            {sourcesCount}{" "}
-            {t(sourcesCount === 1 ? "card.source" : "card.sources")}
-          </span>
-          <span className="inline-flex items-center gap-1 px-2 py-1 min-h-[28px] border border-ink/25 text-ink bg-ink/5 font-body text-fluid-2xs font-bold tracking-wider uppercase rounded-token-xs shadow-2xs shrink-0">
-            <YoutubeIcon className="text-ink" />
-            {t("card.youtube")}
-          </span>
+      <p className="lead-story__summary">{post.summary}</p>
+      {post.credibility_reason && (
+        <div className="lead-story__evidence">
+          <ShieldCheck size={20} className="text-stamp mt-0.5" aria-hidden="true" />
+          <div>
+            <span className="editorial-kicker !text-stamp mb-1">Behind the headline</span>
+            <p className="line-clamp-3">{post.credibility_reason}</p>
+          </div>
         </div>
-        <BookmarkButton postId={post.id} variant="icon" />
+      )}
+      <div className="lead-story__footer">
+        <Link href={`/news/${post.id}`} className="editorial-link">Read the full perspective <ArrowUpRight size={15} aria-hidden="true" /></Link>
+        <div className="flex items-center gap-5">
+          <span className="text-[10px] text-muted">{sourceCount} {t(sourceCount === 1 ? "card.source" : "card.sources")}{host && <span className="hidden sm:inline"> · {host}</span>}</span>
+          <BookmarkButton postId={post.id} />
+        </div>
       </div>
-    </div>
+    </article>
   );
 });
