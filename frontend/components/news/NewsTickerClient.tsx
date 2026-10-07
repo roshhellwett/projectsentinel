@@ -16,16 +16,16 @@ export function NewsTickerClient({ posts }: NewsTickerClientProps) {
   const tickerItems = [...posts, ...posts, ...posts];
 
   return (
-    <div className={`sticky top-12 sm:top-14 lg:top-16 ${Z_INDEX.stickyNav} w-full bg-paper/80 backdrop-blur-md text-ink flex items-center h-9 sm:h-10 overflow-hidden border-b border-rule z-30 transform-gpu`}>
-      <div className="bg-ink text-paper font-display font-bold px-3 sm:px-4 h-full flex items-center shrink-0 z-10 shadow-[4px_0_12px_rgba(0,0,0,0.1)] uppercase tracking-wider text-xs sm:text-sm">
-        Live News
+    <div className={`sticky top-12 sm:top-14 lg:top-16 ${Z_INDEX.stickyNav} w-full bg-paper/78 backdrop-blur-xl text-ink flex items-center h-9 sm:h-10 overflow-hidden border-b border-rule/80 z-30 transform-gpu`}>
+      <div className="bg-accent text-paper font-mono font-bold px-3 sm:px-4 h-full flex items-center shrink-0 z-10 shadow-[8px_0_22px_rgb(0_0_0_/_0.22)] uppercase tracking-[0.12em] text-[10px] sm:text-xs">
+        <span className="mr-2 h-1.5 w-1.5 rounded-full bg-paper animate-pulse" /> Live signal
       </div>
       <div className="flex-1 overflow-hidden relative h-full flex items-center">
          <div className="flex animate-ticker hover:[animation-play-state:paused] whitespace-nowrap h-full items-center">
            {tickerItems.map((p, i) => (
               <span key={`${p.id}-${i}`} className="flex items-center mx-6 sm:mx-10 shrink-0">
-                 <span className="w-1.5 h-1.5 rounded-full bg-ink mr-2.5 animate-pulse" />
-                 <span className="text-ink-soft uppercase tracking-wider text-[10px] sm:text-xs font-bold mr-2 sm:mr-3 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent mr-2.5 animate-pulse" />
+                  <span className="text-muted uppercase tracking-wider text-[10px] sm:text-xs font-bold mr-2 sm:mr-3 font-mono">
                    {p.category}
                  </span>
                  <Link 

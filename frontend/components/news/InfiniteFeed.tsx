@@ -199,12 +199,12 @@ export function InfiniteFeed({
   return (
     <>
       <ErrorBoundary>
-        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
-          <span className="font-mono text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink bg-paper-2 px-3 py-1 rounded-full border border-rule/80 shadow-2xs">
+        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6 px-1">
+          <span className="font-mono text-[10px] sm:text-xs font-bold tracking-[0.12em] uppercase text-accent">
             {dailyCount} read today
           </span>
           {readCount > 0 && (
-            <span className="font-mono text-[11px] sm:text-xs font-bold tracking-wider uppercase text-ink-soft bg-paper-2/60 px-3 py-1 rounded-full border border-rule/60">
+            <span className="font-mono text-[10px] sm:text-xs font-bold tracking-[0.12em] uppercase text-muted">
               {readCount} / {posts.length} read
             </span>
           )}
@@ -212,7 +212,7 @@ export function InfiniteFeed({
 
         <div
           ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 items-stretch touch-pan-y"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 items-stretch touch-pan-y"
         >
           {posts.map((post, index) => (
             <FeedItem

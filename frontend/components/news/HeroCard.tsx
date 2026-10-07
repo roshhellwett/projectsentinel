@@ -70,9 +70,9 @@ export const HeroCard = memo(function HeroCard({
       role="article"
       aria-label={`Featured article: ${post.headline}`}
       className={cn(
-        "group relative cursor-pointer select-none touch-manipulation p-fluid-md sm:p-fluid-lg flex flex-col rounded-token-lg border-2 border-ink bg-paper/80 backdrop-blur-sm shadow-[4px_4px_0px_rgb(var(--c-ink))] transform-gpu transition-all duration-base ease-apple overflow-hidden",
-        "hover:-translate-y-1.5 hover:-translate-x-1.5 hover:shadow-[10px_10px_0px_rgb(var(--c-ink))]",
-        "active:translate-y-0 active:translate-x-0 active:shadow-[2px_2px_0px_rgb(var(--c-ink))]",
+        "hero-card-premium group relative cursor-pointer select-none touch-manipulation p-fluid-md sm:p-fluid-lg flex flex-col lg:pr-[38%] transform-gpu transition-all duration-slow ease-apple",
+        "hover:-translate-y-1 hover:shadow-[0_30px_80px_rgb(0_0_0_/_0.34)]",
+        "active:translate-y-0 active:shadow-[0_14px_42px_rgb(0_0_0_/_0.24)]",
         "focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
       )}
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 320px" }}
@@ -100,6 +100,14 @@ export const HeroCard = memo(function HeroCard({
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <VerificationStamp score={post.credibility_score} compact />
         </div>
+      </div>
+
+      <div className="hero-card__signal hidden lg:flex" aria-hidden="true">
+        <span className="hero-card__signal-index">VERIFIED / 001</span>
+        <div className="hero-card__signal-ring hero-card__signal-ring--outer" />
+        <div className="hero-card__signal-ring hero-card__signal-ring--inner" />
+        <div className="hero-card__signal-core"><ShieldIcon /></div>
+        <span className="hero-card__signal-label">source consensus<br /><strong>{sourcesCount} points of view</strong></span>
       </div>
 
       <Link

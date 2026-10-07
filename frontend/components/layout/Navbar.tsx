@@ -182,7 +182,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/60 backdrop-blur-2xl border-b-2 border-ink shadow-[0_4px_0_rgb(var(--c-ink)/0.05)] transform-gpu select-none transition-all duration-slow`}
+        className={`sticky top-0 inset-x-0 ${Z_INDEX.stickyNav} bg-paper/70 backdrop-blur-2xl border-b border-rule/80 shadow-[0_12px_34px_rgb(0_0_0_/_0.16)] transform-gpu select-none transition-all duration-slow`}
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 lg:px-10">
@@ -195,7 +195,7 @@ export function Navbar() {
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 shrink-0 border border-ink text-ink font-display font-bold text-fluid-xs shadow-[2px_2px_0px_rgb(var(--c-ink))] group-hover:bg-ink group-hover:text-paper transition-all duration-base"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 shrink-0 border border-accent/70 rounded-xl text-accent font-display font-bold text-fluid-xs bg-accent/5 shadow-[0_0_22px_rgb(var(--c-accent)/0.14)] group-hover:bg-accent group-hover:text-paper transition-all duration-base"
               >
                 IV
               </span>
@@ -223,7 +223,7 @@ export function Navbar() {
                     aria-current={active ? "page" : undefined}
                     className={`relative inline-flex items-center gap-fluid-3xs px-fluid-xs py-fluid-3xs min-h-[44px] text-fluid-2xs font-body font-medium transition-all duration-base rounded-token-md ${
                       active
-                        ? "text-ink bg-paper-2 font-bold shadow-sm border border-rule/80 scale-[1.02]"
+                        ? "text-accent bg-accent/10 font-bold shadow-sm border border-accent/20 scale-[1.02]"
                         : "text-muted hover:text-ink hover:bg-paper-2/60 border border-transparent active:scale-95"
                     }`}
                   >
@@ -246,7 +246,7 @@ export function Navbar() {
                 onClick={openSearch}
                 aria-label="Search articles (press /)"
                 title="Search"
-                className="inline-flex items-center gap-fluid-3xs text-muted hover:text-ink transition-all duration-base p-2 sm:px-3 sm:py-1.5 sm:border sm:border-rule sm:bg-paper-2/60 sm:hover:bg-paper-2 sm:shadow-sm rounded-token-md min-touch active:scale-95"
+                 className="inline-flex items-center gap-fluid-3xs text-muted hover:text-accent transition-all duration-base p-2 sm:px-3 sm:py-1.5 sm:border sm:border-rule sm:bg-paper-2/60 sm:hover:bg-paper-2 sm:shadow-sm rounded-token-md min-touch active:scale-95"
               >
                 <SearchIcon />
                 <span className="hidden sm:inline text-fluid-2xs font-body font-medium">Search</span>

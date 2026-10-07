@@ -113,10 +113,10 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
 
   return (
     <section aria-label={t("trending.title")} className="mb-fluid-lg">
-      <div className="flex items-center justify-between gap-fluid-xs mb-fluid-sm sm:mb-fluid-md pb-3 border-b-2 border-ink/40">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-2xs animate-pulse shrink-0" />
-          <h2 className="font-display font-bold text-fluid-lg text-ink tracking-tight min-w-0 truncate">
+      <div className="section-header-premium">
+        <div>
+          <span className="section-header-premium__mark !text-gold">Live read</span>
+          <h2 className="font-display font-bold text-ink min-w-0 truncate">
             {t("trending.title")}
           </h2>
         </div>
@@ -128,7 +128,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("left")}
               disabled={!canScrollLeft}
-              className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-token-md"
+              className="flex items-center justify-center min-h-[42px] min-w-[42px] p-2 border border-rule bg-paper-2/70 text-ink shadow-sm hover:border-accent/60 hover:bg-paper-2 active:scale-95 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-full"
               aria-label={t("trending.aria_scroll_left")}
             >
               <ArrowLeft />
@@ -136,7 +136,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
             <button
               onClick={() => scrollBy("right")}
               disabled={!canScrollRight}
-              className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 border-2 border-ink bg-paper text-ink shadow-[2px_2px_0px_rgb(var(--c-ink))] hover:shadow-[4px_4px_0px_rgb(var(--c-ink))] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:bg-paper-2 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-token-md"
+              className="flex items-center justify-center min-h-[42px] min-w-[42px] p-2 border border-rule bg-paper-2/70 text-ink shadow-sm hover:border-accent/60 hover:bg-paper-2 active:scale-95 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base ease-apple transform-gpu rounded-full"
               aria-label={t("trending.aria_scroll_right")}
             >
               <ArrowRight />

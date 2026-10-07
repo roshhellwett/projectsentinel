@@ -83,7 +83,7 @@ export function Footer() {
             >
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 shrink-0 border border-ink text-ink font-display font-bold text-fluid-sm"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 shrink-0 border border-accent/60 rounded-xl text-accent font-display font-bold text-fluid-sm bg-accent/5"
               >
                 IV
               </span>

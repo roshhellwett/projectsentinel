@@ -50,7 +50,7 @@ async function HeroSection() {
   if (!heroPost) return null;
 
   return (
-    <div id="latest" className="mb-6 sm:mb-10 scroll-mt-24">
+    <div id="latest" className="mb-8 sm:mb-12 scroll-mt-24 ambient-glow">
       <HeroCard post={heroPost} badge="breaking" />
     </div>
   );
@@ -88,7 +88,7 @@ async function TrendingAndFeedSection() {
         </div>
       )}
 
-      <section aria-label="Latest verified news" className="mt-fluid-lg">
+       <section aria-label="Latest verified news" className="mt-fluid-xl">
         <FeedSectionHeader />
         <InfiniteFeed
           initialPosts={feedPosts}
@@ -134,7 +134,7 @@ export default function HomePage() {
         }}
       />
 
-      <div className="relative z-10 px-fluid-md max-[360px]:px-3 pb-24 max-w-[1600px] mx-auto">
+      <div className="relative z-10 px-fluid-md max-[360px]:px-3 pb-24 max-w-[1580px] mx-auto">
         <Suspense
           fallback={
             <div className="h-24 animate-pulse border border-rule bg-paper-2 rounded-[8px] mb-10" />
@@ -157,7 +157,7 @@ export default function HomePage() {
 
 function HeroCardSkeleton() {
   return (
-    <div className="mb-6 sm:mb-10 animate-shimmer h-48 sm:h-80 flex flex-col justify-end p-4 sm:p-8 border border-rule rounded-[8px]">
+    <div className="mb-8 sm:mb-12 animate-shimmer h-64 sm:h-[28rem] flex flex-col justify-end p-4 sm:p-8 border border-rule rounded-[1.25rem] bg-paper-2/70">
       <div className="space-y-2 sm:space-y-3 max-w-2xl">
         <div className="h-3 sm:h-4 w-16 sm:w-20 bg-rule/60 border border-rule" />
         <div className="h-6 sm:h-8 w-full bg-rule/50 border border-rule" />

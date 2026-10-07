@@ -230,7 +230,7 @@ export function MobileBottomNav() {
         style={{ pointerEvents: hideForOverlay ? "none" : "auto" }}
       >
         <div
-          className="relative border-t-2 border-ink bg-paper/60 backdrop-blur-2xl select-none touch-manipulation transition-all duration-slow"
+           className="relative border-t border-rule/90 bg-paper/78 backdrop-blur-2xl select-none touch-manipulation transition-all duration-slow shadow-[0_-14px_36px_rgb(0_0_0_/_0.18)]"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="flex items-center justify-around px-1 pt-1 pb-1.5 sm:pt-1.5 sm:pb-2">
@@ -242,9 +242,9 @@ export function MobileBottomNav() {
               const inner = (
                 <div className="relative flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 min-w-[50px] min-h-[48px] active:scale-90 transition-all duration-fast">
                   {active && (
-                    <span className="absolute top-0 w-8 h-[2.5px] rounded-full bg-ink shadow-2xs animate-fade-in" />
+                     <span className="absolute top-0 w-8 h-[2.5px] rounded-full bg-accent shadow-[0_0_14px_rgb(var(--c-accent)/0.75)] animate-fade-in" />
                   )}
-                  <div className={`transition-transform duration-base ${active ? "scale-110 text-ink" : "text-muted"}`}>
+                   <div className={`transition-transform duration-base ${active ? "scale-110 text-accent" : "text-muted"}`}>
                     <Icon />
                   </div>
                   <span
