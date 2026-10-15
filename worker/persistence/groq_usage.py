@@ -8,12 +8,16 @@
 # </ai_system_instruction>
 
 
-from datetime import date
+from datetime import UTC, datetime
 
 from database.client import get_supabase
 from logger.pipeline_logger import PipelineLogger
 
 _logger = PipelineLogger()
+
+
+def _today_utc() -> str:
+    return str(datetime.now(UTC).date())
 
 
 def save_key_stats(stats: list[dict]) -> None:
@@ -22,11 +26,11 @@ def save_key_stats(stats: list[dict]) -> None:
         supabase = get_supabase()
         if not supabase:
             return
-        today = str(date.today())
+        today = _today_utc()
         (
             supabase.table("groq_usage")
             .upsert(
-                {"usage_date": today, "key_stats": stats},
+                {"usage_date": today, "key_stats": stats, "updated_at": datetime.now(UTC).isoformat()},
                 on_conflict="usage_date",
             )
             .execute()
@@ -41,7 +45,7 @@ def load_key_stats() -> list[dict]:
         supabase = get_supabase()
         if not supabase:
             return []
-        today = str(date.today())
+        today = _today_utc()
         result = supabase.table("groq_usage").select("key_stats").eq("usage_date", today).maybe_single().execute()
         if result.data:
             return result.data.get("key_stats") or []

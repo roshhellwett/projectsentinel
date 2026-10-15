@@ -11,6 +11,7 @@
 import contextlib
 import os
 import threading
+import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
@@ -38,6 +39,11 @@ from writer.post_builder import PostBuilder
 cache.register(FACTCHECK_LAST_RUN, FACTCHECK_INTERVAL)
 
 _pipeline_running = threading.Event()
+_pipeline_started_monotonic: float | None = None
+
+
+def is_pipeline_running() -> bool:
+    return _pipeline_running.is_set()
 
 
 def _budgeted_groups_per_run(logger: PipelineLogger, hard_cap: int) -> int:
@@ -118,7 +124,113 @@ def _record_run_end(logger: PipelineLogger, run_id: str | None, duration: float,
         logger.log("PIPELINE", f"Could not record pipeline run completion: {_e}")
 
 
+def _last_cleanup_age_hours() -> float | None:
+    """Hours since the last successful cleanup marker, or None when unknown."""
+
+    try:
+        from database.client import get_supabase as _get_sb
+
+        _sb = _get_sb()
+        if not _sb:
+            return None
+        res = (
+            _sb.table("pipeline_runs")
+            .select("completed_at")
+            .eq("mode", "cleanup")
+            .order("started_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        rows = res.data or []
+        if not rows:
+            return None
+        ts = rows[0].get("completed_at")
+        if not ts:
+            return None
+        cleaned_at = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+        return (datetime.now(UTC) - cleaned_at).total_seconds() / 3600.0
+    except Exception:
+        return None
+
+
+def _record_cleanup(logger: PipelineLogger, duration: float, results: dict) -> None:
+    """Record a mode='cleanup' marker row so throttle + monitoring see every real cleanup."""
+
+    try:
+        from database.client import get_supabase as _get_sb
+
+        _sb = _get_sb()
+        if _sb:
+            now = datetime.now(UTC).isoformat()
+            _sb.table("pipeline_runs").insert(
+                {
+                    "started_at": now,
+                    "completed_at": now,
+                    "mode": "cleanup",
+                    "duration_seconds": round(duration, 1),
+                    "stats": results,
+                }
+            ).execute()
+    except Exception as _e:
+        logger.log("PIPELINE", f"Could not record cleanup marker: {_e}")
+
+
+def _maybe_run_cleanup(
+    logger: PipelineLogger, interval_hours: float | None = None, log_skip: bool = False
+) -> dict | None:
+    """Self-healing cleanup: run only when no successful cleanup happened recently.
+
+    Called inline by every full pipeline run (cheap when fresh) and by the hourly
+    cleanup guard job. A DB marker row (mode='cleanup') throttles it to at most one
+    real cleanup per interval, no matter how many callers fire.
+    """
+
+    if interval_hours is None:
+        try:
+            interval_hours = float(os.getenv("CLEANUP_INTERVAL_HOURS", "6"))
+        except (ValueError, TypeError):
+            interval_hours = 6.0
+
+    age = _last_cleanup_age_hours()
+    if age is not None and age < interval_hours:
+        if log_skip:
+            logger.log("ARCHIVE", f"Cleanup skipped — last ran {age:.1f}h ago (< {interval_hours:.1f}h interval)")
+        return None
+
+    started = datetime.now(UTC)
+    try:
+        archiver = OldPostArchiver()
+        results = archiver.cleanup_all()
+    except Exception as exc:
+        logger.log("ARCHIVE_ERROR", f"Cleanup failed: {str(exc)[:160]}")
+        return None
+
+    duration = (datetime.now(UTC) - started).total_seconds()
+    logger.log("ARCHIVE", f"Cleanup results: {results}")
+    _record_cleanup(logger, duration, results)
+    return results
+
+
+def watchdog_tick(stall_seconds: int | None = None) -> None:
+    """Log a PIPELINE_STALL event when a pipeline run has been stuck too long."""
+
+    if not _pipeline_running.is_set() or _pipeline_started_monotonic is None:
+        return
+    try:
+        threshold = stall_seconds or int(os.getenv("PIPELINE_STALL_SECONDS", "1800"))
+    except (ValueError, TypeError):
+        threshold = 1800
+    stuck = time.monotonic() - _pipeline_started_monotonic
+    if stuck >= threshold:
+        PipelineLogger().log(
+            "PIPELINE_STALL",
+            f"Pipeline has been running for {stuck / 60.0:.1f} min (threshold {threshold / 60.0:.1f} min)",
+        )
+
+
 def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -> None:
+
+    global _pipeline_started_monotonic
 
     if _pipeline_running.is_set():
         logger = PipelineLogger()
@@ -126,6 +238,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         return
 
     _pipeline_running.set()
+    _pipeline_started_monotonic = time.monotonic()
 
     logger = PipelineLogger()
     mode = "supplementary" if supplementary_only else ("archive" if archive_only else "full")
@@ -135,9 +248,9 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
     run_id = _record_run_start(logger, start_time, mode)
 
     try:
-        max_ai_groups = max(1, int(os.getenv("MAX_AI_GROUPS_PER_RUN", "12")))
+        max_ai_groups = max(1, int(os.getenv("MAX_AI_GROUPS_PER_RUN", "40")))
     except (ValueError, TypeError):
-        max_ai_groups = 12
+        max_ai_groups = 40
 
     stats: dict = {
         "fetched": 0,
@@ -152,9 +265,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
 
     try:
         if archive_only:
-            archiver = OldPostArchiver()
-            results = archiver.cleanup_all()
-            logger.log("ARCHIVE", f"Cleanup results: {results}")
+            results = _maybe_run_cleanup(logger, log_skip=True) or {"skipped": 1}
             duration = (datetime.now(UTC) - start_time).total_seconds()
             _record_run_end(logger, run_id, duration, results)
             return
@@ -174,6 +285,10 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         swept = deduplicator.sweep_stale_unprocessed(hours=stale_hours)
         if swept:
             logger.log("DEDUP", f"Swept {swept} stale singleton(s) older than {stale_hours}h")
+
+        cleanup_results = _maybe_run_cleanup(logger)
+        if cleanup_results is not None:
+            stats["cleanup"] = cleanup_results
 
         all_articles: list[dict] = []
 
@@ -389,7 +504,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                     verification = groq_verifier.verify(group)
                 except AllKeysExhaustedError as budget_err:
                     logger.log("AI_BUDGET", f"Groq budget exhausted — stopping AI processing: {budget_err}")
-                    _batch_mark(group)
                     _dead_letter.append(group)
                     break
                 except Exception as groq_err:
@@ -430,7 +544,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
                             "AI_BUDGET",
                             f"Groq writer budget exhausted — stopping AI processing: {budget_err}",
                         )
-                        _batch_mark(group)
                         _dead_letter.append(group)
                         break
                     except Exception as write_err:
@@ -477,7 +590,7 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         if _dead_letter:
             logger.log(
                 "DEAD_LETTER",
-                f"{len(_dead_letter)} group(s) queued for retry on budget exhaust",
+                f"{len(_dead_letter)} group(s) left unprocessed for retry on next run (budget exhaust)",
             )
 
         duration = (datetime.now(UTC) - start_time).total_seconds()
@@ -492,5 +605,6 @@ def run_pipeline(supplementary_only: bool = False, archive_only: bool = False) -
         raise
     finally:
         _pipeline_running.clear()
+        _pipeline_started_monotonic = None
         with contextlib.suppress(Exception):
             GroqVerifier.save_pool_stats()

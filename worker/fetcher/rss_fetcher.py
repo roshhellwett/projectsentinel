@@ -79,7 +79,7 @@ class RSSFetcher:
         now = time.time()
         unparked = 0
         with cls._feed_health_lock:
-            for url, state in list(cls._feed_health.items()):
+            for _url, state in list(cls._feed_health.items()):
                 if state.get("parked_until", 0) > now:
                     unparked += 1
                     state["parked_until"] = 0.0

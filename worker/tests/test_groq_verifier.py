@@ -224,16 +224,14 @@ def test_key_pool_all_exhausted_raises():
 
 
 def test_key_pool_midnight_reset():
-    from datetime import date, timedelta
-
     pool = KeyPool(["key_a"])
     pool.record_success(0)
     pool.mark_exhausted(0)
 
-    yesterday = str(date.today() - timedelta(days=1))
+    stale_day = "1999-01-01"
     with pool._lock:
-        pool._slots[0]["_last_seen_day"] = yesterday
-        pool._slots[0]["_per_model"]["_default"]["day"] = yesterday
+        pool._slots[0]["_last_seen_day"] = stale_day
+        pool._slots[0]["_per_model"]["_default"]["day"] = stale_day
 
     idx, key = pool.pick()
     assert idx == 0
@@ -431,7 +429,10 @@ def test_verify_cascades_to_next_model_when_keys_exhaust(mock_post, mock_sleep):
         v = GroqVerifier()
         pool = v._ensure_pool()
 
-        primary = "llama-3.3-70b-versatile"
+        from utils.groq_pool import get_verify_model_chain
+
+        chain = get_verify_model_chain()
+        primary, expected_fallback = chain[0], chain[1]
         for i in range(pool.size()):
             pool.record_429(i, retry_after=86400, model=primary)
 
@@ -440,8 +441,8 @@ def test_verify_cascades_to_next_model_when_keys_exhaust(mock_post, mock_sleep):
 
         sent_model = mock_post.call_args.kwargs["json"]["model"]
         assert sent_model != primary, f"Expected cascade to fallback model, got {sent_model}"
-        assert sent_model == "meta-llama/llama-4-scout-17b-16e-instruct", (
-            f"Expected first fallback to be llama-4-scout, got {sent_model}"
+        assert sent_model == expected_fallback, (
+            f"Expected first fallback to be {expected_fallback}, got {sent_model}"
         )
 
 

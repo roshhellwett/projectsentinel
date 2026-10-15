@@ -237,7 +237,10 @@ def test_writer_cascades_to_next_model_when_keys_exhaust():
         w = GroqWriter()
         pool = w._ensure_pool()
 
-        primary = "llama-3.1-8b-instant"
+        from utils.groq_pool import get_write_model_chain
+
+        chain = get_write_model_chain()
+        primary, expected_fallback = chain[0], chain[1]
         for i in range(pool.size()):
             pool.record_429(i, retry_after=86400, model=primary)
 
@@ -246,4 +249,6 @@ def test_writer_cascades_to_next_model_when_keys_exhaust():
 
         sent_model = mock_post.call_args.kwargs["json"]["model"]
         assert sent_model != primary, f"Expected cascade away from {primary}"
-        assert sent_model == "allam-2-7b", f"Expected first write fallback to be allam-2-7b, got {sent_model}"
+        assert sent_model == expected_fallback, (
+            f"Expected first write fallback to be {expected_fallback}, got {sent_model}"
+        )

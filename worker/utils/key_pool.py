@@ -13,9 +13,15 @@ from __future__ import annotations
 import threading
 import time
 from collections import deque
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 
 _DEFAULT_MODEL = "_default"
+
+
+def _today_utc() -> str:
+    """UTC day key — must match Groq's quota reset (00:00 UTC) and groq_usage dates."""
+
+    return datetime.now(UTC).strftime("%Y-%m-%d")
 
 
 class AllKeysExhaustedError(Exception):
@@ -66,7 +72,7 @@ class KeyPool:
                 "skip_this_run": False,
                 "_invalid_key": False,
                 "last_used_at": 0.0,
-                "_last_seen_day": str(date.today()),
+                "_last_seen_day": _today_utc(),
                 "_per_model": {},
             }
             for num, k in normalized
@@ -84,7 +90,7 @@ class KeyPool:
             ms = {
                 "calls_today": 0,
                 "tokens_today": 0,
-                "day": str(date.today()),
+                "day": _today_utc(),
                 "day_dead": False,
                 "cooldown_until": 0.0,
                 "rpm_window": deque(),
@@ -94,7 +100,7 @@ class KeyPool:
         return ms
 
     def _refresh_model_state(self, slot: dict, model: str, now: float) -> dict:
-        today = str(date.today())
+        today = _today_utc()
 
         if slot.get("_last_seen_day") != today:
             if not slot["_invalid_key"]:
@@ -288,7 +294,7 @@ class KeyPool:
             return out
 
     def get_persist_stats(self) -> list[dict]:
-        today = str(date.today())
+        today = _today_utc()
         with self._lock:
             out = []
             for i, s in enumerate(self._slots):
@@ -308,7 +314,7 @@ class KeyPool:
             return out
 
     def restore_stats(self, persisted: list[dict]) -> None:
-        today = str(date.today())
+        today = _today_utc()
         with self._lock:
             for entry in persisted:
                 idx = entry.get("index")

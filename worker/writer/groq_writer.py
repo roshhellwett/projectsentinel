@@ -16,14 +16,20 @@ import time
 import requests
 
 from logger.pipeline_logger import PipelineLogger
-from utils.groq_pool import get_groq_pool, get_write_model_chain, reset_pool
+from utils.groq_pool import (
+    ModelUnavailableError,
+    get_groq_pool,
+    get_write_model_chain,
+    mark_model_dead,
+    reset_pool,
+)
 from utils.key_pool import AllKeysExhaustedError, KeyPool
 
 
 class GroqWriter:
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
-    RETRY_DELAY = 10
+    RETRY_DELAY = 5
 
     EST_TOKENS_PER_CALL = 320
 
@@ -69,7 +75,7 @@ class GroqWriter:
         user_content = self._build_prompt(key_facts, category)
         chain = get_write_model_chain()
 
-        last_exhaustion: AllKeysExhaustedError | None = None
+        last_failure: Exception | None = None
         for model_idx, model in enumerate(chain):
             if model_idx > 0:
                 self.logger.log(
@@ -79,7 +85,7 @@ class GroqWriter:
             try:
                 return self._write_with_model(model, pool, user_content)
             except AllKeysExhaustedError as exc:
-                last_exhaustion = exc
+                last_failure = exc
                 if model_idx < len(chain) - 1:
                     self.logger.log(
                         "GROQ_WRITE",
@@ -91,9 +97,22 @@ class GroqWriter:
                     f"Entire model chain exhausted: {exc}",
                 )
                 raise
+            except ModelUnavailableError as exc:
+                last_failure = exc
+                if model_idx < len(chain) - 1:
+                    self.logger.log(
+                        "GROQ_WRITE",
+                        f"Model {model} unavailable ({str(exc)[:80]}); cascading to next model",
+                    )
+                    continue
+                self.logger.log(
+                    "GROQ_WRITE_ERROR",
+                    f"Entire model chain unavailable: {exc}",
+                )
+                raise
 
-        if last_exhaustion is not None:
-            raise last_exhaustion
+        if last_failure is not None:
+            raise last_failure
         raise Exception("Groq write model chain is empty")
 
     def _write_with_model(self, model: str, pool: KeyPool, user_content: str) -> dict:
@@ -154,6 +173,29 @@ class GroqWriter:
                     )
                     continue
 
+                if response.status_code == 404:
+                    body_preview = (response.text or "")[:160]
+                    mark_model_dead(model)
+                    raise ModelUnavailableError(f"model '{model}' returned 404: {body_preview}")
+
+                if response.status_code == 400:
+                    body_preview = (response.text or "")[:200]
+                    if re.search(
+                        r"model[^.]{0,80}(not found|does not exist|decommission|deprecat|unknown)",
+                        body_preview,
+                        re.IGNORECASE,
+                    ):
+                        mark_model_dead(model)
+                        raise ModelUnavailableError(f"model '{model}' unavailable: {body_preview}")
+                    retries_used += 1
+                    self.logger.log(
+                        "GROQ_WRITE_ERROR",
+                        f"400 from {model} (retry {retries_used}/{self.MAX_RETRIES}): {body_preview}",
+                    )
+                    if retries_used < self.MAX_RETRIES:
+                        time.sleep(self.RETRY_DELAY)
+                    continue
+
                 response.raise_for_status()
 
                 try:
@@ -195,6 +237,8 @@ class GroqWriter:
                 )
                 return parsed
 
+            except ModelUnavailableError:
+                raise
             except requests.exceptions.RequestException as e:
                 retries_used += 1
                 error_str = str(e)

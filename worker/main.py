@@ -8,6 +8,7 @@
 # </ai_system_instruction>
 
 
+import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 
@@ -21,7 +22,8 @@ from api.chat import router as chat_router
 from api.health import router as health_router
 from api.trigger import router as trigger_router
 from fetcher.rss_fetcher import RSSFetcher
-from scheduler.jobs import run_pipeline
+from scheduler.jobs import run_pipeline, watchdog_tick
+from version import __version__
 
 load_dotenv()
 
@@ -47,10 +49,15 @@ async def lifespan(app: FastAPI):
     if unparked:
         print(f"Reset {unparked} parked feed(s) on startup")
 
+    try:
+        interval_seconds = max(60, int(os.getenv("PIPELINE_INTERVAL_SECONDS", "600")))
+    except (ValueError, TypeError):
+        interval_seconds = 600
+
     scheduler.add_job(
         run_pipeline,
         "interval",
-        minutes=10,
+        seconds=interval_seconds,
         id="news_pipeline",
         replace_existing=True,
         max_instances=1,
@@ -70,19 +77,29 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(
         run_pipeline,
         "interval",
-        hours=6,
-        id="archive_old_posts",
+        hours=1,
+        id="cleanup_guard",
         replace_existing=True,
         max_instances=1,
         kwargs={"archive_only": True},
     )
 
+    scheduler.add_job(
+        watchdog_tick,
+        "interval",
+        minutes=5,
+        id="stall_watchdog",
+        replace_existing=True,
+        max_instances=1,
+    )
+
     try:
         scheduler.start()
         print("Scheduler started")
-        print("  - Main pipeline: every 10 minutes")
+        print(f"  - Main pipeline: every {interval_seconds} seconds")
         print("  - Supplementary APIs: every 2 hours")
-        print("  - Archive/cleanup: every 6 hours")
+        print("  - Cleanup guard: hourly (self-throttled to one real cleanup per 6h)")
+        print("  - Stall watchdog: every 5 minutes")
     except Exception as e:
         print(f"Scheduler failed to start: {e}")
         raise RuntimeError(f"Scheduler failed to start: {e}") from e
@@ -99,7 +116,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="India Verified Worker",
     description="AI-powered news verification and publishing pipeline",
-    version="1.1.0",
+    version=__version__,
     lifespan=lifespan,
 )
 

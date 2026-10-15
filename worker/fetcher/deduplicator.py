@@ -32,7 +32,7 @@ class Deduplicator:
 
     _HASH_PAGE_SIZE = 1000
     _HASH_LOOKBACK_DAYS = 21
-    _HASH_MAX_PAGES = 50
+    _HASH_MAX_PAGES = 150
 
     def _load_known_hashes(self) -> set[str]:
 

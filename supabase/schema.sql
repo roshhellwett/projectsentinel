@@ -222,6 +222,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON known_false_claims TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON pipeline_runs     TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON groq_usage        TO service_role;
 
+REVOKE ALL ON raw_articles, discarded_articles, known_false_claims, pipeline_runs, groq_usage FROM anon, authenticated;
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON posts FROM anon, authenticated;
 GRANT SELECT ON posts TO anon, authenticated;
 
 DO $$ BEGIN

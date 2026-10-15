@@ -19,8 +19,10 @@ import requests
 
 from logger.pipeline_logger import PipelineLogger
 from utils.groq_pool import (
+    ModelUnavailableError,
     get_groq_pool,
     get_verify_model_chain,
+    mark_model_dead,
     reset_pool,
     save_verify_pool_stats,
 )
@@ -30,7 +32,7 @@ from utils.key_pool import AllKeysExhaustedError, KeyPool
 class GroqVerifier:
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
     MAX_RETRIES = 3
-    RETRY_DELAY = 10
+    RETRY_DELAY = 5
 
     EST_TOKENS_PER_CALL = 850
 
@@ -188,6 +190,29 @@ class GroqVerifier:
                     )
                     continue
 
+                if response.status_code == 404:
+                    body_preview = (response.text or "")[:160]
+                    mark_model_dead(model)
+                    raise ModelUnavailableError(f"model '{model}' returned 404: {body_preview}")
+
+                if response.status_code == 400:
+                    body_preview = (response.text or "")[:200]
+                    if re.search(
+                        r"model[^.]{0,80}(not found|does not exist|decommission|deprecat|unknown)",
+                        body_preview,
+                        re.IGNORECASE,
+                    ):
+                        mark_model_dead(model)
+                        raise ModelUnavailableError(f"model '{model}' unavailable: {body_preview}")
+                    retries_used += 1
+                    self.logger.log(
+                        "GROQ_VERIFY_ERROR",
+                        f"400 from {model} (retry {retries_used}/{self.MAX_RETRIES}): {body_preview}",
+                    )
+                    if retries_used < self.MAX_RETRIES:
+                        time.sleep(self.RETRY_DELAY)
+                    continue
+
                 response.raise_for_status()
 
                 try:
@@ -236,6 +261,8 @@ class GroqVerifier:
                 )
                 return parsed
 
+            except ModelUnavailableError:
+                raise
             except requests.exceptions.RequestException as e:
                 retries_used += 1
                 error_str = str(e)
@@ -335,7 +362,7 @@ class GroqVerifier:
             return None
 
         if not isinstance(result["key_facts"], list):
-            result["key_facts"] = list(result["key_facts"]) if isinstance(result["key_facts"], (list, tuple)) else []
+            result["key_facts"] = list(result["key_facts"]) if isinstance(result["key_facts"], list | tuple) else []
 
         valid_categories = [
             "politics",

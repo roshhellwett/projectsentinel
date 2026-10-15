@@ -14,6 +14,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
 from database.client import get_supabase
+from version import __version__
 
 router = APIRouter()
 
@@ -22,6 +23,7 @@ class HealthResponse(BaseModel):
     """Response from the /health endpoint."""
 
     status: str = Field(default="ok", description="Always 'ok' when the service is running")
+    version: str = Field(default=__version__, description="Worker version (matches the deployed build)")
     timestamp: str = Field(description="ISO 8601 timestamp of the check")
 
 
@@ -33,6 +35,11 @@ class StatusResponse(BaseModel):
     )
     stories_today: int = Field(default=0, description="Number of posts published today")
     pipeline_healthy: bool = Field(default=False, description="True if the pipeline ran within the last 45 minutes")
+    last_cleanup_at: str | None = Field(
+        default=None, description="ISO 8601 timestamp of the last successful cleanup/archival run"
+    )
+    cleanup_healthy: bool = Field(default=False, description="True if cleanup ran within the last 12 hours")
+    version: str = Field(default=__version__, description="Worker version (matches the deployed build)")
     checked_at: str = Field(description="ISO 8601 timestamp of this status check")
 
 
@@ -58,6 +65,7 @@ async def pipeline_status():
     now = datetime.now(UTC)
 
     last_run_at: str | None = None
+    last_cleanup_at: str | None = None
     stories_today: int = 0
 
     sb = get_supabase()
@@ -68,6 +76,17 @@ async def pipeline_status():
             )
             if run_result.data:
                 last_run_at = run_result.data[0]["started_at"]
+
+            cleanup_result = (
+                sb.table("pipeline_runs")
+                .select("completed_at")
+                .eq("mode", "cleanup")
+                .order("started_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            if cleanup_result.data:
+                last_cleanup_at = cleanup_result.data[0].get("completed_at")
 
             today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
             count_result = (
@@ -85,10 +104,21 @@ async def pipeline_status():
         except Exception:
             pass
 
+    cleanup_healthy = False
+    if last_cleanup_at:
+        try:
+            cleanup_dt = datetime.fromisoformat(str(last_cleanup_at).replace("Z", "+00:00"))
+            cleanup_healthy = (now - cleanup_dt) < timedelta(hours=12)
+        except Exception:
+            pass
+
     return StatusResponse(
         last_run_at=last_run_at,
         stories_today=stories_today,
         pipeline_healthy=pipeline_healthy,
+        last_cleanup_at=last_cleanup_at,
+        cleanup_healthy=cleanup_healthy,
+        version=__version__,
         checked_at=now.isoformat(),
     )
 

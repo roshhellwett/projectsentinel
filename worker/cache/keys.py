@@ -2,7 +2,7 @@
 
 # ── URL hashes for dedup (raw_articles) ──
 KNOWN_HASHES = "known_hashes"
-KNOWN_HASHES_TTL = 600  # reload every 10 min (matches pipeline interval)
+KNOWN_HASHES_TTL = 3600  # full reload hourly; in-process inserts are added to the cache instantly
 
 # ── Recent post headlines for title dedup ──
 RECENT_HEADLINES = "recent_headlines"

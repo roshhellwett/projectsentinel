@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import os
 import threading
+import time
 
 from utils.key_pool import KeyPool, load_numbered_keys
 
@@ -28,7 +29,6 @@ GROQ_MODEL_LIMITS: dict[str, tuple[int, int, int]] = {
     "llama-3.3-70b-versatile": (1000, 30, 12000),
     "meta-llama/llama-4-scout-17b-16e-instruct": (1000, 30, 30000),
     "qwen/qwen3-32b": (1000, 60, 6000),
-    "qwen/qwen3.6-27b": (1000, 30, 8000),
     "openai/gpt-oss-20b": (1000, 30, 8000),
     "openai/gpt-oss-120b": (1000, 30, 8000),
     "groq/compound": (250, 30, 70000),
@@ -37,8 +37,9 @@ GROQ_MODEL_LIMITS: dict[str, tuple[int, int, int]] = {
     "llama-3.1-8b-instant": (14400, 30, 6000),
 }
 
+# Only models verified alive against the live Groq API belong here.
+# (qwen/qwen3.6-27b was decommissioned — every call 404'd and wasted ~60-90s of retries.)
 VERIFY_MODEL_CHAIN: list[str] = [
-    "qwen/qwen3.6-27b",
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
     "groq/compound",
@@ -47,7 +48,6 @@ VERIFY_MODEL_CHAIN: list[str] = [
 ]
 
 WRITE_MODEL_CHAIN: list[str] = [
-    "qwen/qwen3.6-27b",
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
     "groq/compound",
@@ -59,7 +59,6 @@ WRITE_MODEL_CHAIN: list[str] = [
 # chat surface can never starve the verification/writing pipeline.
 CHAT_MODEL_CHAIN: list[str] = [
     "openai/gpt-oss-20b",
-    "qwen/qwen3.6-27b",
     "groq/compound-mini",
     "groq/compound",
     "allam-2-7b",
@@ -79,6 +78,47 @@ def safe_model_limits(model: str) -> tuple[int, int, int]:
     rpm = max(1, rpm - RPM_HEADROOM)
     tpm = max(1, int(tpm * TPM_SAFETY_FACTOR))
     return rpd, rpm, tpm
+
+
+class ModelUnavailableError(Exception):
+    """Groq reports the model as missing/decommissioned (e.g. 404 model_not_found)."""
+
+
+_MODEL_DEAD_TTL_SECONDS = 24 * 3600
+_dead_models: dict[str, float] = {}
+_dead_models_lock = threading.Lock()
+
+
+def mark_model_dead(model: str, ttl_seconds: float = _MODEL_DEAD_TTL_SECONDS) -> None:
+    """Blacklist a model so every caller cascades past it without retrying."""
+
+    with _dead_models_lock:
+        _dead_models[model] = time.time() + float(ttl_seconds)
+
+
+def is_model_dead(model: str) -> bool:
+    with _dead_models_lock:
+        until = _dead_models.get(model)
+        if until is None:
+            return False
+        if until <= time.time():
+            _dead_models.pop(model, None)
+            return False
+        return True
+
+
+def reset_dead_models() -> None:
+    """Clear the model blacklist (used by tests and manual recovery)."""
+
+    with _dead_models_lock:
+        _dead_models.clear()
+
+
+def filter_usable_chain(chain: list[str]) -> list[str]:
+    """Drop blacklisted models; keep the original chain if everything is blacklisted."""
+
+    usable = [m for m in chain if not is_model_dead(m)]
+    return usable or list(chain)
 
 
 def _build_model_limits_map() -> dict[str, tuple[int, int, int]]:
@@ -105,17 +145,17 @@ def _env_float(name: str, default: float) -> float:
 
 def get_verify_model_chain() -> list[str]:
 
-    return _env_chain("GROQ_VERIFY_MODEL_CHAIN", "GROQ_VERIFY_MODEL", VERIFY_MODEL_CHAIN)
+    return filter_usable_chain(_env_chain("GROQ_VERIFY_MODEL_CHAIN", "GROQ_VERIFY_MODEL", VERIFY_MODEL_CHAIN))
 
 
 def get_write_model_chain() -> list[str]:
 
-    return _env_chain("GROQ_WRITE_MODEL_CHAIN", "GROQ_WRITE_MODEL", WRITE_MODEL_CHAIN)
+    return filter_usable_chain(_env_chain("GROQ_WRITE_MODEL_CHAIN", "GROQ_WRITE_MODEL", WRITE_MODEL_CHAIN))
 
 
 def get_chat_model_chain() -> list[str]:
 
-    return _env_chain("GROQ_CHAT_MODEL_CHAIN", "GROQ_CHAT_MODEL", CHAT_MODEL_CHAIN)
+    return filter_usable_chain(_env_chain("GROQ_CHAT_MODEL_CHAIN", "GROQ_CHAT_MODEL", CHAT_MODEL_CHAIN))
 
 
 

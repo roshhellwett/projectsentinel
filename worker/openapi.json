@@ -3,7 +3,7 @@
   "info": {
     "title": "India Verified Worker",
     "description": "AI-powered news verification and publishing pipeline",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "paths": {
     "/health": {
@@ -43,6 +43,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset-feeds": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Reset parked RSS feeds",
+        "description": "Unparks all RSS feeds that were parked due to repeated failures. Returns the number of feeds that were unparked.",
+        "operationId": "reset_feeds_reset_feeds_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetFeedsResponse"
                 }
               }
             }
@@ -115,10 +137,121 @@
           }
         }
       }
+    },
+    "/chat": {
+      "post": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Reader assistant",
+        "description": "Answers reader questions about India Verified using read-only, whitelisted lookups over published news data. Always returns HTTP 200 so the website can degrade gracefully; failures come back as a fixed fallback sentence.",
+        "operationId": "chat_chat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid worker token"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ChatRequest": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 800,
+            "minLength": 1,
+            "title": "Message"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ChatTurn"
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "History"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ChatRequest"
+      },
+      "ChatResponse": {
+        "properties": {
+          "reply": {
+            "type": "string",
+            "title": "Reply",
+            "description": "The assistant's answer, or the fixed fallback sentence"
+          },
+          "degraded": {
+            "type": "boolean",
+            "title": "Degraded",
+            "description": "True when the model chain was unavailable",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply"
+        ],
+        "title": "ChatResponse"
+      },
+      "ChatTurn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 800,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatTurn"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -140,6 +273,12 @@
             "description": "Always 'ok' when the service is running",
             "default": "ok"
           },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "description": "Worker version (matches the deployed build)",
+            "default": "1.2.0"
+          },
           "timestamp": {
             "type": "string",
             "title": "Timestamp",
@@ -152,6 +291,33 @@
         ],
         "title": "HealthResponse",
         "description": "Response from the /health endpoint."
+      },
+      "ResetFeedsResponse": {
+        "properties": {
+          "unparked": {
+            "type": "integer",
+            "title": "Unparked",
+            "description": "Number of feeds that were unparked"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable status message"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp",
+            "description": "ISO 8601 timestamp of the reset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unparked",
+          "message",
+          "timestamp"
+        ],
+        "title": "ResetFeedsResponse",
+        "description": "Response from the /reset-feeds endpoint."
       },
       "StatusResponse": {
         "properties": {
@@ -178,6 +344,30 @@
             "title": "Pipeline Healthy",
             "description": "True if the pipeline ran within the last 45 minutes",
             "default": false
+          },
+          "last_cleanup_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Cleanup At",
+            "description": "ISO 8601 timestamp of the last successful cleanup/archival run"
+          },
+          "cleanup_healthy": {
+            "type": "boolean",
+            "title": "Cleanup Healthy",
+            "description": "True if cleanup ran within the last 12 hours",
+            "default": false
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "description": "Worker version (matches the deployed build)",
+            "default": "1.2.0"
           },
           "checked_at": {
             "type": "string",
@@ -261,13 +451,6 @@
           "type": {
             "type": "string",
             "title": "Error Type"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "type": "object",
-            "title": "Context"
           }
         },
         "type": "object",

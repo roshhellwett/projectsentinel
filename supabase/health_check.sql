@@ -308,6 +308,19 @@ activity_check AS (
              THEN 'persisted (worker is alive)'
              ELSE 'no row yet — first run of the UTC day may be pending'
         END AS detail
+    UNION ALL
+    SELECT
+        'cleanup ran < 12h ago' AS check_name,
+        CASE WHEN (
+            SELECT MAX(completed_at) FROM pipeline_runs WHERE mode = 'cleanup'
+        ) > NOW() - INTERVAL '12 hours' THEN 'OK' ELSE 'FAIL' END AS status,
+        COALESCE(
+            'last cleanup: ' || to_char(
+                (SELECT MAX(completed_at) FROM pipeline_runs WHERE mode = 'cleanup'),
+                'YYYY-MM-DD HH24:MI:SS UTC'
+            ),
+            'NO CLEANUP RECORDED — storage will grow unbounded'
+        ) AS detail
 ),
 
 storage_check AS (
@@ -324,10 +337,10 @@ storage_check AS (
             SELECT EXTRACT(DAY FROM NOW() - MIN(published_at)) FROM posts
         ) IS NULL OR (
             SELECT EXTRACT(DAY FROM NOW() - MIN(published_at)) FROM posts
-        ) < 200 THEN 'OK' ELSE 'WARN' END AS status,
+        ) < 62 THEN 'OK' ELSE 'WARN' END AS status,
         COALESCE(
             (SELECT EXTRACT(DAY FROM NOW() - MIN(published_at))::int FROM posts)::text
-                || ' days (archiver deletes >180d every Monday)',
+                || ' days (posts > 60d are deleted by the cleanup guard)',
             'no posts yet'
         ) AS detail
 )

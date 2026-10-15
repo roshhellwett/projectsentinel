@@ -15,13 +15,11 @@ from datetime import UTC, datetime
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
 
-from scheduler.jobs import run_pipeline
+from scheduler.jobs import is_pipeline_running, run_pipeline
 
 router = APIRouter()
 
 ADMIN_SECRET_TOKEN = os.getenv("ADMIN_SECRET_TOKEN", "")
-_pipeline_running = threading.Event()
-_pipeline_lock = threading.Lock()
 
 
 class TriggerResponse(BaseModel):
@@ -62,12 +60,10 @@ async def trigger_pipeline(
     if x_admin_token != ADMIN_SECRET_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid admin token")
 
-    with _pipeline_lock:
-        if _pipeline_running.is_set():
-            return TriggerResponse(
-                success=False, message="Pipeline is already running", timestamp=datetime.now(UTC).isoformat()
-            )
-        _pipeline_running.set()
+    if is_pipeline_running():
+        return TriggerResponse(
+            success=False, message="Pipeline is already running", timestamp=datetime.now(UTC).isoformat()
+        )
 
     kwargs = {}
     if request:
@@ -76,18 +72,8 @@ async def trigger_pipeline(
         if request.archive_only:
             kwargs["archive_only"] = True
 
-    def _run_guarded(**kw):
-        try:
-            run_pipeline(**kw)
-        finally:
-            _pipeline_running.clear()
-
-    try:
-        thread = threading.Thread(target=_run_guarded, kwargs=kwargs, daemon=True)
-        thread.start()
-    except Exception:
-        _pipeline_running.clear()
-        raise
+    thread = threading.Thread(target=run_pipeline, kwargs=kwargs, daemon=True)
+    thread.start()
 
     return TriggerResponse(
         success=True, message="Pipeline triggered successfully", timestamp=datetime.now(UTC).isoformat()

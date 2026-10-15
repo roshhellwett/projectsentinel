@@ -8,6 +8,18 @@
 # </ai_system_instruction>
 
 
+"""Deletes stale rows so the database stays inside Supabase's free-tier 500MB cap.
+
+Retention windows:
+- posts: 60 days (user-facing news archive — "2 months")
+- raw_articles: 14 days (dedup queue)
+- discarded_articles: 7 days (observability log)
+- pipeline_runs: 3 days (run history)
+
+Deletes are batched (id-paged, oldest first) so a single statement can never time
+out on a large backlog — every batch removes at most BATCH_SIZE rows.
+"""
+
 from datetime import UTC, datetime, timedelta
 
 from database.client import get_supabase
@@ -15,87 +27,138 @@ from logger.pipeline_logger import PipelineLogger
 
 
 class OldPostArchiver:
-    def __init__(self):
-        self.logger = PipelineLogger()
-        self.supabase = None
-        self._init_supabase()
 
-    def _init_supabase(self):
-
-        self.supabase = get_supabase()
-
-    # ── Retention defaults (aggressive to stay within free tier) ──
-    POSTS_RETENTION_DAYS = 90
+    POSTS_RETENTION_DAYS = 60
     RAW_ARTICLES_RETENTION_DAYS = 14
     DISCARDED_RETENTION_DAYS = 7
     PIPELINE_RUNS_RETENTION_DAYS = 3
-    TELEGRAM_DELIVERIES_RETENTION_DAYS = 60
 
-    def delete_old_posts(self, days: int | None = None) -> int:
+    BATCH_SIZE = 500
+    MAX_BATCHES_PER_TABLE = 20
 
+    def __init__(self):
+        self.logger = PipelineLogger()
+        self.supabase = get_supabase()
         if not self.supabase:
-            self.logger.log("ARCHIVER_ERROR", "Supabase not initialized")
-            return 0
-
-        days = days or self.POSTS_RETENTION_DAYS
-        try:
-            cutoff_date = (datetime.now(UTC) - timedelta(days=days)).isoformat()
-            delete_result = self.supabase.table("posts").delete().lt("published_at", cutoff_date).execute()
-            deleted = len(delete_result.data) if delete_result.data else 0
-            if deleted == 0:
-                self.logger.log("ARCHIVER", "No old posts to delete")
-            else:
-                self.logger.log("ARCHIVER", f"Deleted {deleted} posts older than {days} days")
-            return deleted
-
-        except Exception as e:
-            self.logger.log("ARCHIVER_ERROR", f"Failed to delete old posts: {str(e)}")
-            return 0
-
-    def cleanup_discarded_articles(self, days: int | None = None) -> int:
-
-        return self._delete_old_rows("discarded_articles", "discarded_at", days or self.DISCARDED_RETENTION_DAYS)
-
-    def cleanup_raw_articles(self, days: int | None = None) -> int:
-
-        return self._delete_old_rows("raw_articles", "fetched_at", days or self.RAW_ARTICLES_RETENTION_DAYS)
-
-    def cleanup_pipeline_runs(self, days: int | None = None) -> int:
-
-        return self._delete_old_rows("pipeline_runs", "started_at", days or self.PIPELINE_RUNS_RETENTION_DAYS)
-
-    def cleanup_telegram_deliveries(self, days: int | None = None) -> int:
-
-        return self._delete_old_rows("telegram_deliveries", "sent_at", days or self.TELEGRAM_DELIVERIES_RETENTION_DAYS)
+            self.logger.log("ARCHIVER_ERROR", "Supabase not initialized - archiving disabled")
 
     def cleanup_all(self) -> dict[str, int]:
+        """Run every cleanup task and return per-table deleted row counts."""
 
         results: dict[str, int] = {}
-        for method, name in [
-            (self.delete_old_posts, "posts_deleted"),
-            (self.cleanup_discarded_articles, "discarded_articles_deleted"),
-            (self.cleanup_raw_articles, "raw_articles_deleted"),
-            (self.cleanup_pipeline_runs, "pipeline_runs_deleted"),
-            (self.cleanup_telegram_deliveries, "telegram_deliveries_deleted"),
-        ]:
+        tasks = (
+            ("posts_deleted", "posts", self.delete_old_posts),
+            ("discarded_articles_deleted", "discarded_articles", self.cleanup_discarded_articles),
+            ("raw_articles_deleted", "raw_articles", self.cleanup_raw_articles),
+            ("pipeline_runs_deleted", "pipeline_runs", self.cleanup_pipeline_runs),
+        )
+        errors = 0
+        for result_key, label, task in tasks:
             try:
-                results[name] = method()
-            except Exception as e:
-                self.logger.log("ARCHIVER_ERROR", f"{name} failed: {str(e)}")
-                results[name] = -1
+                results[result_key] = task()
+            except Exception as exc:
+                errors += 1
+                self.logger.log("ARCHIVER_ERROR", f"cleanup failed for {label}: {str(exc)[:160]}")
+                results[result_key] = -1
+
+        results["errors"] = errors
         return results
 
-    def _delete_old_rows(self, table: str, date_column: str, days: int) -> int:
+    def delete_old_posts(self, days: int | None = None, max_batches: int | None = None) -> int:
+        """Delete posts older than the retention window (default 60 days)."""
+
+        return self._delete_old_batched(
+            "posts", "published_at", days or self.POSTS_RETENTION_DAYS, "posts", max_batches
+        )
+
+    def cleanup_discarded_articles(self, days: int | None = None, max_batches: int | None = None) -> int:
+        """Delete discarded-article log rows older than the retention window."""
+
+        return self._delete_old_batched(
+            "discarded_articles",
+            "discarded_at",
+            days or self.DISCARDED_RETENTION_DAYS,
+            "discarded_articles",
+            max_batches,
+        )
+
+    def cleanup_raw_articles(self, days: int | None = None, max_batches: int | None = None) -> int:
+        """Delete raw dedup-queue rows older than the retention window."""
+
+        return self._delete_old_batched(
+            "raw_articles", "fetched_at", days or self.RAW_ARTICLES_RETENTION_DAYS, "raw_articles", max_batches
+        )
+
+    def cleanup_pipeline_runs(self, days: int | None = None, max_batches: int | None = None) -> int:
+        """Delete pipeline-run history rows older than the retention window."""
+
+        return self._delete_old_batched(
+            "pipeline_runs",
+            "started_at",
+            days or self.PIPELINE_RUNS_RETENTION_DAYS,
+            "pipeline_runs",
+            max_batches,
+        )
+
+    def _delete_old_batched(
+        self,
+        table: str,
+        date_column: str,
+        days: int,
+        label: str,
+        max_batches: int | None = None,
+    ) -> int:
+        """Delete rows older than `days` in id-paged batches, oldest first.
+
+        Returns the number of deleted rows, or -1 when the scan itself failed.
+        """
+
         if not self.supabase:
-            self.logger.log("ARCHIVER_ERROR", "Supabase not initialized")
             return 0
 
-        try:
-            cutoff_date = (datetime.now(UTC) - timedelta(days=days)).isoformat()
-            delete_result = self.supabase.table(table).delete().lt(date_column, cutoff_date).execute()
-            deleted = len(delete_result.data) if delete_result.data else 0
-            self.logger.log("ARCHIVER", f"Deleted {deleted} {table} rows older than {days} days")
-            return deleted
-        except Exception as e:
-            self.logger.log("ARCHIVER_ERROR", f"Failed to clean {table}: {str(e)}")
-            return 0
+        batch_cap = max_batches or self.MAX_BATCHES_PER_TABLE
+        cutoff = (datetime.now(UTC) - timedelta(days=days)).isoformat()
+        deleted_total = 0
+        batches = 0
+
+        while batches < batch_cap:
+            try:
+                res = (
+                    self.supabase.table(table)
+                    .select("id")
+                    .lt(date_column, cutoff)
+                    .order(date_column)
+                    .limit(self.BATCH_SIZE)
+                    .execute()
+                )
+                rows = res.data or []
+                ids = [row.get("id") for row in rows if row.get("id")]
+            except Exception as exc:
+                self.logger.log("ARCHIVER_ERROR", f"scan {table} failed: {str(exc)[:160]}")
+                return -1 if deleted_total == 0 else deleted_total
+
+            if not ids:
+                break
+
+            try:
+                del_res = self.supabase.table(table).delete().in_("id", ids).execute()
+                deleted = len(del_res.data) if del_res.data else len(ids)
+            except Exception as exc:
+                self.logger.log(
+                    "ARCHIVER_ERROR", f"delete batch on {table} failed ({len(ids)} rows): {str(exc)[:160]}"
+                )
+                return deleted_total
+
+            deleted_total += deleted
+            batches += 1
+
+            if len(ids) < self.BATCH_SIZE:
+                break
+
+        if deleted_total:
+            suffix = " (batch cap reached, continues next run)" if batches >= batch_cap else ""
+            self.logger.log(
+                "ARCHIVER",
+                f"Deleted {deleted_total} {label} row(s) older than {days}d in {batches} batch(es){suffix}",
+            )
+        return deleted_total
