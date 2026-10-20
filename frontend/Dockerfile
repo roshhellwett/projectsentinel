@@ -1,9 +1,9 @@
-FROM node:20-alpine AS base
+FROM node:20.19.1-alpine AS base
 
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci --include=dev
 
 FROM base AS builder
 WORKDIR /app

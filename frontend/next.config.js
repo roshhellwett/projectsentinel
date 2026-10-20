@@ -48,6 +48,7 @@ const nextConfig = {
   // Performance & Build Optimization
   // ─────────────────────────────────────────────────────────────────────
   trailingSlash: false,
+  output: 'standalone',
   poweredByHeader: false,
   compress: true,
   reactStrictMode: true,
@@ -184,4 +185,3 @@ const sentryOptions = {
 };
 
 module.exports = withSentryConfig(withBundleAnalyzer(nextConfig), sentryOptions);
-
