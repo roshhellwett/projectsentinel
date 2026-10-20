@@ -12,17 +12,17 @@ export function MastheadClient({ avgScore, verifiedToday }: { avgScore: number |
   return (
     <section aria-label="Today's edition">
       <div className="edition-meta">
-        <span className="edition-meta__live">The daily perspective</span>
+         <span className="edition-meta__live">India&apos;s daily signal</span>
         <span className="hidden md:inline">Independent by design. Open by default.</span>
         <LiveClock variant="hero" />
       </div>
       <div className="editorial-masthead">
         <div className="animate-slide-up">
-          <p className="editorial-kicker">A little less noise. A lot more clarity.</p>
-          <h1>Know the story.<br />See the <em>whole picture.</em></h1>
-          <p className="editorial-masthead__description">
-            India, in perspective. Concise stories, compared across sources—with the context and credibility to make up your own mind.
-          </p>
+           <p className="editorial-kicker">A little less noise. A lot more clarity.</p>
+           <h1>Read India with <em>clarity.</em></h1>
+           <p className="editorial-masthead__description">
+             Fast, source-linked briefings for the first scroll of your day, the lunch-break catch-up, and the decisions that follow.
+           </p>
           <div className="editorial-masthead__actions">
             <Link href="#latest" className="editorial-button">Read the latest <ArrowDown size={15} aria-hidden="true" /></Link>
             <Link href="/how-it-works" className="editorial-link">Our verification process <ArrowUpRight size={15} aria-hidden="true" /></Link>

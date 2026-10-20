@@ -115,7 +115,7 @@ export function TrendingSection({ posts }: TrendingSectionProps) {
     <section aria-label={t("trending.title")} className="mb-fluid-lg">
       <div className="section-header-premium">
         <div>
-          <span className="section-header-premium__mark">02 / Worth a closer look</span>
+          <span className="section-header-premium__mark">03 / Worth a closer look</span>
           <h2 className="font-display font-bold text-ink min-w-0 truncate">
             {t("trending.title")}
           </h2>

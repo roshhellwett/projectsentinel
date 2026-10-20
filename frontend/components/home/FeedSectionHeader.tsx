@@ -7,7 +7,7 @@ export function FeedSectionHeader() {
   return (
     <div className="section-header-premium">
       <div>
-        <span className="section-header-premium__mark">03 / Keep exploring</span>
+        <span className="section-header-premium__mark">04 / Keep exploring</span>
         <h2 className="font-display font-bold text-ink">
           {t("feed.your_feed")}
         </h2>

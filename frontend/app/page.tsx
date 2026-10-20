@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { fetchLatestPost, fetchPostsCursor } from "@/lib/supabase/server";
+import { fetchPostsCursor } from "@/lib/supabase/server";
 import { HeroCard } from "@/components/news/HeroCard";
 import { TrendingSection } from "@/components/news/TrendingSection";
 import { InfiniteFeed, FeedSkeleton } from "@/components/news/InfiniteFeed";
@@ -11,6 +11,7 @@ import { FeedSectionHeader } from "@/components/home/FeedSectionHeader";
 import { TopicIndex } from "@/components/layout/TopicIndex";
 import { Reveal } from "@/components/layout/Reveal";
 import { TopicGallery } from "@/components/home/TopicGallery";
+import { BusinessBrief } from "@/components/home/BusinessBrief";
 import { EditorialIllustration } from "@/components/visual/EditorialIllustration";
 import { websiteJsonLd, organizationJsonLd, jsonLdToString } from "@/lib/utils/structuredData";
 import { dedupe } from "@/lib/utils/dedupe";
@@ -27,15 +28,18 @@ async function MastheadSection() {
 }
 
 async function NewsroomSection() {
-  const [hero, result] = await Promise.all([fetchLatestPost(), fetchPostsCursor(undefined, 24)]);
+  const result = await fetchPostsCursor(undefined, 50);
   const posts = dedupe(result.posts);
+  const hero = posts[0] ?? null;
   const briefing = posts.filter(post => post.id !== hero?.id).slice(0, 3);
   const leadIds = new Set([...(hero ? [hero.id] : []), ...briefing.map(post => post.id)]);
-  const trending = posts.filter(post => !leadIds.has(post.id)).map(post => {
+  const business = posts.filter(post => post.category === "business" && !leadIds.has(post.id)).slice(0, 4);
+  const businessIds = new Set(business.map(post => post.id));
+  const trending = posts.filter(post => !leadIds.has(post.id) && !businessIds.has(post.id)).map(post => {
     const ageHours = (Date.now() - new Date(post.published_at).getTime()) / 3_600_000;
     return { post, rank: post.credibility_score * 0.6 + Math.max(0, 1 - ageHours / 12) * 40 };
   }).sort((a, b) => b.rank - a.rank).slice(0, 6).map(item => item.post);
-  const excludeIds = [...leadIds, ...trending.map(post => post.id)];
+  const excludeIds = [...leadIds, ...business.map(post => post.id), ...trending.map(post => post.id)];
   const excluded = new Set(excludeIds);
   const feed = posts.filter(post => !excluded.has(post.id));
 
@@ -55,7 +59,14 @@ async function NewsroomSection() {
           </section>
         </Reveal>
       )}
+      <Reveal><BusinessBrief posts={business} /></Reveal>
       {trending.length > 0 && <Reveal className="mt-4"><TrendingSection posts={trending} /></Reveal>}
+      <Reveal>
+        <section id={!hero ? "latest" : "your-feed"} aria-label="Latest verified news">
+        <FeedSectionHeader />
+        <InfiniteFeed initialPosts={feed} hasInitialMore={result.hasMore} excludeIds={excludeIds} />
+        </section>
+      </Reveal>
       <Reveal><TopicGallery /></Reveal>
       <Reveal>
         <section className="method-note" aria-label="Our approach">
@@ -65,10 +76,6 @@ async function NewsroomSection() {
           <Link href="/how-it-works" className="editorial-link">See how it works <ArrowUpRight size={16} aria-hidden="true" /></Link>
         </section>
       </Reveal>
-      <section id={!hero ? "latest" : "your-feed"} aria-label="Latest verified news">
-        <FeedSectionHeader />
-        <InfiniteFeed initialPosts={feed} hasInitialMore={result.hasMore} excludeIds={excludeIds} />
-      </section>
     </>
   );
 }
